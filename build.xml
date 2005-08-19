@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<project name="LazyBones" default="run" basedir=".">
+
+	<property name="tvbrowser.dir" value="/home/henni/devel/svdrp/TV-Browser" />
+	<property name="tvbrowser.lib.dir" value="${tvbrowser.dir}/lib" />
+	<property name="tvbrowser.src.dir" value="${tvbrowser.dir}/src" />
+	<property name="tvbrowser.runtime.dir" value="${tvbrowser.dir}/runtime/tvbrowser" />
+
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="res.dir" value="res" />
+	<property name="nacho" value="nachocalendar-0.22.jar" />
+	<property name="svdrp" value="svdrp.jar" />
+
+
+	<target name="compile">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true">
+			<classpath>
+				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
+				<pathelement location="${lib.dir}/${svdrp}" />
+				<pathelement location="${lib.dir}/${nacho}" />
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<mkdir dir="${classes.dir}/lazybones" />
+		<unjar src="${lib.dir}/${svdrp}" dest="${classes.dir}"/>
+		<unjar src="${lib.dir}/${nacho}" dest="${classes.dir}"/>
+		<copy todir="${classes.dir}/lazybones">
+		      <fileset dir="${res.dir}/images" includes="*.png"/>
+		      <fileset dir="${res.dir}/images" includes="*.gif"/>
+		      <fileset dir="${res.dir}/language" includes="**/*.properties"/>
+        </copy>
+		<jar destfile="${tvbrowser.runtime.dir}/plugins/LazyBones.jar" basedir="${classes.dir}">
+		</jar>
+	</target>
+
+	<target name="run" depends="jar">
+		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
+		</java>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+</project>
