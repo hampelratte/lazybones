@@ -243,7 +243,6 @@ public class LazyBones extends Plugin {
           "Couldn\'t delete timer:")
           + " " + res.getMessage());
     }
-
   }
 
 
@@ -272,12 +271,13 @@ public class LazyBones extends Plugin {
       return;
     }
     int id = ((VDRChannel) o).getId();
+    // TODO use getVDRProgramAt ?
     Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at "
         + Long.toString(millis)));
 
     if (res != null && res.getCode() == 215) {
       List epgList = EPGParser.parse(res.getMessage());
-      /* 
+      /* TODO change to VDRVersion
        * VDR 1.3 already returns the matching entry, 
        * for 1.2 we need to search for a match 
        */

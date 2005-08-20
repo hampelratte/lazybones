@@ -42,7 +42,7 @@ public class VDRChannel implements Serializable {
     public boolean equals(Object o) {
       if(o instanceof VDRChannel) {
         VDRChannel c = (VDRChannel)o;
-        if( c.getId() == this.id && c.getName().equals(this.name) ) {
+        if( c.getId() == getId() && c.getName().equals(getName()) ) {
           return true;
         }
       }
