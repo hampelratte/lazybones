@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.5 2005-08-22 22:08:04 emsker Exp $
+/* $Id: VDRSettingsPanel.java,v 1.6 2005-08-22 22:09:45 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,12 +41,9 @@ import util.ui.ImageUtilities;
 import util.ui.Localizer;
 
 /**
- * TODO integrate timeout and levenshtein
- * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
- * 
  * The root container for the settings tabs
  * 
+ * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
 public class VDRSettingsPanel implements devplugin.SettingsTab {
 
