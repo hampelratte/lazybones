@@ -1,3 +1,32 @@
+/* $Id: DayChooser.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+ * 
+ * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its 
+ *    contributors may be used to endorse or promote products derived from this 
+ *    software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 package lazybones;
 
 import java.awt.GridBagConstraints;
@@ -19,128 +48,130 @@ import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 // TODO beautify this panel
 public class DayChooser extends BrowsePanel implements ActionListener,
-    DateSelectionListener {
+        DateSelectionListener {
 
-  private static final long serialVersionUID = -2936338063641916673L;
+    private static final long serialVersionUID = -2936338063641916673L;
 
-  private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-  .getLocalizerFor(DayChooser.class);
-  
-  private VDRTimer timer;
+    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
+            .getLocalizerFor(DayChooser.class);
 
-  //private Calendar startDate;
+    private VDRTimer timer;
 
-  private JCheckBox monday = new JCheckBox(mLocalizer.msg("monday","Monday"));
+    // private Calendar startDate;
 
-  private JCheckBox tuesday = new JCheckBox(mLocalizer.msg("tuesday","Tuesday"));
+    private JCheckBox monday = new JCheckBox(mLocalizer.msg("monday", "Monday"));
 
-  private JCheckBox wednesday = new JCheckBox(mLocalizer.msg("wednesday","Wednesday"));
+    private JCheckBox tuesday = new JCheckBox(mLocalizer.msg("tuesday",
+            "Tuesday"));
 
-  private JCheckBox thursday = new JCheckBox(mLocalizer.msg("thursday","Thursday"));
+    private JCheckBox wednesday = new JCheckBox(mLocalizer.msg("wednesday",
+            "Wednesday"));
 
-  private JCheckBox friday = new JCheckBox(mLocalizer.msg("friday","Friday"));
+    private JCheckBox thursday = new JCheckBox(mLocalizer.msg("thursday",
+            "Thursday"));
 
-  private JCheckBox saturday = new JCheckBox(mLocalizer.msg("saturday","Saturday"));
+    private JCheckBox friday = new JCheckBox(mLocalizer.msg("friday", "Friday"));
 
-  private JCheckBox sunday = new JCheckBox(mLocalizer.msg("sunday","Sunday"));
+    private JCheckBox saturday = new JCheckBox(mLocalizer.msg("saturday",
+            "Saturday"));
 
-  private DatePanel cal = CalendarFactory.createDatePanel();
+    private JCheckBox sunday = new JCheckBox(mLocalizer.msg("sunday", "Sunday"));
 
+    private DatePanel cal = CalendarFactory.createDatePanel();
 
-  public DayChooser(VDRTimer timer) {
-    this.timer = timer;
+    public DayChooser(VDRTimer timer) {
+        this.timer = timer;
 
-    initGUI();
-  }
-
-
-  private void initGUI() {
-    JPanel days = new JPanel();
-    days.add(monday);
-    days.add(tuesday);
-    days.add(wednesday);
-    days.add(thursday);
-    days.add(friday);
-    days.add(saturday);
-    days.add(sunday);
-
-    this.setLayout(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.weightx = 1.0;
-    gbc.weighty = 1.0;
-    gbc.anchor = GridBagConstraints.WEST;
-    add(days, gbc);
-    
-    gbc.gridx = 0;
-    gbc.gridy = 1;
-    add(cal, gbc);
-
-    monday.addActionListener(this);
-    tuesday.addActionListener(this);
-    wednesday.addActionListener(this);
-    thursday.addActionListener(this);
-    friday.addActionListener(this);
-    saturday.addActionListener(this);
-    sunday.addActionListener(this);
-
-    cal.setSelectionMode(DateSelectionModel.SINGLE_SELECTION);
-    cal.getDateSelectionModel().addDateSelectionListener(this);
-
-    this.setSize(300, 200);
-  }
-
-
-  public void actionPerformed(ActionEvent e) {
-    userInputHappened();
-  }
-
-
-  private void updateTimer() {
-    boolean[] repeatingDays = new boolean[7];
-
-    repeatingDays[0] = monday.isSelected();
-    repeatingDays[1] = tuesday.isSelected();
-    repeatingDays[2] = wednesday.isSelected();
-    repeatingDays[3] = thursday.isSelected();
-    repeatingDays[4] = friday.isSelected();
-    repeatingDays[5] = saturday.isSelected();
-    repeatingDays[6] = sunday.isSelected();
-
-    timer.setRepeatingDays(repeatingDays);
-  }
-
-  public void valueChanged(DateSelectionEvent e) {
-    Object o = cal.getDateSelectionModel().getSelectedDate();
-    if (o != null) {
-      Calendar startDate = GregorianCalendar.getInstance();
-      startDate.setTimeInMillis(cal.getDate().getTime());
-
-      if(timer.isRepeating()) {
-        timer.setFirstTime(startDate);
-        timer.setHasFirstTime(true);
-      } else {
-        Calendar start = timer.getStartTime();
-        start.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
-        start.set(Calendar.MONTH, startDate.get(Calendar.MONTH));
-        start.set(Calendar.DAY_OF_MONTH, startDate.get(Calendar.DAY_OF_MONTH));
-        timer.setStartTime(start);
-        
-        Calendar end = timer.getStartTime();
-        end.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
-        end.set(Calendar.MONTH, startDate.get(Calendar.MONTH));
-        end.set(Calendar.DAY_OF_MONTH, startDate.get(Calendar.DAY_OF_MONTH));
-        timer.setStartTime(end);
-      }
-      
-      userInputHappened();
+        initGUI();
     }
-  }
-  
-  private void userInputHappened() {
-    updateTimer();
-    String dayString = timer.getDayString();
-    super.textfield.setText(dayString);
-  }
+
+    private void initGUI() {
+        JPanel days = new JPanel();
+        days.add(monday);
+        days.add(tuesday);
+        days.add(wednesday);
+        days.add(thursday);
+        days.add(friday);
+        days.add(saturday);
+        days.add(sunday);
+
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(days, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(cal, gbc);
+
+        monday.addActionListener(this);
+        tuesday.addActionListener(this);
+        wednesday.addActionListener(this);
+        thursday.addActionListener(this);
+        friday.addActionListener(this);
+        saturday.addActionListener(this);
+        sunday.addActionListener(this);
+
+        cal.setSelectionMode(DateSelectionModel.SINGLE_SELECTION);
+        cal.getDateSelectionModel().addDateSelectionListener(this);
+
+        this.setSize(300, 200);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        userInputHappened();
+    }
+
+    private void updateTimer() {
+        boolean[] repeatingDays = new boolean[7];
+
+        repeatingDays[0] = monday.isSelected();
+        repeatingDays[1] = tuesday.isSelected();
+        repeatingDays[2] = wednesday.isSelected();
+        repeatingDays[3] = thursday.isSelected();
+        repeatingDays[4] = friday.isSelected();
+        repeatingDays[5] = saturday.isSelected();
+        repeatingDays[6] = sunday.isSelected();
+
+        timer.setRepeatingDays(repeatingDays);
+    }
+
+    public void valueChanged(DateSelectionEvent e) {
+        Object o = cal.getDateSelectionModel().getSelectedDate();
+        if (o != null) {
+            Calendar startDate = GregorianCalendar.getInstance();
+            startDate.setTimeInMillis(cal.getDate().getTime());
+
+            if (timer.isRepeating()) {
+                timer.setFirstTime(startDate);
+                timer.setHasFirstTime(true);
+            } else {
+                Calendar start = timer.getStartTime();
+                start.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
+                start.set(Calendar.MONTH, startDate.get(Calendar.MONTH));
+                start.set(Calendar.DAY_OF_MONTH, startDate
+                        .get(Calendar.DAY_OF_MONTH));
+                timer.setStartTime(start);
+
+                Calendar end = timer.getStartTime();
+                end.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
+                end.set(Calendar.MONTH, startDate.get(Calendar.MONTH));
+                end.set(Calendar.DAY_OF_MONTH, startDate
+                        .get(Calendar.DAY_OF_MONTH));
+                timer.setStartTime(end);
+            }
+
+            userInputHappened();
+        }
+    }
+
+    private void userInputHappened() {
+        updateTimer();
+        String dayString = timer.getDayString();
+        super.textfield.setText(dayString);
+    }
 }
