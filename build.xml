@@ -2,15 +2,9 @@
 
 <project name="LazyBones" default="run" basedir=".">
 
-	<!--
-	Datei /home/henni/ant-Lazybones.properties anlegen mit folgendem Inhalt:
-	tvbrowser.runtime.dir=/home/henni/devel/svdrp/TV-Browser/runtime/tvbrowser
-	danach diesen Kommentar loeschen :)
-	-->
-
-	<property name="userproperties" value="${user.home}/ant-Lazybones.properties"/>
-	<property file="${userproperties}"/>
-	<fail message="Define property 'tvbrowser.runtime.dir' in ${userproperties}} - this should point to directory containing 'tvbrowser.jar' and 'plugins' directory." unless="tvbrowser.runtime.dir" />
+	<property name="build.properties" value="build.properties"/>
+	<property file="${build.properties}"/>
+	<fail message="Define property 'tvbrowser.runtime.dir' in ${build.properties} - this should point to directory containing 'tvbrowser.jar' and 'plugins' directory." unless="tvbrowser.runtime.dir" />
 
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />
