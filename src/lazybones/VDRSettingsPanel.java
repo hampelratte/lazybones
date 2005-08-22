@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.4 2005-08-22 18:31:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -59,7 +59,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 
     private ChannelPanel channelPanel;
 
-    private ConnectionPanel connectionPanel;
+    private GeneralPanel generalPanel;
 
     private PlayerPanel playerPanel;
 
@@ -81,9 +81,9 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane = new JTabbedPane();
             tabbedPane.setPreferredSize(new Dimension(380, 380));
 
-            connectionPanel = new ConnectionPanel(control);
+            generalPanel = new GeneralPanel(control);
             tabbedPane
-                    .addTab(mLocalizer.msg("connection", ""), connectionPanel);
+                    .addTab(mLocalizer.msg("general", ""), generalPanel);
 
             channelPanel = new ChannelPanel(control);
             tabbedPane.addTab(mLocalizer.msg("channels", ""), channelPanel);
@@ -112,7 +112,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
      */
     public void saveSettings() {
         channelPanel.saveSettings();
-        connectionPanel.saveSettings();
+        generalPanel.saveSettings();
         playerPanel.saveSettings();
         timerPanel.saveSettings();
         previewPanel.saveSettings();
