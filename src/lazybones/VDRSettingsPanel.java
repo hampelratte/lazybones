@@ -1,16 +1,10 @@
-/* $Id: VDRSettingsPanel.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
  * 
- * Copyrimport java.awt.BorderLayout;
- import java.awt.Dimension;
-
- import javax.swing.Icon;
- import javax.swing.ImageIcon;
- import javax.swing.JPanel;
- import javax.swing.JTabbedPane;
-
- import util.ui.ImageUtilities;
- import util.ui.Localizer;
- re met:
+ * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.

@@ -1,19 +1,14 @@
-/* $Id: PreviewPanel.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazimport java.awt.Color;
- import java.io.ByteArrayOutputStream;
- import java.io.InputStream;
- import java.net.HttpURLConnection;
- import java.net.URL;
-
- import javax.swing.BorderFactory;
- import javax.swing.ImageIcon;
- import javax.swing.JLabel;
- import javax.swing.JOptionPane;
-
- import de.hampelratte.svdrp.Response;
- import de.hampelratte.svdrp.commands.GRAB;
- edistributions in binary form must reproduce the above copyright notice, 
+ * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
  *    this list of conditions and the following disclaimer in the documentation 
  *    and/or other materials provided with the distribution.
  * 3. Neither the name of the project (Lazy Bones) nor the names of its 
@@ -31,10 +26,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- */
-/*
- * Created on 25.03.2005
- *
  */
 package lazybones;
 

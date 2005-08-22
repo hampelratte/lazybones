@@ -1,13 +1,10 @@
-/* $Id: Player.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: Player.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
  * 
- * Copyrimport java.io.InputStream;
-
- import javax.swing.JOptionPane;
-
- import de.hampelratte.svdrp.Response;
- import de.hampelratte.svdrp.commands.CHAN;
- import devplugin.Program;
- ation, are permitted provided that the following conditions are met:
+ * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.

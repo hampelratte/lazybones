@@ -1,11 +1,9 @@
-/* $Id: Utilities.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: Utilities.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
  * 
- * Copyrimport java.awt.Point;
- import java.awt.Rectangle;
-
- import javax.swing.JTable;
- import javax.swing.JViewport;
- nd use in source and binary forms, with or without
+ * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
  * 1. Redistributions of source code must retain the above copyright notice,

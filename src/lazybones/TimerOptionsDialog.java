@@ -1,23 +1,15 @@
-/* $Id: TimerOptionsDialog.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
  * 
- * Copyrimport java.awt.GridBagConstraints;
- import java.awt.GridBagLayout;
- import java.awt.Insets;
- import java.awt.event.ActionEvent;
- import java.awt.event.ActionListener;
- import java.awt.event.MouseEvent;
- import java.awt.event.MouseListener;
- import java.util.Calendar;
-
- import javax.swing.*;
-
- import tvbrowser.core.ChannelList;
- import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
- import devplugin.Channel;
- import devplugin.Date;
- import devplugin.Plugin;
- import devplugin.Program;
- conditions and the following disclaimer in the documentation 
+ * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
  *    and/or other materials provided with the distribution.
  * 3. Neither the name of the project (Lazy Bones) nor the names of its 
  *    contributors may be used to endorse or promote products derived from this 
