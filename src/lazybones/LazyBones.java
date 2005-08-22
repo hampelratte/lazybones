@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.3 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.4 2005-08-22 21:06:59 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -102,12 +102,6 @@ public class LazyBones extends Plugin {
     private Hashtable vdr2browser = new Hashtable();
 
     private ArrayList notAssigned = new ArrayList();
-
-    /**
-     * Creates the Plugin
-     */
-    public LazyBones() {
-    }
 
     public ActionMenu getContextMenuActions(final Program program) {
         AbstractAction action = new AbstractAction() {
