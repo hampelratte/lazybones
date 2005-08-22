@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.1 2005-08-22 18:31:20 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.2 2005-08-22 22:08:04 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,45 +29,52 @@
  */
 package lazybones;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 import util.ui.Localizer;
 
-public class GeneralPanel extends JPanel {
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+
+public class GeneralPanel {
     private static final long serialVersionUID = 4141920557801647729L;
 
     private static final Localizer mLocalizer = Localizer
             .getLocalizerFor(GeneralPanel.class);
 
-    private LazyBones control;
+	private final String lConn = mLocalizer.msg("connection", "Connection");
 
-    private JLabel lHost = new JLabel(mLocalizer.msg("host", "Host"));
+	private final String lHost = mLocalizer.msg("host", "Host");
+
+	private final String lPort = mLocalizer.msg("port", "Port");
+
+	private final String lTimeout = mLocalizer.msg("timeout", "Timeout");
+
+	private final String lExperts = mLocalizer.msg("experts", "Experts");
+
+	private final String lFuzzyness = mLocalizer.msg("percentageOfEquality",
+			"Percentage of equality");
+
+	private LazyBones control;
 
     private JTextField host;
 
-    private JLabel lPort = new JLabel(mLocalizer.msg("port", "Port"));
-
     private JTextField port;
 
-    private JLabel lTimeout = new JLabel(mLocalizer.msg("timeout", "Timeout"));
-
     private JTextField timeout;
-
-    private JLabel lPercentageOfEquality = new JLabel(mLocalizer.msg(
-            "percentageOfEquality", "Percentage of equality"));
 
     private JSpinner percentageOfEquality;
 
     public GeneralPanel(LazyBones control) {
         this.control = control;
-        initGUI();
+        initComponents();
     }
-
-    private void initGUI() {
+    
+    private void initComponents() {
         host = new JTextField(20);
         host.setText(control.getProperties().getProperty("host"));
         port = new JTextField(20);
@@ -81,74 +88,33 @@ public class GeneralPanel extends JPanel {
         ((JSpinner.DefaultEditor) percentageOfEquality.getEditor())
                 .getTextField().setColumns(2);
         percentageOfEquality.setValue(new Integer(percentageThreshold));
-
-        setLayout(new GridBagLayout());
-
-        JPanel connectionPanel = new JPanel(new GridBagLayout());
-        connectionPanel.setBorder(BorderFactory.createTitledBorder(mLocalizer
-                .msg("connection", "Connection")));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.NONE;
-        connectionPanel.add(lHost, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        connectionPanel.add(host, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        connectionPanel.add(lPort, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        connectionPanel.add(port, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        connectionPanel.add(lTimeout, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        connectionPanel.add(timeout, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(connectionPanel, gbc);
-        
-        JPanel experts = new JPanel(new GridBagLayout());
-        experts.setBorder(BorderFactory.createTitledBorder(mLocalizer
-                .msg("experts", "Experts")));
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints. WEST;
-        gbc.fill = GridBagConstraints.NONE;
-        experts.add(lPercentageOfEquality, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        experts.add(percentageOfEquality, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(experts, gbc);
     }
+
+    JPanel getPanel() {
+		FormLayout layout = new FormLayout("pref, 4dlu, pref",
+				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+		PanelBuilder builder = new PanelBuilder(layout);
+		builder.setDefaultDialogBorder();
+		CellConstraints cc = new CellConstraints();
+
+		builder.addSeparator(lConn,       cc.xyw(1, 1, 3));
+		
+		builder.addLabel(lHost,           cc.xy(1, 3));
+		builder.add(host,                 cc.xy(3, 3));
+		
+		builder.addLabel(lPort,           cc.xy(1, 5));
+		builder.add(port,                 cc.xy(3, 5));
+		
+		builder.addLabel(lTimeout,        cc.xy(1, 7));
+		builder.add(timeout,              cc.xy(3, 7));
+
+		builder.addSeparator(lExperts,    cc.xyw(1, 9, 3));
+		
+		builder.addLabel(lFuzzyness,      cc.xy(1, 11));
+		builder.add(percentageOfEquality, cc.xy(3, 11));
+
+		return builder.getPanel();
+	}
 
     public void saveSettings() {
         String h = host.getText();

@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.4 2005-08-22 18:31:20 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.5 2005-08-22 22:08:04 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -82,8 +82,8 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.setPreferredSize(new Dimension(380, 380));
 
             generalPanel = new GeneralPanel(control);
-            tabbedPane
-                    .addTab(mLocalizer.msg("general", ""), generalPanel);
+            tabbedPane.addTab(mLocalizer.msg("general", ""), generalPanel
+					.getPanel());
 
             channelPanel = new ChannelPanel(control);
             tabbedPane.addTab(mLocalizer.msg("channels", ""), channelPanel);
