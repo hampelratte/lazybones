@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.5 2005-08-23 19:38:49 emsker Exp $
+/* $Id: LazyBones.java,v 1.6 2005-08-23 21:51:36 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,6 +42,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 
@@ -63,6 +64,8 @@ import devplugin.Date;
  * 
  */
 public class LazyBones extends Plugin {
+
+	public static final Logger LOG = Logger.getLogger(LazyBones.class.getName());
 
     /** Translator */
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
@@ -262,7 +265,7 @@ public class LazyBones extends Plugin {
         cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
         cal.set(Calendar.MINUTE, prog.getMinutes());
         cal.add(Calendar.MINUTE, prog.getLength() / 2);
-        long millis = cal.getTimeInMillis() / 1000;
+        long millis = cal.getTimeInMillis();
 
         Object o = channelMapping.get(prog.getChannel().getId());
         if (o == null) {
@@ -274,7 +277,7 @@ public class LazyBones extends Plugin {
         int id = ((VDRChannel) o).getId();
         // TODO use getVDRProgramAt ?
         Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at "
-                + Long.toString(millis)));
+                + Long.toString(millis / 1000)));
 
         if (res != null && res.getCode() == 215) {
             List epgList = EPGParser.parse(res.getMessage());
@@ -284,8 +287,11 @@ public class LazyBones extends Plugin {
              */
             VDRVersion version = Connection.getVersion();
             int minor = version.getMinor();
-            EPGEntry vdrEPG = minor < 3 ? (EPGEntry) epgList.get(0)
-                    : filterEPGDate(epgList, ((VDRChannel) o).getName(), millis);
+            boolean isOlderThan1_3 = version.getMajor() < 1
+					|| (version.getMajor() == 1 && version.getMinor() < 3);
+			EPGEntry vdrEPG = isOlderThan1_3 ? filterEPGDate(epgList,
+					((VDRChannel) o).getName(), millis) : (EPGEntry) epgList
+					.get(0);
 
             VDRTimer timer = new VDRTimer();
             timer.setChannel(id);
@@ -736,11 +742,14 @@ public class LazyBones extends Plugin {
         vdrtimers = new ArrayList();
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
+        	LOG.info("Timer retrieved from VDR");
             String timers = res.getMessage();
             vdrtimers = TimerParser.parse(timers);
         } else if (res != null && res.getCode() == 550) {
+        	LOG.info("No timer defined in VDR");
             // no timers are defined, do nothing
         } else { // something went wrong, we have no timers -> load the
+        	LOG.info("Error/no timer retrieved from VDR - using stored timer");
             // stored ones
             vdrtimers = storedTimers;
             JOptionPane.showMessageDialog(null, mLocalizer.msg(
@@ -772,7 +781,7 @@ public class LazyBones extends Plugin {
                 // timer
                 String mesg = mLocalizer.msg("no_channel_defined",
                         "No channel defined", timer.toNEWT());
-                JOptionPane.showMessageDialog(null, mesg);
+                JOptionPane.showMessageDialog(getParent(), mesg);
                 // notAssigned.add(timer);
                 return;
             }
