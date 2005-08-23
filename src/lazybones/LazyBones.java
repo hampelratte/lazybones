@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.4 2005-08-22 21:06:59 emsker Exp $
+/* $Id: LazyBones.java,v 1.5 2005-08-23 19:38:49 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -267,8 +267,7 @@ public class LazyBones extends Plugin {
         Object o = channelMapping.get(prog.getChannel().getId());
         if (o == null) {
             String mesg = mLocalizer.msg("no_channel_defined",
-                    "No channel defined");
-            mesg = mesg.replaceAll("%timer%", prog.toString());
+                    "No channel defined", prog.toString());
             JOptionPane.showMessageDialog(getParent(), mesg);
             return;
         }
@@ -772,8 +771,7 @@ public class LazyBones extends Plugin {
                 // next
                 // timer
                 String mesg = mLocalizer.msg("no_channel_defined",
-                        "No channel defined");
-                mesg = mesg.replaceAll("%timer%", timer.toNEWT());
+                        "No channel defined", timer.toNEWT());
                 JOptionPane.showMessageDialog(null, mesg);
                 // notAssigned.add(timer);
                 return;
