@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.2 2005-08-22 22:08:04 emsker Exp $
+/* $Id: GeneralPanel.java,v 1.3 2005-08-23 13:53:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -75,11 +75,11 @@ public class GeneralPanel {
     }
     
     private void initComponents() {
-        host = new JTextField(20);
+        host = new JTextField(10);
         host.setText(control.getProperties().getProperty("host"));
-        port = new JTextField(20);
+        port = new JTextField(10);
         port.setText(control.getProperties().getProperty("port"));
-        timeout = new JTextField(20);
+        timeout = new JTextField(10);
         timeout.setText(control.getProperties().getProperty("timeout"));
 
         int percentageThreshold = Integer.parseInt(control.getProperties().getProperty(
