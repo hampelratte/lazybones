@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.8 2005-08-25 15:02:16 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.9 2005-08-25 21:21:53 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -746,11 +746,10 @@ public class LazyBones extends Plugin {
                 vdr2browser.remove(key);
             }
         }
-
-        for (Iterator iter = storedTimers.iterator(); iter.hasNext();) {
+        for (ListIterator iter = storedTimers.listIterator(); iter.hasNext();) {
             VDRTimer timer = (VDRTimer) iter.next();
             if (timer.getEndTime().before(today)) {
-                storedTimers.remove(timer);
+            	iter.remove();
             }
         }
     }
