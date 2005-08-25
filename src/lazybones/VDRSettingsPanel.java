@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.6 2005-08-22 22:09:45 emsker Exp $
+/* $Id: VDRSettingsPanel.java,v 1.7 2005-08-25 21:57:21 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -86,10 +86,12 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.addTab(mLocalizer.msg("channels", ""), channelPanel);
 
             playerPanel = new PlayerPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("player", ""), playerPanel);
+            tabbedPane.addTab(mLocalizer.msg("player", ""), playerPanel
+					.getPanel());
 
             timerPanel = new TimerPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("timer", ""), timerPanel);
+            tabbedPane.addTab(mLocalizer.msg("timer", ""), timerPanel
+					.getPanel());
 
             previewPanel = new PreviewSettingsPanel(control);
             tabbedPane

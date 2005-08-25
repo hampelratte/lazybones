@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.4 2005-08-25 21:57:21 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,17 +29,16 @@
  */
 package lazybones;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 import util.ui.Localizer;
 
-public class TimerPanel extends JPanel {
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+
+public class TimerPanel {
     private static final long serialVersionUID = 4866079997638571269L;
 
     private static final Localizer mLocalizer = Localizer
@@ -47,22 +46,22 @@ public class TimerPanel extends JPanel {
 
     private LazyBones control;
 
-    private JLabel lBefore = new JLabel(mLocalizer.msg("before",
-            "Time buffer before program"));
+    private final String lBefore = mLocalizer.msg("before",
+            "Time buffer before program");
 
     private JSpinner before;
 
-    private JLabel lAfter = new JLabel(mLocalizer.msg("after",
-            "Time buffer after program"));
+    private final String lAfter = mLocalizer.msg("after",
+            "Time buffer after program");
 
     private JSpinner after;
 
     public TimerPanel(LazyBones control) {
         this.control = control;
-        initGUI();
+        initComponents();
     }
-
-    private void initGUI() {
+    
+    private void initComponents() {
         int int_before = Integer.parseInt(control.getProperties().getProperty(
                 "timer.before"));
         int int_after = Integer.parseInt(control.getProperties().getProperty(
@@ -75,37 +74,22 @@ public class TimerPanel extends JPanel {
         ((JSpinner.DefaultEditor) after.getEditor()).getTextField().setColumns(
                 2);
         after.setValue(new Integer(int_after));
+    }
 
-        setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(lBefore, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(before, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(lAfter, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(after, gbc);
-
+    JPanel getPanel() {
+		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
+			"pref, 2dlu, pref");
+		PanelBuilder builder = new PanelBuilder(layout);
+		builder.setDefaultDialogBorder();
+		CellConstraints cc = new CellConstraints();
+		
+		builder.addLabel(lBefore, cc.xy (1,  1));
+		builder.add(before,       cc.xy (3,  1));
+		
+		builder.addLabel(lAfter,  cc.xy (1,  3));
+		builder.add(after,        cc.xy (3,  3));
+	
+		return builder.getPanel();
     }
 
     public void saveSettings() {

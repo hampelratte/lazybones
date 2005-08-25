@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: PlayerPanel.java,v 1.4 2005-08-25 21:57:21 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,18 +29,17 @@
  */
 package lazybones;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import util.ui.Localizer;
 
-public class PlayerPanel extends JPanel {
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+
+public class PlayerPanel {
     private static final long serialVersionUID = 151916691928714906L;
 
     private static final Localizer mLocalizer = Localizer
@@ -48,11 +47,11 @@ public class PlayerPanel extends JPanel {
 
     private LazyBones control;
 
-    private JLabel lPlayer = new JLabel(mLocalizer.msg("player", "Player"));
+    private final String lPlayer = mLocalizer.msg("player", "Player");
 
     private JTextField player;
 
-    private JLabel lParams = new JLabel(mLocalizer.msg("params", "Parameters"));
+    private final String lParams = mLocalizer.msg("params", "Parameters");
 
     private JTextField params;
 
@@ -61,53 +60,34 @@ public class PlayerPanel extends JPanel {
 
     public PlayerPanel(LazyBones control) {
         this.control = control;
-        initGUI();
+        initComponents();
     }
-
-    private void initGUI() {
+    
+    private void initComponents() {
         player = new JTextField(20);
         player.setText(control.getProperties().getProperty("player"));
         params = new JTextField(20);
         params.setText(control.getProperties().getProperty("player_params"));
         switchBefore.setSelected(new Boolean(control.getProperties()
                 .getProperty("switchBefore")).booleanValue());
+    }
 
-        setLayout(new GridBagLayout());
+    JPanel getPanel() {
+		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
+			"pref, 2dlu, pref, 2dlu, pref");
+		PanelBuilder builder = new PanelBuilder(layout);
+		builder.setDefaultDialogBorder();
+		CellConstraints cc = new CellConstraints();
+		
+		builder.addLabel(lPlayer, cc.xy (1,  1));
+		builder.add(player,       cc.xy (3,  1));
+		
+		builder.addLabel(lParams, cc.xy (1,  3));
+		builder.add(params,       cc.xy (3,  3));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+		builder.add(switchBefore, cc.xy (3,  5));
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(lPlayer, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(player, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(lParams, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(params, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 1;
-        add(switchBefore, gbc);
-
+		return builder.getPanel();
     }
 
     public void saveSettings() {
