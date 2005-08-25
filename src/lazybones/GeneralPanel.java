@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.3 2005-08-23 13:53:24 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.4 2005-08-25 21:36:46 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -91,27 +91,27 @@ public class GeneralPanel {
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("pref, 4dlu, pref",
+		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
 				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 
-		builder.addSeparator(lConn,       cc.xyw(1, 1, 3));
+		builder.addSeparator(lConn,       cc.xyw(1,  1, 4));
 		
-		builder.addLabel(lHost,           cc.xy(1, 3));
-		builder.add(host,                 cc.xy(3, 3));
+		builder.addLabel(lHost,           cc.xy (1,  3));
+		builder.add(host,                 cc.xy (3,  3));
 		
-		builder.addLabel(lPort,           cc.xy(1, 5));
-		builder.add(port,                 cc.xy(3, 5));
+		builder.addLabel(lPort,           cc.xy (1,  5));
+		builder.add(port,                 cc.xy (3,  5));
 		
-		builder.addLabel(lTimeout,        cc.xy(1, 7));
-		builder.add(timeout,              cc.xy(3, 7));
+		builder.addLabel(lTimeout,        cc.xy (1,  7));
+		builder.add(timeout,              cc.xy (3,  7));
 
-		builder.addSeparator(lExperts,    cc.xyw(1, 9, 3));
+		builder.addSeparator(lExperts,    cc.xyw(1,  9, 4));
 		
-		builder.addLabel(lFuzzyness,      cc.xy(1, 11));
-		builder.add(percentageOfEquality, cc.xy(3, 11));
+		builder.addLabel(lFuzzyness,      cc.xy (1, 11));
+		builder.add(percentageOfEquality, cc.xy (3, 11));
 
 		return builder.getPanel();
 	}
