@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.7 2005-08-25 12:25:20 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.8 2005-08-25 15:02:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -65,7 +65,8 @@ import devplugin.Date;
  */
 public class LazyBones extends Plugin {
 
-	public static final Logger LOG = Logger.getLogger(LazyBones.class.getName());
+    public static final Logger LOG = Logger
+            .getLogger(LazyBones.class.getName());
 
     /** Translator */
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
@@ -290,10 +291,10 @@ public class LazyBones extends Plugin {
              */
             VDRVersion version = Connection.getVersion();
             boolean isOlderThan1_3 = version.getMajor() < 1
-					|| (version.getMajor() == 1 && version.getMinor() < 3);
-			EPGEntry vdrEPG = isOlderThan1_3 ? filterEPGDate(epgList,
-					((VDRChannel) o).getName(), millis) : (EPGEntry) epgList
-					.get(0);
+                    || (version.getMajor() == 1 && version.getMinor() < 3);
+            EPGEntry vdrEPG = isOlderThan1_3 ? filterEPGDate(epgList,
+                    ((VDRChannel) o).getName(), millis) : (EPGEntry) epgList
+                    .get(0);
 
             VDRTimer timer = new VDRTimer();
             timer.setChannel(id);
@@ -330,7 +331,8 @@ public class LazyBones extends Plugin {
                     int percentage = Utilities.percentageOfEquality(prog
                             .getTitle(), timer.getTitle());
                     if (timer.getFile().indexOf("EPISODE") >= 0
-                            || timer.getFile().indexOf("TITLE") >= 0) {
+                            || timer.getFile().indexOf("TITLE") >= 0
+                            || timer.isRepeating()) {
                         percentage = 100;
                     }
                     int threshold = Integer.parseInt(props
@@ -350,7 +352,8 @@ public class LazyBones extends Plugin {
                                     + " " + response.getMessage());
                         }
                     } else {
-                        Program selectedProgram = showTimerConfirmDialog(timer, prog);
+                        Program selectedProgram = showTimerConfirmDialog(timer,
+                                prog);
                         if (selectedProgram != null) {
                             VDRTimer t = ((TimerProgram) selectedProgram)
                                     .getTimer();
@@ -521,13 +524,15 @@ public class LazyBones extends Plugin {
         TimerSelectionDialog dialog = new TimerSelectionDialog(this);
         dialog.showSelectionDialog(programs);
         Program tmp = dialog.getProgram();
-        if(tmp != null) {
-            TimerProgram program = (TimerProgram)tmp;
+        if (tmp != null) {
+            TimerProgram program = (TimerProgram) tmp;
             VDRTimer t = program.getTimer();
             t.setLifetime(timerOptions.getLifetime());
             t.setPriority(timerOptions.getPriority());
             t.setStartTime(timerOptions.getStartTime());
             t.setEndTime(timerOptions.getEndTime());
+            t.setHasFirstTime(timerOptions.hasFirstTime());
+            t.setFirstTime(timerOptions.getFirstTime());
             t.setRepeatingDays(timerOptions.getRepeatingDays());
             return program;
         }
@@ -542,7 +547,6 @@ public class LazyBones extends Plugin {
      *            the timer received from the VDR
      */
     private void showProgramConfirmDialog(VDRTimer timer) {
-        // get all programs 2 hours before and after the given program
         Calendar cal = timer.getStartTime();
 
         Calendar start = GregorianCalendar.getInstance();
@@ -565,6 +569,7 @@ public class LazyBones extends Plugin {
         if (chan == null)
             return;
 
+        // get all programs 2 hours before and after the given program
         HashSet programSet = new HashSet();
         for (int i = 10; i <= 180; i += 10) {
             // get the program before the given one
@@ -760,14 +765,14 @@ public class LazyBones extends Plugin {
         vdrtimers = new ArrayList();
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
-        	LOG.info("Timer retrieved from VDR");
+            LOG.info("Timer retrieved from VDR");
             String timers = res.getMessage();
             vdrtimers = TimerParser.parse(timers);
         } else if (res != null && res.getCode() == 550) {
-        	LOG.info("No timer defined in VDR");
+            LOG.info("No timer defined in VDR");
             // no timers are defined, do nothing
         } else { // something went wrong, we have no timers -> load the
-        	LOG.info("Error/no timer retrieved from VDR - using stored timer");
+            LOG.info("Error/no timer retrieved from VDR - using stored timer");
             // stored ones
             vdrtimers = storedTimers;
             JOptionPane.showMessageDialog(null, mLocalizer.msg(
@@ -794,13 +799,12 @@ public class LazyBones extends Plugin {
             Channel chan = getChannel(timer);
             if (chan == null) {
                 // if we can't find a channel for this timer, continue with the
-                // next
-                // timer
+                // next timer
                 String mesg = mLocalizer.msg("no_channel_defined",
                         "No channel defined", timer.toNEWT());
                 JOptionPane.showMessageDialog(getParent(), mesg);
                 // notAssigned.add(timer);
-                
+
                 // HAMPELRATTE wenn der aufruf von getTimersFromVDR kommt,
                 // darf nicht einfach ein return kommen
                 // deshalb am besten die nicht verfügbaren sender
@@ -809,6 +813,7 @@ public class LazyBones extends Plugin {
             }
 
             if (timer.isRepeating()) {
+                LOG.info("Marking repeating timer");
                 markRepeatingTimer(timer, chan);
             } else {
                 markSingularTimer(timer, chan);
@@ -817,7 +822,10 @@ public class LazyBones extends Plugin {
 
         for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
             VDRTimer element = (VDRTimer) iterator.next();
-            showProgramConfirmDialog(element);
+            //FIXME für repeating timers müssen wir uns noch was überlegen
+            if (!element.isRepeating()) {
+                showProgramConfirmDialog(element);
+            }
         }
     }
 
@@ -834,6 +842,12 @@ public class LazyBones extends Plugin {
                         .getChannelDayProgram(new Date(startDate), chan);
                 if (dayProgram != null) {
                     boolean continue_marking = markSingularTimer(timer, chan);
+                    /* DEBUG */
+                    String date = startDate.get(Calendar.DAY_OF_MONTH) + "."
+                            + (startDate.get(Calendar.MONTH) + 1);
+                    LOG.info("Trying to mark " + chan + " on" + date + ":\""
+                            + timer + "\"");
+                    /* DEBUG end */
                     if (!continue_marking) {
                         break;
                     }
@@ -895,8 +909,8 @@ public class LazyBones extends Plugin {
                 int deltaStart = startTime - timerstart;
                 int deltaEnd = endTime - timerend;
                 // System.out.println(timer.getTitle() + " " + deltaStart + ":"
-                // +
-                // deltaEnd);
+                // + deltaEnd);
+                
                 // collect candidates
                 if (Math.abs(deltaStart) <= 45 && Math.abs(deltaEnd) <= 45) {
                     candidates.put(new Integer(Math.abs(deltaStart)), prog);
@@ -914,11 +928,11 @@ public class LazyBones extends Plugin {
             // System.out.println("kandidaten: " + candidates.size());
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
-                if (!found) {
+                if (found) {
+                    return true;
+                } else {
                     notAssigned.add(timer);
                     return false;
-                } else {
-                    return true;
                 }
             }
 
@@ -931,7 +945,8 @@ public class LazyBones extends Plugin {
                     progMin.getTitle());
 
             if (timer.getFile().indexOf("EPISODE") >= 0
-                    || timer.getFile().indexOf("TITLE") >= 0) {
+                    || timer.getFile().indexOf("TITLE") >= 0
+                    || timer.isRepeating()) {
                 percentage = 100;
             }
 
@@ -947,9 +962,8 @@ public class LazyBones extends Plugin {
             } else {
                 boolean found = lookUpTimer(timer);
                 if (!found) { // we have no mapping
-                    System.out
-                            .println("Couldn't find a program with that title:\n"
-                                    + timer.getTitle());
+                    LOG.info("Couldn't find a program with that title: "
+                            + timer.getTitle());
                     if (timer.isRepeating()) {
                         DateFormat df = DateFormat
                                 .getDateInstance(DateFormat.LONG);
@@ -964,13 +978,13 @@ public class LazyBones extends Plugin {
                         return false;
                     } else {
                         notAssigned.add(timer);
-                        System.out.println("notAssigned.add " + timer);
+                        LOG.info("Couldn't assign timer: " + timer);
                     }
                 }
             }
         } else { // no channeldayprogram was found
             notAssigned.add(timer);
-            System.out.println("notAssigned.add " + timer);
+            LOG.info("Couldn't assign timer: " + timer);
         }
 
         return true;
