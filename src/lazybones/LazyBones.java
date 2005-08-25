@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.6 2005-08-23 21:51:36 emsker Exp $
+/* $Id: LazyBones.java,v 1.7 2005-08-25 12:25:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -77,6 +77,9 @@ public class LazyBones extends Plugin {
 
     private Properties props;
 
+    /**
+     * 
+     */
     private Hashtable channelMapping = new Hashtable();
 
     /**
@@ -286,7 +289,6 @@ public class LazyBones extends Plugin {
              * search for a match
              */
             VDRVersion version = Connection.getVersion();
-            int minor = version.getMinor();
             boolean isOlderThan1_3 = version.getMajor() < 1
 					|| (version.getMajor() == 1 && version.getMinor() < 3);
 			EPGEntry vdrEPG = isOlderThan1_3 ? filterEPGDate(epgList,
@@ -348,7 +350,7 @@ public class LazyBones extends Plugin {
                                     + " " + response.getMessage());
                         }
                     } else {
-                        Program selectedProgram = showTimerConfirmDialog(prog);
+                        Program selectedProgram = showTimerConfirmDialog(timer, prog);
                         if (selectedProgram != null) {
                             VDRTimer t = ((TimerProgram) selectedProgram)
                                     .getTimer();
@@ -456,10 +458,12 @@ public class LazyBones extends Plugin {
      * dialog to select the right VDR-Program
      * 
      * @param prog
-     *            the in TV-Browser selected Program
+     *            the Program selected in TV-Browser
+     * @param timerOptions
+     *            the timer from TimerOptionsDialog
      * @return the selected VDR-Program
      */
-    private Program showTimerConfirmDialog(Program prog) {
+    private Program showTimerConfirmDialog(VDRTimer timerOptions, Program prog) {
         // get all programs 2 hours before and after the given program
         Calendar cal = GregorianCalendar.getInstance();
         Date date = prog.getDate();
@@ -516,7 +520,18 @@ public class LazyBones extends Plugin {
         // show dialog
         TimerSelectionDialog dialog = new TimerSelectionDialog(this);
         dialog.showSelectionDialog(programs);
-        return dialog.getProgram();
+        Program tmp = dialog.getProgram();
+        if(tmp != null) {
+            TimerProgram program = (TimerProgram)tmp;
+            VDRTimer t = program.getTimer();
+            t.setLifetime(timerOptions.getLifetime());
+            t.setPriority(timerOptions.getPriority());
+            t.setStartTime(timerOptions.getStartTime());
+            t.setEndTime(timerOptions.getEndTime());
+            t.setRepeatingDays(timerOptions.getRepeatingDays());
+            return program;
+        }
+        return null;
     }
 
     /**
@@ -621,10 +636,13 @@ public class LazyBones extends Plugin {
             if (epg.size() > 0) {
                 EPGEntry entry = (EPGEntry) epg.get(0);
                 VDRTimer timer = new VDRTimer();
+                timer.setChannel(id);
                 timer.setTitle(entry.getTitle());
                 timer.setStartTime(entry.getStartTime());
                 timer.setEndTime(entry.getEndTime());
                 timer.setDescription(entry.getDescription());
+                timer.setLifetime(50);
+                timer.setPriority(50);
                 return timer;
             }
         }
@@ -773,7 +791,6 @@ public class LazyBones extends Plugin {
         // for every timer
         while (iter.hasNext()) {
             VDRTimer timer = (VDRTimer) iter.next();
-
             Channel chan = getChannel(timer);
             if (chan == null) {
                 // if we can't find a channel for this timer, continue with the
@@ -783,6 +800,11 @@ public class LazyBones extends Plugin {
                         "No channel defined", timer.toNEWT());
                 JOptionPane.showMessageDialog(getParent(), mesg);
                 // notAssigned.add(timer);
+                
+                // HAMPELRATTE wenn der aufruf von getTimersFromVDR kommt,
+                // darf nicht einfach ein return kommen
+                // deshalb am besten die nicht verfügbaren sender
+                // merken und dann eine "massenmessage" ausgeben
                 return;
             }
 
@@ -1120,6 +1142,9 @@ public class LazyBones extends Plugin {
         return getParentFrame();
     }
 
+    /**
+     * Updates the pluginview of TV-Browser
+     */
     public void updateTree() {
         PluginTreeNode node = getRootNode();
         node.removeAllActions();
