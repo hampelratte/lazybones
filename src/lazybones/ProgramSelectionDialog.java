@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.4 2005-08-26 17:03:08 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,7 +34,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Hashtable;
 
 import javax.swing.*;
 
@@ -51,7 +50,7 @@ import devplugin.Program;
 public class ProgramSelectionDialog extends Thread implements ActionListener {
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(ProgramSelectionDialog.class);
-
+    
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
@@ -64,17 +63,14 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
     private LazyBones control;
 
-    private Hashtable vdr2browser;
-
     private JDialog dialog;
 
     private Program[] programs;
 
     private VDRTimer timer;
 
-    public ProgramSelectionDialog(LazyBones control, Hashtable vdr2browser) {
+    public ProgramSelectionDialog(LazyBones control) {
         this.control = control;
-        this.vdr2browser = vdr2browser;
     }
 
     private void initGUI() {
@@ -141,16 +137,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
             int index = list.getSelectedIndex();
             if (index >= 0) {
                 selectedProgram = (Program) model.get(list.getSelectedIndex());
-
-                String idString = selectedProgram.getID() + "###";
-                int year = selectedProgram.getDate().getYear();
-                int month = selectedProgram.getDate().getMonth();
-                int day = selectedProgram.getDate().getDayOfMonth();
-                idString += day + "_" + month + "_" + year + "###";
-                idString += selectedProgram.getChannel().getId();
-                vdr2browser.put(timer.toNEWT(), idString);
-                control.getTimersFromVDR();
-                // selectedProgram.mark(control);
+                control.timerCreatedOK(selectedProgram, timer);
             }
         } else if (e.getSource() == cancel) {
             selectedProgram = null;
