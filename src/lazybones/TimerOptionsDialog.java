@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.4 2005-08-26 17:14:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -174,9 +174,16 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         for (int i = 0; i < c.length; i++) {
             channels.addItem(c[i]);
         }
-        Date date = new Date(timer.getStartTime());
+        Date date;
+        if (timer.isRepeating()) {
+            date = new Date(timer.getProgTime());
+        } else {
+            date = new Date(timer.getStartTime());
+        }
+
         Program prog = Plugin.getPluginManager().getProgram(date,
                 timer.getTvBrowserProgID());
+
         channels.setSelectedItem(prog.getChannel());
 
         gbc.gridx = 0;
@@ -302,12 +309,33 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             confirmation = false;
             dialog.dispose();
         } else if (e.getSource() == tvbDescription) {
-            Date date = new Date(timer.getStartTime());
+            Date date;
+            if (timer.isRepeating()) {
+                date = new Date(timer.getProgTime());
+            } else {
+                date = new Date(timer.getStartTime());
+            }
             Program prog = Plugin.getPluginManager().getProgram(date,
                     timer.getTvBrowserProgID());
             description.setText(prog.getDescription());
             description.append("\n\n" + prog.getChannel().getCopyrightNotice());
         } else if (e.getSource() == vdrDescription) {
+            /*
+             * HAMPELRATTE funzt noch nicht Date date; if(timer.isRepeating()) {
+             * date = new Date(timer.getProgTime()); } else { date = new
+             * Date(timer.getStartTime()); } Program prog =
+             * Plugin.getPluginManager().getProgram(date,
+             * timer.getTvBrowserProgID()); Calendar tmpCal =
+             * GregorianCalendar.getInstance(); if(timer.isRepeating()) {
+             * tmpCal.setTimeInMillis(timer.getProgTime().getTimeInMillis()); }
+             * else {
+             * tmpCal.setTimeInMillis(timer.getStartTime().getTimeInMillis()); }
+             * tmpCal.add(Calendar.SECOND, 30); // add 30 seconds to be sure,
+             * that the right program is chosen VDRTimer tmp =
+             * control.getVDRProgramAt(tmpCal, prog.getChannel()); String desc =
+             * tmp == null ? "" : tmp.getDescription();
+             * description.setText(desc);
+             */
             description.setText(timer.getDescription());
         }
     }
