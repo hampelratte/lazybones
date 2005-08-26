@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.9 2005-08-25 21:21:53 emsker Exp $
+/* $Id: LazyBones.java,v 1.10 2005-08-26 17:10:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -441,7 +441,7 @@ public class LazyBones extends Plugin {
         }
     }
 
-    private void timerCreatedOK(Program prog, VDRTimer t) {
+    protected void timerCreatedOK(Program prog, VDRTimer t) {
         // store the vdr-name of this program
         String idString = prog.getID() + "###";
         int year = prog.getDate().getYear();
@@ -600,8 +600,7 @@ public class LazyBones extends Plugin {
         Arrays.sort(programs, new ProgramComparator());
 
         // show dialog
-        ProgramSelectionDialog dialog = new ProgramSelectionDialog(this,
-                vdr2browser);
+        ProgramSelectionDialog dialog = new ProgramSelectionDialog(this);
         dialog.showSelectionDialog(programs, timer);
     }
 
@@ -629,7 +628,7 @@ public class LazyBones extends Plugin {
         return null;
     }
 
-    private VDRTimer getVDRProgramAt(Calendar cal, Channel chan) {
+    protected VDRTimer getVDRProgramAt(Calendar cal, Channel chan) {
         long millis = cal.getTimeInMillis() / 1000;
         Object o = channelMapping.get(chan.getId());
         int id = ((VDRChannel) o).getId();
@@ -821,8 +820,9 @@ public class LazyBones extends Plugin {
 
         for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
             VDRTimer element = (VDRTimer) iterator.next();
-            //FIXME für repeating timers müssen wir uns noch was überlegen
+            // FIXME für repeating timers müssen wir uns noch was überlegen
             if (!element.isRepeating()) {
+                LOG.info("scheiße hier");
                 showProgramConfirmDialog(element);
             }
         }
@@ -840,13 +840,13 @@ public class LazyBones extends Plugin {
                 Iterator dayProgram = Plugin.getPluginManager()
                         .getChannelDayProgram(new Date(startDate), chan);
                 if (dayProgram != null) {
-                    boolean continue_marking = markSingularTimer(timer, chan);
-                    /* DEBUG */
+                    /* DEBUG 
                     String date = startDate.get(Calendar.DAY_OF_MONTH) + "."
-                            + (startDate.get(Calendar.MONTH) + 1);
+                    + (startDate.get(Calendar.MONTH) + 1);
                     LOG.info("Trying to mark " + chan + " on" + date + ":\""
                             + timer + "\"");
                     /* DEBUG end */
+                    boolean continue_marking = markSingularTimer(timer, chan);
                     if (!continue_marking) {
                         break;
                     }
@@ -868,21 +868,26 @@ public class LazyBones extends Plugin {
     private boolean markSingularTimer(VDRTimer timer, Channel chan) {
         // TODO show a list with timers, which couldn't be assigned
         // and show programConfirmDialog for these timers
-
-        Calendar cal = GregorianCalendar.getInstance();
-        int today = cal.get(Calendar.DAY_OF_MONTH);
-
+        
         // subtract the recording buffers
-        int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
-        timer.getStartTime().add(Calendar.MINUTE, buffer_before);
-        int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
-        timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
+        // HAMPELRATTE besser neue timer objekte erstellen und die original timer
+        // nicht benutzen
+        removeTimerBuffers(timer);
 
         int day = timer.getStartTime().get(Calendar.DAY_OF_MONTH);
         int month = timer.getStartTime().get(Calendar.MONTH) + 1;
         int year = timer.getStartTime().get(Calendar.YEAR);
-        // if day < today, then day is a date of the next month
-        month = day < today ? month + 1 : month;
+        
+        /* FIXME könnte eventuell noch probleme machen
+         if day < today, then day is a date of the next month
+         beim erstellen des timers machen. hier gibt es probleme
+         mit den repeating timers
+         ergänzung: scheint auch ohne zu gehen
+         */
+        //Calendar cal = GregorianCalendar.getInstance();
+        //int today = cal.get(Calendar.DAY_OF_MONTH);
+        //month = day < today ? month + 1 : month;
+        
         Date date = new Date(year, month, day);
 
         // iterate over all programs of one day
@@ -909,28 +914,22 @@ public class LazyBones extends Plugin {
                 int deltaEnd = endTime - timerend;
                 // System.out.println(timer.getTitle() + " " + deltaStart + ":"
                 // + deltaEnd);
-                
+
                 // collect candidates
                 if (Math.abs(deltaStart) <= 45 && Math.abs(deltaEnd) <= 45) {
                     candidates.put(new Integer(Math.abs(deltaStart)), prog);
                 }
             }
 
-            // we subtract the buffers (at the beginning of this block) to find
-            // the
-            // program. if we have a repeating timer, we have to restore
-            // original
-            // times, so that we have the same situation for the next day
-            timer.getStartTime().add(Calendar.MINUTE, -buffer_before);
-            timer.getEndTime().add(Calendar.MINUTE, buffer_after);
-
-            // System.out.println("kandidaten: " + candidates.size());
+            //LOG.info(candidates.size() + " candidates found");
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
                 if (found) {
+                    addTimeBuffers(timer);
                     return true;
                 } else {
                     notAssigned.add(timer);
+                    addTimeBuffers(timer);
                     return false;
                 }
             }
@@ -957,6 +956,9 @@ public class LazyBones extends Plugin {
             if (percentage > threshold) {
                 progMin.mark(this);
                 timer.setTvBrowserProgID(progMin.getID());
+                if (timer.isRepeating()) {
+                    timer.setProgTime(progMin.getDate().getCalendar());
+                }
                 program2TimerMap.put(progMin, timer);
             } else {
                 boolean found = lookUpTimer(timer);
@@ -974,6 +976,8 @@ public class LazyBones extends Plugin {
                                 + "\n"
                                 + mLocalizer.msg("couldnt_assign_repeating",
                                         "Couldn't assign repeating timer: "));
+                        
+                        addTimeBuffers(timer);
                         return false;
                     } else {
                         notAssigned.add(timer);
@@ -986,10 +990,32 @@ public class LazyBones extends Plugin {
             LOG.info("Couldn't assign timer: " + timer);
         }
 
+        // we subtract the buffers (at the beginning of this block) to find
+        // the program. if we have a repeating timer, we have to restore
+        // original times, so that we have the same situation for the next
+        // day
+        addTimeBuffers(timer);
+        
         return true;
+    }
+    
+    private void addTimeBuffers(VDRTimer timer) {
+        int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
+        timer.getStartTime().add(Calendar.MINUTE, -buffer_before);
+        int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
+        timer.getEndTime().add(Calendar.MINUTE, buffer_after);
+    }
+    
+    private void removeTimerBuffers (VDRTimer timer) {
+        int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
+        timer.getStartTime().add(Calendar.MINUTE, buffer_before);
+        int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
+        timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
     }
 
     private boolean lookUpTimer(VDRTimer timer) {
+        addTimeBuffers(timer);
+        LOG.info("Looking in vdr2browser for: "+ timer.toNEWT());
         Object oid = vdr2browser.get(timer.toNEWT());
         if (oid != null) { // we have a mapping of this timer to a program
             String idString = (String) oid;
