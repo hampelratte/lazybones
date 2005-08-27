@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.11 2005-08-27 20:07:58 emsker Exp $
+/* $Id: LazyBones.java,v 1.12 2005-08-27 20:33:32 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -818,8 +818,11 @@ public class LazyBones extends Plugin {
             }
         }
 
-        // EMSKER: hier werden alle not assigned programme angezeigt
-        if (true) return;
+        if (Boolean.TRUE.toString().equals(
+				props.getProperty("supressMatchDialog"))) {
+			return;
+		}
+        	
         for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
             VDRTimer element = (VDRTimer) iterator.next();
             // FIXME für repeating timers müssen wir uns noch was überlegen

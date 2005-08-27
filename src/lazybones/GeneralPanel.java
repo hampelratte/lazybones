@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.5 2005-08-27 20:07:57 emsker Exp $
+/* $Id: GeneralPanel.java,v 1.6 2005-08-27 20:33:32 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -69,7 +69,17 @@ public class GeneralPanel {
     private JLabel labPercentageOfEquality;
     private JSpinner percentageOfEquality;
 
-    public GeneralPanel(LazyBones control) {
+    private final String lSupressMatchDialog = mLocalizer.msg(
+			"supressMatchDialog", "Supress match dialog");
+
+	private final String ttSupressMatchDialog = mLocalizer.msg(
+			"supressMatchDialog.tooltip",
+			"Do not show EPG selection dialog for non matching VDR timer");
+
+	private JCheckBox supressMatchDialog;
+	
+
+	public GeneralPanel(LazyBones control) {
         this.control = control;
         initComponents();
     }
@@ -93,11 +103,16 @@ public class GeneralPanel {
         labPercentageOfEquality = new JLabel(lFuzzyness);
         labPercentageOfEquality.setLabelFor(percentageOfEquality);
 		labPercentageOfEquality.setToolTipText(ttFuzzyness);
+
+		supressMatchDialog = new JCheckBox(lSupressMatchDialog);
+        supressMatchDialog.setSelected(Boolean.TRUE.toString().equals(
+				control.getProperties().getProperty("supressMatchDialog")));
+        supressMatchDialog.setToolTipText(ttSupressMatchDialog);
     }
 
     JPanel getPanel() {
 		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
-				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -115,6 +130,8 @@ public class GeneralPanel {
 		
 		builder.add(labPercentageOfEquality, cc.xy (1,  9));
 		builder.add(percentageOfEquality,    cc.xy (3,  9));
+		
+		builder.add(supressMatchDialog,      cc.xyw(3, 11, 3));
 
 		return builder.getPanel();
 	}
@@ -159,5 +176,7 @@ public class GeneralPanel {
         control.getProperties().setProperty("timeout", Integer.toString(t));
         control.getProperties().setProperty("percentageThreshold",
                 percentageOfEquality.getValue().toString());
+        control.getProperties().setProperty("supressMatchDialog",
+				"" + supressMatchDialog.isSelected());
     }
 }
