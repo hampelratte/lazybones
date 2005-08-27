@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.4 2005-08-26 17:03:08 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.5 2005-08-27 21:11:41 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -147,13 +147,30 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
     }
 
     public void run() {
+        if (programs.length <= 0) {
+        	return;
+        }
+        /*
+         * wait for TV-Browser started up properly,
+         */
+        while (control.getParent() == null) {
+        	try {
+        		Thread.sleep(200);
+			} catch (InterruptedException e) {
+			}
+        }
         initGUI();
         dialog.setSize(1024, 768);
         model.removeAllElements();
         for (int i = 0; i < programs.length; i++) {
             model.addElement(programs[i]);
         }
-        dialog.pack();
-        dialog.setVisible(true);
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
+				dialog.pack();
+				dialog.setVisible(true);
+			}
+		});
     }
 }
