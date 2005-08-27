@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.7 2005-08-25 21:57:21 emsker Exp $
+/* $Id: VDRSettingsPanel.java,v 1.8 2005-08-27 17:11:29 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -94,8 +94,8 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 					.getPanel());
 
             previewPanel = new PreviewSettingsPanel(control);
-            tabbedPane
-                    .addTab(mLocalizer.msg("remoteControl", ""), previewPanel);
+            tabbedPane.addTab(mLocalizer.msg("remoteControl", ""), previewPanel
+					.getPanel());
         }
 
         JPanel p = new JPanel();

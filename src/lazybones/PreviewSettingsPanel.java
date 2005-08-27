@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: PreviewSettingsPanel.java,v 1.4 2005-08-27 17:11:29 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,13 +29,13 @@
  */
 package lazybones;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
 import javax.swing.*;
 
-public class PreviewSettingsPanel extends JPanel {
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+
+public class PreviewSettingsPanel {
     private static final long serialVersionUID = 5046636902877005743L;
 
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
@@ -43,84 +43,70 @@ public class PreviewSettingsPanel extends JPanel {
 
     private LazyBones control;
 
-    private JLabel lURL = new JLabel(mLocalizer.msg("url",
-            "URL to preview picture"));
+    private final String lURL = mLocalizer.msg("url",
+            "URL to preview picture");
 
     private JTextField url;
 
-    private JLabel lPicturePath = new JLabel(mLocalizer.msg("path",
-            "Path to preview picture"));
+    private final String lPicturePath = mLocalizer.msg("path",
+            "Path to preview picture");
 
-    private JTextArea description = new JTextArea(
-            mLocalizer
-                    .msg(
-                            "desc",
-                            "The URL is the URL, where"
-                                    + " VDRRemoteControl can download the preview image. The path is the path to the preview"
-                                    + " image on the VDR host. This should be the document root of the webserver, which has"
-                                    + " been specified in the URL"), 10, 40);
+    private final String lDescription = mLocalizer
+			.msg(
+					"desc",
+					"The URL is the URL, where"
+							+ " VDRRemoteControl can download the preview image. The path is the path to the preview"
+							+ " image on the VDR host. This should be the document root of the webserver, which has"
+							+ " been specified in the URL");
+                                    
 
     private JTextField picturePath;
+    
+    private JComponent note;
 
     public PreviewSettingsPanel(LazyBones control) {
         this.control = control;
-        initGUI();
+        initComponents();
     }
-
-    private void initGUI() {
+    
+    private void initComponents() {
         url = new JTextField(20);
         url.setText(control.getProperties().getProperty("preview.url"));
         picturePath = new JTextField(20);
         picturePath
                 .setText(control.getProperties().getProperty("preview.path"));
 
-        setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        add(lURL, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(url, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        add(lPicturePath, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(picturePath, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        JScrollPane scrollpane = new JScrollPane(description);
-        add(scrollpane, gbc);
+        JTextArea description;
+        description = new JTextArea(lDescription, 10, 40);
+        description = new JTextArea(lDescription);
         description.setEditable(false);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
-        scrollpane.setBorder(BorderFactory.createEmptyBorder());
         description.setBackground(UIManager.getColor("JPanel.background"));
+
+        note = new JScrollPane(description,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
+
+    JPanel getPanel() {
+		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
+			"pref, 2dlu, pref, 2dlu, top:pref:grow");
+		PanelBuilder builder = new PanelBuilder(layout);
+		builder.setDefaultDialogBorder();
+		CellConstraints cc = new CellConstraints();
+		
+		builder.addLabel(lURL,         cc.xy (1,  1));
+		builder.add(url,               cc.xy (3,  1));
+		
+		builder.addLabel(lPicturePath, cc.xy (1,  3));
+		builder.add(picturePath,       cc.xy (3,  3));
+		
+		builder.add(picturePath,       cc.xy (3,  3));
+		
+		builder.add(note,              cc.xyw(1, 5, 3));
+		
+		return builder.getPanel();
     }
 
     public void saveSettings() {
