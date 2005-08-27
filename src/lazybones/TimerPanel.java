@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.4 2005-08-25 21:57:21 emsker Exp $
+/* $Id: TimerPanel.java,v 1.5 2005-08-27 20:07:58 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -47,14 +48,21 @@ public class TimerPanel {
     private LazyBones control;
 
     private final String lBefore = mLocalizer.msg("before",
-            "Time buffer before program");
+			"Buffer before program");
 
-    private JSpinner before;
+	private final String ttBefore = mLocalizer.msg("before.tooltip",
+			"Time buffer before program");
 
-    private final String lAfter = mLocalizer.msg("after",
-            "Time buffer after program");
+	private JSpinner before;
+
+	private final String lAfter = mLocalizer.msg("after",
+			"Buffer after program");
+
+	private final String ttAfter = mLocalizer.msg("after.tooltip",
+			"Time buffer after program");
 
     private JSpinner after;
+	private JLabel labBefore, labAfter; 
 
     public TimerPanel(LazyBones control) {
         this.control = control;
@@ -68,26 +76,35 @@ public class TimerPanel {
                 "timer.after"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
+        before.setToolTipText(ttBefore);
         ((JSpinner.DefaultEditor) before.getEditor()).getTextField()
                 .setColumns(2);
+        labBefore = new JLabel(lBefore);
+        labBefore.setToolTipText(ttBefore);
+        labBefore.setLabelFor(before);
+
         after = new JSpinner();
         ((JSpinner.DefaultEditor) after.getEditor()).getTextField().setColumns(
-                2);
+				2);
+        after.setToolTipText(ttAfter);
         after.setValue(new Integer(int_after));
+        labAfter = new JLabel(lAfter);
+        labAfter.setToolTipText(ttAfter);
+        labAfter.setLabelFor(after);
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
+		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
 			"pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 		
-		builder.addLabel(lBefore, cc.xy (1,  1));
-		builder.add(before,       cc.xy (3,  1));
+		builder.add(labBefore, cc.xy (1,  1));
+		builder.add(before,    cc.xy (3,  1));
 		
-		builder.addLabel(lAfter,  cc.xy (1,  3));
-		builder.add(after,        cc.xy (3,  3));
+		builder.add(labAfter,  cc.xy (1,  3));
+		builder.add(after,     cc.xy (3,  3));
 	
 		return builder.getPanel();
     }

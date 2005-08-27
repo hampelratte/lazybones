@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.4 2005-08-27 20:07:57 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,10 +29,6 @@
  */
 package lazybones;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -45,10 +41,16 @@ import javax.swing.table.DefaultTableModel;
 
 import tvbrowser.core.ChannelList;
 import util.ui.Localizer;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.LSTC;
 
-public class ChannelPanel extends JPanel implements ActionListener {
+public class ChannelPanel implements ActionListener {
     private static final long serialVersionUID = -655724917391419096L;
 
     private static final Localizer mLocalizer = Localizer
@@ -71,14 +73,13 @@ public class ChannelPanel extends JPanel implements ActionListener {
 
     public ChannelPanel(LazyBones control) {
         this.control = control;
-        initGUI();
+        initComponents();
     }
+    
+    private void initComponents() {
+        up.setIcon(control.getIcon("lazybones/Up12.gif"));
+        down.setIcon(control.getIcon("lazybones/Down12.gif"));
 
-    private void initGUI() {
-        up.setIcon(control.getIcon("lazybones/Up24.gif"));
-        down.setIcon(control.getIcon("lazybones/Down24.gif"));
-
-        setLayout(new GridBagLayout());
         Object[] headers = { "TV-Browser", "VDR" };
         model = new DefaultTableModel(new Object[][] {}, headers) {
             private static final long serialVersionUID = 1366598326846158204L;
@@ -97,22 +98,32 @@ public class ChannelPanel extends JPanel implements ActionListener {
         table.setDefaultRenderer(Object.class, new ChannelCellRenderer());
         table.getTableHeader().setReorderingAllowed(false);
         scrollpane = new JScrollPane(table);
-        add(scrollpane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
-                new Insets(0, 5, 5, 5), 0, 0));
         refresh.addActionListener(this);
-        add(refresh, new GridBagConstraints(0, 1, 1, 1, 0.1, 0.1,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
-                new Insets(0, 5, 5, 5), 0, 0));
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(2, 1, 5, 5));
         up.addActionListener(this);
-        buttonPanel.add(up);
         down.addActionListener(this);
-        buttonPanel.add(down);
-        add(buttonPanel, new GridBagConstraints(1, 0, 1, 1, 0.1, 0.1,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-                        5, 5, 5), 0, 0));
+    }
+
+    JPanel getPanel() {
+		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
+			"160dlu, 2dlu, pref");
+		PanelBuilder builder = new PanelBuilder(layout);
+		builder.setDefaultDialogBorder();
+		CellConstraints cc = new CellConstraints();
+		
+        builder.add(scrollpane,       cc.xyw(1,  1, 5));
+		builder.add(buttonBarPanel(), cc.xyw(1,  3, 5));
+		
+		return builder.getPanel();
+    }
+    
+    private JPanel buttonBarPanel() {
+        ButtonBarBuilder bb = ButtonBarBuilder.createLeftToRightBuilder();
+        bb.addFixed(refresh);
+        bb.addGlue();
+        bb.addGridded(up);
+        bb.addRelatedGap();
+        bb.addGridded(down);
+        return bb.getPanel();
     }
 
     public void actionPerformed(ActionEvent e) {

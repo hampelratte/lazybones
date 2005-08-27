@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.4 2005-08-25 21:57:21 emsker Exp $
+/* $Id: PlayerPanel.java,v 1.5 2005-08-27 20:07:57 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -55,8 +55,13 @@ public class PlayerPanel {
 
     private JTextField params;
 
-    private JCheckBox switchBefore = new JCheckBox(mLocalizer.msg(
-            "switch_before", "Switch to channel before streaming"));
+    private final String lSwitchBefore = mLocalizer.msg(
+            "switch_before", "Switch to channel before streaming");
+    
+    private final String ttSwitchBefore = mLocalizer.msg(
+            "switch_before.tooltip", "This is useful, if you only have one DVB Tuner");
+
+    private JCheckBox switchBefore;
 
     public PlayerPanel(LazyBones control) {
         this.control = control;
@@ -68,24 +73,26 @@ public class PlayerPanel {
         player.setText(control.getProperties().getProperty("player"));
         params = new JTextField(20);
         params.setText(control.getProperties().getProperty("player_params"));
+        switchBefore = new JCheckBox(lSwitchBefore);
         switchBefore.setSelected(new Boolean(control.getProperties()
                 .getProperty("switchBefore")).booleanValue());
+        switchBefore.setToolTipText(ttSwitchBefore);
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
+		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
 			"pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 		
 		builder.addLabel(lPlayer, cc.xy (1,  1));
-		builder.add(player,       cc.xy (3,  1));
+		builder.add(player,       cc.xyw(3,  1, 3));
 		
 		builder.addLabel(lParams, cc.xy (1,  3));
-		builder.add(params,       cc.xy (3,  3));
+		builder.add(params,       cc.xyw(3,  3, 3));
 
-		builder.add(switchBefore, cc.xy (3,  5));
+		builder.add(switchBefore, cc.xyw(3,  5, 3));
 
 		return builder.getPanel();
     }

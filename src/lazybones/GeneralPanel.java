@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.4 2005-08-25 21:36:46 emsker Exp $
+/* $Id: GeneralPanel.java,v 1.5 2005-08-27 20:07:57 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,10 +29,7 @@
  */
 package lazybones;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import util.ui.Localizer;
 
@@ -46,8 +43,6 @@ public class GeneralPanel {
     private static final Localizer mLocalizer = Localizer
             .getLocalizerFor(GeneralPanel.class);
 
-	private final String lConn = mLocalizer.msg("connection", "Connection");
-
 	private final String lHost = mLocalizer.msg("host", "Host");
 
 	private final String lPort = mLocalizer.msg("port", "Port");
@@ -57,7 +52,11 @@ public class GeneralPanel {
 	private final String lExperts = mLocalizer.msg("experts", "Experts");
 
 	private final String lFuzzyness = mLocalizer.msg("percentageOfEquality",
-			"Percentage of equality");
+			"Fuzzylevel program titles");
+
+	private final String ttFuzzyness = mLocalizer.msg(
+			"percentageOfEquality.tooltip",
+			"Percentage of equality of program titles");
 
 	private LazyBones control;
 
@@ -67,6 +66,7 @@ public class GeneralPanel {
 
     private JTextField timeout;
 
+    private JLabel labPercentageOfEquality;
     private JSpinner percentageOfEquality;
 
     public GeneralPanel(LazyBones control) {
@@ -85,33 +85,36 @@ public class GeneralPanel {
         int percentageThreshold = Integer.parseInt(control.getProperties().getProperty(
                 "percentageThreshold"));
         percentageOfEquality = new JSpinner();
+        percentageOfEquality.setToolTipText(ttFuzzyness);
         ((JSpinner.DefaultEditor) percentageOfEquality.getEditor())
                 .getTextField().setColumns(2);
         percentageOfEquality.setValue(new Integer(percentageThreshold));
+
+        labPercentageOfEquality = new JLabel(lFuzzyness);
+        labPercentageOfEquality.setLabelFor(percentageOfEquality);
+		labPercentageOfEquality.setToolTipText(ttFuzzyness);
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
-				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
+				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 
-		builder.addSeparator(lConn,       cc.xyw(1,  1, 4));
+		builder.addLabel(lHost,              cc.xy (1,  1));
+		builder.add(host,                    cc.xyw(3,  1, 3));
 		
-		builder.addLabel(lHost,           cc.xy (1,  3));
-		builder.add(host,                 cc.xy (3,  3));
+		builder.addLabel(lPort,              cc.xy (1,  3));
+		builder.add(port,                    cc.xyw(3,  3, 3));
 		
-		builder.addLabel(lPort,           cc.xy (1,  5));
-		builder.add(port,                 cc.xy (3,  5));
-		
-		builder.addLabel(lTimeout,        cc.xy (1,  7));
-		builder.add(timeout,              cc.xy (3,  7));
+		builder.addLabel(lTimeout,           cc.xy (1,  5));
+		builder.add(timeout,                 cc.xyw(3,  5, 3));
 
-		builder.addSeparator(lExperts,    cc.xyw(1,  9, 4));
+		builder.addSeparator(lExperts,       cc.xyw(1,  7, 5));
 		
-		builder.addLabel(lFuzzyness,      cc.xy (1, 11));
-		builder.add(percentageOfEquality, cc.xy (3, 11));
+		builder.add(labPercentageOfEquality, cc.xy (1,  9));
+		builder.add(percentageOfEquality,    cc.xy (3,  9));
 
 		return builder.getPanel();
 	}

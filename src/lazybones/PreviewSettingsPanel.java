@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.4 2005-08-27 17:11:29 emsker Exp $
+/* $Id: PreviewSettingsPanel.java,v 1.5 2005-08-27 20:07:58 emsker Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -90,21 +90,19 @@ public class PreviewSettingsPanel {
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("pref, 4dlu, pref, pref:grow",
+		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
 			"pref, 2dlu, pref, 2dlu, top:pref:grow");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 		
 		builder.addLabel(lURL,         cc.xy (1,  1));
-		builder.add(url,               cc.xy (3,  1));
+		builder.add(url,               cc.xyw(3,  1, 3));
 		
 		builder.addLabel(lPicturePath, cc.xy (1,  3));
-		builder.add(picturePath,       cc.xy (3,  3));
+		builder.add(picturePath,       cc.xyw(3,  3, 3));
 		
-		builder.add(picturePath,       cc.xy (3,  3));
-		
-		builder.add(note,              cc.xyw(1, 5, 3));
+		builder.add(note,              cc.xyw(1, 5, 5));
 		
 		return builder.getPanel();
     }
