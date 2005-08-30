@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.4 2005-08-30 19:52:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -83,7 +83,6 @@ public class RemoteControl extends JPanel implements ActionListener {
                 GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
                 new Insets(5, 5, 10, 5), 0, 0));
 
-        watch.addActionListener(Controller.getController());
         watch.addActionListener(this);
         add(watch, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
