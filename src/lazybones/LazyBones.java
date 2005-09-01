@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.12 2005-08-27 20:33:32 emsker Exp $
+/* $Id: LazyBones.java,v 1.13 2005-09-01 18:45:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -874,14 +874,13 @@ public class LazyBones extends Plugin {
         // TODO show a list with timers, which couldn't be assigned
         // and show programConfirmDialog for these timers
         
-        // subtract the recording buffers
-        // HAMPELRATTE besser neue timer objekte erstellen und die original timer
-        // nicht benutzen
-        removeTimerBuffers(timer);
-
-        int day = timer.getStartTime().get(Calendar.DAY_OF_MONTH);
-        int month = timer.getStartTime().get(Calendar.MONTH) + 1;
-        int year = timer.getStartTime().get(Calendar.YEAR);
+        // create a clone of the timer and subtract the recording buffers
+        VDRTimer bufferLessTimer = (VDRTimer)timer.clone();
+        removeTimerBuffers(bufferLessTimer);
+        
+        int day = bufferLessTimer.getStartTime().get(Calendar.DAY_OF_MONTH);
+        int month = bufferLessTimer.getStartTime().get(Calendar.MONTH) + 1;
+        int year = bufferLessTimer.getStartTime().get(Calendar.YEAR);
         
         /* FIXME könnte eventuell noch probleme machen
          if day < today, then day is a date of the next month
@@ -904,12 +903,12 @@ public class LazyBones extends Plugin {
                 int startTime = prog.getStartTime();
                 int endTime = startTime + prog.getLength();
 
-                Calendar timerStartCal = timer.getStartTime();
+                Calendar timerStartCal = bufferLessTimer.getStartTime();
                 int hour = timerStartCal.get(Calendar.HOUR_OF_DAY);
                 int minute = timerStartCal.get(Calendar.MINUTE);
                 int timerstart = hour * 60 + minute;
 
-                Calendar timerEndCal = timer.getEndTime();
+                Calendar timerEndCal = bufferLessTimer.getEndTime();
                 hour = timerEndCal.get(Calendar.HOUR_OF_DAY);
                 minute = timerEndCal.get(Calendar.MINUTE);
                 int timerend = hour * 60 + minute;
@@ -930,11 +929,9 @@ public class LazyBones extends Plugin {
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
                 if (found) {
-                    addTimeBuffers(timer);
                     return true;
                 } else {
                     notAssigned.add(timer);
-                    addTimeBuffers(timer);
                     return false;
                 }
             }
@@ -947,6 +944,7 @@ public class LazyBones extends Plugin {
             int percentage = Utilities.percentageOfEquality(timer.getTitle(),
                     progMin.getTitle());
 
+            // override the percentage
             if (timer.getFile().indexOf("EPISODE") >= 0
                     || timer.getFile().indexOf("TITLE") >= 0
                     || timer.isRepeating()) {
@@ -982,7 +980,6 @@ public class LazyBones extends Plugin {
                                 + mLocalizer.msg("couldnt_assign_repeating",
                                         "Couldn't assign repeating timer: "));
                         
-                        addTimeBuffers(timer);
                         return false;
                     } else {
                         notAssigned.add(timer);
@@ -995,20 +992,7 @@ public class LazyBones extends Plugin {
             LOG.info("Couldn't assign timer: " + timer);
         }
 
-        // we subtract the buffers (at the beginning of this block) to find
-        // the program. if we have a repeating timer, we have to restore
-        // original times, so that we have the same situation for the next
-        // day
-        addTimeBuffers(timer);
-        
         return true;
-    }
-    
-    private void addTimeBuffers(VDRTimer timer) {
-        int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
-        timer.getStartTime().add(Calendar.MINUTE, -buffer_before);
-        int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
-        timer.getEndTime().add(Calendar.MINUTE, buffer_after);
     }
     
     private void removeTimerBuffers (VDRTimer timer) {
@@ -1019,7 +1003,6 @@ public class LazyBones extends Plugin {
     }
 
     private boolean lookUpTimer(VDRTimer timer) {
-        addTimeBuffers(timer);
         LOG.info("Looking in vdr2browser for: "+ timer.toNEWT());
         Object oid = vdr2browser.get(timer.toNEWT());
         if (oid != null) { // we have a mapping of this timer to a program
@@ -1176,10 +1159,6 @@ public class LazyBones extends Plugin {
 
     public void handleTvDataDeleted(ChannelDayProgram oldProg) {
         markPrograms(oldProg);
-    }
-
-    public void handleTvDataUpdateFinished() {
-        // markPrograms();
     }
 
     public Frame getParent() {
