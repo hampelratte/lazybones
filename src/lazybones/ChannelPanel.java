@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.4 2005-08-27 20:07:57 emsker Exp $
+/* $Id: ChannelPanel.java,v 1.5 2005-09-01 18:50:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -182,7 +182,7 @@ public class ChannelPanel implements ActionListener {
                         name = name.substring(0, name.indexOf(','));
                     }
                     chan.setName(name);
-                    if (chan.getId() < 500 && !tableContains(chan)) {
+                    if (/*chan.getId() < 500 &&*/ !tableContains(chan)) {
                         vdrchans.add(chan);
                     }
                 }
