@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.13 2005-09-01 18:45:34 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.14 2005-09-02 11:24:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -285,6 +285,12 @@ public class LazyBones extends Plugin {
 
         if (res != null && res.getCode() == 215) {
             List epgList = EPGParser.parse(res.getMessage());
+            
+            if(epgList.size() <= 0) {
+                noEPGAvailable(prog, id);
+                return;
+            }
+            
             /*
              * VDR 1.3 already returns the matching entry, for 1.2 we need to
              * search for a match
