@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.4 2005-09-12 17:18:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,7 +38,6 @@ import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.GRAB;
@@ -50,9 +49,6 @@ import de.hampelratte.svdrp.commands.GRAB;
 public class PreviewPanel extends JLabel {
 
     private static final long serialVersionUID = -6728708348263401257L;
-
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(PreviewPanel.class);
 
     private ImageIcon image = new ImageIcon();
 
@@ -117,9 +113,6 @@ public class PreviewPanel extends JLabel {
                     }
                 } catch (Exception e) {
                     running = false;
-                    String mesg = mLocalizer.msg("couldnt_grab",
-                            "Coulnd't grab picture:\n");
-                    JOptionPane.showMessageDialog(null, mesg + e);
                 }
             }
         }
