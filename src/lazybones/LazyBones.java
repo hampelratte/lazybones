@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.14 2005-09-02 11:24:35 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.15 2005-09-12 17:05:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -123,19 +123,6 @@ public class LazyBones extends Plugin {
         action.putValue(Action.SMALL_ICON,
                 createImageIcon("lazybones/vdr16.png"));
 
-        Action[] actions = new Action[4];
-        actions[0] = new AbstractAction() {
-            private static final long serialVersionUID = -5553013336005178712L;
-
-            public void actionPerformed(ActionEvent evt) {
-                watch(program);
-            }
-        };
-        actions[0].putValue(Action.NAME, mLocalizer.msg("watch",
-                "Watch this channel"));
-        actions[0].putValue(Action.SMALL_ICON,
-                createImageIcon("lazybones/vdr16.png"));
-
         PluginAccess[] plugins = program.getMarkedByPlugins();
         boolean marked = false;
         for (int i = 0; i < plugins.length; i++) {
@@ -144,8 +131,12 @@ public class LazyBones extends Plugin {
                 break;
             }
         }
-
-        if (marked) {
+        
+        Action[] actions = null;
+        
+        if(marked) {
+            actions = new Action[4];
+            
             actions[1] = new AbstractAction() {
                 private static final long serialVersionUID = -3300041354617117202L;
 
@@ -157,7 +148,7 @@ public class LazyBones extends Plugin {
                     "Delete timer"));
             actions[1].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/cancel.png"));
-
+            
             actions[2] = new AbstractAction() {
                 private static final long serialVersionUID = 2186961953492186827L;
 
@@ -170,7 +161,22 @@ public class LazyBones extends Plugin {
                     "Edit Timer"));
             actions[2].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Edit16.png"));
+            
+            actions[3] = new AbstractAction() {
+                private static final long serialVersionUID = -6741513103428614974L;
+
+                public void actionPerformed(ActionEvent evt) {
+                    getTimersFromVDR();
+                }
+            };
+            actions[3].putValue(Action.NAME, mLocalizer.msg("resync",
+                    "Synchronize with VDR"));
+            actions[3].putValue(Action.SMALL_ICON,
+                    createImageIcon("lazybones/Refresh16.gif"));
+            
         } else {
+            actions = new Action[3];
+            
             actions[1] = new AbstractAction() {
                 private static final long serialVersionUID = -6045308970837086440L;
 
@@ -182,19 +188,32 @@ public class LazyBones extends Plugin {
                     "Capture with VDR"));
             actions[1].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/capture.png"));
-        }
+            
+            actions[2] = new AbstractAction() {
+                private static final long serialVersionUID = -6741513103428614974L;
 
-        actions[3] = new AbstractAction() {
-            private static final long serialVersionUID = -6741513103428614974L;
+                public void actionPerformed(ActionEvent evt) {
+                    getTimersFromVDR();
+                }
+            };
+            actions[2].putValue(Action.NAME, mLocalizer.msg("resync",
+                    "Synchronize with VDR"));
+            actions[2].putValue(Action.SMALL_ICON,
+                    createImageIcon("lazybones/Refresh16.gif"));
+        }
+        
+        
+        actions[0] = new AbstractAction() {
+            private static final long serialVersionUID = -5553013336005178712L;
 
             public void actionPerformed(ActionEvent evt) {
-                getTimersFromVDR();
+                watch(program);
             }
         };
-        actions[3].putValue(Action.NAME, mLocalizer.msg("resync",
-                "Synchronize with VDR"));
-        actions[3].putValue(Action.SMALL_ICON,
-                createImageIcon("lazybones/Refresh16.gif"));
+        actions[0].putValue(Action.NAME, mLocalizer.msg("watch",
+                "Watch this channel"));
+        actions[0].putValue(Action.SMALL_ICON,
+                createImageIcon("lazybones/vdr16.png"));
 
         return new ActionMenu(action, actions);
     }
