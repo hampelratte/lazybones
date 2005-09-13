@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.5 2005-08-27 21:11:41 emsker Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.6 2005-09-13 21:51:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -83,6 +83,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -96,12 +97,6 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         dialog.getContentPane().add(new JLabel(msg), gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 1;
-        dialog.getContentPane().add(new JScrollPane(list), gbc);
-
-        gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
@@ -112,6 +107,13 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         dialog.getContentPane().add(ok, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 1;
+        gbc.weighty = 1.0;
+        dialog.getContentPane().add(new JScrollPane(list), gbc);
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -160,15 +162,15 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 			}
         }
         initGUI();
-        dialog.setSize(1024, 768);
+        dialog.setSize(600, 400);
         model.removeAllElements();
         for (int i = 0; i < programs.length; i++) {
             model.addElement(programs[i]);
         }
-		SwingUtilities.invokeLater(new Runnable() {
-
+		
+        SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				dialog.pack();
+				//dialog.pack();
 				dialog.setVisible(true);
 			}
 		});
