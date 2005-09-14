@@ -11,6 +11,8 @@
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="res.dir" value="res" />
+	<property name="doc.dir" value="${res.dir}/docs"/>
+	<property name="jar.file" value="${tvbrowser.runtime.dir}/plugins/LazyBones.jar"/>
 	<property name="nacho" value="nachocalendar-0.22.jar" />
 	<property name="svdrp.src.dir" value="svdrp4j/src" />
 
@@ -37,7 +39,7 @@
 		      <fileset dir="${res.dir}/images" includes="*.gif"/>
 		      <fileset dir="${res.dir}/language" includes="**/*.properties"/>
         </copy>
-		<jar destfile="${tvbrowser.runtime.dir}/plugins/LazyBones.jar" basedir="${classes.dir}">
+		<jar destfile="${jar.file}" basedir="${classes.dir}">
 		</jar>
 	</target>
 
@@ -50,4 +52,24 @@
 		<delete dir="${build.dir}"/>
 	</target>
 
+	<target name="dist" depends="jar" description="Make distribution zip">
+	        <property name="dist-tmp.dir" value="${build.dir}/dist-tmp"/>        
+	        <mkdir dir="${dist-tmp.dir}"/>
+	        
+	        <delete>
+	            <fileset dir="${build.dir}" includes="*.zip"/>
+	        </delete>
+	        
+	        <copy file="${jar.file}" todir="${dist-tmp.dir}/LazyBones-${version}/"/>
+	        <copy todir="${dist-tmp.dir}/LazyBones-${version}">
+	            <fileset dir="${doc.dir}">
+	            </fileset>
+	        </copy>
+	        
+	        <zip destfile="${build.dir}/LazyBones-${version}.zip" 
+	             basedir="${dist-tmp.dir}"/>
+
+	        <delete dir="${dist-tmp.dir}"/>
+	    </target>
+	
 </project>
