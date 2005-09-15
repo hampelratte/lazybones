@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.6 2005-08-27 20:33:32 emsker Exp $
+/* $Id: GeneralPanel.java,v 1.7 2005-09-15 16:08:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -95,11 +95,10 @@ public class GeneralPanel {
         int percentageThreshold = Integer.parseInt(control.getProperties().getProperty(
                 "percentageThreshold"));
         percentageOfEquality = new JSpinner();
+        percentageOfEquality.setModel(new SpinnerNumberModel(percentageThreshold,0,100,1));
         percentageOfEquality.setToolTipText(ttFuzzyness);
         ((JSpinner.DefaultEditor) percentageOfEquality.getEditor())
                 .getTextField().setColumns(2);
-        percentageOfEquality.setValue(new Integer(percentageThreshold));
-
         labPercentageOfEquality = new JLabel(lFuzzyness);
         labPercentageOfEquality.setLabelFor(percentageOfEquality);
 		labPercentageOfEquality.setToolTipText(ttFuzzyness);
