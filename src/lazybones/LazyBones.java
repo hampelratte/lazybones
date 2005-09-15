@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.15 2005-09-12 17:05:06 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.16 2005-09-15 12:32:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -201,8 +201,7 @@ public class LazyBones extends Plugin {
             actions[2].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Refresh16.gif"));
         }
-        
-        
+
         actions[0] = new AbstractAction() {
             private static final long serialVersionUID = -5553013336005178712L;
 
@@ -304,12 +303,12 @@ public class LazyBones extends Plugin {
 
         if (res != null && res.getCode() == 215) {
             List epgList = EPGParser.parse(res.getMessage());
-            
-            if(epgList.size() <= 0) {
+
+            if (epgList.size() <= 0) {
                 noEPGAvailable(prog, id);
                 return;
             }
-            
+
             /*
              * VDR 1.3 already returns the matching entry, for 1.2 we need to
              * search for a match
@@ -683,7 +682,7 @@ public class LazyBones extends Plugin {
     }
 
     public PluginInfo getInfo() {
-        String name = mLocalizer.msg("vdr", "This program has expired");
+        String name = mLocalizer.msg("vdr", "Video Disk Recorder");
         String description = mLocalizer
                 .msg("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
@@ -773,7 +772,7 @@ public class LazyBones extends Plugin {
         for (ListIterator iter = storedTimers.listIterator(); iter.hasNext();) {
             VDRTimer timer = (VDRTimer) iter.next();
             if (timer.getEndTime().before(today)) {
-            	iter.remove();
+                iter.remove();
             }
         }
     }
@@ -794,25 +793,27 @@ public class LazyBones extends Plugin {
         } else if (res != null && res.getCode() == 550) {
             LOG.info("No timer defined in VDR");
             // no timers are defined, do nothing
-        } else { // something went wrong, we have no timers -> load the
+        } else { /*
+                     * something went wrong, we have no timers -> load the
+                     * stored ones
+                     */
             LOG.info("Error/no timer retrieved from VDR - using stored timer");
-            // stored ones
             vdrtimers = storedTimers;
             JOptionPane.showMessageDialog(null, mLocalizer.msg(
                     "using_stored_timers",
                     "Couldn't retrieve timers from VDR, using stored ones."));
         }
 
-        // mark all "timed" programs
-        markPrograms(vdrtimers);
+        // mark all "timed" programs (haltOnNoChannel = false, because we can
+        // have multiple channels)
+        markPrograms(vdrtimers, false);
 
         // update the plugin tree
         updateTree();
     }
 
-    private void markPrograms(ArrayList affectedTimers) {
+    private void markPrograms(ArrayList affectedTimers, boolean haltOnNoChannel) {
         program2TimerMap = new Hashtable();
-        // Iterator iter = vdrtimers.iterator();
         Iterator iter = affectedTimers.iterator();
         notAssigned.clear();
 
@@ -824,15 +825,17 @@ public class LazyBones extends Plugin {
                 // if we can't find a channel for this timer, continue with the
                 // next timer
                 String mesg = mLocalizer.msg("no_channel_defined",
-                        "No channel defined", timer.toNEWT());
+                        "No channel defined", timer.toString());
                 JOptionPane.showMessageDialog(getParent(), mesg);
                 // notAssigned.add(timer);
 
-                // HAMPELRATTE wenn der aufruf von getTimersFromVDR kommt,
-                // darf nicht einfach ein return kommen
-                // deshalb am besten die nicht verfügbaren sender
-                // merken und dann eine "massenmessage" ausgeben
-                return;
+                if (haltOnNoChannel) {
+                    return;
+                } else {
+                // TODO ausgabe?
+                    LOG.warning(mLocalizer.msg("no_channel_defined",
+                            "No channel defined", timer.toString()));
+                }
             }
 
             if (timer.isRepeating()) {
@@ -844,15 +847,15 @@ public class LazyBones extends Plugin {
         }
 
         if (Boolean.TRUE.toString().equals(
-				props.getProperty("supressMatchDialog"))) {
-			return;
-		}
-        	
+                props.getProperty("supressMatchDialog"))) {
+            return;
+        }
+
         for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
             VDRTimer element = (VDRTimer) iterator.next();
             // FIXME für repeating timers müssen wir uns noch was überlegen
             if (!element.isRepeating()) {
-                LOG.info("scheiße hier");
+                LOG.info("show ProgramConfirmDialog");
                 showProgramConfirmDialog(element);
             }
         }
@@ -870,12 +873,12 @@ public class LazyBones extends Plugin {
                 Iterator dayProgram = Plugin.getPluginManager()
                         .getChannelDayProgram(new Date(startDate), chan);
                 if (dayProgram != null) {
-                    /* DEBUG 
-                    String date = startDate.get(Calendar.DAY_OF_MONTH) + "."
-                    + (startDate.get(Calendar.MONTH) + 1);
-                    LOG.info("Trying to mark " + chan + " on" + date + ":\""
-                            + timer + "\"");
-                    /* DEBUG end */
+                    /*
+                     * DEBUG String date = startDate.get(Calendar.DAY_OF_MONTH) +
+                     * "." + (startDate.get(Calendar.MONTH) + 1);
+                     * LOG.info("Trying to mark " + chan + " on" + date + ":\"" +
+                     * timer + "\""); /* DEBUG end
+                     */
                     boolean continue_marking = markSingularTimer(timer, chan);
                     if (!continue_marking) {
                         break;
@@ -898,26 +901,20 @@ public class LazyBones extends Plugin {
     private boolean markSingularTimer(VDRTimer timer, Channel chan) {
         // TODO show a list with timers, which couldn't be assigned
         // and show programConfirmDialog for these timers
-        
+
         // create a clone of the timer and subtract the recording buffers
-        VDRTimer bufferLessTimer = (VDRTimer)timer.clone();
+        VDRTimer bufferLessTimer = (VDRTimer) timer.clone();
         removeTimerBuffers(bufferLessTimer);
-        
+
         int day = bufferLessTimer.getStartTime().get(Calendar.DAY_OF_MONTH);
         int month = bufferLessTimer.getStartTime().get(Calendar.MONTH) + 1;
         int year = bufferLessTimer.getStartTime().get(Calendar.YEAR);
-        
-        /* FIXME könnte eventuell noch probleme machen
-         if day < today, then day is a date of the next month
-         beim erstellen des timers machen. hier gibt es probleme
-         mit den repeating timers
-         ergänzung: scheint auch ohne zu gehen
-         */
-        //Calendar cal = GregorianCalendar.getInstance();
-        //int today = cal.get(Calendar.DAY_OF_MONTH);
-        //month = day < today ? month + 1 : month;
-        
+
         Date date = new Date(year, month, day);
+
+        if (chan == null) {
+            return false;
+        }
 
         // iterate over all programs of one day
         Iterator it = getPluginManager().getChannelDayProgram(date, chan);
@@ -950,7 +947,7 @@ public class LazyBones extends Plugin {
                 }
             }
 
-            //LOG.info(candidates.size() + " candidates found");
+            // LOG.info(candidates.size() + " candidates found");
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
                 if (found) {
@@ -1004,7 +1001,7 @@ public class LazyBones extends Plugin {
                                 + "\n"
                                 + mLocalizer.msg("couldnt_assign_repeating",
                                         "Couldn't assign repeating timer: "));
-                        
+
                         return false;
                     } else {
                         notAssigned.add(timer);
@@ -1019,8 +1016,8 @@ public class LazyBones extends Plugin {
 
         return true;
     }
-    
-    private void removeTimerBuffers (VDRTimer timer) {
+
+    protected void removeTimerBuffers(VDRTimer timer) {
         int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
         timer.getStartTime().add(Calendar.MINUTE, buffer_before);
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
@@ -1028,7 +1025,7 @@ public class LazyBones extends Plugin {
     }
 
     private boolean lookUpTimer(VDRTimer timer) {
-        LOG.info("Looking in vdr2browser for: "+ timer.toNEWT());
+        LOG.info("Looking in vdr2browser for: " + timer.toNEWT());
         Object oid = vdr2browser.get(timer.toNEWT());
         if (oid != null) { // we have a mapping of this timer to a program
             String idString = (String) oid;
@@ -1179,7 +1176,9 @@ public class LazyBones extends Plugin {
                 affectedTimers.add(timer);
             }
         }
-        markPrograms(affectedTimers);
+
+        // markPrograms only for one channel -> haltOnNoChannel = true
+        markPrograms(affectedTimers, true);
     }
 
     public void handleTvDataDeleted(ChannelDayProgram oldProg) {

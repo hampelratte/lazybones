@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.4 2005-08-26 17:14:48 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.5 2005-09-15 12:32:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -178,12 +178,17 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         if (timer.isRepeating()) {
             date = new Date(timer.getProgTime());
         } else {
-            date = new Date(timer.getStartTime());
+            VDRTimer tmp = (VDRTimer)timer.clone();
+            // we have to remove the buffers again, to get the right start date
+            // example: start time is 00.00 h with time buffers we have 23.45
+            // Calendar then decreases the start date, so that don't have the right date, but
+            // the date of the day before.
+            control.removeTimerBuffers(tmp);
+            date = new Date(tmp.getStartTime());
         }
 
         Program prog = Plugin.getPluginManager().getProgram(date,
                 timer.getTvBrowserProgID());
-
         channels.setSelectedItem(prog.getChannel());
 
         gbc.gridx = 0;
