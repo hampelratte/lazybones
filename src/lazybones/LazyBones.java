@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.16 2005-09-15 12:32:17 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.17 2005-09-16 15:52:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,7 +40,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -131,12 +130,12 @@ public class LazyBones extends Plugin {
                 break;
             }
         }
-        
+
         Action[] actions = null;
-        
-        if(marked) {
+
+        if (marked) {
             actions = new Action[4];
-            
+
             actions[1] = new AbstractAction() {
                 private static final long serialVersionUID = -3300041354617117202L;
 
@@ -148,7 +147,7 @@ public class LazyBones extends Plugin {
                     "Delete timer"));
             actions[1].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/cancel.png"));
-            
+
             actions[2] = new AbstractAction() {
                 private static final long serialVersionUID = 2186961953492186827L;
 
@@ -161,7 +160,7 @@ public class LazyBones extends Plugin {
                     "Edit Timer"));
             actions[2].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Edit16.png"));
-            
+
             actions[3] = new AbstractAction() {
                 private static final long serialVersionUID = -6741513103428614974L;
 
@@ -173,10 +172,10 @@ public class LazyBones extends Plugin {
                     "Synchronize with VDR"));
             actions[3].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Refresh16.gif"));
-            
+
         } else {
             actions = new Action[3];
-            
+
             actions[1] = new AbstractAction() {
                 private static final long serialVersionUID = -6045308970837086440L;
 
@@ -188,7 +187,7 @@ public class LazyBones extends Plugin {
                     "Capture with VDR"));
             actions[1].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/capture.png"));
-            
+
             actions[2] = new AbstractAction() {
                 private static final long serialVersionUID = -6741513103428614974L;
 
@@ -771,7 +770,7 @@ public class LazyBones extends Plugin {
         }
         for (ListIterator iter = storedTimers.listIterator(); iter.hasNext();) {
             VDRTimer timer = (VDRTimer) iter.next();
-            if (timer.getEndTime().before(today)) {
+            if (timer.getEndTime().before(today) & !timer.isRepeating()) {
                 iter.remove();
             }
         }
@@ -799,6 +798,7 @@ public class LazyBones extends Plugin {
                      */
             LOG.info("Error/no timer retrieved from VDR - using stored timer");
             vdrtimers = storedTimers;
+
             JOptionPane.showMessageDialog(null, mLocalizer.msg(
                     "using_stored_timers",
                     "Couldn't retrieve timers from VDR, using stored ones."));
@@ -813,7 +813,7 @@ public class LazyBones extends Plugin {
     }
 
     private void markPrograms(ArrayList affectedTimers, boolean haltOnNoChannel) {
-        program2TimerMap = new Hashtable();
+        program2TimerMap.clear();
         Iterator iter = affectedTimers.iterator();
         notAssigned.clear();
 
@@ -829,17 +829,15 @@ public class LazyBones extends Plugin {
                 JOptionPane.showMessageDialog(getParent(), mesg);
                 // notAssigned.add(timer);
 
+                // leave method only, if the haltOnNoChannel is true
+                // this is the case, if the call comes from handleTvData*
                 if (haltOnNoChannel) {
                     return;
-                } else {
-                // TODO ausgabe?
-                    LOG.warning(mLocalizer.msg("no_channel_defined",
-                            "No channel defined", timer.toString()));
                 }
             }
 
             if (timer.isRepeating()) {
-                LOG.info("Marking repeating timer");
+                LOG.info("Marking repeating timer " + timer);
                 markRepeatingTimer(timer, chan);
             } else {
                 markSingularTimer(timer, chan);
@@ -853,32 +851,46 @@ public class LazyBones extends Plugin {
 
         for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
             VDRTimer element = (VDRTimer) iterator.next();
-            // FIXME für repeating timers müssen wir uns noch was überlegen
             if (!element.isRepeating()) {
-                LOG.info("show ProgramConfirmDialog");
                 showProgramConfirmDialog(element);
+            } else {
+                // FIXME für repeating timers müssen wir uns noch was überlegen
+                JOptionPane
+                        .showMessageDialog(
+                                null,
+                                mLocalizer
+                                        .msg(
+                                                "couldnt_assign_repeating",
+                                                "Couldn't assign repeating timer. This timer will not be marked in the program table."));
             }
         }
     }
 
     private void markRepeatingTimer(VDRTimer timer, Channel chan) {
         // TODO repeating timers eventuell auch mappen, wenn program
-        // nicht zugeordnet werden kann
+        // nicht zugeordnet werden kann.
 
         Calendar startDate = timer.getStartTime();
         Calendar endDate = timer.getEndTime();
+
+        // store original times
+        long start = startDate.getTimeInMillis();
+        long end = endDate.getTimeInMillis();
 
         while (true) {
             if (timer.isDaySet(startDate)) {
                 Iterator dayProgram = Plugin.getPluginManager()
                         .getChannelDayProgram(new Date(startDate), chan);
                 if (dayProgram != null) {
+
+                    // DEBUG
                     /*
-                     * DEBUG String date = startDate.get(Calendar.DAY_OF_MONTH) +
-                     * "." + (startDate.get(Calendar.MONTH) + 1);
-                     * LOG.info("Trying to mark " + chan + " on" + date + ":\"" +
-                     * timer + "\""); /* DEBUG end
+                     * String date = startDate.get(Calendar.DAY_OF_MONTH) + "." +
+                     * (startDate.get(Calendar.MONTH) + 1); LOG.info("Trying to
+                     * mark " + chan + " on" + date + ":\"" + timer + "\"");
                      */
+                    // DEBUG end
+
                     boolean continue_marking = markSingularTimer(timer, chan);
                     if (!continue_marking) {
                         break;
@@ -890,6 +902,10 @@ public class LazyBones extends Plugin {
             startDate.add(Calendar.DAY_OF_MONTH, 1);
             endDate.add(Calendar.DAY_OF_MONTH, 1);
         }
+
+        // restore original times
+        startDate.setTimeInMillis(start);
+        endDate.setTimeInMillis(end);
     }
 
     /**
@@ -978,7 +994,7 @@ public class LazyBones extends Plugin {
             // if the percentage of common words is
             // higher than the config value percentageThreshold, mark this
             // program
-            if (percentage > threshold) {
+            if (percentage >= threshold) {
                 progMin.mark(this);
                 timer.setTvBrowserProgID(progMin.getID());
                 if (timer.isRepeating()) {
@@ -990,23 +1006,8 @@ public class LazyBones extends Plugin {
                 if (!found) { // we have no mapping
                     LOG.info("Couldn't find a program with that title: "
                             + timer.getTitle());
-                    if (timer.isRepeating()) {
-                        DateFormat df = DateFormat
-                                .getDateInstance(DateFormat.LONG);
-                        JOptionPane.showMessageDialog(null, "["
-                                + df.format(new java.util.Date(timer
-                                        .getStartTime().getTimeInMillis()))
-                                + "] "
-                                + timer.getTitle()
-                                + "\n"
-                                + mLocalizer.msg("couldnt_assign_repeating",
-                                        "Couldn't assign repeating timer: "));
-
-                        return false;
-                    } else {
-                        notAssigned.add(timer);
-                        LOG.info("Couldn't assign timer: " + timer);
-                    }
+                    notAssigned.add(timer);
+                    LOG.info("Couldn't assign timer: " + timer);
                 }
             }
         } else { // no channeldayprogram was found
