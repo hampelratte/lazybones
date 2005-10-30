@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.6 2005-10-30 13:10:24 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.7 2005-10-30 13:13:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -105,7 +105,7 @@ public class ChannelPanel implements ActionListener {
 
     JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:85dlu, 3dlu, 120dlu,3dlu,3dlu",
-			"160dlu, 2dlu, pref");
+			"160dlu:GROW, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();

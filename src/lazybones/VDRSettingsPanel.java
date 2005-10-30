@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.9 2005-08-27 20:07:58 emsker Exp $
+/* $Id: VDRSettingsPanel.java,v 1.10 2005-10-30 13:10:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,8 +47,6 @@ import util.ui.Localizer;
  */
 public class VDRSettingsPanel implements devplugin.SettingsTab {
 	
-	static final String FORMBUILDER_DEFAULT_COLUMNS = "right:80dlu, 3dlu, 30dlu, 3dlu, 80dlu";
-
     private static final Localizer mLocalizer = Localizer
             .getLocalizerFor(VDRSettingsPanel.class);
 

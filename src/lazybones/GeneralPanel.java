@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.7 2005-09-15 16:08:34 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.8 2005-10-30 13:10:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,6 +37,7 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+//TODO weitere möglichkeiten für die fehlermeldungen einbauen
 public class GeneralPanel {
     private static final long serialVersionUID = 4141920557801647729L;
 
@@ -103,34 +104,35 @@ public class GeneralPanel {
         labPercentageOfEquality.setLabelFor(percentageOfEquality);
 		labPercentageOfEquality.setToolTipText(ttFuzzyness);
 
-		supressMatchDialog = new JCheckBox(lSupressMatchDialog);
+		supressMatchDialog = new JCheckBox();
         supressMatchDialog.setSelected(Boolean.TRUE.toString().equals(
 				control.getProperties().getProperty("supressMatchDialog")));
         supressMatchDialog.setToolTipText(ttSupressMatchDialog);
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
-				"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+		FormLayout layout = new FormLayout("left:85dlu, 3dlu, 120dlu",
+				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 
 		builder.addLabel(lHost,              cc.xy (1,  1));
-		builder.add(host,                    cc.xyw(3,  1, 3));
+		builder.add(host,                    cc.xyw(3,  1, 1));
 		
 		builder.addLabel(lPort,              cc.xy (1,  3));
-		builder.add(port,                    cc.xyw(3,  3, 3));
+		builder.add(port,                    cc.xyw(3,  3, 1));
 		
 		builder.addLabel(lTimeout,           cc.xy (1,  5));
-		builder.add(timeout,                 cc.xyw(3,  5, 3));
+		builder.add(timeout,                 cc.xyw(3,  5, 1));
 
-		builder.addSeparator(lExperts,       cc.xyw(1,  7, 5));
+		builder.addSeparator(lExperts,       cc.xyw(1,  7, 3));
 		
 		builder.add(labPercentageOfEquality, cc.xy (1,  9));
 		builder.add(percentageOfEquality,    cc.xy (3,  9));
 		
-		builder.add(supressMatchDialog,      cc.xyw(3, 11, 3));
+        builder.addLabel(lSupressMatchDialog,cc.xy (1, 11));
+		builder.add(supressMatchDialog,      cc.xyw(3, 11, 1));
 
 		return builder.getPanel();
 	}
