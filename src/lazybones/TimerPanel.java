@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.6 2005-10-30 13:10:24 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.7 2005-10-30 13:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -94,7 +94,7 @@ public class TimerPanel {
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:65dlu, 3dlu, 25dlu",
+		FormLayout layout = new FormLayout("left:75dlu, 3dlu, 25dlu",
 			"pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();

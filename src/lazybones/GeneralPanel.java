@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.8 2005-10-30 13:10:24 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.9 2005-10-30 13:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -111,7 +111,7 @@ public class GeneralPanel {
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:85dlu, 3dlu, 120dlu",
+		FormLayout layout = new FormLayout("left:100dlu, 3dlu, 120dlu",
 				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
