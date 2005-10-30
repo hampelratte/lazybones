@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: Player.java,v 1.4 2005-10-30 13:01:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -89,8 +89,9 @@ public class Player {
             }
             arguments[0] = control.getProperties().getProperty("player");
             String host = control.getProperties().getProperty("host");
-            arguments[arguments.length - 1] = "http://" + host + ":3000/"
-                    + channel;
+            String streamtype = control.getProperties().getProperty("streamtype");
+            arguments[arguments.length - 1] = "http://" + host + ":3000/" +
+                    streamtype + "/" + channel;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
             JOptionPane.showMessageDialog(null, mLocalizer

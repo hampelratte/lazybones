@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.5 2005-08-27 20:07:57 emsker Exp $
+/* $Id: PlayerPanel.java,v 1.6 2005-10-30 13:00:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -62,6 +63,8 @@ public class PlayerPanel {
             "switch_before.tooltip", "This is useful, if you only have one DVB Tuner");
 
     private JCheckBox switchBefore;
+    
+    private JComboBox streamType;
 
     public PlayerPanel(LazyBones control) {
         this.control = control;
@@ -77,22 +80,35 @@ public class PlayerPanel {
         switchBefore.setSelected(new Boolean(control.getProperties()
                 .getProperty("switchBefore")).booleanValue());
         switchBefore.setToolTipText(ttSwitchBefore);
+        streamType = new JComboBox();
+        streamType.addItem("TS");
+        streamType.addItem("PS");
+        streamType.addItem("PES");
+        streamType.addItem("ES");
+        String streamString = control.getProperties().getProperty("streamtype");
+        for(int i=0; i<streamType.getItemCount(); i++) {
+            if(streamType.getItemAt(i).equals(streamString)) {
+                streamType.setSelectedIndex(i);
+            }
+        }
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout(VDRSettingsPanel.FORMBUILDER_DEFAULT_COLUMNS,
-			"pref, 2dlu, pref, 2dlu, pref");
+		FormLayout layout = new FormLayout("left:35dlu, 3dlu, 120dlu",
+			"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 		
 		builder.addLabel(lPlayer, cc.xy (1,  1));
-		builder.add(player,       cc.xyw(3,  1, 3));
+		builder.add(player,       cc.xyw(3,  1, 1));
 		
 		builder.addLabel(lParams, cc.xy (1,  3));
-		builder.add(params,       cc.xyw(3,  3, 3));
+		builder.add(params,       cc.xyw(3,  3, 1));
 
-		builder.add(switchBefore, cc.xyw(3,  5, 3));
+        builder.add(streamType, cc.xyw(3,  5, 1));
+        
+		builder.add(switchBefore, cc.xyw(3,  7, 1));
 
 		return builder.getPanel();
     }
@@ -102,5 +118,6 @@ public class PlayerPanel {
         control.getProperties().setProperty("player_params", params.getText());
         control.getProperties().setProperty("switchBefore",
                 new Boolean(switchBefore.isSelected()).toString());
+        control.getProperties().setProperty("streamtype", streamType.getSelectedItem().toString());
     }
 }

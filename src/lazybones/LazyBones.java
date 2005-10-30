@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.17 2005-09-16 15:52:24 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.18 2005-10-30 13:00:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -917,6 +917,9 @@ public class LazyBones extends Plugin {
     private boolean markSingularTimer(VDRTimer timer, Channel chan) {
         // TODO show a list with timers, which couldn't be assigned
         // and show programConfirmDialog for these timers
+        
+        // TODO eventuell erkennen: ein timer kann auch mehrere sendungen
+        // aufnehmen (doppelpacks z.b.)
 
         // create a clone of the timer and subtract the recording buffers
         VDRTimer bufferLessTimer = (VDRTimer) timer.clone();
@@ -1111,6 +1114,9 @@ public class LazyBones extends Plugin {
         String host = props.getProperty("host");
         host = host == null ? "localhost" : host;
         props.setProperty("host", host);
+        String streamtype = props.getProperty("streamtype");
+        streamtype = streamtype == null ? "TS" : streamtype;
+        props.setProperty("streamtype", streamtype);
         String port = props.getProperty("port");
         port = port == null ? "2001" : port;
         props.setProperty("port", port);
