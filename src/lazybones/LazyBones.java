@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.18 2005-10-30 13:00:49 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.19 2005-11-12 16:29:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -403,9 +403,12 @@ public class LazyBones extends Plugin {
                     noEPGAvailable(prog, id);
                 }
             }
+        } else if(res != null && res.getCode() == 550 & "No schedule found\n".equals(res.getMessage())) {
+            noEPGAvailable(prog, id);
         } else {
+            String msg = res != null ? res.getMessage() : "Reason unknown";
             JOptionPane.showMessageDialog(null, mLocalizer.msg(
-                    "couldnt_create", "Couldn\'t create timer:"));
+                    "couldnt_create", "Couldn\'t create timer\n: ") + " " + msg);
         }
     }
 
