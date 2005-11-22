@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.5 2005-09-15 12:32:17 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.6 2005-11-22 22:18:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,8 +34,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Calendar;
 
 import javax.swing.*;
@@ -53,7 +53,7 @@ import devplugin.Program;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
 public class TimerOptionsDialog extends Thread implements ActionListener,
-        MouseListener {
+        ItemListener {
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(TimerOptionsDialog.class);
 
@@ -88,16 +88,12 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
     private JLabel lTitle = new JLabel(mLocalizer.msg("title", "Title"));
 
     private JTextField title = new JTextField();
+    
+    private JLabel lDescription = new JLabel(mLocalizer.msg("description", "Description"));
+    
+    private JComboBox comboDesc = new JComboBox();
 
     private JTextArea description = new JTextArea();
-
-    private JPopupMenu popupmenu = new JPopupMenu();
-
-    private JMenuItem tvbDescription = new JMenuItem(mLocalizer.msg(
-            "tvbDescription", "Take TV-Browsers' description"));
-
-    private JMenuItem vdrDescription = new JMenuItem(mLocalizer.msg(
-            "vdrDescription", "Take VDRs' description"));
 
     private JButton ok = new JButton();
 
@@ -193,6 +189,10 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
 
         gbc.gridx = 0;
         gbc.gridy = 7;
+        panel.add(lDescription, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 8;
         gbc.gridwidth = 2;
         gbc.weighty = 1.0;
         description.setRows(10);
@@ -206,21 +206,9 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             description.setText(timer.getDescription());
         }
         panel.add(new JScrollPane(description), gbc);
-        popupmenu.add(tvbDescription);
-        tvbDescription.addActionListener(this);
-        popupmenu.add(vdrDescription);
-        vdrDescription.addActionListener(this);
-        popupmenu.setLabel(mLocalizer.msg("chooseDescription",
-                "Choose Description"));
-        description.addMouseListener(this);
-        if (!update) {
-            description.setToolTipText(mLocalizer.msg(
-                    "chooseDescriptionTooltip",
-                    "Use right mouse button to choose the description"));
-        }
 
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         gbc.gridwidth = 1;
         gbc.weighty = 0.1;
         panel.add(cancel, gbc);
@@ -267,9 +255,17 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         panel.add(lifetime, gbc);
         lifetime
                 .setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
+        
+        gbc.gridx = 1;
+        gbc.gridy = 7;
+        panel.add(comboDesc, gbc);
+        comboDesc.addItem("VDR");
+        comboDesc.addItem("TV-Browser");
+        comboDesc.addItemListener(this);
+        comboDesc.setEnabled(!update);
 
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         panel.add(ok, gbc);
 
         ok.setText(mLocalizer.msg("ok", "OK"));
@@ -313,36 +309,7 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         } else if (e.getSource() == cancel) {
             confirmation = false;
             dialog.dispose();
-        } else if (e.getSource() == tvbDescription) {
-            Date date;
-            if (timer.isRepeating()) {
-                date = new Date(timer.getProgTime());
-            } else {
-                date = new Date(timer.getStartTime());
-            }
-            Program prog = Plugin.getPluginManager().getProgram(date,
-                    timer.getTvBrowserProgID());
-            description.setText(prog.getDescription());
-            description.append("\n\n" + prog.getChannel().getCopyrightNotice());
-        } else if (e.getSource() == vdrDescription) {
-            /*
-             * HAMPELRATTE funzt noch nicht Date date; if(timer.isRepeating()) {
-             * date = new Date(timer.getProgTime()); } else { date = new
-             * Date(timer.getStartTime()); } Program prog =
-             * Plugin.getPluginManager().getProgram(date,
-             * timer.getTvBrowserProgID()); Calendar tmpCal =
-             * GregorianCalendar.getInstance(); if(timer.isRepeating()) {
-             * tmpCal.setTimeInMillis(timer.getProgTime().getTimeInMillis()); }
-             * else {
-             * tmpCal.setTimeInMillis(timer.getStartTime().getTimeInMillis()); }
-             * tmpCal.add(Calendar.SECOND, 30); // add 30 seconds to be sure,
-             * that the right program is chosen VDRTimer tmp =
-             * control.getVDRProgramAt(tmpCal, prog.getChannel()); String desc =
-             * tmp == null ? "" : tmp.getDescription();
-             * description.setText(desc);
-             */
-            description.setText(timer.getDescription());
-        }
+        } 
     }
 
     public void start() {
@@ -356,21 +323,39 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         return confirmation;
     }
 
-    public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON3 && !update) {
-            popupmenu.show(e.getComponent(), e.getX(), e.getY());
+    public void itemStateChanged(ItemEvent e) {
+        if(e.getStateChange() == ItemEvent.SELECTED) {
+            String item = (String)e.getItem();
+            if("VDR".equals(item)) {
+                /*
+                 * HAMPELRATTE funzt noch nicht Date date; if(timer.isRepeating()) {
+                 * date = new Date(timer.getProgTime()); } else { date = new
+                 * Date(timer.getStartTime()); } Program prog =
+                 * Plugin.getPluginManager().getProgram(date,
+                 * timer.getTvBrowserProgID()); Calendar tmpCal =
+                 * GregorianCalendar.getInstance(); if(timer.isRepeating()) {
+                 * tmpCal.setTimeInMillis(timer.getProgTime().getTimeInMillis()); }
+                 * else {
+                 * tmpCal.setTimeInMillis(timer.getStartTime().getTimeInMillis()); }
+                 * tmpCal.add(Calendar.SECOND, 30); // add 30 seconds to be sure,
+                 * that the right program is chosen VDRTimer tmp =
+                 * control.getVDRProgramAt(tmpCal, prog.getChannel()); String desc =
+                 * tmp == null ? "" : tmp.getDescription();
+                 * description.setText(desc);
+                 */
+                description.setText(timer.getDescription());
+            } else {
+                Date date;
+                if (timer.isRepeating()) {
+                    date = new Date(timer.getProgTime());
+                } else {
+                    date = new Date(timer.getStartTime());
+                }
+                Program prog = Plugin.getPluginManager().getProgram(date,
+                        timer.getTvBrowserProgID());
+                description.setText(prog.getDescription());
+                description.append("\n\n" + prog.getChannel().getCopyrightNotice());
+            }
         }
-    }
-
-    public void mouseEntered(MouseEvent arg0) {
-    }
-
-    public void mouseExited(MouseEvent arg0) {
-    }
-
-    public void mousePressed(MouseEvent arg0) {
-    }
-
-    public void mouseReleased(MouseEvent arg0) {
     }
 }
