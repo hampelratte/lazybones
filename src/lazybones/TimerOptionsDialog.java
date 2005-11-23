@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.6 2005-11-22 22:18:30 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.7 2005-11-23 16:41:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -287,19 +287,14 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             confirmation = true;
             timer.setFile(title.getText());
             Channel c = (Channel) channels.getSelectedItem();
-            VDRChannel vdrc = (VDRChannel) control.getChannelMapping().get(
-                    c.getId());
+            VDRChannel vdrc = (VDRChannel) control.getChannelMapping().get(c.getId());
             timer.setChannel(vdrc.getId());
             Calendar start = timer.getStartTime();
-            start.set(Calendar.HOUR_OF_DAY, ((Time) starttime.getValue())
-                    .getHour());
-            start.set(Calendar.MINUTE, ((Time) starttime.getValue())
-                    .getMinute());
+            start.set(Calendar.HOUR_OF_DAY, ((Time) starttime.getValue()).getHour());
+            start.set(Calendar.MINUTE, ((Time) starttime.getValue()).getMinute());
             timer.setStartTime(start);
             Calendar end = timer.getEndTime();
-            end
-                    .set(Calendar.HOUR_OF_DAY, ((Time) endtime.getValue())
-                            .getHour());
+            end.set(Calendar.HOUR_OF_DAY, ((Time) endtime.getValue()).getHour());
             end.set(Calendar.MINUTE, ((Time) endtime.getValue()).getMinute());
             timer.setEndTime(end);
             timer.setPriority(((Integer) priority.getValue()).intValue());

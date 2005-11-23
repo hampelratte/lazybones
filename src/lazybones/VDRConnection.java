@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.4 2005-08-26 17:15:49 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.5 2005-11-23 16:41:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,8 +29,6 @@
  */
 package lazybones;
 
-import javax.swing.JOptionPane;
-
 import de.hampelratte.svdrp.Command;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
@@ -40,6 +38,9 @@ import de.hampelratte.svdrp.Response;
  * 
  */
 public class VDRConnection {
+    
+    private static Logger LOG = Logger.getLogger();
+    
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(VDRConnection.class);
 
@@ -60,9 +61,10 @@ public class VDRConnection {
             res = connection.send(cmd);
             connection.close();
         } catch (Exception e1) {
-            JOptionPane.showMessageDialog(null, mLocalizer.msg(
+            String mesg = mLocalizer.msg(
                     "couldnt_connect", "Couldn't connect to VDR")
-                    + ":\n" + e1.toString());
+                    + ":\n" + e1.toString();
+            LOG.log(mesg, Logger.CONNECTION, Logger.ERROR);
         }
         return res;
     }

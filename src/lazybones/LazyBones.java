@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.20 2005-11-23 12:21:51 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.21 2005-11-23 16:41:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 
@@ -64,8 +63,7 @@ import devplugin.Date;
  */
 public class LazyBones extends Plugin {
 
-    public static final Logger LOG = Logger
-            .getLogger(LazyBones.class.getName());
+    public static final Logger LOG = Logger.getLogger();
 
     /** Translator */
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
@@ -230,9 +228,7 @@ public class LazyBones extends Plugin {
 
         action.setBigIcon(createImageIcon("lazybones/vdr24.png"));
         action.setSmallIcon(createImageIcon("lazybones/vdr16.png"));
-        action
-                .setShortDescription(mLocalizer.msg("vdr",
-                        "Video Disk Recorder"));
+        action.setShortDescription(mLocalizer.msg("vdr", "Video Disk Recorder"));
         action.setText(mLocalizer.msg("vdr", "Video Disk Recorder"));
 
         return new ActionMenu(action);
@@ -244,8 +240,7 @@ public class LazyBones extends Plugin {
 
     private void deleteTimer(Program prog) {
         VDRTimer timer = (VDRTimer) program2TimerMap.get(prog);
-        Response res = VDRConnection.send(new DELT(Integer.toString(timer
-                .getID())));
+        Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
         if (res == null) {
             return;
         } else if (res.getCode() == 250) {
@@ -265,16 +260,16 @@ public class LazyBones extends Plugin {
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(getParent(), mLocalizer.msg(
+            LOG.log(mLocalizer.msg(
                     "couldnt_delete", "Couldn\'t delete timer:")
-                    + " " + res.getMessage());
+                    + " " + res.getMessage(), Logger.OTHER, Logger.ERROR);
         }
     }
 
     private void createTimer(Program prog) {
         if (prog.isExpired()) {
-            JOptionPane.showMessageDialog(getParent(), mLocalizer.msg(
-                    "expired", "This program has expired"));
+            LOG.log(mLocalizer.msg(
+                    "expired", "This program has expired"), Logger.OTHER, Logger.ERROR);
             return;
         }
 
@@ -290,13 +285,11 @@ public class LazyBones extends Plugin {
 
         Object o = channelMapping.get(prog.getChannel().getId());
         if (o == null) {
-            String mesg = mLocalizer.msg("no_channel_defined",
-                    "No channel defined", prog.toString());
-            JOptionPane.showMessageDialog(getParent(), mesg);
+            LOG.log(mLocalizer.msg("no_channel_defined",
+                    "No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
             return;
         }
         int id = ((VDRChannel) o).getId();
-        // TODO use getVDRProgramAt ?
         Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at "
                 + Long.toString(millis / 1000)));
 
@@ -348,7 +341,12 @@ public class LazyBones extends Plugin {
                 return;
             }
 
-            boolean create = showTimerOptionsDialog(timer, false);
+            boolean showOptionsDialog = Boolean.TRUE.toString().equals(props.getProperty("showTimerOptionsDialog"));
+            boolean create = true;
+            if(showOptionsDialog) {
+                create = showTimerOptionsDialog(timer, false);
+            }
+            
             if (create) {
                 if (timer.getTitle() != null) {
                     int percentage = Utilities.percentageOfEquality(prog
@@ -369,10 +367,10 @@ public class LazyBones extends Plugin {
                             // get the whole timer list again :-(
                             getTimersFromVDR();
                         } else {
-                            JOptionPane.showMessageDialog(null, mLocalizer
-                                    .msg("couldnt_create",
-                                            "Couldn\'t create timer:")
-                                    + " " + response.getMessage());
+                            LOG.log(
+                                mLocalizer.msg("couldnt_create",
+                                   "Couldn\'t create timer:")
+                                    + " " + response.getMessage(),Logger.OTHER, Logger.ERROR);
                         }
                     } else {
                         Program selectedProgram = showTimerConfirmDialog(timer,
@@ -392,10 +390,10 @@ public class LazyBones extends Plugin {
                             if (response.getCode() == 250) {
                                 timerCreatedOK(prog, t);
                             } else {
-                                JOptionPane.showMessageDialog(null, mLocalizer
-                                        .msg("couldnt_create",
-                                                "Couldn\'t create timer:")
-                                        + " " + response.getMessage());
+                                LOG.log(
+                                        mLocalizer.msg("couldnt_create",
+                                           "Couldn\'t create timer:")
+                                            + " " + response.getMessage(),Logger.OTHER, Logger.ERROR);
                             }
                         }
                     }
@@ -407,8 +405,8 @@ public class LazyBones extends Plugin {
             noEPGAvailable(prog, id);
         } else {
             String msg = res != null ? res.getMessage() : "Reason unknown";
-            JOptionPane.showMessageDialog(null, mLocalizer.msg(
-                    "couldnt_create", "Couldn\'t create timer\n: ") + " " + msg);
+            LOG.log(mLocalizer.msg("couldnt_create",
+                    "Couldn\'t create timer\n: ") + " " + msg,Logger.OTHER, Logger.ERROR);
         }
     }
 
@@ -428,9 +426,13 @@ public class LazyBones extends Plugin {
         int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
 
-        int result = JOptionPane.showConfirmDialog(null, mLocalizer.msg(
+        boolean dontCare = Boolean.FALSE.toString().equals(props.getProperty("logEPGErrors"));
+        int result = JOptionPane.NO_OPTION;
+        if(!dontCare) {
+            result = JOptionPane.showConfirmDialog(null, mLocalizer.msg(
                 "noEPGdata", ""), "", JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.OK_OPTION) {
+        }
+        if (dontCare || result == JOptionPane.OK_OPTION) {
             VDRTimer newTimer = new VDRTimer();
             newTimer.setActive(true);
             newTimer.setChannel(channelID);
@@ -579,9 +581,6 @@ public class LazyBones extends Plugin {
 
         Calendar start = GregorianCalendar.getInstance();
         start.setTimeInMillis(cal.getTimeInMillis());
-        Calendar end = timer.getEndTime();
-        long length = end.getTimeInMillis() - start.getTimeInMillis();
-        start.add(Calendar.MILLISECOND, (int) length);
 
         Enumeration en = channelMapping.keys();
         Channel chan = null;
@@ -747,6 +746,7 @@ public class LazyBones extends Plugin {
             // ones
             storedTimers = (ArrayList) in.readObject();
         } catch (Exception e) {
+            LOG.log("Couldn't read data", Logger.OTHER, Logger.ERROR);
             e.printStackTrace(System.out);
         }
 
@@ -791,22 +791,20 @@ public class LazyBones extends Plugin {
         vdrtimers = new ArrayList();
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
-            LOG.info("Timer retrieved from VDR");
+            LOG.log("Timer retrieved from VDR",Logger.OTHER, Logger.INFO);
             String timers = res.getMessage();
             vdrtimers = TimerParser.parse(timers);
         } else if (res != null && res.getCode() == 550) {
-            LOG.info("No timer defined in VDR");
+            LOG.log("No timer defined in VDR",Logger.OTHER, Logger.INFO);
             // no timers are defined, do nothing
         } else { /*
                      * something went wrong, we have no timers -> load the
                      * stored ones
                      */
-            LOG.info("Error/no timer retrieved from VDR - using stored timer");
+            LOG.log(mLocalizer.msg("using_stored_timers",
+                "Couldn't retrieve timers from VDR, using stored ones."), 
+                Logger.CONNECTION, Logger.ERROR);
             vdrtimers = storedTimers;
-
-            JOptionPane.showMessageDialog(null, mLocalizer.msg(
-                    "using_stored_timers",
-                    "Couldn't retrieve timers from VDR, using stored ones."));
         }
 
         // mark all "timed" programs (haltOnNoChannel = false, because we can
@@ -831,7 +829,7 @@ public class LazyBones extends Plugin {
                 // next timer
                 String mesg = mLocalizer.msg("no_channel_defined",
                         "No channel defined", timer.toString());
-                JOptionPane.showMessageDialog(getParent(), mesg);
+                LOG.log(mesg, Logger.OTHER, Logger.ERROR);
                 // notAssigned.add(timer);
 
                 // leave method only, if the haltOnNoChannel is true
@@ -842,7 +840,7 @@ public class LazyBones extends Plugin {
             }
 
             if (timer.isRepeating()) {
-                LOG.info("Marking repeating timer " + timer);
+                LOG.log("Marking repeating timer " + timer, Logger.CONNECTION, Logger.INFO);
                 markRepeatingTimer(timer, chan);
             } else {
                 markSingularTimer(timer, chan);
@@ -860,13 +858,10 @@ public class LazyBones extends Plugin {
                 showProgramConfirmDialog(element);
             } else {
                 // FIXME für repeating timers müssen wir uns noch was überlegen
-                JOptionPane
-                        .showMessageDialog(
-                                null,
-                                mLocalizer
-                                        .msg(
-                                                "couldnt_assign_repeating",
-                                                "Couldn't assign repeating timer. This timer will not be marked in the program table."));
+                LOG.log(mLocalizer.msg(
+                        "couldnt_assign_repeating",
+                        "Couldn't assign repeating timer. This timer"+
+                        " will not be marked in the program table."), Logger.OTHER, Logger.ERROR);
             }
         }
     }
@@ -1012,15 +1007,15 @@ public class LazyBones extends Plugin {
             } else {
                 boolean found = lookUpTimer(timer);
                 if (!found) { // we have no mapping
-                    LOG.info("Couldn't find a program with that title: "
-                            + timer.getTitle());
+                    LOG.log("Couldn't find a program with that title: "
+                            + timer.getTitle(), Logger.OTHER, Logger.WARN);
                     notAssigned.add(timer);
-                    LOG.info("Couldn't assign timer: " + timer);
+                    LOG.log("Couldn't assign timer: " + timer, Logger.OTHER, Logger.WARN);
                 }
             }
         } else { // no channeldayprogram was found
             notAssigned.add(timer);
-            LOG.info("Couldn't assign timer: " + timer);
+            LOG.log("Couldn't assign timer: " + timer,Logger.OTHER, Logger.WARN);
         }
 
         return true;
@@ -1034,7 +1029,7 @@ public class LazyBones extends Plugin {
     }
 
     private boolean lookUpTimer(VDRTimer timer) {
-        LOG.info("Looking in vdr2browser for: " + timer.toNEWT());
+        LOG.log("Looking in vdr2browser for: " + timer.toNEWT(),Logger.OTHER, Logger.DEBUG);
         Object oid = vdr2browser.get(timer.toNEWT());
         if (oid != null) { // we have a mapping of this timer to a program
             String idString = (String) oid;
@@ -1151,6 +1146,20 @@ public class LazyBones extends Plugin {
         String switchBefore = props.getProperty("switchBefore");
         switchBefore = switchBefore == null ? "false" : switchBefore;
         props.setProperty("switchBefore", switchBefore);
+        
+        String logConnectionErrors = props.getProperty("logConnectionErrors");
+        logConnectionErrors = logConnectionErrors == null ? "true" : logConnectionErrors;
+        props.setProperty("logConnectionErrors", logConnectionErrors);
+        Logger.logConnectionErrors = new Boolean(logConnectionErrors).booleanValue();
+        
+        String logEPGErrors = props.getProperty("logEPGErrors");
+        logEPGErrors = logEPGErrors == null ? "true" : logEPGErrors;
+        props.setProperty("logEPGErrors", logEPGErrors);
+        Logger.logEPGErrors = new Boolean(logEPGErrors).booleanValue();
+        
+        String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
+        showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
+        props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
 
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
@@ -1228,11 +1237,12 @@ public class LazyBones extends Plugin {
             Response response = VDRConnection.send(new UPDT(timer.toNEWT()));
 
             if (response == null) {
-                JOptionPane.showMessageDialog(null, mLocalizer.msg(
+                String mesg = mLocalizer.msg(
                         "couldnt_change", "Couldn\'t change timer:")
                         + "\n"
                         + mLocalizer.msg("couldnt_connect",
-                                "Couldn\'t connect to VDR"));
+                                "Couldn\'t connect to VDR");
+                LOG.log(mesg, Logger.CONNECTION, Logger.ERROR);                
                 return;
             }
 
@@ -1241,9 +1251,10 @@ public class LazyBones extends Plugin {
                 // get the whole timer list again :-(
                 getTimersFromVDR();
             } else {
-                JOptionPane.showMessageDialog(null, mLocalizer.msg(
+                String mesg =  mLocalizer.msg(
                         "couldnt_change", "Couldn\'t change timer:")
-                        + " " + response.getMessage());
+                        + " " + response.getMessage();
+                LOG.log(mesg, Logger.OTHER, Logger.ERROR);
             }
         }
     }

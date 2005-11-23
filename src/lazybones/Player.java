@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.4 2005-10-30 13:01:25 hampelratte Exp $
+/* $Id: Player.java,v 1.5 2005-11-23 16:41:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,8 +31,6 @@ package lazybones;
 
 import java.io.InputStream;
 
-import javax.swing.JOptionPane;
-
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.CHAN;
 import devplugin.Program;
@@ -45,6 +43,8 @@ import devplugin.Program;
  */
 public class Player {
     private static PlayerThread playerThread;
+    
+    private static Logger LOG = Logger.getLogger();
 
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(Player.class);
@@ -70,9 +70,9 @@ public class Player {
                 Response res = VDRConnection.send(new CHAN(Integer
                         .toString(channel)));
                 if (res == null || res.getCode() != 250) {
-                    JOptionPane.showMessageDialog(null, mLocalizer.msg("Error",
-                            "Error")
-                            + ": " + res.getMessage());
+                    String mesg = mLocalizer.msg("Error",
+                    "Error") + ": " + res.getMessage();
+                    LOG.log(mesg, Logger.OTHER, Logger.ERROR);
                     return;
                 }
             }
@@ -94,9 +94,8 @@ public class Player {
                     streamtype + "/" + channel;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
-            JOptionPane.showMessageDialog(null, mLocalizer
-                    .msg("Error", "Error")
-                    + ": " + e1);
+            String mesg =  mLocalizer.msg("Error", "Error")+ ": " + e1;
+            LOG.log(mesg, Logger.OTHER, Logger.ERROR);
         }
     }
 
@@ -126,9 +125,8 @@ public class Player {
                 new PlayerOutputter(p.getErrorStream());
                 p.waitFor();
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, mLocalizer.msg(
-                        "couldnt_start", "Couldn't start player")
-                        + ": " + e);
+                String mesg = mLocalizer.msg("couldnt_start", "Couldn't start player")+ ": " + e;
+                LOG.log(mesg, Logger.OTHER, Logger.ERROR);
             }
             running = false;
         }
@@ -156,8 +154,7 @@ public class Player {
             int length = -1;
             try {
                 while ((length = in.read(buffer)) > 0) {
-                    System.out.println("PLAYER: "
-                            + new String(buffer, 0, length));
+                    LOG.log("PLAYER: " + new String(buffer, 0, length), Logger.OTHER, Logger.DEBUG);
                 }
             } catch (Exception e) {
             }

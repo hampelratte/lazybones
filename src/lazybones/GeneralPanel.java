@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.9 2005-10-30 13:27:04 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.10 2005-11-23 16:41:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,8 @@ import com.jgoodies.forms.layout.FormLayout;
 
 //TODO weitere möglichkeiten für die fehlermeldungen einbauen
 public class GeneralPanel {
+    private Logger LOG = Logger.getLogger();
+    
     private static final long serialVersionUID = 4141920557801647729L;
 
     private static final Localizer mLocalizer = Localizer
@@ -78,6 +80,24 @@ public class GeneralPanel {
 			"Do not show EPG selection dialog for non matching VDR timer");
 
 	private JCheckBox supressMatchDialog;
+    
+    private final String lLogConnectionErrors = mLocalizer.msg(
+            "logConnectionErrors",
+            "Show error dialogs on connection problems");
+    
+    private JCheckBox logConnectionErrors;
+    
+    private final String lLogEPGErrors = mLocalizer.msg(
+            "logEPGErrors",
+            "Show error dialogs, if EPG data are missing");
+    
+    private JCheckBox logEPGErrors;
+    
+    private final String lShowTimerOptionsDialog = mLocalizer.msg(
+            "showTimerOptionsDialog",
+            "Show timer options dialog on timer creation");
+    
+    private JCheckBox showTimerOptionsDialog;
 	
 
 	public GeneralPanel(LazyBones control) {
@@ -108,11 +128,24 @@ public class GeneralPanel {
         supressMatchDialog.setSelected(Boolean.TRUE.toString().equals(
 				control.getProperties().getProperty("supressMatchDialog")));
         supressMatchDialog.setToolTipText(ttSupressMatchDialog);
+        
+        logConnectionErrors = new JCheckBox();
+        logConnectionErrors.setSelected(Boolean.TRUE.toString().equals(
+                control.getProperties().getProperty("logConnectionErrors")));
+        
+        logEPGErrors = new JCheckBox();
+        logEPGErrors.setSelected(Boolean.TRUE.toString().equals(
+                control.getProperties().getProperty("logEPGErrors")));
+        
+        showTimerOptionsDialog = new JCheckBox();
+        showTimerOptionsDialog.setSelected(Boolean.TRUE.toString().equals(
+                control.getProperties().getProperty("showTimerOptionsDialog")));
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:100dlu, 3dlu, 120dlu",
-				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, 2dlu, pref, 2dlu, pref");
+		FormLayout layout = new FormLayout("left:150dlu, 3dlu, 120dlu",
+				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, "+
+                "2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -133,6 +166,15 @@ public class GeneralPanel {
 		
         builder.addLabel(lSupressMatchDialog,cc.xy (1, 11));
 		builder.add(supressMatchDialog,      cc.xyw(3, 11, 1));
+        
+        builder.addLabel(lLogConnectionErrors,   cc.xy (1, 13));
+        builder.add(logConnectionErrors,         cc.xyw(3, 13, 1));
+        
+        builder.addLabel(lLogEPGErrors,          cc.xy (1, 15));
+        builder.add(logEPGErrors,                cc.xyw(3, 15, 1));
+        
+        builder.addLabel(lShowTimerOptionsDialog,cc.xy (1, 17));
+        builder.add(showTimerOptionsDialog,      cc.xyw(3, 17, 1));
 
 		return builder.getPanel();
 	}
@@ -144,26 +186,21 @@ public class GeneralPanel {
         try {
             p = Integer.parseInt(port.getText());
         } catch (NumberFormatException nfe) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            mLocalizer
-                                    .msg(
-                                            "invalidPort",
-                                            "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>"));
+            String mesg = mLocalizer.msg(
+                   "invalidPort",
+                   "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>");
+            LOG.log(mesg, Logger.OTHER, Logger.ERROR);
             p = 2001;
             port.setText("2001");
         }
         try {
             t = Integer.parseInt(timeout.getText());
         } catch (NumberFormatException nfe) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            mLocalizer
+            String mesg = mLocalizer
                                     .msg(
                                             "invalidTimeout",
-                                            "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>"));
+                                            "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
+            LOG.log(mesg, Logger.OTHER, Logger.ERROR);
             t = 500;
             port.setText("500");
         }
@@ -179,5 +216,11 @@ public class GeneralPanel {
                 percentageOfEquality.getValue().toString());
         control.getProperties().setProperty("supressMatchDialog",
 				"" + supressMatchDialog.isSelected());
+        control.getProperties().setProperty("logConnectionErrors",
+                "" + logConnectionErrors.isSelected());
+        control.getProperties().setProperty("logEPGErrors",
+                "" + logEPGErrors.isSelected());
+        control.getProperties().setProperty("showTimerOptionsDialog",
+                "" + showTimerOptionsDialog.isSelected());
     }
 }
