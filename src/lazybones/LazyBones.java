@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.19 2005-11-12 16:29:34 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.20 2005-11-23 12:21:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -553,6 +553,8 @@ public class LazyBones extends Plugin {
         if (tmp != null) {
             TimerProgram program = (TimerProgram) tmp;
             VDRTimer t = program.getTimer();
+            t.setTitle(timerOptions.getTitle());
+            t.setDescription(timerOptions.getDescription());
             t.setLifetime(timerOptions.getLifetime());
             t.setPriority(timerOptions.getPriority());
             t.setStartTime(timerOptions.getStartTime());
