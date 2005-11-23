@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.1 2005-11-23 16:41:49 hampelratte Exp $
+/* $Id: Logger.java,v 1.2 2005-11-23 18:47:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,65 +34,92 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 
 public class Logger {
-    
-    public static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(LazyBones.class.getName());
-    
+
+    public static final java.util.logging.Logger LOG = java.util.logging.Logger
+            .getLogger(LazyBones.class.getName());
+
     public final static int CONNECTION = 0;
+
     public final static int EPG = 1;
+
     public final static int OTHER = 2;
-    
-    public final static LoggingLevel DEBUG = new LoggingLevel("LAZYBONES DEBUG",56738);
-    public final static LoggingLevel INFO = new LoggingLevel("LAZYBONES INFO",56739);
-    public final static LoggingLevel WARN = new LoggingLevel("LAZYBONES WARN",56740);
-    public final static LoggingLevel ERROR = new LoggingLevel("LAZYBONES ERROR",56741);
-    public final static LoggingLevel FATAL = new LoggingLevel("LAZYBONES FATAL",56742);
-    
+
+    public final static LoggingLevel DEBUG = new LoggingLevel(
+            "LAZYBONES DEBUG", 56738);
+
+    public final static LoggingLevel INFO = new LoggingLevel("LAZYBONES INFO",
+            56739);
+
+    public final static LoggingLevel WARN = new LoggingLevel("LAZYBONES WARN",
+            56740);
+
+    public final static LoggingLevel ERROR = new LoggingLevel(
+            "LAZYBONES ERROR", 56741);
+
+    public final static LoggingLevel FATAL = new LoggingLevel(
+            "LAZYBONES FATAL", 56742);
+
     private static Logger instance;
-    
+
     public static boolean logConnectionErrors = true;
+
     public static boolean logEPGErrors = true;
-    
+
     private Logger() {
-        
+
     }
-    
+
     public static Logger getLogger() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new Logger();
         }
         return instance;
     }
-    
+
     public void log(Object o, int type, LoggingLevel level) {
-        switch(type) {
-            case CONNECTION:
-                if(logConnectionErrors) {
-                    LOG.log(level, o.toString());
-                    if(level == ERROR || level == FATAL) {
-                        JOptionPane.showMessageDialog(null, o.toString());
-                    }
-                }
-                break;
-            case EPG:
-                if(logEPGErrors) {
-                    LOG.log(level, o.toString());
-                    if(level == ERROR || level == FATAL) {
-                        JOptionPane.showMessageDialog(null, o.toString());
-                    }
-                }
-                break;
-            default:
+        switch (type) {
+        case CONNECTION:
+            if (logConnectionErrors) {
                 LOG.log(level, o.toString());
-                if(level == ERROR || level == FATAL) {
-                    JOptionPane.showMessageDialog(null, o.toString());
+                if (level == ERROR || level == FATAL) {
+                    new MessagePopup(o.toString());
                 }
-                break;
+            }
+            break;
+        case EPG:
+            if (logEPGErrors) {
+                LOG.log(level, o.toString());
+                if (level == ERROR || level == FATAL) {
+                    new MessagePopup(o.toString());
+                }
+            }
+            break;
+        default:
+            LOG.log(level, o.toString());
+            if (level == ERROR || level == FATAL) {
+                new MessagePopup(o.toString());
+            }
+            break;
         }
     }
-    
+
     private static class LoggingLevel extends Level {
         private LoggingLevel(String name, int level) {
             super(name, level);
+        }
+    }
+
+    private class MessagePopup extends Thread {
+
+        private String message;
+
+        MessagePopup(String message) {
+            this.message = message;
+            start();
+        }
+
+        public void run() {
+            JOptionPane.showMessageDialog(null, message);
         }
     }
 }
