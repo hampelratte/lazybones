@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.21 2005-11-23 16:41:49 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.22 2005-11-23 18:45:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -827,9 +827,8 @@ public class LazyBones extends Plugin {
             if (chan == null) {
                 // if we can't find a channel for this timer, continue with the
                 // next timer
-                String mesg = mLocalizer.msg("no_channel_defined",
-                        "No channel defined", timer.toString());
-                LOG.log(mesg, Logger.OTHER, Logger.ERROR);
+                LOG.log(mLocalizer.msg("no_channel_defined",
+                        "No channel defined", timer.toString()), Logger.OTHER, Logger.ERROR);
                 // notAssigned.add(timer);
 
                 // leave method only, if the haltOnNoChannel is true
@@ -851,10 +850,11 @@ public class LazyBones extends Plugin {
                 props.getProperty("supressMatchDialog"))) {
             return;
         }
-
+        
         for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
             VDRTimer element = (VDRTimer) iterator.next();
             if (!element.isRepeating()) {
+                // klappt nicht, wenn keine epg-daten im tvbrowser vorliegen
                 showProgramConfirmDialog(element);
             } else {
                 // FIXME für repeating timers müssen wir uns noch was überlegen
@@ -879,6 +879,10 @@ public class LazyBones extends Plugin {
 
         while (true) {
             if (timer.isDaySet(startDate)) {
+                if(chan == null) {
+                    break;
+                }
+                
                 Iterator dayProgram = Plugin.getPluginManager()
                         .getChannelDayProgram(new Date(startDate), chan);
                 if (dayProgram != null) {
@@ -1016,6 +1020,8 @@ public class LazyBones extends Plugin {
         } else { // no channeldayprogram was found
             notAssigned.add(timer);
             LOG.log("Couldn't assign timer: " + timer,Logger.OTHER, Logger.WARN);
+            String mesg = mLocalizer.msg("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
+            LOG.log(mesg, Logger.EPG, Logger.ERROR);
         }
 
         return true;
