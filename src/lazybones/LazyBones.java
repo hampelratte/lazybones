@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.22 2005-11-23 18:45:04 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.23 2005-11-24 16:46:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,6 +44,8 @@ import java.util.*;
 
 import javax.swing.*;
 
+import lazybones.gui.TimerManager;
+
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -74,6 +76,8 @@ public class LazyBones extends Plugin {
     private PreviewPanel pp;
 
     private Properties props;
+    
+    private TimerManager timerManager;
 
     /**
      * 
@@ -81,7 +85,7 @@ public class LazyBones extends Plugin {
     private Hashtable channelMapping = new Hashtable();
 
     /**
-     * The current VDR timers
+     * The current VDR timers (all: the marked and not marked)
      */
     // private Vector vdrtimers = new Vector();
     private ArrayList vdrtimers = new ArrayList();
@@ -109,8 +113,6 @@ public class LazyBones extends Plugin {
 
     public ActionMenu getContextMenuActions(final Program program) {
         AbstractAction action = new AbstractAction() {
-            private static final long serialVersionUID = 4909372697426213602L;
-
             public void actionPerformed(ActionEvent evt) {
 
             }
@@ -132,11 +134,9 @@ public class LazyBones extends Plugin {
         Action[] actions = null;
 
         if (marked) {
-            actions = new Action[4];
+            actions = new Action[5];
 
             actions[1] = new AbstractAction() {
-                private static final long serialVersionUID = -3300041354617117202L;
-
                 public void actionPerformed(ActionEvent evt) {
                     deleteTimer(program);
                 }
@@ -147,8 +147,6 @@ public class LazyBones extends Plugin {
                     createImageIcon("lazybones/cancel.png"));
 
             actions[2] = new AbstractAction() {
-                private static final long serialVersionUID = 2186961953492186827L;
-
                 public void actionPerformed(ActionEvent evt) {
                     VDRTimer timer = (VDRTimer) program2TimerMap.get(program);
                     editTimer(timer);
@@ -160,8 +158,6 @@ public class LazyBones extends Plugin {
                     createImageIcon("lazybones/Edit16.png"));
 
             actions[3] = new AbstractAction() {
-                private static final long serialVersionUID = -6741513103428614974L;
-
                 public void actionPerformed(ActionEvent evt) {
                     getTimersFromVDR();
                 }
@@ -170,13 +166,21 @@ public class LazyBones extends Plugin {
                     "Synchronize with VDR"));
             actions[3].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Refresh16.gif"));
+            
+            actions[4] = new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {
+                    getTimerManager().setVisible(true);
+                }
+            };
+            actions[4].putValue(Action.NAME, mLocalizer.msg("showAllTimers",
+                    "Show all timers"));
+            actions[4].putValue(Action.SMALL_ICON,
+                    createImageIcon("lazybones/view_detailed.png"));
 
         } else {
-            actions = new Action[3];
+            actions = new Action[4];
 
             actions[1] = new AbstractAction() {
-                private static final long serialVersionUID = -6045308970837086440L;
-
                 public void actionPerformed(ActionEvent evt) {
                     createTimer(program);
                 }
@@ -187,8 +191,6 @@ public class LazyBones extends Plugin {
                     createImageIcon("lazybones/capture.png"));
 
             actions[2] = new AbstractAction() {
-                private static final long serialVersionUID = -6741513103428614974L;
-
                 public void actionPerformed(ActionEvent evt) {
                     getTimersFromVDR();
                 }
@@ -197,11 +199,19 @@ public class LazyBones extends Plugin {
                     "Synchronize with VDR"));
             actions[2].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Refresh16.gif"));
+            
+            actions[3] = new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {
+                    getTimerManager().setVisible(true);
+                }
+            };
+            actions[3].putValue(Action.NAME, mLocalizer.msg("showAllTimers",
+                    "Show all timers"));
+            actions[3].putValue(Action.SMALL_ICON,
+                    createImageIcon("lazybones/view_detailed.png"));
         }
 
         actions[0] = new AbstractAction() {
-            private static final long serialVersionUID = -5553013336005178712L;
-
             public void actionPerformed(ActionEvent evt) {
                 watch(program);
             }
@@ -238,7 +248,7 @@ public class LazyBones extends Plugin {
         Player.play(program, this);
     }
 
-    private void deleteTimer(Program prog) {
+    public void deleteTimer(Program prog) {
         VDRTimer timer = (VDRTimer) program2TimerMap.get(prog);
         Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
         if (res == null) {
@@ -265,7 +275,7 @@ public class LazyBones extends Plugin {
                     + " " + res.getMessage(), Logger.OTHER, Logger.ERROR);
         }
     }
-
+    
     private void createTimer(Program prog) {
         if (prog.isExpired()) {
             LOG.log(mLocalizer.msg(
@@ -791,7 +801,7 @@ public class LazyBones extends Plugin {
         vdrtimers = new ArrayList();
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
-            LOG.log("Timer retrieved from VDR",Logger.OTHER, Logger.INFO);
+            LOG.log("Timers retrieved from VDR",Logger.OTHER, Logger.INFO);
             String timers = res.getMessage();
             vdrtimers = TimerParser.parse(timers);
         } else if (res != null && res.getCode() == 550) {
@@ -813,6 +823,13 @@ public class LazyBones extends Plugin {
 
         // update the plugin tree
         updateTree();
+    }
+    
+    private TimerManager getTimerManager() {
+        if(timerManager == null) {
+            timerManager = new TimerManager(this);
+        }
+        return timerManager;
     }
 
     private void markPrograms(ArrayList affectedTimers, boolean haltOnNoChannel) {
@@ -861,7 +878,7 @@ public class LazyBones extends Plugin {
                 LOG.log(mLocalizer.msg(
                         "couldnt_assign_repeating",
                         "Couldn't assign repeating timer. This timer"+
-                        " will not be marked in the program table."), Logger.OTHER, Logger.ERROR);
+                        " will not be marked in the program table.", element), Logger.OTHER, Logger.ERROR);
             }
         }
     }
@@ -869,6 +886,12 @@ public class LazyBones extends Plugin {
     private void markRepeatingTimer(VDRTimer timer, Channel chan) {
         // TODO repeating timers eventuell auch mappen, wenn program
         // nicht zugeordnet werden kann.
+        
+        /** 
+         * shows, if the repeating timer marked at least one program
+         * then notAssigned doesn't have to be called
+         */
+        boolean matchedProgramm = false;
 
         Calendar startDate = timer.getStartTime();
         Calendar endDate = timer.getEndTime();
@@ -886,20 +909,16 @@ public class LazyBones extends Plugin {
                 Iterator dayProgram = Plugin.getPluginManager()
                         .getChannelDayProgram(new Date(startDate), chan);
                 if (dayProgram != null) {
-
-                    // DEBUG
-                    /*
-                     * String date = startDate.get(Calendar.DAY_OF_MONTH) + "." +
-                     * (startDate.get(Calendar.MONTH) + 1); LOG.info("Trying to
-                     * mark " + chan + " on" + date + ":\"" + timer + "\"");
-                     */
-                    // DEBUG end
-
                     boolean continue_marking = markSingularTimer(timer, chan);
                     if (!continue_marking) {
                         break;
+                    } else {
+                       matchedProgramm = true; 
                     }
                 } else {
+                    if(!matchedProgramm) {
+                        notAssigned.add(timer);
+                    }
                     break;
                 }
             }
@@ -919,9 +938,6 @@ public class LazyBones extends Plugin {
      * @return Returns, if markRepeatingTimer() should continue or not
      */
     private boolean markSingularTimer(VDRTimer timer, Channel chan) {
-        // TODO show a list with timers, which couldn't be assigned
-        // and show programConfirmDialog for these timers
-        
         // TODO eventuell erkennen: ein timer kann auch mehrere sendungen
         // aufnehmen (doppelpacks z.b.)
 
@@ -970,7 +986,6 @@ public class LazyBones extends Plugin {
                 }
             }
 
-            // LOG.info(candidates.size() + " candidates found");
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
                 if (found) {
@@ -1003,6 +1018,7 @@ public class LazyBones extends Plugin {
             // program
             if (percentage >= threshold) {
                 progMin.mark(this);
+                timer.setAssigned(true);
                 timer.setTvBrowserProgID(progMin.getID());
                 if (timer.isRepeating()) {
                     timer.setProgTime(progMin.getDate().getCalendar());
@@ -1063,6 +1079,7 @@ public class LazyBones extends Plugin {
                     if (p.getID().equals(progID)
                             && p.getDate().equals(progDate)) {
                         p.mark(this);
+                        timer.setAssigned(true);
                         timer.setTvBrowserProgID(p.getID());
                         program2TimerMap.put(p, timer);
                         return true;
@@ -1074,7 +1091,7 @@ public class LazyBones extends Plugin {
         return false;
     }
 
-    private Channel getChannel(VDRTimer timer) {
+    public Channel getChannel(VDRTimer timer) {
         Channel chan = null;
         Enumeration en = channelMapping.keys();
         while (en.hasMoreElements()) {
@@ -1236,7 +1253,7 @@ public class LazyBones extends Plugin {
         return true;
     }
 
-    private void editTimer(VDRTimer timer) {
+    public void editTimer(VDRTimer timer) {
         boolean change = showTimerOptionsDialog(timer, true);
 
         if (change) {
@@ -1298,5 +1315,9 @@ public class LazyBones extends Plugin {
             }
         }
         return null;
+    }
+
+    public ArrayList getTimers() {
+        return vdrtimers;
     }
 }
