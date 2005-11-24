@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.10 2005-11-23 16:41:49 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.11 2005-11-24 16:47:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,6 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-//TODO weitere möglichkeiten für die fehlermeldungen einbauen
 public class GeneralPanel {
     private Logger LOG = Logger.getLogger();
     
