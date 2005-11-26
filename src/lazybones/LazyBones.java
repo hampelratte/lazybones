@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.26 2005-11-26 12:49:37 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.27 2005-11-26 13:50:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -790,18 +790,16 @@ public class LazyBones extends Plugin {
             Timer timer = (Timer) iter.next();
             Channel chan = ProgramManager.getInstance().getChannel(timer);
             if (chan == null) {
-                // if we can't find a channel for this timer, continue with the
-                // next timer
-                LOG.log(mLocalizer.msg("no_channel_defined",
-                        "No channel defined", timer.toString()), Logger.OTHER, Logger.ERROR);
+                timer.setReason(Timer.NO_CHANNEL);
 
                 // leave method only, if the haltOnNoChannel is true
                 // this is the case, if the call comes from markPrograms(ChannelDayProgram)
                 if (haltOnNoChannel) {
                     return;
                 }
-                
-                timer.setReason(Timer.NO_CHANNEL);
+
+                // we couldn't find a channel for this timer, continue with the
+                // next timer
                 continue;
             }
 
@@ -825,11 +823,25 @@ public class LazyBones extends Plugin {
                 + TimerManager.getInstance().getNotAssignedTimers().size(),
                 Logger.OTHER, Logger.DEBUG);
         while (iterator.hasNext()) {
-            Timer element = (Timer) iterator.next();
+            Timer timer = (Timer) iterator.next();
             // TODO klappt nicht, wenn keine epg-daten im tvbrowser vorliegen
-             showProgramConfirmDialog(element);
-            LOG.log("Not assigned timer: " + element.toString(), Logger.OTHER,
-                    Logger.DEBUG);
+            switch(timer.getReason()) {
+            case Timer.NOT_FOUND:
+                showProgramConfirmDialog(timer);
+                break;
+            case Timer.NO_EPG:
+                LOG.log("Couldn't assign timer: " + timer, Logger.EPG, Logger.WARN);
+                String mesg = mLocalizer.msg("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
+                LOG.log(mesg, Logger.EPG, Logger.ERROR);
+                break;
+            case Timer.NO_CHANNEL:
+                LOG.log(mLocalizer.msg("no_channel_defined",
+                        "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
+                break;
+            default:
+                LOG.log("Not assigned timer: " + timer.toString(), Logger.OTHER,
+                        Logger.DEBUG);
+            }
         }
     }
 
@@ -935,9 +947,6 @@ public class LazyBones extends Plugin {
             }
         } else { // no channeldayprogram was found
             if(!timer.isRepeating()) {
-                LOG.log("Couldn't assign timer: " + timer,Logger.OTHER, Logger.WARN);
-                String mesg = mLocalizer.msg("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
-                LOG.log(mesg, Logger.EPG, Logger.ERROR);
                 timer.setReason(Timer.NO_EPG);
             }
         }
@@ -1053,12 +1062,18 @@ public class LazyBones extends Plugin {
         Iterator iterator = TimerManager.getInstance().getTimers().iterator();
         while (iterator.hasNext()) {
             Timer timer = (Timer) iterator.next();
-            String progChan = prog.getChannel().getId();
-            Date date = new Date(timer.getStartTime());
-            Program timerProgram = Plugin.getPluginManager().getProgram(date,
-                    timer.getTvBrowserProgID());
-            if (timerProgram != null
-                    && timerProgram.getChannel().getId().equals(progChan)) {
+            Channel timerChannel = ProgramManager.getInstance().getChannel(timer);
+            Channel progChannel = prog.getChannel();
+            
+            // timer channel couldn't be found
+            // no channel available for this timer
+            if(timerChannel == null) {
+                return;
+            } 
+            
+            // timer channel and prog channel are equal
+            // add this timer to affected timers
+            if (timerChannel.equals(progChannel)) {
                 affectedTimers.add(timer);
             }
         }
