@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.2 2005-11-26 12:49:39 hampelratte Exp $
+/* $Id: TimerList.java,v 1.3 2005-11-26 13:48:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,10 @@ import devplugin.Program;
 
 public class TimerList extends JDialog implements ActionListener {
 
+    private static Logger LOG = Logger.getLogger();
+    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
+    .getLocalizerFor(LazyBones.class); // strings of lazybones are needed
+    
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
     private ProgramList timerList = new ProgramList(model);
@@ -136,12 +140,17 @@ public class TimerList extends JDialog implements ActionListener {
     
     private void addProgramm(ArrayList programs, Timer timer, Calendar time) {
         Channel chan = ProgramManager.getInstance().getChannel(timer);
-        TimerProgram p = new TimerProgram(chan, new Date(time), time
-                .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
-        p.setTitle(timer.getTitle());
-        p.setDescription("");
-        p.setTimer(timer);
-        programs.add(p);
+        if(chan != null) {
+            TimerProgram p = new TimerProgram(chan, new Date(time), time
+                    .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
+            p.setTitle(timer.getTitle());
+            p.setDescription("");
+            p.setTimer(timer);
+            programs.add(p);
+        } else {
+            LOG.log(mLocalizer.msg("no_channel_defined",
+                    "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
+        }
     }
 
     public void actionPerformed(ActionEvent e) {
