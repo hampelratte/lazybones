@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.1 2005-11-26 01:29:07 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.2 2005-11-26 02:18:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -180,5 +180,16 @@ public class TimerManager {
             }
         }
         return null;
+    }
+    
+    
+    public void replaceStoredTimer(Timer timer) {
+        for (Iterator it = storedTimers.iterator(); it.hasNext();) {
+            Timer storedTimer = (Timer) it.next();
+            if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
+                storedTimers.remove(storedTimer);
+                storedTimers.add(timer);
+            }
+        }
     }
 }

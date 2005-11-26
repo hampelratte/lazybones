@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.24 2005-11-26 01:29:07 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.25 2005-11-26 02:18:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -343,7 +343,7 @@ public class LazyBones extends Plugin {
                         Program selectedProgram = showTimerConfirmDialog(timer,
                                 prog);
                         if (selectedProgram != null) {
-                            VDRTimer t = ((TimerProgram) selectedProgram)
+                            Timer t = ((TimerProgram) selectedProgram)
                                     .getTimer();
                             // start the recording x min before the beggining of
                             // the program
@@ -436,15 +436,10 @@ public class LazyBones extends Plugin {
         }
     }
 
-    protected void timerCreatedOK(Program prog, VDRTimer t) {
-        // store the vdr-name of this program
-        String idString = prog.getID() + "###";
-        int year = prog.getDate().getYear();
-        int month = prog.getDate().getMonth();
-        int day = prog.getDate().getDayOfMonth();
-        idString += day + "_" + month + "_" + year + "###";
-        idString += prog.getChannel().getId();
-
+    protected void timerCreatedOK(Program prog, Timer timer) {
+        timer.setTvBrowserProgID(prog.getID());
+        TimerManager.getInstance().replaceStoredTimer(timer);
+        
         // since we dont have the ID of the new timer, we have
         // to get the whole timer list again :-(
         getTimersFromVDR();
@@ -772,6 +767,9 @@ public class LazyBones extends Plugin {
                 if (haltOnNoChannel) {
                     return;
                 }
+                
+                timer.setReason(Timer.NO_CHANNEL);
+                continue;
             }
 
             markSingularTimer(timer, chan);
@@ -821,11 +819,6 @@ public class LazyBones extends Plugin {
 
         Date date = new Date(year, month, day);
 
-        if (chan == null) {
-            // leave method, if channel is not available
-            return;
-        }
-
         Iterator it = getPluginManager().getChannelDayProgram(date, chan);
         if (it != null) {
             TreeMap candidates = new TreeMap();
@@ -860,6 +853,9 @@ public class LazyBones extends Plugin {
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
                 if (found) {
+                    return;
+                } else {
+                    timer.setReason(Timer.NOT_FOUND);
                     return;
                 }
             }
@@ -1159,6 +1155,8 @@ public class LazyBones extends Plugin {
                     }
                 }
             }
+        } else {
+            LOG.log("No mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
         }
 
         return false;
