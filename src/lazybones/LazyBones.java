@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.23 2005-11-24 16:46:01 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.24 2005-11-26 01:29:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,8 +44,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import lazybones.gui.TimerManager;
-
+import lazybones.gui.TimerList;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -77,39 +76,7 @@ public class LazyBones extends Plugin {
 
     private Properties props;
     
-    private TimerManager timerManager;
-
-    /**
-     * 
-     */
-    private Hashtable channelMapping = new Hashtable();
-
-    /**
-     * The current VDR timers (all: the marked and not marked)
-     */
-    // private Vector vdrtimers = new Vector();
-    private ArrayList vdrtimers = new ArrayList();
-
-    /**
-     * The VDR timers from the last session, which have been stored to disk
-     */
-    private ArrayList storedTimers = new ArrayList();
-
-    /**
-     * Stores a mapping of tv-browser programs to vdr-timers. If the users
-     * deletes a timer, we can lookup the timer for the selected program with
-     * this mapping
-     */
-    private Hashtable program2TimerMap = new Hashtable();
-
-    /**
-     * Stores a mapping of vdr titles, which totally differ from the titles of
-     * tv-browser. This way, we can detect these programs and don't need to ask
-     * the user again
-     */
-    private Hashtable vdr2browser = new Hashtable();
-
-    private ArrayList notAssigned = new ArrayList();
+    private TimerList timerList;
 
     public ActionMenu getContextMenuActions(final Program program) {
         AbstractAction action = new AbstractAction() {
@@ -148,7 +115,8 @@ public class LazyBones extends Plugin {
 
             actions[2] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
-                    VDRTimer timer = (VDRTimer) program2TimerMap.get(program);
+                    Timer timer = (Timer) TimerManager.getInstance().getTimer(
+                            program.getID());
                     editTimer(timer);
                 }
             };
@@ -169,7 +137,7 @@ public class LazyBones extends Plugin {
             
             actions[4] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
-                    getTimerManager().setVisible(true);
+                    getTimerList().setVisible(true);
                 }
             };
             actions[4].putValue(Action.NAME, mLocalizer.msg("showAllTimers",
@@ -202,7 +170,7 @@ public class LazyBones extends Plugin {
             
             actions[3] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
-                    getTimerManager().setVisible(true);
+                    getTimerList().setVisible(true);
                 }
             };
             actions[3].putValue(Action.NAME, mLocalizer.msg("showAllTimers",
@@ -249,26 +217,14 @@ public class LazyBones extends Plugin {
     }
 
     public void deleteTimer(Program prog) {
-        VDRTimer timer = (VDRTimer) program2TimerMap.get(prog);
+        Timer timer = TimerManager.getInstance().getTimer(prog.getID());
         Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
         if (res == null) {
             return;
         } else if (res.getCode() == 250) {
             prog.unmark(this);
-            program2TimerMap.remove(prog);
-            vdr2browser.remove(timer.toNEWT());
             getTimersFromVDR();
             updateTree();
-            Enumeration en = program2TimerMap.keys();
-            while (en.hasMoreElements()) {
-                Object key = en.nextElement();
-                // decrease the id of all timers with an id higher than that of
-                // the deleted timer. vdr does this too (how stupid!!)
-                VDRTimer t = (VDRTimer) program2TimerMap.get(key);
-                if (t.getID() > timer.getID()) {
-                    t.setID(t.getID() - 1);
-                }
-            }
         } else {
             LOG.log(mLocalizer.msg(
                     "couldnt_delete", "Couldn\'t delete timer:")
@@ -293,7 +249,7 @@ public class LazyBones extends Plugin {
         cal.add(Calendar.MINUTE, prog.getLength() / 2);
         long millis = cal.getTimeInMillis();
 
-        Object o = channelMapping.get(prog.getChannel().getId());
+        Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
             LOG.log(mLocalizer.msg("no_channel_defined",
                     "No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
@@ -322,7 +278,7 @@ public class LazyBones extends Plugin {
                     ((VDRChannel) o).getName(), millis) : (EPGEntry) epgList
                     .get(0);
 
-            VDRTimer timer = new VDRTimer();
+            Timer timer = new Timer();
             timer.setChannel(id);
             timer.setTvBrowserProgID(prog.getID());
             timer.setPriority(50);
@@ -383,6 +339,7 @@ public class LazyBones extends Plugin {
                                     + " " + response.getMessage(),Logger.OTHER, Logger.ERROR);
                         }
                     } else {
+                        // TODO das müsste eigentlich früher kommen
                         Program selectedProgram = showTimerConfirmDialog(timer,
                                 prog);
                         if (selectedProgram != null) {
@@ -420,7 +377,7 @@ public class LazyBones extends Plugin {
         }
     }
 
-    private boolean showTimerOptionsDialog(VDRTimer timer, boolean updateDialog) {
+    private boolean showTimerOptionsDialog(Timer timer, boolean updateDialog) {
         TimerOptionsDialog tod = new TimerOptionsDialog(this, timer,
                 updateDialog);
         tod.start();
@@ -443,7 +400,7 @@ public class LazyBones extends Plugin {
                 "noEPGdata", ""), "", JOptionPane.YES_NO_OPTION);
         }
         if (dontCare || result == JOptionPane.OK_OPTION) {
-            VDRTimer newTimer = new VDRTimer();
+            Timer newTimer = new Timer();
             newTimer.setActive(true);
             newTimer.setChannel(channelID);
             newTimer.setLifetime(50);
@@ -487,7 +444,6 @@ public class LazyBones extends Plugin {
         int day = prog.getDate().getDayOfMonth();
         idString += day + "_" + month + "_" + year + "###";
         idString += prog.getChannel().getId();
-        vdr2browser.put(t.toNEWT(), idString);
 
         // since we dont have the ID of the new timer, we have
         // to get the whole timer list again :-(
@@ -504,7 +460,7 @@ public class LazyBones extends Plugin {
      *            the timer from TimerOptionsDialog
      * @return the selected VDR-Program
      */
-    private Program showTimerConfirmDialog(VDRTimer timerOptions, Program prog) {
+    private Program showTimerConfirmDialog(Timer timerOptions, Program prog) {
         // get all programs 2 hours before and after the given program
         Calendar cal = GregorianCalendar.getInstance();
         Date date = prog.getDate();
@@ -523,7 +479,7 @@ public class LazyBones extends Plugin {
             Calendar c = GregorianCalendar.getInstance();
             c.setTimeInMillis(cal.getTimeInMillis());
             c.add(Calendar.MINUTE, i * -1);
-            VDRTimer t1 = getVDRProgramAt(c, chan);
+            Timer t1 = getVDRProgramAt(c, chan);
             if (t1 != null) {
                 programSet.add(t1);
             }
@@ -532,7 +488,7 @@ public class LazyBones extends Plugin {
             c = GregorianCalendar.getInstance();
             c.setTimeInMillis(cal.getTimeInMillis());
             c.add(Calendar.MINUTE, i);
-            VDRTimer t2 = getVDRProgramAt(c, chan);
+            Timer t2 = getVDRProgramAt(c, chan);
             if (t2 != null) {
                 programSet.add(t2);
             }
@@ -541,7 +497,7 @@ public class LazyBones extends Plugin {
         Program[] programs = new Program[programSet.size()];
         int i = 0;
         for (Iterator iter = programSet.iterator(); iter.hasNext();) {
-            VDRTimer timer = (VDRTimer) iter.next();
+            Timer timer = (Timer) iter.next();
             Calendar time = timer.getStartTime();
             TimerProgram p = new TimerProgram(chan, new Date(time), time
                     .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
@@ -586,19 +542,19 @@ public class LazyBones extends Plugin {
      * @param timer
      *            the timer received from the VDR
      */
-    private void showProgramConfirmDialog(VDRTimer timer) {
+    private void showProgramConfirmDialog(Timer timer) {
         Calendar cal = timer.getStartTime();
 
         Calendar start = GregorianCalendar.getInstance();
         start.setTimeInMillis(cal.getTimeInMillis());
 
-        Enumeration en = channelMapping.keys();
+        Enumeration en = ProgramManager.getChannelMapping().keys();
         Channel chan = null;
         while (en.hasMoreElements()) {
             String channelID = (String) en.nextElement();
-            VDRChannel channel = (VDRChannel) channelMapping.get(channelID);
+            VDRChannel channel = (VDRChannel) ProgramManager.getChannelMapping().get(channelID);
             if (channel.getId() == timer.getChannel()) {
-                chan = getChannelById(channelID);
+                chan = ProgramManager.getInstance().getChannelById(channelID);
             }
         }
 
@@ -606,14 +562,14 @@ public class LazyBones extends Plugin {
         if (chan == null)
             return;
 
-        // get all programs 2 hours before and after the given program
+        // get all programs 3 hours before and after the given program
         HashSet programSet = new HashSet();
-        for (int i = 10; i <= 180; i += 10) {
+        for (int i = 10; i <= 180; i += 10) { // FIXME eigentlich müsste man das minütlich abfragen nicht 10min
             // get the program before the given one
             Calendar c = GregorianCalendar.getInstance();
             c.setTimeInMillis(start.getTimeInMillis());
             c.add(Calendar.MINUTE, i * -1);
-            Program p1 = getProgramAt(c, chan);
+            Program p1 = ProgramManager.getInstance().getProgramAt(c, c, chan);
             if (p1 != null) {
                 programSet.add(p1);
             }
@@ -622,7 +578,7 @@ public class LazyBones extends Plugin {
             c = GregorianCalendar.getInstance();
             c.setTimeInMillis(start.getTimeInMillis());
             c.add(Calendar.MINUTE, i);
-            Program p2 = getProgramAt(c, chan);
+            Program p2 = ProgramManager.getInstance().getProgramAt(c, c, chan);
             if (p2 != null) {
                 programSet.add(p2);
             }
@@ -641,33 +597,9 @@ public class LazyBones extends Plugin {
         dialog.showSelectionDialog(programs, timer);
     }
 
-    private Program getProgramAt(Calendar cal, Channel chan) {
-        Iterator dayProgram = getPluginManager().getChannelDayProgram(
-                new Date(cal), chan);
-        cal.add(Calendar.MONTH, 1);
-        while (dayProgram != null && dayProgram.hasNext()) {
-            Program prog = (Program) dayProgram.next();
-            Calendar progStart = GregorianCalendar.getInstance();
-            progStart.set(Calendar.YEAR, prog.getDate().getYear());
-            progStart.set(Calendar.MONTH, prog.getDate().getMonth());
-            progStart
-                    .set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
-            progStart.set(Calendar.HOUR_OF_DAY, prog.getHours());
-            progStart.set(Calendar.MINUTE, prog.getMinutes());
-
-            Calendar progEnd = GregorianCalendar.getInstance();
-            progEnd.setTimeInMillis(progStart.getTimeInMillis());
-            progEnd.add(Calendar.MINUTE, prog.getLength());
-            if (cal.after(progStart) && cal.before(progEnd)) {
-                return prog;
-            }
-        }
-        return null;
-    }
-
-    protected VDRTimer getVDRProgramAt(Calendar cal, Channel chan) {
+    protected Timer getVDRProgramAt(Calendar cal, Channel chan) {
         long millis = cal.getTimeInMillis() / 1000;
-        Object o = channelMapping.get(chan.getId());
+        Object o = ProgramManager.getChannelMapping().get(chan.getId());
         int id = ((VDRChannel) o).getId();
 
         LSTE cmd = new LSTE(Integer.toString(id), "at " + Long.toString(millis));
@@ -684,7 +616,7 @@ public class LazyBones extends Plugin {
                 timer.setDescription(entry.getDescription());
                 timer.setLifetime(50);
                 timer.setPriority(50);
-                return timer;
+                return new Timer(timer);
             }
         }
         return null;
@@ -735,26 +667,14 @@ public class LazyBones extends Plugin {
         return new VDRSettingsPanel(this);
     }
 
-    protected Hashtable getChannelMapping() {
-        return channelMapping;
-    }
-
-    protected void setChannelMapping(Hashtable channelMapping) {
-        this.channelMapping = channelMapping;
-    }
-
     public void readData(ObjectInputStream in) {
         try {
             // load channel mapping
-            channelMapping = (Hashtable) in.readObject();
+            ProgramManager.setChannelMapping((Hashtable) in.readObject());
 
-            // load vdr2browser mapping for programs with totally different
-            // titles
-            vdr2browser = (Hashtable) in.readObject();
-
-            // load stored timers. if no connection is available, we use these
-            // ones
-            storedTimers = (ArrayList) in.readObject();
+            // load stored timers. 
+            // if no connection is available, we use these ones
+            TimerManager.getInstance().setStoredTimers((ArrayList) in.readObject());
         } catch (Exception e) {
             LOG.log("Couldn't read data", Logger.OTHER, Logger.ERROR);
             e.printStackTrace(System.out);
@@ -762,29 +682,9 @@ public class LazyBones extends Plugin {
 
         Calendar today = GregorianCalendar.getInstance();
 
-        // remove old mappings
-        Enumeration en = vdr2browser.keys();
-        while (en.hasMoreElements()) {
-            String key = (String) en.nextElement();
-            String prog = (String) vdr2browser.get(key);
-            String[] parts = prog.split("###");
-            String dateString = parts[1];
-            parts = dateString.split("_");
-            int day = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]);
-            int year = Integer.parseInt(parts[2]);
-
-            Calendar progTime = GregorianCalendar.getInstance();
-            progTime.set(Calendar.DAY_OF_MONTH, day);
-            progTime.set(Calendar.MONTH, month - 1);
-            progTime.set(Calendar.YEAR, year);
-
-            if (progTime.before(today)) {
-                vdr2browser.remove(key);
-            }
-        }
-        for (ListIterator iter = storedTimers.listIterator(); iter.hasNext();) {
-            VDRTimer timer = (VDRTimer) iter.next();
+        for (ListIterator iter = TimerManager.getInstance().getStoredTimers()
+                .listIterator(); iter.hasNext();) {
+            Timer timer = (Timer) iter.next();
             if (timer.getEndTime().before(today) & !timer.isRepeating()) {
                 iter.remove();
             }
@@ -792,157 +692,127 @@ public class LazyBones extends Plugin {
     }
 
     protected void getTimersFromVDR() {
-        Enumeration en = program2TimerMap.keys();
-        while (en.hasMoreElements()) {
-            Program prog = (Program) en.nextElement();
-            prog.unmark(this);
+        TimerManager tm = TimerManager.getInstance();
+        ArrayList timers = tm.getTimers();
+        for (Iterator it = timers.iterator(); it.hasNext();) {
+            Timer timer = (Timer) it.next();
+            String progID = timer.getTvBrowserProgID();
+            if(progID != null) { // timer could be assigned
+                Date date = new Date(timer.getStartTime());
+                Program prog = LazyBones.getPluginManager()
+                    .getProgram(date, progID);
+                if(prog != null) {
+                    prog.unmark(this);
+                }
+            }
         }
 
-        vdrtimers = new ArrayList();
+        tm.removeAll();
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
             LOG.log("Timers retrieved from VDR",Logger.OTHER, Logger.INFO);
-            String timers = res.getMessage();
-            vdrtimers = TimerParser.parse(timers);
+            String timersString = res.getMessage();
+            ArrayList vdrtimers = TimerParser.parse(timersString);
+            tm.setTimers(vdrtimers);
         } else if (res != null && res.getCode() == 550) {
-            LOG.log("No timer defined in VDR",Logger.OTHER, Logger.INFO);
             // no timers are defined, do nothing
-        } else { /*
-                     * something went wrong, we have no timers -> load the
-                     * stored ones
-                     */
+            LOG.log("No timer defined on VDR",Logger.OTHER, Logger.INFO);
+        } else { /* something went wrong, we have no timers -> 
+                  * load the stored ones */
             LOG.log(mLocalizer.msg("using_stored_timers",
                 "Couldn't retrieve timers from VDR, using stored ones."), 
                 Logger.CONNECTION, Logger.ERROR);
-            vdrtimers = storedTimers;
+            
+            ArrayList vdrtimers = tm.getStoredTimers();
+            tm.setTimers(vdrtimers);
         }
 
         // mark all "timed" programs (haltOnNoChannel = false, because we can
         // have multiple channels)
-        markPrograms(vdrtimers, false);
+        markPrograms(TimerManager.getInstance().getTimers(), false);
 
         // update the plugin tree
         updateTree();
     }
     
-    private TimerManager getTimerManager() {
-        if(timerManager == null) {
-            timerManager = new TimerManager(this);
+    private TimerList getTimerList() {
+        if(timerList == null) {
+            timerList = new TimerList(this);
         }
-        return timerManager;
+        return timerList;
     }
 
+    /**
+     * Called to mark all Programs
+     * 
+     * @param affectedTimers
+     *            An ArrayList with all timers
+     * @param haltOnNoChannel
+     *            Determines, if the method should terminate, if the channel
+     *            couldn't be found for a timer. This is useful, if all timers
+     *            have the same channel (see markPrograms(ChannelDayProgram
+     *            prog))
+     * @see LazyBones#markPrograms(ChannelDayProgram)
+     */
     private void markPrograms(ArrayList affectedTimers, boolean haltOnNoChannel) {
-        program2TimerMap.clear();
         Iterator iter = affectedTimers.iterator();
-        notAssigned.clear();
 
         // for every timer
         while (iter.hasNext()) {
-            VDRTimer timer = (VDRTimer) iter.next();
-            Channel chan = getChannel(timer);
+            Timer timer = (Timer) iter.next();
+            Channel chan = ProgramManager.getInstance().getChannel(timer);
             if (chan == null) {
                 // if we can't find a channel for this timer, continue with the
                 // next timer
                 LOG.log(mLocalizer.msg("no_channel_defined",
                         "No channel defined", timer.toString()), Logger.OTHER, Logger.ERROR);
-                // notAssigned.add(timer);
 
                 // leave method only, if the haltOnNoChannel is true
-                // this is the case, if the call comes from handleTvData*
+                // this is the case, if the call comes from markPrograms(ChannelDayProgram)
                 if (haltOnNoChannel) {
                     return;
                 }
             }
 
-            if (timer.isRepeating()) {
-                LOG.log("Marking repeating timer " + timer, Logger.CONNECTION, Logger.INFO);
-                markRepeatingTimer(timer, chan);
-            } else {
-                markSingularTimer(timer, chan);
-            }
+            markSingularTimer(timer, chan);
         }
-
+        handleNotAssignedTimers();
+    }
+    
+    /**
+     * Handles all timers, which couldn't be assigned automatically
+     *
+     */
+    private void handleNotAssignedTimers() {
         if (Boolean.TRUE.toString().equals(
                 props.getProperty("supressMatchDialog"))) {
             return;
         }
-        
-        for (Iterator iterator = notAssigned.iterator(); iterator.hasNext();) {
-            VDRTimer element = (VDRTimer) iterator.next();
-            if (!element.isRepeating()) {
-                // klappt nicht, wenn keine epg-daten im tvbrowser vorliegen
-                showProgramConfirmDialog(element);
-            } else {
-                // FIXME für repeating timers müssen wir uns noch was überlegen
-                LOG.log(mLocalizer.msg(
-                        "couldnt_assign_repeating",
-                        "Couldn't assign repeating timer. This timer"+
-                        " will not be marked in the program table.", element), Logger.OTHER, Logger.ERROR);
-            }
+        Iterator iterator = TimerManager.getInstance().getNotAssignedTimers()
+                .iterator();
+        LOG.log("Not assigned timers: "
+                + TimerManager.getInstance().getNotAssignedTimers().size(),
+                Logger.OTHER, Logger.DEBUG);
+        while (iterator.hasNext()) {
+            Timer element = (Timer) iterator.next();
+            // TODO klappt nicht, wenn keine epg-daten im tvbrowser vorliegen
+             showProgramConfirmDialog(element);
+            LOG.log("Not assigned timer: " + element.toString(), Logger.OTHER,
+                    Logger.DEBUG);
         }
-    }
-
-    private void markRepeatingTimer(VDRTimer timer, Channel chan) {
-        // TODO repeating timers eventuell auch mappen, wenn program
-        // nicht zugeordnet werden kann.
-        
-        /** 
-         * shows, if the repeating timer marked at least one program
-         * then notAssigned doesn't have to be called
-         */
-        boolean matchedProgramm = false;
-
-        Calendar startDate = timer.getStartTime();
-        Calendar endDate = timer.getEndTime();
-
-        // store original times
-        long start = startDate.getTimeInMillis();
-        long end = endDate.getTimeInMillis();
-
-        while (true) {
-            if (timer.isDaySet(startDate)) {
-                if(chan == null) {
-                    break;
-                }
-                
-                Iterator dayProgram = Plugin.getPluginManager()
-                        .getChannelDayProgram(new Date(startDate), chan);
-                if (dayProgram != null) {
-                    boolean continue_marking = markSingularTimer(timer, chan);
-                    if (!continue_marking) {
-                        break;
-                    } else {
-                       matchedProgramm = true; 
-                    }
-                } else {
-                    if(!matchedProgramm) {
-                        notAssigned.add(timer);
-                    }
-                    break;
-                }
-            }
-            startDate.add(Calendar.DAY_OF_MONTH, 1);
-            endDate.add(Calendar.DAY_OF_MONTH, 1);
-        }
-
-        // restore original times
-        startDate.setTimeInMillis(start);
-        endDate.setTimeInMillis(end);
     }
 
     /**
      * 
      * @param timer
      * @param chan
-     * @return Returns, if markRepeatingTimer() should continue or not
      */
-    private boolean markSingularTimer(VDRTimer timer, Channel chan) {
+    private void markSingularTimer(Timer timer, Channel chan) {
         // TODO eventuell erkennen: ein timer kann auch mehrere sendungen
         // aufnehmen (doppelpacks z.b.)
 
         // create a clone of the timer and subtract the recording buffers
-        VDRTimer bufferLessTimer = (VDRTimer) timer.clone();
+        Timer bufferLessTimer = (Timer) timer.clone();
         removeTimerBuffers(bufferLessTimer);
 
         int day = bufferLessTimer.getStartTime().get(Calendar.DAY_OF_MONTH);
@@ -952,14 +822,15 @@ public class LazyBones extends Plugin {
         Date date = new Date(year, month, day);
 
         if (chan == null) {
-            return false;
+            // leave method, if channel is not available
+            return;
         }
 
-        // iterate over all programs of one day
         Iterator it = getPluginManager().getChannelDayProgram(date, chan);
         if (it != null) {
             TreeMap candidates = new TreeMap();
-            while (it.hasNext()) {
+            while (it.hasNext()) { // iterate over all programs of one day and
+                                    // compare start and end time
                 Program prog = (Program) it.next();
                 int startTime = prog.getStartTime();
                 int endTime = startTime + prog.getLength();
@@ -989,10 +860,7 @@ public class LazyBones extends Plugin {
             if (candidates.size() == 0) {
                 boolean found = lookUpTimer(timer);
                 if (found) {
-                    return true;
-                } else {
-                    notAssigned.add(timer);
-                    return false;
+                    return;
                 }
             }
 
@@ -1010,6 +878,8 @@ public class LazyBones extends Plugin {
                     || timer.isRepeating()) {
                 percentage = 100;
             }
+            
+            LOG.log("Percentage:"+percentage + " " + timer.toString(), Logger.OTHER, Logger.DEBUG);
 
             int threshold = Integer.parseInt(props
                     .getProperty("percentageThreshold"));
@@ -1018,107 +888,44 @@ public class LazyBones extends Plugin {
             // program
             if (percentage >= threshold) {
                 progMin.mark(this);
-                timer.setAssigned(true);
                 timer.setTvBrowserProgID(progMin.getID());
                 if (timer.isRepeating()) {
-                    timer.setProgTime(progMin.getDate().getCalendar());
+                    Date d = progMin.getDate();
+                    timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
+                    timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
+                    timer.getStartTime().set(Calendar.YEAR, d.getYear());
                 }
-                program2TimerMap.put(progMin, timer);
             } else {
                 boolean found = lookUpTimer(timer);
                 if (!found) { // we have no mapping
                     LOG.log("Couldn't find a program with that title: "
                             + timer.getTitle(), Logger.OTHER, Logger.WARN);
-                    notAssigned.add(timer);
                     LOG.log("Couldn't assign timer: " + timer, Logger.OTHER, Logger.WARN);
+                    timer.setReason(Timer.NOT_FOUND);
                 }
             }
         } else { // no channeldayprogram was found
-            notAssigned.add(timer);
-            LOG.log("Couldn't assign timer: " + timer,Logger.OTHER, Logger.WARN);
-            String mesg = mLocalizer.msg("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
-            LOG.log(mesg, Logger.EPG, Logger.ERROR);
+            if(!timer.isRepeating()) {
+                LOG.log("Couldn't assign timer: " + timer,Logger.OTHER, Logger.WARN);
+                String mesg = mLocalizer.msg("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
+                LOG.log(mesg, Logger.EPG, Logger.ERROR);
+                timer.setReason(Timer.NO_EPG);
+            }
         }
-
-        return true;
     }
 
-    protected void removeTimerBuffers(VDRTimer timer) {
+    protected void removeTimerBuffers(Timer timer) {
         int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
         timer.getStartTime().add(Calendar.MINUTE, buffer_before);
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
         timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
     }
 
-    private boolean lookUpTimer(VDRTimer timer) {
-        LOG.log("Looking in vdr2browser for: " + timer.toNEWT(),Logger.OTHER, Logger.DEBUG);
-        Object oid = vdr2browser.get(timer.toNEWT());
-        if (oid != null) { // we have a mapping of this timer to a program
-            String idString = (String) oid;
-            String[] parts = idString.split("###");
-            String dateString = parts[1];
-            String[] d = dateString.split("_");
-            Date progDate = new Date(Integer.parseInt(d[2]), Integer
-                    .parseInt(d[1]), Integer.parseInt(d[0]));
-            String channelId = parts[2];
-            String progID = parts[0];
-            Channel[] channels = getPluginManager().getSubscribedChannels();
-            Channel c = null;
-            for (int i = 0; i < channels.length; i++) {
-                if (channels[i].getId().equals(channelId)) {
-                    c = channels[i];
-                    break;
-                }
-            }
-
-            if (c != null) {
-                Iterator iterator = getPluginManager().getChannelDayProgram(
-                        progDate, c);
-                while (iterator.hasNext()) {
-                    Program p = (Program) iterator.next();
-                    if (p.getID().equals(progID)
-                            && p.getDate().equals(progDate)) {
-                        p.mark(this);
-                        timer.setAssigned(true);
-                        timer.setTvBrowserProgID(p.getID());
-                        program2TimerMap.put(p, timer);
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public Channel getChannel(VDRTimer timer) {
-        Channel chan = null;
-        Enumeration en = channelMapping.keys();
-        while (en.hasMoreElements()) {
-            String channelID = (String) en.nextElement();
-            VDRChannel channel = (VDRChannel) channelMapping.get(channelID);
-            if (channel.getId() == timer.getChannel()) {
-                chan = getChannelById(channelID);
-            }
-        }
-        return chan;
-    }
-
-    private Channel getChannelById(String id) {
-        Channel[] channels = getPluginManager().getSubscribedChannels();
-        for (int i = 0; i < channels.length; i++) {
-            if (channels[i].getId().equals(id)) {
-                return channels[i];
-            }
-        }
-        return null;
-    }
 
     public void writeData(ObjectOutputStream out) {
         try {
-            out.writeObject(channelMapping);
-            out.writeObject(vdr2browser);
-            out.writeObject(vdrtimers);
+            out.writeObject(ProgramManager.getChannelMapping());
+            out.writeObject(TimerManager.getInstance().getTimers());
         } catch (IOException e) {
             e.printStackTrace(System.out);
         }
@@ -1207,10 +1014,16 @@ public class LazyBones extends Plugin {
         markPrograms(newProg);
     }
 
+    /**
+     * Called if handleTVData* has been called.
+     * In this case only one channel has to be marked again
+     * @param prog the ChannelDayProgram, which has to be marked
+     */
     private void markPrograms(ChannelDayProgram prog) {
         ArrayList affectedTimers = new ArrayList();
-        for (Iterator iterator = affectedTimers.iterator(); iterator.hasNext();) {
-            VDRTimer timer = (VDRTimer) iterator.next();
+        Iterator iterator = TimerManager.getInstance().getTimers().iterator();
+        while (iterator.hasNext()) {
+            Timer timer = (Timer) iterator.next();
             String progChan = prog.getChannel().getId();
             Date date = new Date(timer.getStartTime());
             Program timerProgram = Plugin.getPluginManager().getProgram(date,
@@ -1222,6 +1035,7 @@ public class LazyBones extends Plugin {
         }
 
         // markPrograms only for one channel -> haltOnNoChannel = true
+        LOG.log("Affected timers " + affectedTimers.size(), Logger.OTHER, Logger.DEBUG);
         markPrograms(affectedTimers, true);
     }
 
@@ -1240,10 +1054,18 @@ public class LazyBones extends Plugin {
         PluginTreeNode node = getRootNode();
         node.removeAllActions();
         node.removeAllChildren();
-        Enumeration en = program2TimerMap.keys();
-        while (en.hasMoreElements()) {
-            Program prog = (Program) en.nextElement();
-            node.addProgram(prog);
+        
+        Iterator it = TimerManager.getInstance().getTimers().iterator();
+        while(it.hasNext()) {
+            Timer timer = (Timer)it.next();
+            if(timer.isAssigned()) {
+                Timer bufferLess = (Timer)timer.clone();
+                removeTimerBuffers(bufferLess);
+                Program prog = ProgramManager.getInstance().getProgram(bufferLess);
+                if(prog != null) {
+                    node.addProgram(prog);
+                }
+            }
         }
 
         node.update();
@@ -1253,7 +1075,7 @@ public class LazyBones extends Plugin {
         return true;
     }
 
-    public void editTimer(VDRTimer timer) {
+    public void editTimer(Timer timer) {
         boolean change = showTimerOptionsDialog(timer, true);
 
         if (change) {
@@ -1316,8 +1138,29 @@ public class LazyBones extends Plugin {
         }
         return null;
     }
+    
+    private boolean lookUpTimer(Timer timer) {
+        LOG.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+        String progID = TimerManager.getInstance().hasBeenMappedBefore(timer);
+        if (progID != null) { // we have a mapping of this timer to a program
+            Channel c = ProgramManager.getInstance().getChannel(timer);
+            if (c != null) {
+                Date date = new Date(timer.getStartTime());
+                Iterator iterator = getPluginManager().getChannelDayProgram(
+                        date, c);
+                while (iterator.hasNext()) {
+                    Program p = (Program) iterator.next();
+                    if (p.getID().equals(progID)
+                            && p.getDate().equals(date)) {
+                        p.mark(this);
+                        timer.setTvBrowserProgID(p.getID());
+                        LOG.log("Mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+                        return true;
+                    }
+                }
+            }
+        }
 
-    public ArrayList getTimers() {
-        return vdrtimers;
+        return false;
     }
 }

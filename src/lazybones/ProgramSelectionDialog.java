@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.6 2005-09-13 21:51:38 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.7 2005-11-26 01:29:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.util.Date;
 
 import javax.swing.*;
 
@@ -87,13 +89,17 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
+        
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+        Date date = new Date(timer.getStartTime().getTimeInMillis());
+        String dateString = df.format(date);
         String msg = mLocalizer
                 .msg(
                         "message",
                         "<html>I couldn\'t find a program, which matches the"
-                                + " timer <b>%timer%</b> of VDR.<br>Please select the right"
-                                + " program in the given list and press OK.</html>");
-        msg = msg.replaceAll("%timer%", timer.getTitle());
+                                + " timer <b>{0}</b> of on <b>{1}</b>VDR.<br>Please select the right"
+                                + " program in the given list and press OK.</html>",
+                        timer.getTitle(), dateString);
         dialog.getContentPane().add(new JLabel(msg), gbc);
 
         gbc.gridx = 0;

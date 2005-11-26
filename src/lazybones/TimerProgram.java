@@ -1,4 +1,4 @@
-/* $Id: TimerProgram.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: TimerProgram.java,v 1.4 2005-11-26 01:29:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,7 +30,6 @@
 package lazybones;
 
 import tvdataservice.MutableProgram;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Channel;
 import devplugin.Date;
 
@@ -42,7 +41,7 @@ import devplugin.Date;
  */
 public class TimerProgram extends MutableProgram {
 
-    private VDRTimer timer;
+    private Timer timer;
 
     public TimerProgram(Channel arg0, Date arg1) {
         super(arg0, arg1);
@@ -52,11 +51,11 @@ public class TimerProgram extends MutableProgram {
         super(arg0, arg1, arg2, arg3);
     }
 
-    public VDRTimer getTimer() {
+    public Timer getTimer() {
         return timer;
     }
 
-    public void setTimer(VDRTimer timer) {
+    public void setTimer(Timer timer) {
         this.timer = timer;
     }
 }

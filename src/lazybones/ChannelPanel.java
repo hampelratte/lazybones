@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.7 2005-10-30 13:13:25 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.8 2005-11-26 01:29:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -69,16 +69,16 @@ public class ChannelPanel implements ActionListener {
 
     private JScrollPane scrollpane;
 
-    private LazyBones control;
+    private LazyBones lazyBones;
 
     public ChannelPanel(LazyBones control) {
-        this.control = control;
+        this.lazyBones = control;
         initComponents();
     }
     
     private void initComponents() {
-        up.setIcon(control.getIcon("lazybones/Up12.gif"));
-        down.setIcon(control.getIcon("lazybones/Down12.gif"));
+        up.setIcon(lazyBones.getIcon("lazybones/Up12.gif"));
+        down.setIcon(lazyBones.getIcon("lazybones/Down12.gif"));
 
         Object[] headers = { "TV-Browser", "VDR" };
         model = new DefaultTableModel(new Object[][] {}, headers) {
@@ -89,7 +89,7 @@ public class ChannelPanel implements ActionListener {
             }
         };
         devplugin.Channel[] c = ChannelList.getSubscribedChannels();
-        Hashtable channelMapping = control.getChannelMapping();
+        Hashtable channelMapping = ProgramManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
             model.addRow(row);
@@ -248,6 +248,6 @@ public class ChannelPanel implements ActionListener {
                 }
             }
         }
-        control.setChannelMapping(channelMapping);
+        ProgramManager.setChannelMapping(channelMapping);
     }
 }

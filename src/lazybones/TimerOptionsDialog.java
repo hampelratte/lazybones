@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.7 2005-11-23 16:41:49 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.8 2005-11-26 01:29:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,7 +41,6 @@ import java.util.Calendar;
 import javax.swing.*;
 
 import tvbrowser.core.ChannelList;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Channel;
 import devplugin.Date;
 import devplugin.Plugin;
@@ -105,13 +104,13 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
 
     private JPanel panel = new JPanel();
 
-    private VDRTimer timer;
+    private Timer timer;
 
     private boolean confirmation = false;
 
     private boolean update = false;
 
-    public TimerOptionsDialog(LazyBones control, VDRTimer timer, boolean update) {
+    public TimerOptionsDialog(LazyBones control, Timer timer, boolean update) {
         this.update = update;
         this.control = control;
         this.timer = timer;
@@ -171,17 +170,15 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             channels.addItem(c[i]);
         }
         Date date;
-        if (timer.isRepeating()) {
-            date = new Date(timer.getProgTime());
-        } else {
-            VDRTimer tmp = (VDRTimer)timer.clone();
-            // we have to remove the buffers again, to get the right start date
-            // example: start time is 00.00 h with time buffers we have 23.45
-            // Calendar then decreases the start date, so that don't have the right date, but
-            // the date of the day before.
-            control.removeTimerBuffers(tmp);
-            date = new Date(tmp.getStartTime());
-        }
+        Timer tmp = (Timer)timer.clone();
+        // TODO überprüfen, ob das richtig klappt
+        // we have to remove the buffers again, to get the right start date
+        // example: start time is 00.00 h with time buffers we have 23.45
+        // Calendar then decreases the start date, so that we don't have the right date, but
+        // the date of the day before.
+        control.removeTimerBuffers(tmp);
+        date = new Date(tmp.getStartTime());
+        
 
         Program prog = Plugin.getPluginManager().getProgram(date,
                 timer.getTvBrowserProgID());
@@ -287,7 +284,7 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             confirmation = true;
             timer.setFile(title.getText());
             Channel c = (Channel) channels.getSelectedItem();
-            VDRChannel vdrc = (VDRChannel) control.getChannelMapping().get(c.getId());
+            VDRChannel vdrc = (VDRChannel) ProgramManager.getChannelMapping().get(c.getId());
             timer.setChannel(vdrc.getId());
             Calendar start = timer.getStartTime();
             start.set(Calendar.HOUR_OF_DAY, ((Time) starttime.getValue()).getHour());
@@ -341,11 +338,7 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
                 description.setText(timer.getDescription());
             } else {
                 Date date;
-                if (timer.isRepeating()) {
-                    date = new Date(timer.getProgTime());
-                } else {
                     date = new Date(timer.getStartTime());
-                }
                 Program prog = Plugin.getPluginManager().getProgram(date,
                         timer.getTvBrowserProgID());
                 description.setText(prog.getDescription());

@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.1 2005-11-24 16:42:23 hampelratte Exp $
+/* $Id: TimerList.java,v 1.1 2005-11-26 01:29:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,15 +37,14 @@ import java.util.*;
 
 import javax.swing.*;
 
-import lazybones.LazyBones;
-import lazybones.TimerProgram;
+import lazybones.*;
+import lazybones.Timer;
 import util.ui.ProgramList;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Channel;
 import devplugin.Date;
 import devplugin.Program;
 
-public class TimerManager extends JDialog implements ActionListener {
+public class TimerList extends JDialog implements ActionListener {
 
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
@@ -56,7 +55,7 @@ public class TimerManager extends JDialog implements ActionListener {
     
     private LazyBones control;
 
-    public TimerManager(LazyBones control) {
+    public TimerList(LazyBones control) {
         super(control.getParent(), true);
         this.control = control;
         initGUI();
@@ -117,32 +116,14 @@ public class TimerManager extends JDialog implements ActionListener {
     
     private void getTimers() {
         model.removeAllElements();
-        ArrayList timers = control.getTimers();
+        ArrayList timers = TimerManager.getInstance().getTimers();
         
         ArrayList programs = new ArrayList();
-        int i = 0;
         for (Iterator iter = timers.iterator(); iter.hasNext();) {
-            VDRTimer timer = (VDRTimer) iter.next();
+            Timer timer = (Timer) iter.next();
             Calendar time;
-            if(timer.isRepeating()) {
-                Calendar calendar = GregorianCalendar.getInstance();
-                if(timer.hasFirstTime()) {
-                    calendar = timer.getFirstTime();
-                }
-                Calendar startTime = timer.getStartTime();
-                calendar.set(Calendar.HOUR_OF_DAY, startTime.get(Calendar.HOUR_OF_DAY));
-                calendar.set(Calendar.MINUTE, startTime.get(Calendar.MINUTE));
-                
-                for (int j = 0; j < 21; j++) { // next 3 weeks
-                    if(timer.isDaySet(calendar)) {
-                        addProgramm(programs, timer, calendar);
-                    }
-                    calendar.add(Calendar.DAY_OF_MONTH, 1);
-                }
-            } else {
-                time = timer.getStartTime();
-                addProgramm(programs, timer, time);
-            }
+            time = timer.getStartTime();
+            addProgramm(programs, timer, time);
         }
         
         Collections.sort(programs, new ProgramComparator());
@@ -153,8 +134,8 @@ public class TimerManager extends JDialog implements ActionListener {
         }
     }
     
-    private void addProgramm(ArrayList programs, VDRTimer timer, Calendar time) {
-        Channel chan = control.getChannel(timer);
+    private void addProgramm(ArrayList programs, Timer timer, Calendar time) {
+        Channel chan = ProgramManager.getInstance().getChannel(timer);
         TimerProgram p = new TimerProgram(chan, new Date(time), time
                 .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
         p.setTitle(timer.getTitle());
@@ -169,7 +150,7 @@ public class TimerManager extends JDialog implements ActionListener {
         } else if(e.getSource() == buttonEdit) {
             if(timerList.getSelectedIndex() >= 0) {
                 TimerProgram tp = (TimerProgram)timerList.getSelectedValue();
-                VDRTimer timer = tp.getTimer();
+                Timer timer = tp.getTimer();
                 control.editTimer(timer);
             }
         } else if(e.getSource() == buttonRemove) {
