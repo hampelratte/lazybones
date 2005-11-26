@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.2 2005-11-26 02:18:26 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.3 2005-11-26 15:32:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -189,7 +189,11 @@ public class TimerManager {
             if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
                 storedTimers.remove(storedTimer);
                 storedTimers.add(timer);
+                return;
             }
         }
+        
+        // timer couldn't be found -> this is a new timer
+        storedTimers.add(timer);
     }
 }
