@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.9 2005-11-26 02:17:04 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.10 2005-11-26 12:49:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -109,6 +109,8 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
     private boolean confirmation = false;
 
     private boolean update = false;
+    
+    private boolean initialized = false;
 
     public TimerOptionsDialog(LazyBones control, Timer timer, boolean update) {
         this.update = update;
@@ -169,19 +171,15 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         for (int i = 0; i < c.length; i++) {
             channels.addItem(c[i]);
         }
-        Date date;
+        
         Timer tmp = (Timer)timer.clone();
         // we have to remove the buffers again, to get the right start date
         // example: start time is 00.00 h with time buffers we have 23.45
         // Calendar then decreases the start date, so that we don't have the right date, but
         // the date of the day before.
         control.removeTimerBuffers(tmp);
-        date = new Date(tmp.getStartTime());
-        
-
-        Program prog = Plugin.getPluginManager().getProgram(date,
-                timer.getTvBrowserProgID());
-        channels.setSelectedItem(prog.getChannel());
+        Program prog = ProgramManager.getInstance().getProgram(timer);
+        channels.setSelectedItem(ProgramManager.getInstance().getChannel(timer));
 
         gbc.gridx = 0;
         gbc.gridy = 7;
@@ -195,7 +193,7 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         if ("".equals(timer.getDescription())
-                && !"".equals(prog.getDescription())) {
+                && prog != null && !"".equals(prog.getDescription())) {
             description.setText(prog.getDescription());
             description.append("\n\n" + prog.getChannel().getCopyrightNotice());
         } else {
@@ -276,6 +274,8 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             starttime.setEnabled(false);
             endtime.setEnabled(false);
         }
+        
+        initialized = true;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -304,10 +304,12 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
     }
 
     public void start() {
-        dialog.setSize(400, 500);
-        dialog.setLocation(50, 50);
-        dialog.setVisible(true);
-        dialog.pack();
+        if(initialized) {
+            dialog.setSize(400, 500);
+            dialog.setLocation(50, 50);
+            dialog.setVisible(true);
+            dialog.pack();
+        }
     }
 
     public boolean getConfirmation() {

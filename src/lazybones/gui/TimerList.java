@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.1 2005-11-26 01:29:11 hampelratte Exp $
+/* $Id: TimerList.java,v 1.2 2005-11-26 12:49:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -90,21 +90,21 @@ public class TimerList extends JDialog implements ActionListener {
         buttonNew = new JButton();
         buttonNew.setText("New Timer");
         buttonNew.addActionListener(this);
-        //this.getContentPane().add(buttonNew, gbc);
+        this.getContentPane().add(buttonNew, gbc);
         
         gbc.insets = new java.awt.Insets(0,0,10,0);
         gbc.gridx = 1;
         buttonEdit = new JButton();
         buttonEdit.setText("Edit Timer");
         buttonEdit.addActionListener(this);
-        //this.getContentPane().add(buttonEdit, gbc);
+        this.getContentPane().add(buttonEdit, gbc);
         
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 2;
         buttonRemove = new JButton();
         buttonRemove.setText("Delete Timer");
         buttonRemove.addActionListener(this);
-        //this.getContentPane().add(buttonRemove, gbc);
+        this.getContentPane().add(buttonRemove, gbc);
         
         this.setName("timerManager");
         this.setSize(new java.awt.Dimension(400,600));
@@ -146,7 +146,7 @@ public class TimerList extends JDialog implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == buttonNew) {
-            
+            control.createTimer();
         } else if(e.getSource() == buttonEdit) {
             if(timerList.getSelectedIndex() >= 0) {
                 TimerProgram tp = (TimerProgram)timerList.getSelectedValue();
@@ -155,9 +155,12 @@ public class TimerList extends JDialog implements ActionListener {
             }
         } else if(e.getSource() == buttonRemove) {
             if(timerList.getSelectedIndex() >= 0) {
-                
+                TimerProgram tp = (TimerProgram)timerList.getSelectedValue();
+                Timer timer = tp.getTimer();
+                control.deleteTimer(timer);
             }
         }
+        getTimers();
     }
     
     public void setVisible(boolean visible) {

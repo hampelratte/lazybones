@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.25 2005-11-26 02:18:27 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.26 2005-11-26 12:49:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,6 +43,8 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 
 import javax.swing.*;
+
+import tvbrowser.core.ChannelList;
 
 import lazybones.gui.TimerList;
 import de.hampelratte.svdrp.Connection;
@@ -216,6 +218,26 @@ public class LazyBones extends Plugin {
         Player.play(program, this);
     }
 
+    
+    public void deleteTimer(Timer timer) {
+        Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
+        if (res == null) {
+            return;
+        } else if (res.getCode() == 250) {
+            String progID = timer.getTvBrowserProgID();
+            if(progID != null) {
+                Program prog = ProgramManager.getInstance().getProgram(timer);
+                prog.unmark(this);
+            }
+            getTimersFromVDR();
+            updateTree();
+        } else {
+            LOG.log(mLocalizer.msg(
+                    "couldnt_delete", "Couldn\'t delete timer:")
+                    + " " + res.getMessage(), Logger.OTHER, Logger.ERROR);
+        }
+    }
+    
     public void deleteTimer(Program prog) {
         Timer timer = TimerManager.getInstance().getTimer(prog.getID());
         Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
@@ -230,6 +252,17 @@ public class LazyBones extends Plugin {
                     "couldnt_delete", "Couldn\'t delete timer:")
                     + " " + res.getMessage(), Logger.OTHER, Logger.ERROR);
         }
+    }
+    
+    public void createTimer() {
+        Timer timer = new Timer();
+        timer.setChannel(1);
+        Program prog = ProgramManager.getInstance().getProgram(timer);
+        
+        boolean showTimerOptions = Boolean.TRUE.toString().equals(props.getProperty("showTimerOptionsDialog"));
+        props.setProperty("showTimerOptionsDialog",Boolean.TRUE.toString());
+        createTimer(prog);
+        props.setProperty("showTimerOptionsDialog",Boolean.toString(showTimerOptions));
     }
     
     private void createTimer(Program prog) {
@@ -376,7 +409,7 @@ public class LazyBones extends Plugin {
                     "Couldn\'t create timer\n: ") + " " + msg,Logger.OTHER, Logger.ERROR);
         }
     }
-
+    
     private boolean showTimerOptionsDialog(Timer timer, boolean updateDialog) {
         TimerOptionsDialog tod = new TimerOptionsDialog(this, timer,
                 updateDialog);
