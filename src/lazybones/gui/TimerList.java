@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.3 2005-11-26 13:48:24 hampelratte Exp $
+/* $Id: TimerList.java,v 1.4 2005-11-26 15:26:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,7 +47,7 @@ import devplugin.Program;
 public class TimerList extends JDialog implements ActionListener {
 
     private static Logger LOG = Logger.getLogger();
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
+    private static final util.ui.Localizer lazyBonesLocalizer = util.ui.Localizer
     .getLocalizerFor(LazyBones.class); // strings of lazybones are needed
     
     private JScrollPane scrollPane = null;
@@ -92,26 +92,26 @@ public class TimerList extends JDialog implements ActionListener {
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 0;
         buttonNew = new JButton();
-        buttonNew.setText("New Timer");
+        buttonNew.setText(lazyBonesLocalizer.msg("new_timer","New Timer"));
         buttonNew.addActionListener(this);
         this.getContentPane().add(buttonNew, gbc);
         
         gbc.insets = new java.awt.Insets(0,0,10,0);
         gbc.gridx = 1;
         buttonEdit = new JButton();
-        buttonEdit.setText("Edit Timer");
+        buttonEdit.setText(lazyBonesLocalizer.msg("edit","Edit Timer"));
         buttonEdit.addActionListener(this);
         this.getContentPane().add(buttonEdit, gbc);
         
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 2;
         buttonRemove = new JButton();
-        buttonRemove.setText("Delete Timer");
+        buttonRemove.setText(lazyBonesLocalizer.msg("dont_capture","Delete Timer"));
         buttonRemove.addActionListener(this);
         this.getContentPane().add(buttonRemove, gbc);
         
         this.setName("timerManager");
-        this.setSize(new java.awt.Dimension(400,600));
+        this.setSize(new java.awt.Dimension(500,600));
         this.setTitle("Timer Manager");
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         
@@ -148,7 +148,7 @@ public class TimerList extends JDialog implements ActionListener {
             p.setTimer(timer);
             programs.add(p);
         } else {
-            LOG.log(mLocalizer.msg("no_channel_defined",
+            LOG.log(lazyBonesLocalizer.msg("no_channel_defined",
                     "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
         }
     }
