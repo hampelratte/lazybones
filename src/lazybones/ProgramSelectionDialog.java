@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.7 2005-11-26 01:29:07 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.8 2005-11-26 02:17:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,7 +40,6 @@ import java.util.Date;
 import javax.swing.*;
 
 import util.ui.ProgramList;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Program;
 
 /**
@@ -69,7 +68,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
     private Program[] programs;
 
-    private VDRTimer timer;
+    private Timer timer;
 
     public ProgramSelectionDialog(LazyBones control) {
         this.control = control;
@@ -130,7 +129,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         cancel.addActionListener(this);
     }
 
-    public void showSelectionDialog(Program[] programs, VDRTimer timer) {
+    public void showSelectionDialog(Program[] programs, Timer timer) {
         this.programs = programs;
         this.timer = timer;
         start();

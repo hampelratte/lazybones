@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.8 2005-11-26 01:29:06 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.9 2005-11-26 02:17:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -171,7 +171,6 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         }
         Date date;
         Timer tmp = (Timer)timer.clone();
-        // TODO überprüfen, ob das richtig klappt
         // we have to remove the buffers again, to get the right start date
         // example: start time is 00.00 h with time buffers we have 23.45
         // Calendar then decreases the start date, so that we don't have the right date, but
