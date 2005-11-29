@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.1 2005-11-26 01:29:07 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.2 2005-11-29 18:10:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,7 +38,7 @@ import devplugin.Program;
 public class ProgramManager {
     private static ProgramManager instance;
     
-    private static Hashtable channelMapping;
+    private static Hashtable channelMapping = new Hashtable();
     
     private ProgramManager() {
     }

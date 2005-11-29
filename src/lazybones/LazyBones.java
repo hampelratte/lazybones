@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.28 2005-11-29 14:55:01 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.29 2005-11-29 18:10:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,8 +43,6 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 
 import javax.swing.*;
-
-import tvbrowser.core.ChannelList;
 
 import lazybones.gui.TimerList;
 import de.hampelratte.svdrp.Connection;
@@ -282,7 +280,6 @@ public class LazyBones extends Plugin {
         cal.add(Calendar.MINUTE, prog.getLength() / 2);
         long millis = cal.getTimeInMillis();
 
-        // TODO Programmanager.getchannelmapping kann null sein
         Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
             LOG.log(mLocalizer.msg("no_channel_defined",
@@ -373,12 +370,12 @@ public class LazyBones extends Plugin {
                                     + " " + response.getMessage(),Logger.OTHER, Logger.ERROR);
                         }
                     } else {
-                        // TODO das müsste eigentlich früher kommen
                         Program selectedProgram = showTimerConfirmDialog(timer,
                                 prog);
                         if (selectedProgram != null) {
                             Timer t = ((TimerProgram) selectedProgram)
                                     .getTimer();
+                            System.out.println(t);
                             // start the recording x min before the beggining of
                             // the program
                             t.getStartTime().add(Calendar.MINUTE,
@@ -825,7 +822,6 @@ public class LazyBones extends Plugin {
                 Logger.OTHER, Logger.DEBUG);
         while (iterator.hasNext()) {
             Timer timer = (Timer) iterator.next();
-            // TODO klappt nicht, wenn keine epg-daten im tvbrowser vorliegen
             switch(timer.getReason()) {
             case Timer.NOT_FOUND:
                 showProgramConfirmDialog(timer);
