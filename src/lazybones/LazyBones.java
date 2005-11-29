@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.27 2005-11-26 13:50:33 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.28 2005-11-29 14:55:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -282,6 +282,7 @@ public class LazyBones extends Plugin {
         cal.add(Calendar.MINUTE, prog.getLength() / 2);
         long millis = cal.getTimeInMillis();
 
+        // TODO Programmanager.getchannelmapping kann null sein
         Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
             LOG.log(mLocalizer.msg("no_channel_defined",
