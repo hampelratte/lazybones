@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.8 2005-11-29 18:10:06 hampelratte Exp $
+/* $Id: Player.java,v 1.9 2005-12-02 12:38:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,12 +50,13 @@ public class Player {
             .getLocalizerFor(Player.class);
 
     public static void play(Program prog, LazyBones control) {
-    	Object o = null;
-    	// TODO fehlermeldung oder logeintrag, wenn player nicht gestartet wird
+    	Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o != null) {
             VDRChannel chan = (VDRChannel) o;
             int id = chan.getId();
             Player.play(id, control);
+        } else {
+            LOG.log("Couldn't start Player", Logger.OTHER, Logger.ERROR);
         }
     }
 
