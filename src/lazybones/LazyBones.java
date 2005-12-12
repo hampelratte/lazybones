@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.29 2005-11-29 18:10:06 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.30 2005-12-12 21:49:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -739,7 +739,7 @@ public class LazyBones extends Plugin {
             LOG.log("Timers retrieved from VDR",Logger.OTHER, Logger.INFO);
             String timersString = res.getMessage();
             ArrayList vdrtimers = TimerParser.parse(timersString);
-            tm.setTimers(vdrtimers);
+            tm.setTimers(vdrtimers, true);
         } else if (res != null && res.getCode() == 550) {
             // no timers are defined, do nothing
             LOG.log("No timer defined on VDR",Logger.OTHER, Logger.INFO);
@@ -750,7 +750,7 @@ public class LazyBones extends Plugin {
                 Logger.CONNECTION, Logger.ERROR);
             
             ArrayList vdrtimers = tm.getStoredTimers();
-            tm.setTimers(vdrtimers);
+            tm.setTimers(vdrtimers, false);
         }
 
         // mark all "timed" programs (haltOnNoChannel = false, because we can

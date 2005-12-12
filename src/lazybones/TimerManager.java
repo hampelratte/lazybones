@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.3 2005-11-26 15:32:28 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.4 2005-12-12 21:49:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -66,8 +66,8 @@ public class TimerManager {
         return instance;
     }
 
-    public void addTimer(Timer timer) {
-        if(!timer.isRepeating()) {
+    public void addTimer(Timer timer, boolean calculateRepeatingTimers) {
+        if(!timer.isRepeating() || !calculateRepeatingTimers) {
             timers.add(timer);
         } else {
             Calendar startTime = timer.getStartTime();
@@ -81,15 +81,17 @@ public class TimerManager {
                 startTime.set(Calendar.YEAR, tmp.get(Calendar.YEAR));
             }
             
-            for (int j = 0; j < 21; j++) { // next 3 weeks, more data is never available in TVB
-                Calendar tmpStart = (Calendar)startTime.clone();
-                tmpStart.add(Calendar.DAY_OF_MONTH, j);
-                if(timer.isDaySet(tmpStart)) {
-                    Timer oneDayTimer = (Timer)timer.clone();
-                    oneDayTimer.setStartTime(tmpStart);
-                    long start = tmpStart.getTimeInMillis();
-                    oneDayTimer.getEndTime().setTimeInMillis(start + duration);
-                    timers.add(oneDayTimer);
+            if(calculateRepeatingTimers) {
+                for (int j = 0; j < 21; j++) { // next 3 weeks, more data is never available in TVB
+                    Calendar tmpStart = (Calendar)startTime.clone();
+                    tmpStart.add(Calendar.DAY_OF_MONTH, j);
+                    if(timer.isDaySet(tmpStart)) {
+                        Timer oneDayTimer = (Timer)timer.clone();
+                        oneDayTimer.setStartTime(tmpStart);
+                        long start = tmpStart.getTimeInMillis();
+                        oneDayTimer.getEndTime().setTimeInMillis(start + duration);
+                        timers.add(oneDayTimer);
+                    }
                 }
             }
         }
@@ -113,10 +115,10 @@ public class TimerManager {
     /**
      * @param vdrTimers an ArrayList of VDRTimer objects
      */
-    public void setTimers(ArrayList vdrTimers) {
+    public void setTimers(ArrayList vdrTimers, boolean calculateRepeatingTimers) {
         for (Iterator it = vdrTimers.iterator(); it.hasNext();) {
             VDRTimer element = (VDRTimer) it.next();
-            addTimer(new Timer(element));
+            addTimer(new Timer(element), calculateRepeatingTimers);
         }
     }
 
