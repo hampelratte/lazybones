@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.30 2005-12-12 21:49:25 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.31 2005-12-14 19:28:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -907,8 +907,17 @@ public class LazyBones extends Plugin {
             Program progMin = (Program) candidates.get(candidates.firstKey());
 
             // calculate the precentage of common words
-            int percentage = Utilities.percentageOfEquality(timer.getTitle(),
-                    progMin.getTitle());
+            int percentage = 0;
+            if(!timer.getPath().equals("")) {
+                int percentagePath = Utilities.percentageOfEquality(timer.getPath(), progMin
+                        .getTitle());
+                int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), progMin
+                        .getTitle());
+                percentage = Math.max(percentagePath, percentageTitle);
+            } else {
+                percentage = Utilities.percentageOfEquality(timer.getTitle(), progMin
+                    .getTitle());
+            }
 
             // override the percentage
             if (timer.getFile().indexOf("EPISODE") >= 0
