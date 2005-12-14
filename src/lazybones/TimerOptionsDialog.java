@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.10 2005-11-26 12:49:37 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.11 2005-12-14 19:29:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -172,11 +172,11 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             channels.addItem(c[i]);
         }
         
-        Timer tmp = (Timer)timer.clone();
         // we have to remove the buffers again, to get the right start date
         // example: start time is 00.00 h with time buffers we have 23.45
         // Calendar then decreases the start date, so that we don't have the right date, but
         // the date of the day before.
+        Timer tmp = (Timer)timer.clone();
         control.removeTimerBuffers(tmp);
         Program prog = ProgramManager.getInstance().getProgram(timer);
         channels.setSelectedItem(ProgramManager.getInstance().getChannel(timer));

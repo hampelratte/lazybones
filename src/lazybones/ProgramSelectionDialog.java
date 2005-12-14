@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.8 2005-11-26 02:17:04 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.9 2005-12-14 19:29:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,7 +34,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.*;
@@ -47,6 +47,15 @@ import devplugin.Program;
  * has to choose the right program, then.
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ */
+
+/*
+ * IDEA not assigned timers könnten im kontextmenu aufgelistet werden unter dem
+ * punkt, diesem programm diesen timer zuordnen. so würde der programselectiondialog
+ * wegfallen und das auswählen der sendungen ist viel flexibler.
+ * 
+ * timer, die nicht zugeordnet werden können, weil das programm im tvbrowser falsch ist,
+ * können dann auch ignoriert werden
  */
 public class ProgramSelectionDialog extends Thread implements ActionListener {
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
@@ -89,14 +98,14 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
         
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
         Date date = new Date(timer.getStartTime().getTimeInMillis());
-        String dateString = df.format(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String dateString = sdf.format(date);
         String msg = mLocalizer
                 .msg(
                         "message",
                         "<html>I couldn\'t find a program, which matches the"
-                                + " timer <b>{0}</b> of on <b>{1}</b>VDR.<br>Please select the right"
+                                + " timer <b>{0}</b> at <b>{1}</b>VDR.<br>Please select the right"
                                 + " program in the given list and press OK.</html>",
                         timer.getTitle(), dateString);
         dialog.getContentPane().add(new JLabel(msg), gbc);
