@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.4 2005-12-12 21:49:24 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.5 2005-12-16 20:16:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -178,7 +178,11 @@ public class TimerManager {
         for (Iterator it = storedTimers.iterator(); it.hasNext();) {
             Timer storedTimer = (Timer) it.next();
             if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
-                return storedTimer.getTvBrowserProgID();
+                if(storedTimer.getReason() == Timer.NO_PROGRAM) {
+                    return "NO_PROGRAM";
+                } else {
+                    return storedTimer.getTvBrowserProgID();
+                }
             }
         }
         return null;

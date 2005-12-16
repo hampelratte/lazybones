@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.9 2005-12-14 19:29:09 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.10 2005-12-16 20:16:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -64,6 +64,10 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
+    
+    private JButton never = new JButton();
+    
+    // TODO button nicht mehr anzeigen
 
     private DefaultListModel model = new DefaultListModel();
 
@@ -91,7 +95,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.gridheight = 1;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -99,15 +103,14 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.insets = new Insets(5, 5, 5, 5);
         
         Date date = new Date(timer.getStartTime().getTimeInMillis());
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         String dateString = sdf.format(date);
-        String msg = mLocalizer
-                .msg(
-                        "message",
+        String title = timer.getPath() + timer.getTitle();
+        String msg = mLocalizer.msg("message",
                         "<html>I couldn\'t find a program, which matches the"
                                 + " timer <b>{0}</b> at <b>{1}</b>VDR.<br>Please select the right"
                                 + " program in the given list and press OK.</html>",
-                        timer.getTitle(), dateString);
+                        title, dateString);
         dialog.getContentPane().add(new JLabel(msg), gbc);
 
         gbc.gridx = 0;
@@ -115,8 +118,14 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         dialog.getContentPane().add(cancel, gbc);
-
+        
         gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        dialog.getContentPane().add(never, gbc);
+
+        gbc.gridx = 2;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
@@ -124,7 +133,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.gridheight = 1;
         gbc.weighty = 1.0;
         dialog.getContentPane().add(new JScrollPane(list), gbc);
@@ -132,9 +141,11 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         ok.setText(mLocalizer.msg("ok", "OK"));
+        never.setText(mLocalizer.msg("never","Never assign"));
         cancel.setText(mLocalizer.msg("cancel", "Cancel"));
 
         ok.addActionListener(this);
+        never.addActionListener(this);
         cancel.addActionListener(this);
     }
 
@@ -157,6 +168,9 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
             }
         } else if (e.getSource() == cancel) {
             selectedProgram = null;
+        } else if (e.getSource() == never ) {
+            timer.setReason(Timer.NO_PROGRAM);
+            TimerManager.getInstance().replaceStoredTimer(timer);
         }
 
         dialog.dispose();

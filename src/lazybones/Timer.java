@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.2 2005-11-26 02:17:02 hampelratte Exp $
+/* $Id: Timer.java,v 1.3 2005-12-16 20:16:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,6 +37,7 @@ public class Timer extends VDRTimer {
     public static final int NO_EPG = 1;
     public static final int NOT_FOUND = 2;
     public static final int NO_CHANNEL = 3;
+    public static final int NO_PROGRAM = 4;
     
     private int reason = Timer.NO_REASON;
     

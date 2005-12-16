@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.31 2005-12-14 19:28:13 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.32 2005-12-16 20:16:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -590,7 +590,7 @@ public class LazyBones extends Plugin {
 
         // get all programs 3 hours before and after the given program
         HashSet programSet = new HashSet();
-        for (int i = 10; i <= 180; i += 10) { // FIXME eigentlich müsste man das minütlich abfragen nicht 10min
+        for (int i = 0; i <= 180; i++) { 
             // get the program before the given one
             Calendar c = GregorianCalendar.getInstance();
             c.setTimeInMillis(start.getTimeInMillis());
@@ -834,6 +834,9 @@ public class LazyBones extends Plugin {
             case Timer.NO_CHANNEL:
                 LOG.log(mLocalizer.msg("no_channel_defined",
                         "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
+                break;
+            case Timer.NO_PROGRAM:
+                // do nothing
                 break;
             default:
                 LOG.log("Not assigned timer: " + timer.toString(), Logger.OTHER,
@@ -1193,19 +1196,26 @@ public class LazyBones extends Plugin {
         LOG.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
         String progID = TimerManager.getInstance().hasBeenMappedBefore(timer);
         if (progID != null) { // we have a mapping of this timer to a program
-            Channel c = ProgramManager.getInstance().getChannel(timer);
-            if (c != null) {
-                Date date = new Date(timer.getStartTime());
-                Iterator iterator = getPluginManager().getChannelDayProgram(
-                        date, c);
-                while (iterator.hasNext()) {
-                    Program p = (Program) iterator.next();
-                    if (p.getID().equals(progID)
-                            && p.getDate().equals(date)) {
-                        p.mark(this);
-                        timer.setTvBrowserProgID(p.getID());
-                        LOG.log("Mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
-                        return true;
+            if(progID.equals("NO_PROGRAM")) {
+                LOG.log("Timer " + timer.toString()+" should never be assigned",Logger.OTHER, Logger.DEBUG);
+                timer.setReason(Timer.NO_PROGRAM);
+                return true;
+            } else {
+                Channel c = ProgramManager.getInstance().getChannel(timer);
+                if (c != null) {
+                    Date date = new Date(timer.getStartTime());
+                    Iterator iterator = getPluginManager()
+                            .getChannelDayProgram(date, c);
+                    while (iterator.hasNext()) {
+                        Program p = (Program) iterator.next();
+                        if (p.getID().equals(progID)
+                                && p.getDate().equals(date)) {
+                            p.mark(this);
+                            timer.setTvBrowserProgID(p.getID());
+                            LOG.log("Mapping found for: " + timer.toString(),
+                                    Logger.OTHER, Logger.DEBUG);
+                            return true;
+                        }
                     }
                 }
             }
