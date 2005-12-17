@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.4 2005-11-26 15:26:52 hampelratte Exp $
+/* $Id: TimerList.java,v 1.5 2005-12-17 15:19:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -143,7 +143,7 @@ public class TimerList extends JDialog implements ActionListener {
         if(chan != null) {
             TimerProgram p = new TimerProgram(chan, new Date(time), time
                     .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
-            p.setTitle(timer.getTitle());
+            p.setTitle(timer.getPath()+timer.getTitle());
             p.setDescription("");
             p.setTimer(timer);
             programs.add(p);
