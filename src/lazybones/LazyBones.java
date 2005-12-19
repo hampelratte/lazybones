@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.32 2005-12-16 20:16:34 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.33 2005-12-19 23:56:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -62,6 +62,7 @@ import devplugin.Date;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
  */
+//TODO seperate gui from core
 public class LazyBones extends Plugin {
 
     public static final Logger LOG = Logger.getLogger();
@@ -1073,6 +1074,11 @@ public class LazyBones extends Plugin {
             Timer timer = (Timer) iterator.next();
             Channel timerChannel = ProgramManager.getInstance().getChannel(timer);
             Channel progChannel = prog.getChannel();
+            
+            // timer couldn't be assigned before
+            if(!timer.isAssigned()) {
+                return;
+            } 
             
             // timer channel couldn't be found
             // no channel available for this timer
