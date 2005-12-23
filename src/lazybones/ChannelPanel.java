@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.9 2005-12-14 19:29:09 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.10 2005-12-23 15:39:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,6 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.LSTC;
+import devplugin.Channel;
 
 public class ChannelPanel implements ActionListener {
     private static final long serialVersionUID = -655724917391419096L;
@@ -65,8 +66,11 @@ public class ChannelPanel implements ActionListener {
     private JButton down = new JButton();
 
     private JButton refresh = new JButton(mLocalizer
-            .msg("refresh_channels", ""));
+            .msg("refresh_channels", "Refresh"));
 
+    private JButton sort = new JButton(mLocalizer
+            .msg("sort_channels", "Sort"));
+    
     private JScrollPane scrollpane;
 
     private LazyBones lazyBones;
@@ -99,12 +103,13 @@ public class ChannelPanel implements ActionListener {
         table.getTableHeader().setReorderingAllowed(false);
         scrollpane = new JScrollPane(table);
         refresh.addActionListener(this);
+        sort.addActionListener(this);
         up.addActionListener(this);
         down.addActionListener(this);
     }
 
     JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:85dlu, 3dlu, 120dlu,3dlu,3dlu",
+		FormLayout layout = new FormLayout("left:85dlu:GROW, 3dlu, 120dlu, 3dlu, 3dlu",
 			"160dlu:GROW, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
@@ -119,6 +124,8 @@ public class ChannelPanel implements ActionListener {
     private JPanel buttonBarPanel() {
         ButtonBarBuilder bb = ButtonBarBuilder.createLeftToRightBuilder();
         bb.addFixed(refresh);
+        bb.addRelatedGap();
+        bb.addGridded(sort);
         bb.addGlue();
         bb.addGridded(up);
         bb.addRelatedGap();
@@ -129,6 +136,8 @@ public class ChannelPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == refresh) {
             refreshChannelList();
+        } else if (e.getSource() == sort) {
+            trySort();
         } else if (e.getSource() == up) {
             int[] indices = table.getSelectedRows();
             Arrays.sort(indices);
@@ -182,16 +191,27 @@ public class ChannelPanel implements ActionListener {
                         name = name.substring(0, name.indexOf(','));
                     }
                     chan.setName(name);
-                    // TODO eventuell eine grenze in den optionen einbauen
+                    // IDEA eventuell eine grenze in den optionen einbauen
                     if (/*chan.getId() < 500 &&*/ !tableContains(chan)) {
                         vdrchans.add(chan);
                     }
                 }
 
                 // add vdrchannels
+                int max = model.getRowCount() -1;
+                int count = 0;
                 for (Iterator iter = vdrchans.iterator(); iter.hasNext();) {
                     VDRChannel element = (VDRChannel) iter.next();
-                    model.addRow(new Object[] { null, element });
+                    if(count <= max) {
+                        if(model.getValueAt(count, 1) != null) {
+                            model.addRow(new Object[] { null, element });
+                        } else {
+                            model.setValueAt(element, count, 1);
+                        }
+                    } else { 
+                        model.addRow(new Object[] { null, element });
+                    }
+                    count++;
                 }
             }
         } catch (Exception ex) {
@@ -251,4 +271,77 @@ public class ChannelPanel implements ActionListener {
         }
         ProgramManager.setChannelMapping(channelMapping);
     }
+    
+    public void trySort() {
+        for (int i = 0; i < model.getRowCount(); i++) {
+            ArrayList list = new ArrayList();
+            Object tvbc = model.getValueAt(i,0);
+            if(tvbc == null) {
+                continue;
+            }
+            String tvbChan = ((Channel)tvbc).getName();
+            tvbChan = tvbChan.toLowerCase();
+            
+            for (int j = 0; j < model.getRowCount(); j++) {
+                Object o = model.getValueAt(j,1);
+                if(o == null) {
+                    swapCells(1, j, model.getRowCount()-1);
+                    System.out.println("schiebe leere zelle nach unten");
+                    continue;
+                }
+                String vdrChan = ((VDRChannel)o).getName();
+                vdrChan = vdrChan.toLowerCase();
+                int pos = vdrChan.indexOf(" ");
+                if(pos > 0) {
+                    vdrChan = vdrChan.substring(0, pos);
+                }
+                int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
+                list.add(new Container(percent, j));
+            }
+            
+            Collections.sort(list);
+            Container c = (Container)list.get(list.size()-1);
+            int index = c.getIndex();
+            if (index != i && i < model.getRowCount()) {
+                swapCells(1, i, index);
+            }
+        }
+    }
+    
+    private class Container implements Comparable {
+        private int percent;
+        private int index;
+        
+        Container(int _percent, int _index) {
+            percent = _percent;
+            index = _index;
+        }
+
+        public int compareTo(Object o) {
+            if(o instanceof Container) {
+                Container c = (Container)o;
+                if(c.getPercent() == percent) {
+                    return 0;
+                } else if(percent < c.getPercent()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+            return -1;
+        }
+        
+        public int getPercent() {
+            return percent;
+        }
+        
+        public int getIndex() {
+            return index;
+        }
+        
+        public String toString() {
+            return percent+"% "+index;
+        }
+    }
+
 }
