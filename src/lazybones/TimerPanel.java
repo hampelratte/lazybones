@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.7 2005-10-30 13:27:04 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.8 2005-12-23 17:35:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import util.ui.Localizer;
 
@@ -63,6 +64,11 @@ public class TimerPanel {
 
     private JSpinner after;
 	private JLabel labBefore, labAfter; 
+    
+    private JLabel lPrio = new JLabel(mLocalizer.msg("prio", "Priority"));
+    private JSpinner prio;
+    private JLabel lLifetime = new JLabel(mLocalizer.msg("lifetime", "Lifetime"));
+    private JSpinner lifetime;
 
     public TimerPanel(LazyBones control) {
         this.control = control;
@@ -74,6 +80,10 @@ public class TimerPanel {
                 "timer.before"));
         int int_after = Integer.parseInt(control.getProperties().getProperty(
                 "timer.after"));
+        int int_prio = Integer.parseInt(control.getProperties().getProperty(
+                "timer.prio"));
+        int int_lifetime = Integer.parseInt(control.getProperties().getProperty(
+                "timer.lifetime"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
         before.setToolTipText(ttBefore);
@@ -91,11 +101,20 @@ public class TimerPanel {
         labAfter = new JLabel(lAfter);
         labAfter.setToolTipText(ttAfter);
         labAfter.setLabelFor(after);
+        
+        prio = new JSpinner();
+        ((JSpinner.DefaultEditor) prio.getEditor()).getTextField()
+        .setColumns(2);
+        prio.setModel(new SpinnerNumberModel(int_prio,0,99,1));
+        lifetime = new JSpinner();
+        ((JSpinner.DefaultEditor) lifetime.getEditor()).getTextField()
+        .setColumns(2);
+        lifetime.setModel(new SpinnerNumberModel(int_lifetime,0,99,1));
     }
 
     JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:75dlu, 3dlu, 25dlu",
-			"pref, 2dlu, pref");
+			"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -105,6 +124,12 @@ public class TimerPanel {
 		
 		builder.add(labAfter,  cc.xy (1,  3));
 		builder.add(after,     cc.xy (3,  3));
+        
+        builder.add(lPrio,     cc.xy (1,  5));
+        builder.add(prio,      cc.xy (3,  5));
+        
+        builder.add(lLifetime, cc.xy (1,  7));
+        builder.add(lifetime,  cc.xy (3,  7));
 	
 		return builder.getPanel();
     }
@@ -114,5 +139,9 @@ public class TimerPanel {
                 before.getValue().toString());
         control.getProperties().setProperty("timer.after",
                 after.getValue().toString());
+        control.getProperties().setProperty("timer.prio",
+                prio.getValue().toString());
+        control.getProperties().setProperty("timer.lifetime",
+                lifetime.getValue().toString());
     }
 }

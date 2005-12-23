@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.33 2005-12-19 23:56:51 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.34 2005-12-23 17:35:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -313,8 +313,10 @@ public class LazyBones extends Plugin {
             Timer timer = new Timer();
             timer.setChannel(id);
             timer.setTvBrowserProgID(prog.getID());
-            timer.setPriority(50);
-            timer.setLifetime(50);
+            int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
+            timer.setPriority(prio);
+            int lifetime = Integer.parseInt(getProperties().getProperty("timer.lifetime"));
+            timer.setLifetime(lifetime);
 
             int buffer_before = Integer.parseInt(props
                     .getProperty("timer.before"));
@@ -435,8 +437,10 @@ public class LazyBones extends Plugin {
             Timer newTimer = new Timer();
             newTimer.setActive(true);
             newTimer.setChannel(channelID);
-            newTimer.setLifetime(50);
-            newTimer.setPriority(50);
+            int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
+            int lifetime = Integer.parseInt(getProperties().getProperty("timer.lifetime"));
+            newTimer.setLifetime(lifetime);
+            newTimer.setPriority(prio);
             newTimer.setTitle(prog.getTitle());
             newTimer.setTvBrowserProgID(prog.getID());
 
@@ -641,8 +645,10 @@ public class LazyBones extends Plugin {
                 timer.setStartTime(entry.getStartTime());
                 timer.setEndTime(entry.getEndTime());
                 timer.setDescription(entry.getDescription());
-                timer.setLifetime(50);
-                timer.setPriority(50);
+                int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
+                int lifetime = Integer.parseInt(getProperties().getProperty("timer.lifetime"));
+                timer.setLifetime(lifetime);
+                timer.setPriority(prio);
                 return new Timer(timer);
             }
         }
@@ -1009,8 +1015,14 @@ public class LazyBones extends Plugin {
         timer_before = timer_before == null ? "5" : timer_before;
         String timer_after = props.getProperty("timer.after");
         timer_after = timer_after == null ? "10" : timer_after;
+        String timer_prio = props.getProperty("timer.prio");
+        timer_prio = timer_prio == null ? "50" : timer_prio;
+        String timer_lifetime = props.getProperty("timer.lifetime");
+        timer_lifetime = timer_lifetime == null ? "50" : timer_lifetime;
         props.setProperty("timer.before", timer_before);
         props.setProperty("timer.after", timer_after);
+        props.setProperty("timer.prio", timer_prio);
+        props.setProperty("timer.lifetime", timer_lifetime);
 
         String preview_url = props.getProperty("preview.url");
         preview_url = preview_url == null ? "http://htpc:8000/preview.jpg"
