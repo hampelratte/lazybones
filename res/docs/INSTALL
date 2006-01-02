@@ -1,0 +1,6 @@
+Installation: Simply copy the LazyBones.jar in the plugins directory of
+TV-Browser. You can choose between the global plugin directory, which
+resides in the TV-Browser installation directory, and your personal plugin
+directory, which should reside in your home directory:
+~/.tvbrowser for Linux/Unix users
+C:\Dokumente und Einstellungen\YourUser\TV-Browser for Windows
