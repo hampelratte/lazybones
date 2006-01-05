@@ -5,6 +5,7 @@
 	<property name="build.properties" value="build.properties"/>
 	<property file="${build.properties}"/>
 	<fail message="Define property 'tvbrowser.runtime.dir' in ${build.properties} - this should point to directory containing 'tvbrowser.jar' and 'plugins' directory." unless="tvbrowser.runtime.dir" />
+	<fail message="Define property 'version' in ${build.properties}" unless="version" />
 
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />

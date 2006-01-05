@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.10 2005-12-16 20:16:34 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.11 2006-01-05 15:12:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,8 +67,6 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
     
     private JButton never = new JButton();
     
-    // TODO button nicht mehr anzeigen
-
     private DefaultListModel model = new DefaultListModel();
 
     private ProgramList list = new ProgramList(model);
