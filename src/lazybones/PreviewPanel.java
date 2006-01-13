@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.4 2005-09-12 17:18:45 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.5 2006-01-13 10:10:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.GRAB;
+import de.hampelratte.svdrp.responses.R216;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -48,14 +49,14 @@ import de.hampelratte.svdrp.commands.GRAB;
  */
 public class PreviewPanel extends JLabel {
 
-    private static final long serialVersionUID = -6728708348263401257L;
+    private static final Logger LOG = Logger.getLogger();
 
-    private ImageIcon image = new ImageIcon();
+    private ImageIcon image;
 
     private PreviewGrabber pg;
 
     private LazyBones control;
-
+    
     public PreviewPanel(LazyBones control) {
         this.control = control;
         initGUI();
@@ -79,41 +80,78 @@ public class PreviewPanel extends JLabel {
     private class PreviewGrabber extends Thread {
 
         private boolean running = true;
+        
+        private GRAB grab; 
+        
+        PreviewGrabber() {
+            grab = new GRAB();
+            grab.setFormat("jpeg");
+            grab.setQuality("80");
+        }
 
         public void run() {
-            GRAB grab = new GRAB(control.getProperties().getProperty(
-                    "preview.path"));
-            grab.setQuality("80");
-            grab.setFormat("jpeg");
-
             while (running) {
                 try {
                     Thread.sleep(1000);
-                    int width = getWidth();
-                    int height = getHeight();
-                    grab.setResolution(width + " " + height);
-                    Response res = VDRConnection.send(grab);
-                    if (res.getCode() == 250) {
-                        URL url = new URL(control.getProperties().getProperty(
-                                "preview.url"));
-                        HttpURLConnection con = (HttpURLConnection) url
-                                .openConnection();
-                        InputStream in = con.getInputStream();
-                        byte[] buffer = new byte[1024];
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        int length = -1;
-                        while ((length = in.read(buffer)) >= 0) {
-                            bos.write(buffer, 0, length);
-                        }
-                        in.close();
-                        con.disconnect();
-                        image = new ImageIcon(bos.toByteArray());
-                        setIcon(image);
-                        repaint();
+                    grab.setResolution(getWidth() + " " + getHeight());
+                    String method = control.getProperties().getProperty(
+                            "preview.method");
+                    if ("HTTP".equals(method)) {
+                        image = getHTTPImage();
+                    } else if ("SVDRP".equals(method)) {
+                        image = getSVDRPImage();
                     }
-                } catch (Exception e) {
-                    running = false;
+                    if (image != null) {
+                        setIcon(image);
+                    } else {
+                        LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
+                    }
+                } catch (InterruptedException e) {
+                    System.out.println("Problem with grabber thread:");
+                    e.printStackTrace();
+                } 
+            }
+        }
+        
+        private ImageIcon getHTTPImage() {
+            grab.setFilename(control.getProperties()
+                    .getProperty("preview.path"));
+            ImageIcon preview = new ImageIcon();
+            try {
+                Response res = VDRConnection.send(grab);
+                if (res.getCode() == 250) {
+                    URL url = new URL(control.getProperties().getProperty(
+                            "preview.url"));
+                    HttpURLConnection con = (HttpURLConnection) url
+                            .openConnection();
+                    InputStream in = con.getInputStream();
+                    byte[] buffer = new byte[1024];
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    int length = -1;
+                    while ((length = in.read(buffer)) >= 0) {
+                        bos.write(buffer, 0, length);
+                    }
+                    in.close();
+                    con.disconnect();
+                    preview = new ImageIcon(bos.toByteArray());
+                    setIcon(preview);
+                    repaint();
                 }
+            } catch (Exception e) {
+                System.out.println("Couldn't grab image:");
+                e.printStackTrace();
+            }
+            return preview;
+        }
+        
+        private ImageIcon getSVDRPImage() {
+            grab.setFilename("-");
+            Response res = VDRConnection.send(grab);
+            if (res != null && res.getCode() == 216) {
+                R216 r216 = (R216)res;
+                return r216.getImage();
+            } else {
+                return null;
             }
         }
 

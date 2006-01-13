@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.34 2005-12-23 17:35:31 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.35 2006-01-13 10:10:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -664,7 +664,7 @@ public class LazyBones extends Plugin {
         String description = mLocalizer
                 .msg("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
-        String author = "Henrik Niehaus, hampelratte@users.sf.net";
+        String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
         return new PluginInfo(name, description, author, new Version(0, 1));
     }
 
@@ -1030,8 +1030,12 @@ public class LazyBones extends Plugin {
         String preview_path = props.getProperty("preview.path");
         preview_path = preview_path == null ? "/pub/web/preview.jpg"
                 : preview_path;
+        String preview_method = props.getProperty("preview.method");
+        preview_method = preview_method == null ? "HTTP"
+                : preview_method;
         props.setProperty("preview.url", preview_url);
         props.setProperty("preview.path", preview_path);
+        props.setProperty("preview.method", preview_method);
 
         String switchBefore = props.getProperty("switchBefore");
         switchBefore = switchBefore == null ? "false" : switchBefore;
