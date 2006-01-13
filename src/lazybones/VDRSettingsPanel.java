@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.10 2005-10-30 13:10:24 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.11 2006-01-13 10:10:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,7 +50,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
     private static final Localizer mLocalizer = Localizer
             .getLocalizerFor(VDRSettingsPanel.class);
 
-    private LazyBones control = new LazyBones();
+    private LazyBones control;
 
     private JTabbedPane tabbedPane;
 
@@ -68,11 +68,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
         this.control = control;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see devplugin.SettingsTab#createSettingsPanel()
-     */
+
     public JPanel createSettingsPanel() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
@@ -105,11 +101,6 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
         return p;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see devplugin.SettingsTab#saveSettings()
-     */
     public void saveSettings() {
         channelPanel.saveSettings();
         generalPanel.saveSettings();
@@ -118,23 +109,12 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
         previewPanel.saveSettings();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see devplugin.SettingsTab#getIcon()
-     */
     public Icon getIcon() {
         return new ImageIcon(ImageUtilities.createImageFromJar(
                 "lazybones/vdr16.png", VDRSettingsPanel.class));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see devplugin.SettingsTab#getTitle()
-     */
     public String getTitle() {
         return "Lazy Bones";
     }
-
 }
