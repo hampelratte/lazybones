@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.5 2006-01-13 10:10:52 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.6 2006-01-13 12:14:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -114,6 +114,7 @@ public class PreviewPanel extends JLabel {
         }
         
         private ImageIcon getHTTPImage() {
+            LOG.log("Grabbing image over HTTP", Logger.OTHER, Logger.DEBUG);
             grab.setFilename(control.getProperties()
                     .getProperty("preview.path"));
             ImageIcon preview = new ImageIcon();
@@ -145,12 +146,14 @@ public class PreviewPanel extends JLabel {
         }
         
         private ImageIcon getSVDRPImage() {
+            LOG.log("Grabbing image over SVDRP", Logger.OTHER, Logger.DEBUG);
             grab.setFilename("-");
             Response res = VDRConnection.send(grab);
             if (res != null && res.getCode() == 216) {
                 R216 r216 = (R216)res;
                 return r216.getImage();
             } else {
+                LOG.log(res, Logger.OTHER, Logger.DEBUG);
                 return null;
             }
         }

@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.8 2006-01-13 10:36:03 hampelratte Exp $
+/* $Id: PreviewSettingsPanel.java,v 1.9 2006-01-13 12:14:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,7 +53,7 @@ public class PreviewSettingsPanel implements ItemListener {
     
     private CardLayout cardLayout = new CardLayout();
     
-    private JPanel cardsContainer = new JPanel();
+    private JPanel cardsContainer = new JPanel(cardLayout);
 
     private JPanel httpPanel = new JPanel();
     
@@ -118,6 +118,9 @@ public class PreviewSettingsPanel implements ItemListener {
         
         httpPanel = builder.getPanel();
         
+        cardsContainer.add(httpPanel, "HTTP");
+        cardsContainer.add(new JPanel(), "SVDRP");
+        
         method.addItem("HTTP");
         method.addItem("SVDRP");
         method.addItemListener(this);
@@ -129,10 +132,6 @@ public class PreviewSettingsPanel implements ItemListener {
                 break;
             }
         }
-        
-        cardsContainer.setLayout(cardLayout);
-        cardsContainer.add(httpPanel, "HTTP");
-        cardsContainer.add(new JPanel(), "SVDRP");
     }
 
     JPanel getPanel() {
@@ -155,8 +154,6 @@ public class PreviewSettingsPanel implements ItemListener {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        //JPanel dummy = new JPanel(new BorderLayout());
-        //dummy.add(httpPanel, BorderLayout.CENTER);
         panel.add(cardsContainer, gbc);
         return panel;
     }
@@ -172,13 +169,6 @@ public class PreviewSettingsPanel implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
         if(e.getStateChange() == ItemEvent.SELECTED) {
             cardLayout.show(cardsContainer, e.getItem().toString());
-            /*
-            if(e.getItem().toString().equals("HTTP")) {
-                httpPanel.setVisible(true);
-            } else {
-                httpPanel.setVisible(false);
-            }*/
         }
-        
     }
 }
