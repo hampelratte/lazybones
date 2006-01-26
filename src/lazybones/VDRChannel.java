@@ -1,4 +1,4 @@
-/* $Id: VDRChannel.java,v 1.4 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: VDRChannel.java,v 1.5 2006-01-26 16:19:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -68,7 +68,7 @@ public class VDRChannel implements Serializable {
     }
 
     public String toString() {
-        return getName();
+        return  "["+getId()+"] " + getName();
     }
 
     public boolean equals(Object o) {
