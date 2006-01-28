@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.6 2006-01-13 12:14:06 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.7 2006-01-28 12:15:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -105,6 +105,7 @@ public class PreviewPanel extends JLabel {
                         setIcon(image);
                     } else {
                         LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
+                        stopGrabbing();
                     }
                 } catch (InterruptedException e) {
                     System.out.println("Problem with grabber thread:");
@@ -117,7 +118,7 @@ public class PreviewPanel extends JLabel {
             LOG.log("Grabbing image over HTTP", Logger.OTHER, Logger.DEBUG);
             grab.setFilename(control.getProperties()
                     .getProperty("preview.path"));
-            ImageIcon preview = new ImageIcon();
+            ImageIcon preview = null;
             try {
                 Response res = VDRConnection.send(grab);
                 if (res.getCode() == 250) {
@@ -139,8 +140,8 @@ public class PreviewPanel extends JLabel {
                     repaint();
                 }
             } catch (Exception e) {
-                System.out.println("Couldn't grab image:");
-                e.printStackTrace();
+                //System.out.println("Couldn't grab image:");
+                //e.printStackTrace();
             }
             return preview;
         }
