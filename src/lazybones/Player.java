@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.9 2005-12-02 12:38:19 hampelratte Exp $
+/* $Id: Player.java,v 1.10 2006-03-06 20:42:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,9 +46,6 @@ public class Player {
     
     private static Logger LOG = Logger.getLogger();
 
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(Player.class);
-
     public static void play(Program prog, LazyBones control) {
     	Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o != null) {
@@ -72,7 +69,7 @@ public class Player {
                 Response res = VDRConnection.send(new CHAN(Integer
                         .toString(channel)));
                 if (res == null || res.getCode() != 250) {
-                    String mesg = mLocalizer.msg("Error",
+                    String mesg = LazyBones.getTranslation("Error",
                     "Error") + ": " + res.getMessage();
                     LOG.log(mesg, Logger.OTHER, Logger.ERROR);
                     return;
@@ -96,7 +93,7 @@ public class Player {
                     streamtype + "/" + channel;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
-            String mesg =  mLocalizer.msg("Error", "Error")+ ": " + e1;
+            String mesg =  LazyBones.getTranslation("Error", "Error")+ ": " + e1;
             LOG.log(mesg, Logger.OTHER, Logger.ERROR);
         }
     }
@@ -127,7 +124,7 @@ public class Player {
                 new PlayerOutputter(p.getErrorStream());
                 p.waitFor();
             } catch (Exception e) {
-                String mesg = mLocalizer.msg("couldnt_start", "Couldn't start player")+ ": " + e;
+                String mesg = LazyBones.getTranslation("couldnt_start", "Couldn't start player")+ ": " + e;
                 LOG.log(mesg, Logger.OTHER, Logger.ERROR);
             }
             running = false;

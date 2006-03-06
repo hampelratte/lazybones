@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,6 @@ import javax.swing.*;
 import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerManager;
-
 import util.ui.ProgramList;
 import devplugin.Program;
 
@@ -62,9 +61,6 @@ import devplugin.Program;
  * können dann auch ignoriert werden
  */
 public class ProgramSelectionDialog extends Thread implements ActionListener {
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(ProgramSelectionDialog.class);
-    
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
@@ -91,7 +87,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
     private void initGUI() {
         dialog = new JDialog(control.getParent(), true);
-        dialog.setTitle(mLocalizer.msg("title", "Select Program"));
+        dialog.setTitle(LazyBones.getTranslation("LazyBones.windowtitle_programselect", "Select Program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -108,7 +104,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         String dateString = sdf.format(date);
         String title = timer.getPath() + timer.getTitle();
-        String msg = mLocalizer.msg("message",
+        String msg = LazyBones.getTranslation("message_programselect",
                         "<html>I couldn\'t find a program, which matches the"
                                 + " timer <b>{0}</b> at <b>{1}</b>VDR.<br>Please select the right"
                                 + " program in the given list and press OK.</html>",
@@ -142,9 +138,9 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        ok.setText(mLocalizer.msg("ok", "OK"));
-        never.setText(mLocalizer.msg("never","Never assign"));
-        cancel.setText(mLocalizer.msg("cancel", "Cancel"));
+        ok.setText(LazyBones.getTranslation("ok", "OK"));
+        never.setText(LazyBones.getTranslation("never","Never assign"));
+        cancel.setText(LazyBones.getTranslation("cancel", "Cancel"));
 
         ok.addActionListener(this);
         never.addActionListener(this);

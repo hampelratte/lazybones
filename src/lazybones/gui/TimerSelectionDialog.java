@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,7 +38,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import lazybones.LazyBones;
-
 import util.ui.ProgramList;
 import devplugin.Program;
 
@@ -49,9 +48,6 @@ import devplugin.Program;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  */
 public class TimerSelectionDialog implements ActionListener {
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(TimerSelectionDialog.class);
-
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
@@ -73,7 +69,7 @@ public class TimerSelectionDialog implements ActionListener {
 
     private void initGUI() {
         dialog = new JDialog(control.getParent(), true);
-        dialog.setTitle(mLocalizer.msg("title", "Select VDR-program"));
+        dialog.setTitle(LazyBones.getTranslation("windowtitle_vdrselect", "Select VDR-program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -84,16 +80,11 @@ public class TimerSelectionDialog implements ActionListener {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
-        dialog
-                .getContentPane()
-                .add(
-                        new JLabel(
-                                mLocalizer
-                                        .msg(
-                                                "message",
-                                                "<html>I couldn\'t find a program,"
-                                                        + " which matches the selected one.<br>Please select the"
-                                                        + " right program in the given list and press OK.</html>")),
+        dialog.getContentPane().add(
+               new JLabel(LazyBones.getTranslation(
+                        "message_vdrselect", "<html>I couldn\'t find a program,"
+                                   + " which matches the selected one.<br>Please select the"
+                                   + " right program in the given list and press OK.</html>")),
                         gbc);
 
         gbc.gridx = 0;
@@ -116,8 +107,8 @@ public class TimerSelectionDialog implements ActionListener {
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        ok.setText(mLocalizer.msg("ok", "OK"));
-        cancel.setText(mLocalizer.msg("cancel", "Cancel"));
+        ok.setText(LazyBones.getTranslation("ok", "OK"));
+        cancel.setText(LazyBones.getTranslation("cancel", "Cancel"));
 
         ok.addActionListener(this);
         cancel.addActionListener(this);

@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,7 +39,7 @@ import java.util.GregorianCalendar;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-
+import lazybones.LazyBones;
 import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DatePanel;
 import net.sf.nachocalendar.event.DateSelectionEvent;
@@ -53,30 +53,27 @@ public class DayChooser extends BrowsePanel implements ActionListener,
 
     private static final long serialVersionUID = -2936338063641916673L;
 
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(DayChooser.class);
-
     private VDRTimer timer;
 
     // private Calendar startDate;
 
-    private JCheckBox monday = new JCheckBox(mLocalizer.msg("monday", "Monday"));
+    private JCheckBox monday = new JCheckBox(LazyBones.getTranslation("monday", "Monday"));
 
-    private JCheckBox tuesday = new JCheckBox(mLocalizer.msg("tuesday",
+    private JCheckBox tuesday = new JCheckBox(LazyBones.getTranslation("tuesday",
             "Tuesday"));
 
-    private JCheckBox wednesday = new JCheckBox(mLocalizer.msg("wednesday",
+    private JCheckBox wednesday = new JCheckBox(LazyBones.getTranslation("wednesday",
             "Wednesday"));
 
-    private JCheckBox thursday = new JCheckBox(mLocalizer.msg("thursday",
+    private JCheckBox thursday = new JCheckBox(LazyBones.getTranslation("thursday",
             "Thursday"));
 
-    private JCheckBox friday = new JCheckBox(mLocalizer.msg("friday", "Friday"));
+    private JCheckBox friday = new JCheckBox(LazyBones.getTranslation("friday", "Friday"));
 
-    private JCheckBox saturday = new JCheckBox(mLocalizer.msg("saturday",
+    private JCheckBox saturday = new JCheckBox(LazyBones.getTranslation("saturday",
             "Saturday"));
 
-    private JCheckBox sunday = new JCheckBox(mLocalizer.msg("sunday", "Sunday"));
+    private JCheckBox sunday = new JCheckBox(LazyBones.getTranslation("sunday", "Sunday"));
 
     private DatePanel cal = CalendarFactory.createDatePanel();
 

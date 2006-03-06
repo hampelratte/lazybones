@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: PlayerPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,32 +36,25 @@ import javax.swing.JTextField;
 
 import lazybones.LazyBones;
 
-import util.ui.Localizer;
-
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class PlayerPanel {
-    private static final long serialVersionUID = 151916691928714906L;
-
-    private static final Localizer mLocalizer = Localizer
-            .getLocalizerFor(PlayerPanel.class);
-
     private LazyBones control;
 
-    private final String lPlayer = mLocalizer.msg("player", "Player");
+    private final String lPlayer = LazyBones.getTranslation("player", "Player");
 
     private JTextField player;
 
-    private final String lParams = mLocalizer.msg("params", "Parameters");
+    private final String lParams = LazyBones.getTranslation("params", "Parameters");
 
     private JTextField params;
 
-    private final String lSwitchBefore = mLocalizer.msg(
+    private final String lSwitchBefore = LazyBones.getTranslation(
             "switch_before", "Switch to channel before streaming");
     
-    private final String ttSwitchBefore = mLocalizer.msg(
+    private final String ttSwitchBefore = LazyBones.getTranslation(
             "switch_before.tooltip", "This is useful, if you only have one DVB Tuner");
 
     private JCheckBox switchBefore;

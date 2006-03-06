@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,6 @@ import javax.swing.JLabel;
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.VDRConnection;
-
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.GRAB;
 import de.hampelratte.svdrp.responses.R216;

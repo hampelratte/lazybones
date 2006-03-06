@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,9 +40,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.*;
-
 import tvbrowser.core.ChannelList;
-import util.ui.Localizer;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
@@ -56,9 +54,6 @@ import devplugin.Channel;
 public class ChannelPanel implements ActionListener {
     private static final long serialVersionUID = -655724917391419096L;
 
-    private static final Localizer mLocalizer = Localizer
-            .getLocalizerFor(ChannelPanel.class);
-
     private DefaultTableModel model;
 
     private JTable table = new JTable();
@@ -67,11 +62,9 @@ public class ChannelPanel implements ActionListener {
 
     private JButton down = new JButton();
 
-    private JButton refresh = new JButton(mLocalizer
-            .msg("refresh_channels", "Refresh"));
+    private JButton refresh = new JButton(LazyBones.getTranslation("refresh_channels", "Refresh"));
 
-    private JButton sort = new JButton(mLocalizer
-            .msg("sort_channels", "Sort"));
+    private JButton sort = new JButton(LazyBones.getTranslation("sort_channels", "Sort"));
     
     private JScrollPane scrollpane;
 

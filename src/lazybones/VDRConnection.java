@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.7 2006-03-06 19:51:49 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.8 2006-03-06 20:42:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -61,7 +61,7 @@ public class VDRConnection {
             res = connection.send(cmd);
             connection.close();
         } catch (Exception e1) {
-            String mesg = mLocalizer.msg(
+            String mesg = LazyBones.getTranslation(
                     "couldnt_connect", "Couldn't connect to VDR")
                     + ":\n" + e1.toString();
             LOG.log(mesg, Logger.CONNECTION, Logger.ERROR);

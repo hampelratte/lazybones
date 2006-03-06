@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,6 @@ import javax.swing.*;
 
 import lazybones.*;
 import lazybones.Timer;
-
 import tvbrowser.core.ChannelList;
 import devplugin.Channel;
 import devplugin.Date;
@@ -56,42 +55,38 @@ import devplugin.Program;
  */
 public class TimerOptionsDialog extends Thread implements ActionListener,
         ItemListener {
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(TimerOptionsDialog.class);
-
-    private JLabel lChannels = new JLabel(mLocalizer.msg("channel", "Channel"));
+    private JLabel lChannels = new JLabel(LazyBones.getTranslation("channel", "Channel"));
 
     private JComboBox channels = new JComboBox();
 
-    private JLabel lDay = new JLabel(mLocalizer.msg("day", "Day"));
+    private JLabel lDay = new JLabel(LazyBones.getTranslation("day", "Day"));
 
     private DayChooser dayChooser;
 
     private BrowseTextField day;
 
-    private JLabel lStarttime = new JLabel(mLocalizer.msg("start", "Start"));
+    private JLabel lStarttime = new JLabel(LazyBones.getTranslation("start", "Start"));
 
     private JSpinner starttime = new JSpinner();
 
-    private JLabel lEndtime = new JLabel(mLocalizer.msg("stop", "Stop"));
+    private JLabel lEndtime = new JLabel(LazyBones.getTranslation("stop", "Stop"));
 
     private JSpinner endtime = new JSpinner();
 
-    private JLabel lPriority = new JLabel(mLocalizer.msg("priority",
+    private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority",
             "Priorität"));
 
     private JSpinner priority = new JSpinner();
 
-    private JLabel lLifetime = new JLabel(mLocalizer
-            .msg("lifetime", "Lifetime"));
+    private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
 
     private JSpinner lifetime = new JSpinner();
 
-    private JLabel lTitle = new JLabel(mLocalizer.msg("title", "Title"));
+    private JLabel lTitle = new JLabel(LazyBones.getTranslation("title", "Title"));
 
     private JTextField title = new JTextField();
     
-    private JLabel lDescription = new JLabel(mLocalizer.msg("description", "Description"));
+    private JLabel lDescription = new JLabel(LazyBones.getTranslation("description", "Description"));
     
     private JComboBox comboDesc = new JComboBox();
 
@@ -126,7 +121,7 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
 
     private void initGUI() {
         dialog = new JDialog(control.getParent(), true);
-        dialog.setTitle(mLocalizer.msg("windowtitle", "Timer Options"));
+        dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
         panel.setLayout(new GridBagLayout());
         dialog.getContentPane().add(panel);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -265,8 +260,8 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
         gbc.gridy = 9;
         panel.add(ok, gbc);
 
-        ok.setText(mLocalizer.msg("ok", "OK"));
-        cancel.setText(mLocalizer.msg("cancel", "Cancel"));
+        ok.setText(LazyBones.getTranslation("ok", "OK"));
+        cancel.setText(LazyBones.getTranslation("cancel", "Cancel"));
 
         ok.addActionListener(this);
         cancel.addActionListener(this);

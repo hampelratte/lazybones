@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,7 +34,6 @@ import javax.swing.*;
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.VDRConnection;
-import util.ui.Localizer;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -43,23 +42,18 @@ import com.jgoodies.forms.layout.FormLayout;
 public class GeneralPanel {
     private Logger LOG = Logger.getLogger();
     
-    private static final long serialVersionUID = 4141920557801647729L;
+	private final String lHost = LazyBones.getTranslation("host", "Host");
 
-    private static final Localizer mLocalizer = Localizer
-            .getLocalizerFor(GeneralPanel.class);
+	private final String lPort = LazyBones.getTranslation("port", "Port");
 
-	private final String lHost = mLocalizer.msg("host", "Host");
+	private final String lTimeout = LazyBones.getTranslation("timeout", "Timeout");
 
-	private final String lPort = mLocalizer.msg("port", "Port");
+	private final String lExperts = LazyBones.getTranslation("experts", "Experts");
 
-	private final String lTimeout = mLocalizer.msg("timeout", "Timeout");
-
-	private final String lExperts = mLocalizer.msg("experts", "Experts");
-
-	private final String lFuzzyness = mLocalizer.msg("percentageOfEquality",
+	private final String lFuzzyness = LazyBones.getTranslation("percentageOfEquality",
 			"Fuzzylevel program titles");
 
-	private final String ttFuzzyness = mLocalizer.msg(
+	private final String ttFuzzyness = LazyBones.getTranslation(
 			"percentageOfEquality.tooltip",
 			"Percentage of equality of program titles");
 
@@ -74,28 +68,28 @@ public class GeneralPanel {
     private JLabel labPercentageOfEquality;
     private JSpinner percentageOfEquality;
 
-    private final String lSupressMatchDialog = mLocalizer.msg(
+    private final String lSupressMatchDialog = LazyBones.getTranslation(
 			"supressMatchDialog", "Supress match dialog");
 
-	private final String ttSupressMatchDialog = mLocalizer.msg(
+	private final String ttSupressMatchDialog = LazyBones.getTranslation(
 			"supressMatchDialog.tooltip",
 			"Do not show EPG selection dialog for non matching VDR timer");
 
 	private JCheckBox supressMatchDialog;
     
-    private final String lLogConnectionErrors = mLocalizer.msg(
+    private final String lLogConnectionErrors = LazyBones.getTranslation(
             "logConnectionErrors",
             "Show error dialogs on connection problems");
     
     private JCheckBox logConnectionErrors;
     
-    private final String lLogEPGErrors = mLocalizer.msg(
+    private final String lLogEPGErrors = LazyBones.getTranslation(
             "logEPGErrors",
             "Show error dialogs, if EPG data are missing");
     
     private JCheckBox logEPGErrors;
     
-    private final String lShowTimerOptionsDialog = mLocalizer.msg(
+    private final String lShowTimerOptionsDialog = LazyBones.getTranslation(
             "showTimerOptionsDialog",
             "Show timer options dialog on timer creation");
     
@@ -188,7 +182,7 @@ public class GeneralPanel {
         try {
             p = Integer.parseInt(port.getText());
         } catch (NumberFormatException nfe) {
-            String mesg = mLocalizer.msg(
+            String mesg = LazyBones.getTranslation(
                    "invalidPort",
                    "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>");
             LOG.log(mesg, Logger.OTHER, Logger.ERROR);
@@ -198,8 +192,7 @@ public class GeneralPanel {
         try {
             t = Integer.parseInt(timeout.getText());
         } catch (NumberFormatException nfe) {
-            String mesg = mLocalizer
-                                    .msg(
+            String mesg = LazyBones.getTranslation(
                                             "invalidTimeout",
                                             "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
             LOG.log(mesg, Logger.OTHER, Logger.ERROR);

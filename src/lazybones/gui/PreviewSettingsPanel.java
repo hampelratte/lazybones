@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: PreviewSettingsPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,10 @@
  */
 package lazybones.gui;
 
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -42,14 +45,9 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class PreviewSettingsPanel implements ItemListener {
-    private static final long serialVersionUID = 5046636902877005743L;
-
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(PreviewSettingsPanel.class);
-
     private LazyBones control;
     
-    private String lMethod = mLocalizer.msg("method", "Method");
+    private String lMethod = LazyBones.getTranslation("method", "Method");
     
     private JComboBox method = new JComboBox();
     
@@ -59,18 +57,16 @@ public class PreviewSettingsPanel implements ItemListener {
 
     private JPanel httpPanel = new JPanel();
     
-    private final String lURL = mLocalizer.msg("url",
+    private final String lURL = LazyBones.getTranslation("url",
             "URL to preview picture");
 
     private JTextField url;
 
-    private final String lPicturePath = mLocalizer.msg("path",
+    private final String lPicturePath = LazyBones.getTranslation("path",
             "Path to preview picture");
 
-    private final String lDescription = mLocalizer
-			.msg(
-					"desc",
-					"The URL is the URL, where"
+    private final String lDescription = LazyBones.getTranslation(
+					"desc_url", "The URL is the URL, where"
 							+ " VDRRemoteControl can download the preview image. The path is the path to the preview"
 							+ " image on the VDR host. This should be the document root of the webserver, which has"
 							+ " been specified in the URL");

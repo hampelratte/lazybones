@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.5 2005-12-17 15:19:45 hampelratte Exp $
+/* $Id: TimerList.java,v 1.6 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,9 +47,6 @@ import devplugin.Program;
 public class TimerList extends JDialog implements ActionListener {
 
     private static Logger LOG = Logger.getLogger();
-    private static final util.ui.Localizer lazyBonesLocalizer = util.ui.Localizer
-    .getLocalizerFor(LazyBones.class); // strings of lazybones are needed
-    
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
     private ProgramList timerList = new ProgramList(model);
@@ -92,21 +89,21 @@ public class TimerList extends JDialog implements ActionListener {
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 0;
         buttonNew = new JButton();
-        buttonNew.setText(lazyBonesLocalizer.msg("new_timer","New Timer"));
+        buttonNew.setText(LazyBones.getTranslation("new_timer","New Timer"));
         buttonNew.addActionListener(this);
         this.getContentPane().add(buttonNew, gbc);
         
         gbc.insets = new java.awt.Insets(0,0,10,0);
         gbc.gridx = 1;
         buttonEdit = new JButton();
-        buttonEdit.setText(lazyBonesLocalizer.msg("edit","Edit Timer"));
+        buttonEdit.setText(LazyBones.getTranslation("edit","Edit Timer"));
         buttonEdit.addActionListener(this);
         this.getContentPane().add(buttonEdit, gbc);
         
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 2;
         buttonRemove = new JButton();
-        buttonRemove.setText(lazyBonesLocalizer.msg("dont_capture","Delete Timer"));
+        buttonRemove.setText(LazyBones.getTranslation("dont_capture","Delete Timer"));
         buttonRemove.addActionListener(this);
         this.getContentPane().add(buttonRemove, gbc);
         
@@ -148,7 +145,7 @@ public class TimerList extends JDialog implements ActionListener {
             p.setTimer(timer);
             programs.add(p);
         } else {
-            LOG.log(lazyBonesLocalizer.msg("no_channel_defined",
+            LOG.log(LazyBones.getTranslation("no_channel_defined",
                     "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
         }
     }

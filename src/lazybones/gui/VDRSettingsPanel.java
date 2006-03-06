@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,9 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import lazybones.LazyBones;
-
 import util.ui.ImageUtilities;
-import util.ui.Localizer;
 
 /**
  * The root container for the settings tabs
@@ -48,10 +46,6 @@ import util.ui.Localizer;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
 public class VDRSettingsPanel implements devplugin.SettingsTab {
-	
-    private static final Localizer mLocalizer = Localizer
-            .getLocalizerFor(VDRSettingsPanel.class);
-
     private LazyBones control;
 
     private JTabbedPane tabbedPane;
@@ -77,23 +71,23 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.setPreferredSize(new Dimension(380, 380));
 
             generalPanel = new GeneralPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("general", ""), generalPanel
+            tabbedPane.addTab(LazyBones.getTranslation("general", ""), generalPanel
 					.getPanel());
 
             channelPanel = new ChannelPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("channels", ""), channelPanel
+            tabbedPane.addTab(LazyBones.getTranslation("channels", ""), channelPanel
 					.getPanel());
 
             playerPanel = new PlayerPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("player", ""), playerPanel
+            tabbedPane.addTab(LazyBones.getTranslation("player", ""), playerPanel
 					.getPanel());
 
             timerPanel = new TimerPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("timer", ""), timerPanel
+            tabbedPane.addTab(LazyBones.getTranslation("timer", ""), timerPanel
 					.getPanel());
 
             previewPanel = new PreviewSettingsPanel(control);
-            tabbedPane.addTab(mLocalizer.msg("remoteControl", ""), previewPanel
+            tabbedPane.addTab(LazyBones.getTranslation("remoteControl", ""), previewPanel
 					.getPanel());
         }
 

@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,40 +36,33 @@ import javax.swing.SpinnerNumberModel;
 
 import lazybones.LazyBones;
 
-import util.ui.Localizer;
-
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class TimerPanel {
-    private static final long serialVersionUID = 4866079997638571269L;
-
-    private static final Localizer mLocalizer = Localizer
-            .getLocalizerFor(TimerPanel.class);
-
     private LazyBones control;
 
-    private final String lBefore = mLocalizer.msg("before",
+    private final String lBefore = LazyBones.getTranslation("before",
 			"Buffer before program");
 
-	private final String ttBefore = mLocalizer.msg("before.tooltip",
+	private final String ttBefore = LazyBones.getTranslation("before.tooltip",
 			"Time buffer before program");
 
 	private JSpinner before;
 
-	private final String lAfter = mLocalizer.msg("after",
+	private final String lAfter = LazyBones.getTranslation("after",
 			"Buffer after program");
 
-	private final String ttAfter = mLocalizer.msg("after.tooltip",
+	private final String ttAfter = LazyBones.getTranslation("after.tooltip",
 			"Time buffer after program");
 
     private JSpinner after;
 	private JLabel labBefore, labAfter; 
     
-    private JLabel lPrio = new JLabel(mLocalizer.msg("prio", "Priority"));
+    private JLabel lPrio = new JLabel(LazyBones.getTranslation("priority", "Priority"));
     private JSpinner prio;
-    private JLabel lLifetime = new JLabel(mLocalizer.msg("lifetime", "Lifetime"));
+    private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
     private JSpinner lifetime;
 
     public TimerPanel(LazyBones control) {

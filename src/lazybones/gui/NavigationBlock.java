@@ -1,4 +1,4 @@
-/* $Id: NavigationBlock.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: NavigationBlock.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import lazybones.Controller;
+import lazybones.LazyBones;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -48,22 +49,19 @@ import lazybones.Controller;
 public class NavigationBlock extends JPanel {
     private static final long serialVersionUID = 7226115547859845252L;
 
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(NavigationBlock.class);
+    JButton bMenu = new JButton(LazyBones.getTranslation("Menu", "Menu"));
 
-    JButton bMenu = new JButton(mLocalizer.msg("Menu", "Menu"));
+    JButton bBack = new JButton(LazyBones.getTranslation("Back", "Back"));
 
-    JButton bBack = new JButton(mLocalizer.msg("Back", "Back"));
+    JButton bUp = new JButton(LazyBones.getTranslation("Up", "Up"));
 
-    JButton bUp = new JButton(mLocalizer.msg("Up", "Up"));
+    JButton bDown = new JButton(LazyBones.getTranslation("Down", "Down"));
 
-    JButton bDown = new JButton(mLocalizer.msg("Down", "Down"));
+    JButton bLeft = new JButton(LazyBones.getTranslation("Left", "Left"));
 
-    JButton bLeft = new JButton(mLocalizer.msg("Left", "Left"));
+    JButton bRight = new JButton(LazyBones.getTranslation("Right", "Right"));
 
-    JButton bRight = new JButton(mLocalizer.msg("Right", "Right"));
-
-    JButton bOk = new JButton(mLocalizer.msg("OK", "OK"));
+    JButton bOk = new JButton(LazyBones.getTranslation("OK", "OK"));
 
     public NavigationBlock() {
         initGUI();

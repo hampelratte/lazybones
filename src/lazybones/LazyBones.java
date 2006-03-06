@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.36 2006-03-06 19:51:48 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.37 2006-03-06 20:42:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,9 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.*;
 
 import javax.swing.*;
@@ -62,7 +65,6 @@ import devplugin.Date;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
  */
-//TODO seperate gui from core
 public class LazyBones extends Plugin {
 
     public static final Logger LOG = Logger.getLogger();
@@ -78,14 +80,14 @@ public class LazyBones extends Plugin {
     private Properties props;
     
     private TimerList timerList;
-
+    
     public ActionMenu getContextMenuActions(final Program program) {
         AbstractAction action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
 
             }
         };
-        action.putValue(Action.NAME, mLocalizer.msg("vdr",
+        action.putValue(Action.NAME, LazyBones.getTranslation("vdr",
                 "Video Disk Recorder"));
         action.putValue(Action.SMALL_ICON,
                 createImageIcon("lazybones/vdr16.png"));
@@ -109,7 +111,7 @@ public class LazyBones extends Plugin {
                     deleteTimer(program);
                 }
             };
-            actions[1].putValue(Action.NAME, mLocalizer.msg("dont_capture",
+            actions[1].putValue(Action.NAME, LazyBones.getTranslation("dont_capture",
                     "Delete timer"));
             actions[1].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/cancel.png"));
@@ -121,7 +123,7 @@ public class LazyBones extends Plugin {
                     editTimer(timer);
                 }
             };
-            actions[2].putValue(Action.NAME, mLocalizer.msg("edit",
+            actions[2].putValue(Action.NAME, LazyBones.getTranslation("edit",
                     "Edit Timer"));
             actions[2].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Edit16.png"));
@@ -131,7 +133,7 @@ public class LazyBones extends Plugin {
                     getTimersFromVDR();
                 }
             };
-            actions[3].putValue(Action.NAME, mLocalizer.msg("resync",
+            actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync",
                     "Synchronize with VDR"));
             actions[3].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Refresh16.gif"));
@@ -141,7 +143,7 @@ public class LazyBones extends Plugin {
                     getTimerList().setVisible(true);
                 }
             };
-            actions[4].putValue(Action.NAME, mLocalizer.msg("showAllTimers",
+            actions[4].putValue(Action.NAME, LazyBones.getTranslation("showAllTimers",
                     "Show all timers"));
             actions[4].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/view_detailed.png"));
@@ -150,7 +152,7 @@ public class LazyBones extends Plugin {
                     wakeUpVDR();
                 }
             };
-            actions[5].putValue(Action.NAME, mLocalizer.msg("wakeUpVDR",
+            actions[5].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
                     "Wake VDR up"));
             actions[5].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/bell16.png"));
@@ -163,7 +165,7 @@ public class LazyBones extends Plugin {
                     createTimer(program);
                 }
             };
-            actions[1].putValue(Action.NAME, mLocalizer.msg("capture",
+            actions[1].putValue(Action.NAME, LazyBones.getTranslation("capture",
                     "Capture with VDR"));
             actions[1].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/capture.png"));
@@ -173,7 +175,7 @@ public class LazyBones extends Plugin {
                     getTimersFromVDR();
                 }
             };
-            actions[2].putValue(Action.NAME, mLocalizer.msg("resync",
+            actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync",
                     "Synchronize with VDR"));
             actions[2].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/Refresh16.gif"));
@@ -183,7 +185,7 @@ public class LazyBones extends Plugin {
                     getTimerList().setVisible(true);
                 }
             };
-            actions[3].putValue(Action.NAME, mLocalizer.msg("showAllTimers",
+            actions[3].putValue(Action.NAME, LazyBones.getTranslation("showAllTimers",
                     "Show all timers"));
             actions[3].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/view_detailed.png"));
@@ -192,7 +194,7 @@ public class LazyBones extends Plugin {
                     wakeUpVDR();
                 }
             };
-            actions[4].putValue(Action.NAME, mLocalizer.msg("wakeUpVDR",
+            actions[4].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
                     "Wake VDR up"));
             actions[4].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/bell16.png"));
@@ -203,7 +205,7 @@ public class LazyBones extends Plugin {
                 watch(program);
             }
         };
-        actions[0].putValue(Action.NAME, mLocalizer.msg("watch",
+        actions[0].putValue(Action.NAME, LazyBones.getTranslation("watch",
                 "Watch this channel"));
         actions[0].putValue(Action.SMALL_ICON,
                 createImageIcon("lazybones/vdr16.png"));
@@ -212,7 +214,50 @@ public class LazyBones extends Plugin {
     }
 
     protected void wakeUpVDR() {
-                
+        // TODO config werte einsetzen
+        String ipStr = "";
+        String macStr = "";
+        final int PORT = 9;
+        
+        try {
+            byte[] macBytes = getMacBytes(macStr);
+            byte[] bytes = new byte[6 + 16 * macBytes.length];
+            for (int i = 0; i < 6; i++) {
+                bytes[i] = (byte) 0xff;
+            }
+            for (int i = 6; i < bytes.length; i += macBytes.length) {
+                System.arraycopy(macBytes, 0, bytes, i, macBytes.length);
+            }
+            
+            InetAddress address = InetAddress.getByName(ipStr);
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, PORT);
+            DatagramSocket socket = new DatagramSocket();
+            socket.send(packet);
+            socket.close();
+            
+            LOG.log("Wake-on-LAN packet sent.", Logger.CONNECTION, Logger.INFO);
+        }
+        catch (Exception e) {
+            LOG.log("Couldn't send Wake-on-Lan packet: \n\t" + e, Logger.CONNECTION, Logger.ERROR);
+        }
+        
+    }
+    
+    private static byte[] getMacBytes(String macStr) throws IllegalArgumentException {
+        byte[] bytes = new byte[6];
+        String[] hex = macStr.split("(\\:|\\-)");
+        if (hex.length != 6) {
+            throw new IllegalArgumentException("Invalid MAC address.");
+        }
+        try {
+            for (int i = 0; i < 6; i++) {
+                bytes[i] = (byte) Integer.parseInt(hex[i], 16);
+            }
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid hex digit in MAC address.");
+        }
+        return bytes;
     }
 
     public ActionMenu getButtonAction() {
@@ -229,8 +274,8 @@ public class LazyBones extends Plugin {
 
         action.setBigIcon(createImageIcon("lazybones/vdr24.png"));
         action.setSmallIcon(createImageIcon("lazybones/vdr16.png"));
-        action.setShortDescription(mLocalizer.msg("vdr", "Video Disk Recorder"));
-        action.setText(mLocalizer.msg("vdr", "Video Disk Recorder"));
+        action.setShortDescription(LazyBones.getTranslation("vdr", "Video Disk Recorder"));
+        action.setText(LazyBones.getTranslation("vdr", "Video Disk Recorder"));
 
         return new ActionMenu(action);
     }
@@ -253,7 +298,7 @@ public class LazyBones extends Plugin {
             getTimersFromVDR();
             updateTree();
         } else {
-            LOG.log(mLocalizer.msg(
+            LOG.log(LazyBones.getTranslation(
                     "couldnt_delete", "Couldn\'t delete timer:")
                     + " " + res.getMessage(), Logger.OTHER, Logger.ERROR);
         }
@@ -269,7 +314,7 @@ public class LazyBones extends Plugin {
             getTimersFromVDR();
             updateTree();
         } else {
-            LOG.log(mLocalizer.msg(
+            LOG.log(LazyBones.getTranslation(
                     "couldnt_delete", "Couldn\'t delete timer:")
                     + " " + res.getMessage(), Logger.OTHER, Logger.ERROR);
         }
@@ -288,7 +333,7 @@ public class LazyBones extends Plugin {
     
     private void createTimer(Program prog) {
         if (prog.isExpired()) {
-            LOG.log(mLocalizer.msg(
+            LOG.log(LazyBones.getTranslation(
                     "expired", "This program has expired"), Logger.OTHER, Logger.ERROR);
             return;
         }
@@ -305,7 +350,7 @@ public class LazyBones extends Plugin {
 
         Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
-            LOG.log(mLocalizer.msg("no_channel_defined",
+            LOG.log(LazyBones.getTranslation("no_channel_defined",
                     "No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
             return;
         }
@@ -390,7 +435,7 @@ public class LazyBones extends Plugin {
                             getTimersFromVDR();
                         } else {
                             LOG.log(
-                                mLocalizer.msg("couldnt_create",
+                                LazyBones.getTranslation("couldnt_create",
                                    "Couldn\'t create timer:")
                                     + " " + response.getMessage(),Logger.OTHER, Logger.ERROR);
                         }
@@ -414,7 +459,7 @@ public class LazyBones extends Plugin {
                                 timerCreatedOK(prog, t);
                             } else {
                                 LOG.log(
-                                        mLocalizer.msg("couldnt_create",
+                                        LazyBones.getTranslation("couldnt_create",
                                            "Couldn\'t create timer:")
                                             + " " + response.getMessage(),Logger.OTHER, Logger.ERROR);
                             }
@@ -428,7 +473,7 @@ public class LazyBones extends Plugin {
             noEPGAvailable(prog, id);
         } else {
             String msg = res != null ? res.getMessage() : "Reason unknown";
-            LOG.log(mLocalizer.msg("couldnt_create",
+            LOG.log(LazyBones.getTranslation("couldnt_create",
                     "Couldn\'t create timer\n: ") + " " + msg,Logger.OTHER, Logger.ERROR);
         }
     }
@@ -452,7 +497,7 @@ public class LazyBones extends Plugin {
         boolean dontCare = Boolean.FALSE.toString().equals(props.getProperty("logEPGErrors"));
         int result = JOptionPane.NO_OPTION;
         if(!dontCare) {
-            result = JOptionPane.showConfirmDialog(null, mLocalizer.msg(
+            result = JOptionPane.showConfirmDialog(null, LazyBones.getTranslation(
                 "noEPGdata", ""), "", JOptionPane.YES_NO_OPTION);
         }
         if (dontCare || result == JOptionPane.OK_OPTION) {
@@ -682,9 +727,8 @@ public class LazyBones extends Plugin {
     }
 
     public PluginInfo getInfo() {
-        String name = mLocalizer.msg("vdr", "Video Disk Recorder");
-        String description = mLocalizer
-                .msg("desc",
+        String name = LazyBones.getTranslation("vdr", "Video Disk Recorder");
+        String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
         return new PluginInfo(name, description, author, new Version(0, 1));
@@ -694,7 +738,7 @@ public class LazyBones extends Plugin {
      * Called by loadSettings to initialize the GUI and other things
      */
     private void initRemoteControl() {
-        remoteControl = new JDialog(getParent(), mLocalizer.msg(
+        remoteControl = new JDialog(getParent(), LazyBones.getTranslation(
                 "remoteControl", "VDR RemoteControl"), true);
         remoteControl.setSize(800, 450);
         remoteControl.getContentPane().setLayout(new GridBagLayout());
@@ -774,7 +818,7 @@ public class LazyBones extends Plugin {
             LOG.log("No timer defined on VDR",Logger.OTHER, Logger.INFO);
         } else { /* something went wrong, we have no timers -> 
                   * load the stored ones */
-            LOG.log(mLocalizer.msg("using_stored_timers",
+            LOG.log(LazyBones.getTranslation("using_stored_timers",
                 "Couldn't retrieve timers from VDR, using stored ones."), 
                 Logger.CONNECTION, Logger.ERROR);
             
@@ -857,11 +901,11 @@ public class LazyBones extends Plugin {
                 break;
             case Timer.NO_EPG:
                 LOG.log("Couldn't assign timer: " + timer, Logger.EPG, Logger.WARN);
-                String mesg = mLocalizer.msg("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
+                String mesg = LazyBones.getTranslation("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
                 LOG.log(mesg, Logger.EPG, Logger.ERROR);
                 break;
             case Timer.NO_CHANNEL:
-                LOG.log(mLocalizer.msg("no_channel_defined",
+                LOG.log(LazyBones.getTranslation("no_channel_defined",
                         "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
                 break;
             case Timer.NO_PROGRAM:
@@ -1179,10 +1223,10 @@ public class LazyBones extends Plugin {
             Response response = VDRConnection.send(new UPDT(timer.toNEWT()));
 
             if (response == null) {
-                String mesg = mLocalizer.msg(
+                String mesg = LazyBones.getTranslation(
                         "couldnt_change", "Couldn\'t change timer:")
                         + "\n"
-                        + mLocalizer.msg("couldnt_connect",
+                        + LazyBones.getTranslation("couldnt_connect",
                                 "Couldn\'t connect to VDR");
                 LOG.log(mesg, Logger.CONNECTION, Logger.ERROR);                
                 return;
@@ -1193,7 +1237,7 @@ public class LazyBones extends Plugin {
                 // get the whole timer list again :-(
                 getTimersFromVDR();
             } else {
-                String mesg =  mLocalizer.msg(
+                String mesg =  LazyBones.getTranslation(
                         "couldnt_change", "Couldn\'t change timer:")
                         + " " + response.getMessage();
                 LOG.log(mesg, Logger.OTHER, Logger.ERROR);
@@ -1268,5 +1312,17 @@ public class LazyBones extends Plugin {
         }
 
         return false;
+    }
+    
+    public static String getTranslation(String key, String altText) {
+        return mLocalizer.msg(key,altText);
+    }
+    
+    public static String getTranslation(String key, String altText, String arg1) {
+        return mLocalizer.msg(key,altText, arg1);
+    }
+    
+    public static String getTranslation(String key, String altText, String arg1, String arg2) {
+        return mLocalizer.msg(key,altText, arg1, arg2);
     }
 }
