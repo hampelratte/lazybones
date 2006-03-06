@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.9 2006-01-13 12:14:02 hampelratte Exp $
+/* $Id: PreviewSettingsPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,13 +27,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.*;
+
+import lazybones.LazyBones;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -134,7 +136,7 @@ public class PreviewSettingsPanel implements ItemListener {
         }
     }
 
-    JPanel getPanel() {
+    public JPanel getPanel() {
 		JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

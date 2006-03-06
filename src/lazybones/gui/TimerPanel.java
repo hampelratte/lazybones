@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.8 2005-12-23 17:35:32 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,12 +27,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+
+import lazybones.LazyBones;
 
 import util.ui.Localizer;
 
@@ -112,7 +114,7 @@ public class TimerPanel {
         lifetime.setModel(new SpinnerNumberModel(int_lifetime,0,99,1));
     }
 
-    JPanel getPanel() {
+    public JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:75dlu, 3dlu, 25dlu",
 			"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);

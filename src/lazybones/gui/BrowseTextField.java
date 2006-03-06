@@ -1,4 +1,4 @@
-/* $Id: BrowseTextField.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: BrowseTextField.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+
 
 public class BrowseTextField extends JPanel implements ActionListener {
 

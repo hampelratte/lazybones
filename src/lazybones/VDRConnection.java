@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.6 2006-01-28 12:18:56 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.7 2006-03-06 19:51:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,11 +46,11 @@ public class VDRConnection {
 
     private static Connection connection;
 
-    protected static String host;
+    public static String host;
 
-    protected static int port;
+    public static int port;
 
-    protected static int timeout = 500;
+    public static int timeout = 500;
 
     public static Response send(Command cmd) {
         Response res = null;

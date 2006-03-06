@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,15 +27,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.*;
+
+import lazybones.LazyBones;
+import lazybones.Timer;
+import lazybones.TimerManager;
 
 import util.ui.ProgramList;
 import devplugin.Program;
@@ -44,16 +50,27 @@ import devplugin.Program;
  * Shown, if a Program and a VDRTimer have totally different titles. The user
  * has to choose the right program, then.
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
-public class TimerSelectionDialog implements ActionListener {
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(TimerSelectionDialog.class);
 
+/*
+ * IDEA not assigned timers könnten im kontextmenu aufgelistet werden unter dem
+ * punkt, diesem programm diesen timer zuordnen. so würde der programselectiondialog
+ * wegfallen und das auswählen der sendungen ist viel flexibler.
+ * 
+ * timer, die nicht zugeordnet werden können, weil das programm im tvbrowser falsch ist,
+ * können dann auch ignoriert werden
+ */
+public class ProgramSelectionDialog extends Thread implements ActionListener {
+    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
+            .getLocalizerFor(ProgramSelectionDialog.class);
+    
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
-
+    
+    private JButton never = new JButton();
+    
     private DefaultListModel model = new DefaultListModel();
 
     private ProgramList list = new ProgramList(model);
@@ -64,71 +81,80 @@ public class TimerSelectionDialog implements ActionListener {
 
     private JDialog dialog;
 
-    public TimerSelectionDialog(LazyBones control) {
+    private Program[] programs;
+
+    private Timer timer;
+
+    public ProgramSelectionDialog(LazyBones control) {
         this.control = control;
-        initGUI();
     }
 
     private void initGUI() {
         dialog = new JDialog(control.getParent(), true);
-        dialog.setTitle(mLocalizer.msg("title", "Select VDR-program"));
+        dialog.setTitle(mLocalizer.msg("title", "Select Program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.gridheight = 1;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
-        dialog
-                .getContentPane()
-                .add(
-                        new JLabel(
-                                mLocalizer
-                                        .msg(
-                                                "message",
-                                                "<html>I couldn\'t find a program,"
-                                                        + " which matches the selected one.<br>Please select the"
-                                                        + " right program in the given list and press OK.</html>")),
-                        gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 1;
-        dialog.getContentPane().add(new JScrollPane(list), gbc);
+        
+        Date date = new Date(timer.getStartTime().getTimeInMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        String dateString = sdf.format(date);
+        String title = timer.getPath() + timer.getTitle();
+        String msg = mLocalizer.msg("message",
+                        "<html>I couldn\'t find a program, which matches the"
+                                + " timer <b>{0}</b> at <b>{1}</b>VDR.<br>Please select the right"
+                                + " program in the given list and press OK.</html>",
+                        title, dateString);
+        dialog.getContentPane().add(new JLabel(msg), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         dialog.getContentPane().add(cancel, gbc);
-
+        
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
+        dialog.getContentPane().add(never, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
         dialog.getContentPane().add(ok, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 1;
+        gbc.weighty = 1.0;
+        dialog.getContentPane().add(new JScrollPane(list), gbc);
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         ok.setText(mLocalizer.msg("ok", "OK"));
+        never.setText(mLocalizer.msg("never","Never assign"));
         cancel.setText(mLocalizer.msg("cancel", "Cancel"));
 
         ok.addActionListener(this);
+        never.addActionListener(this);
         cancel.addActionListener(this);
     }
 
-    public void showSelectionDialog(Program[] programs) {
-        dialog.setSize(1024, 768);
-        model.removeAllElements();
-        for (int i = 0; i < programs.length; i++) {
-            model.addElement(programs[i]);
-        }
-        dialog.pack();
-        dialog.setVisible(true);
+    public void showSelectionDialog(Program[] programs, Timer timer) {
+        this.programs = programs;
+        this.timer = timer;
+        start();
     }
 
     public Program getProgram() {
@@ -138,12 +164,45 @@ public class TimerSelectionDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
             int index = list.getSelectedIndex();
-            if (index >= 0)
+            if (index >= 0) {
                 selectedProgram = (Program) model.get(list.getSelectedIndex());
+                control.timerCreatedOK(selectedProgram, timer);
+            }
         } else if (e.getSource() == cancel) {
             selectedProgram = null;
+        } else if (e.getSource() == never ) {
+            timer.setReason(Timer.NO_PROGRAM);
+            TimerManager.getInstance().replaceStoredTimer(timer);
         }
 
         dialog.dispose();
+    }
+
+    public void run() {
+        if (programs.length <= 0) {
+        	return;
+        }
+        /*
+         * wait for TV-Browser started up properly,
+         */
+        while (control.getParent() == null) {
+        	try {
+        		Thread.sleep(200);
+			} catch (InterruptedException e) {
+			}
+        }
+        initGUI();
+        dialog.setSize(600, 400);
+        model.removeAllElements();
+        for (int i = 0; i < programs.length; i++) {
+            model.addElement(programs[i]);
+        }
+		
+        SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				//dialog.pack();
+				dialog.setVisible(true);
+			}
+		});
     }
 }

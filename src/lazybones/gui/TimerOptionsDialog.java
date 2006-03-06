@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.11 2005-12-14 19:29:09 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -39,6 +39,9 @@ import java.awt.event.ItemListener;
 import java.util.Calendar;
 
 import javax.swing.*;
+
+import lazybones.*;
+import lazybones.Timer;
 
 import tvbrowser.core.ChannelList;
 import devplugin.Channel;

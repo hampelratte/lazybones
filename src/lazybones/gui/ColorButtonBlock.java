@@ -1,4 +1,4 @@
-/* $Id: SpinnerTimeModel.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: ColorButtonBlock.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,57 +27,61 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+/*
+ * Created on 26.03.2005
+ *
+ */
+package lazybones.gui;
 
-import java.util.Iterator;
-import java.util.Vector;
+import java.awt.Color;
+import java.awt.GridLayout;
 
-import javax.swing.SpinnerModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
-public class SpinnerTimeModel implements SpinnerModel {
+import lazybones.Controller;
 
-    private Time time = new Time();
+/**
+ * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * 
+ */
+public class ColorButtonBlock extends JPanel {
 
-    private Vector changeListener = new Vector();
+    private static final long serialVersionUID = 3052192662507759492L;
 
-    public Object getNextValue() {
-        time.increase();
-        fireStateChanged();
-        return time;
+    JButton bRed = new JButton("  ");
+
+    JButton bGreen = new JButton("  ");
+
+    JButton bYellow = new JButton("  ");
+
+    JButton bBlue = new JButton("  ");
+
+    public ColorButtonBlock() {
+        initGUI();
     }
 
-    public Object getPreviousValue() {
-        time.decrease();
-        fireStateChanged();
-        return time;
-    }
+    private void initGUI() {
 
-    public Object getValue() {
-        return time;
-    }
+        bRed.setActionCommand("RED");
+        bGreen.setActionCommand("GREEN");
+        bYellow.setActionCommand("YELLOW");
+        bBlue.setActionCommand("BLUE");
 
-    public void setValue(Object o) {
-        if (o instanceof Time) {
-            time = (Time) o;
-            fireStateChanged();
-        }
-    }
+        bRed.addActionListener(Controller.getController());
+        bGreen.addActionListener(Controller.getController());
+        bYellow.addActionListener(Controller.getController());
+        bBlue.addActionListener(Controller.getController());
 
-    public void addChangeListener(ChangeListener arg0) {
-        changeListener.add(arg0);
-    }
+        bRed.setBackground(Color.RED);
+        bGreen.setBackground(Color.GREEN);
+        bYellow.setBackground(Color.YELLOW);
+        bBlue.setBackground(Color.BLUE);
 
-    public void removeChangeListener(ChangeListener arg0) {
-        changeListener.remove(arg0);
-    }
-
-    private void fireStateChanged() {
-        Iterator it = changeListener.iterator();
-        while (it.hasNext()) {
-            ChangeListener cl = (ChangeListener) it.next();
-            cl.stateChanged(new ChangeEvent(this));
-        }
+        setLayout(new GridLayout(1, 4, 10, 10));
+        add(bRed);
+        add(bGreen);
+        add(bYellow);
+        add(bBlue);
     }
 }

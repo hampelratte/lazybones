@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.11 2006-01-13 10:10:07 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -36,6 +36,8 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
+import lazybones.LazyBones;
 
 import util.ui.ImageUtilities;
 import util.ui.Localizer;

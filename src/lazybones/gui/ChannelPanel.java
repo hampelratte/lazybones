@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.10 2005-12-23 15:39:42 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +38,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import lazybones.*;
 
 import tvbrowser.core.ChannelList;
 import util.ui.Localizer;
@@ -108,7 +110,7 @@ public class ChannelPanel implements ActionListener {
         down.addActionListener(this);
     }
 
-    JPanel getPanel() {
+    public JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:85dlu:GROW, 3dlu, 120dlu, 3dlu, 3dlu",
 			"160dlu:GROW, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);

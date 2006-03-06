@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.6 2005-10-30 13:00:49 hampelratte Exp $
+/* $Id: PlayerPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,12 +27,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import lazybones.LazyBones;
 
 import util.ui.Localizer;
 
@@ -93,7 +95,7 @@ public class PlayerPanel {
         }
     }
 
-    JPanel getPanel() {
+    public JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:35dlu, 3dlu, 120dlu",
 			"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);

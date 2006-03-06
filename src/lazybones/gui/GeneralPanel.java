@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.11 2005-11-24 16:47:18 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,10 +27,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import javax.swing.*;
 
+import lazybones.LazyBones;
+import lazybones.Logger;
+import lazybones.VDRConnection;
 import util.ui.Localizer;
 
 import com.jgoodies.forms.builder.PanelBuilder;
@@ -141,7 +144,7 @@ public class GeneralPanel {
                 control.getProperties().getProperty("showTimerOptionsDialog")));
     }
 
-    JPanel getPanel() {
+    public JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:150dlu, 3dlu, 120dlu",
 				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, "+
                 "2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");

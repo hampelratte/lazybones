@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.35 2006-01-13 10:10:52 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.36 2006-03-06 19:51:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,7 +44,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import lazybones.gui.TimerList;
+import lazybones.gui.*;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -102,7 +102,7 @@ public class LazyBones extends Plugin {
         Action[] actions = null;
 
         if (marked) {
-            actions = new Action[5];
+            actions = new Action[6];
 
             actions[1] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
@@ -145,9 +145,18 @@ public class LazyBones extends Plugin {
                     "Show all timers"));
             actions[4].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/view_detailed.png"));
+            actions[5] = new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {
+                    wakeUpVDR();
+                }
+            };
+            actions[5].putValue(Action.NAME, mLocalizer.msg("wakeUpVDR",
+                    "Wake VDR up"));
+            actions[5].putValue(Action.SMALL_ICON,
+                    createImageIcon("lazybones/bell16.png"));
 
         } else {
-            actions = new Action[4];
+            actions = new Action[5];
 
             actions[1] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
@@ -178,6 +187,15 @@ public class LazyBones extends Plugin {
                     "Show all timers"));
             actions[3].putValue(Action.SMALL_ICON,
                     createImageIcon("lazybones/view_detailed.png"));
+            actions[4] = new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {
+                    wakeUpVDR();
+                }
+            };
+            actions[4].putValue(Action.NAME, mLocalizer.msg("wakeUpVDR",
+                    "Wake VDR up"));
+            actions[4].putValue(Action.SMALL_ICON,
+                    createImageIcon("lazybones/bell16.png"));
         }
 
         actions[0] = new AbstractAction() {
@@ -191,6 +209,10 @@ public class LazyBones extends Plugin {
                 createImageIcon("lazybones/vdr16.png"));
 
         return new ActionMenu(action, actions);
+    }
+
+    protected void wakeUpVDR() {
+                
     }
 
     public ActionMenu getButtonAction() {
@@ -472,7 +494,7 @@ public class LazyBones extends Plugin {
         }
     }
 
-    protected void timerCreatedOK(Program prog, Timer timer) {
+    public void timerCreatedOK(Program prog, Timer timer) {
         timer.setTvBrowserProgID(prog.getID());
         TimerManager.getInstance().replaceStoredTimer(timer);
         
@@ -968,7 +990,7 @@ public class LazyBones extends Plugin {
         }
     }
 
-    protected void removeTimerBuffers(Timer timer) {
+    public void removeTimerBuffers(Timer timer) {
         int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
         timer.getStartTime().add(Calendar.MINUTE, buffer_before);
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));

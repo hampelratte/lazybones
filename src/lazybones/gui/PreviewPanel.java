@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.7 2006-01-28 12:15:04 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -38,6 +38,10 @@ import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+
+import lazybones.LazyBones;
+import lazybones.Logger;
+import lazybones.VDRConnection;
 
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.GRAB;

@@ -1,4 +1,4 @@
-/* $Id: NumberBlock.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: NumberBlock.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,13 +31,15 @@
  * Created on 25.03.2005
  *
  */
-package lazybones;
+package lazybones.gui;
 
 import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import lazybones.Controller;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
