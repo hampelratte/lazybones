@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.6 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: TimerList.java,v 1.7 2006-03-30 13:57:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,12 +33,25 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
-import lazybones.*;
+import lazybones.LazyBones;
+import lazybones.Logger;
+import lazybones.ProgramManager;
 import lazybones.Timer;
+import lazybones.TimerManager;
+import lazybones.TimerProgram;
 import util.ui.ProgramList;
 import devplugin.Channel;
 import devplugin.Date;

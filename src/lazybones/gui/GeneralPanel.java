@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.3 2006-03-30 11:03:38 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.4 2006-03-30 13:57:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,7 +32,12 @@ package lazybones.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import lazybones.LazyBones;
 import lazybones.Logger;

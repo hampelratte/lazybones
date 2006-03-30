@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.3 2006-03-30 13:57:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,7 +35,12 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import lazybones.LazyBones;
 import util.ui.ProgramList;

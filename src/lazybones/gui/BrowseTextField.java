@@ -1,4 +1,4 @@
-/* $Id: BrowseTextField.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: BrowseTextField.java,v 1.2 2006-03-30 13:57:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,7 +34,12 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
 
 
 public class BrowseTextField extends JPanel implements ActionListener {

@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.2 2005-11-29 18:10:06 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.3 2006-03-30 13:57:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,11 @@
  */
 package lazybones;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 import devplugin.Channel;
 import devplugin.Date;
