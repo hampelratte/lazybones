@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.3 2006-03-30 11:03:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,9 @@
  */
 package lazybones.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 
 import lazybones.LazyBones;
@@ -39,7 +42,7 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class GeneralPanel {
+public class GeneralPanel implements ActionListener {
     private Logger LOG = Logger.getLogger();
     
 	private final String lHost = LazyBones.getTranslation("host", "Host");
@@ -49,6 +52,12 @@ public class GeneralPanel {
 	private final String lTimeout = LazyBones.getTranslation("timeout", "Timeout");
 
 	private final String lExperts = LazyBones.getTranslation("experts", "Experts");
+    
+    private final String lWOLEnabled = LazyBones.getTranslation("WOLEnabled", "Enable Wake-on-LAN");
+    
+    private final String lWOLMac = LazyBones.getTranslation("WOLMac", "Wake-on-LAN Mac-Adress");
+    
+    private final String lWOLBroadc = LazyBones.getTranslation("WOLBroadc", "Wake-on-LAN Broadcast-Adress");
 
 	private final String lFuzzyness = LazyBones.getTranslation("percentageOfEquality",
 			"Fuzzylevel program titles");
@@ -64,6 +73,12 @@ public class GeneralPanel {
     private JTextField port;
 
     private JTextField timeout;
+    
+    private JTextField tWOLMac;
+    
+    private JTextField tWOLBroadc;
+    
+    private JCheckBox cWOLEnabled;
 
     private JLabel labPercentageOfEquality;
     private JSpinner percentageOfEquality;
@@ -108,6 +123,20 @@ public class GeneralPanel {
         port.setText(control.getProperties().getProperty("port"));
         timeout = new JTextField(10);
         timeout.setText(control.getProperties().getProperty("timeout"));
+        
+        cWOLEnabled = new JCheckBox();
+        boolean wolEnabled = Boolean.TRUE.toString().equals(
+                control.getProperties().getProperty("WOLEnabled"));
+        cWOLEnabled.setSelected(wolEnabled);
+        cWOLEnabled.addActionListener(this);
+        String mac = control.getProperties().getProperty("WOLMac");
+        tWOLMac = new JTextField();
+        tWOLMac.setText(mac);
+        tWOLMac.setEnabled(wolEnabled);
+        String broadc = control.getProperties().getProperty("WOLBroadc");
+        tWOLBroadc = new JTextField();
+        tWOLBroadc.setText(broadc);
+        tWOLBroadc.setEnabled(wolEnabled);
 
         int percentageThreshold = Integer.parseInt(control.getProperties().getProperty(
                 "percentageThreshold"));
@@ -140,8 +169,9 @@ public class GeneralPanel {
 
     public JPanel getPanel() {
 		FormLayout layout = new FormLayout("left:150dlu, 3dlu, 120dlu",
-				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, "+
-                "2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, 2dlu, pref," +
+                " 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu," +
+                " pref, 2dlu, pref, 2dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -156,21 +186,30 @@ public class GeneralPanel {
 		builder.add(timeout,                 cc.xyw(3,  5, 1));
 
 		builder.addSeparator(lExperts,       cc.xyw(1,  7, 3));
+        
+        builder.addLabel(lWOLEnabled,        cc.xy (1,  9));
+        builder.add(cWOLEnabled,             cc.xy (3,  9));
+        
+        builder.addLabel(lWOLMac,            cc.xy (1,  11));
+        builder.add(tWOLMac,                 cc.xy (3,  11));
+        
+        builder.addLabel(lWOLBroadc,         cc.xy (1,  13));
+        builder.add(tWOLBroadc,              cc.xy (3,  13));
 		
-		builder.add(labPercentageOfEquality, cc.xy (1,  9));
-		builder.add(percentageOfEquality,    cc.xy (3,  9));
+		builder.add(labPercentageOfEquality, cc.xy (1,  15));
+		builder.add(percentageOfEquality,    cc.xy (3,  15));
 		
-        builder.addLabel(lSupressMatchDialog,cc.xy (1, 11));
-		builder.add(supressMatchDialog,      cc.xyw(3, 11, 1));
+        builder.addLabel(lSupressMatchDialog,cc.xy (1, 17));
+		builder.add(supressMatchDialog,      cc.xyw(3, 17, 1));
         
-        builder.addLabel(lLogConnectionErrors,   cc.xy (1, 13));
-        builder.add(logConnectionErrors,         cc.xyw(3, 13, 1));
+        builder.addLabel(lLogConnectionErrors,   cc.xy (1, 19));
+        builder.add(logConnectionErrors,         cc.xyw(3, 19, 1));
         
-        builder.addLabel(lLogEPGErrors,          cc.xy (1, 15));
-        builder.add(logEPGErrors,                cc.xyw(3, 15, 1));
+        builder.addLabel(lLogEPGErrors,          cc.xy (1, 21));
+        builder.add(logEPGErrors,                cc.xyw(3, 21, 1));
         
-        builder.addLabel(lShowTimerOptionsDialog,cc.xy (1, 17));
-        builder.add(showTimerOptionsDialog,      cc.xyw(3, 17, 1));
+        builder.addLabel(lShowTimerOptionsDialog,cc.xy (1, 23));
+        builder.add(showTimerOptionsDialog,      cc.xyw(3, 23, 1));
 
 		return builder.getPanel();
 	}
@@ -207,6 +246,8 @@ public class GeneralPanel {
         control.getProperties().setProperty("host", h);
         control.getProperties().setProperty("port", Integer.toString(p));
         control.getProperties().setProperty("timeout", Integer.toString(t));
+        control.getProperties().setProperty("WOLMac", tWOLMac.getText());
+        control.getProperties().setProperty("WOLBroadc", tWOLBroadc.getText());
         control.getProperties().setProperty("percentageThreshold",
                 percentageOfEquality.getValue().toString());
         control.getProperties().setProperty("supressMatchDialog",
@@ -217,5 +258,14 @@ public class GeneralPanel {
                 "" + logEPGErrors.isSelected());
         control.getProperties().setProperty("showTimerOptionsDialog",
                 "" + showTimerOptionsDialog.isSelected());
+        control.getProperties().setProperty("WOLEnabled",
+                "" + cWOLEnabled.isSelected());
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == cWOLEnabled) {
+            tWOLBroadc.setEnabled(cWOLEnabled.isSelected());
+            tWOLMac.setEnabled(cWOLEnabled.isSelected());
+        }
     }
 }

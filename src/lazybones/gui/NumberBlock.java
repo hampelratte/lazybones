@@ -1,4 +1,4 @@
-/* $Id: NumberBlock.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: NumberBlock.java,v 1.2 2006-03-30 11:03:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,8 +47,8 @@ import lazybones.Controller;
  */
 public class NumberBlock extends JPanel {
 
-    private static final long serialVersionUID = 3468623048482612161L;
-
+    JButton power = new JButton("Power");
+    
     JButton b0 = new JButton("0");
 
     JButton b1 = new JButton("1");
@@ -74,8 +74,9 @@ public class NumberBlock extends JPanel {
     }
 
     private void initGUI() {
-        setLayout(new GridLayout(4, 3, 10, 10));
+        setLayout(new GridLayout(5, 3, 10, 10));
 
+        power.setActionCommand("POWER");
         b0.setActionCommand("0");
         b1.setActionCommand("1");
         b2.setActionCommand("2");
@@ -87,6 +88,7 @@ public class NumberBlock extends JPanel {
         b8.setActionCommand("8");
         b9.setActionCommand("9");
 
+        power.addActionListener(Controller.getController());
         b0.addActionListener(Controller.getController());
         b1.addActionListener(Controller.getController());
         b2.addActionListener(Controller.getController());
@@ -98,6 +100,9 @@ public class NumberBlock extends JPanel {
         b8.addActionListener(Controller.getController());
         b9.addActionListener(Controller.getController());
 
+        add(new JLabel()); // dummy
+        add(new JLabel()); // dummy
+        add(power);
         add(b1);
         add(b2);
         add(b3);

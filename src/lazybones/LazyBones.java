@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.37 2006-03-06 20:42:01 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.38 2006-03-30 11:03:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,9 +40,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.*;
 
 import javax.swing.*;
@@ -81,6 +78,7 @@ public class LazyBones extends Plugin {
     
     private TimerList timerList;
     
+    //TODO wol nur, wenn auch aktiviert
     public ActionMenu getContextMenuActions(final Program program) {
         AbstractAction action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -92,10 +90,10 @@ public class LazyBones extends Plugin {
         action.putValue(Action.SMALL_ICON,
                 createImageIcon("lazybones/vdr16.png"));
 
-        PluginAccess[] plugins = program.getMarkedByPlugins();
+        Marker[] markers = program.getMarkerArr();
         boolean marked = false;
-        for (int i = 0; i < plugins.length; i++) {
-            if (plugins[i].getId().equals(this.getId())) {
+        for (int i = 0; i < markers.length; i++) {
+            if (markers[i].getId().equals(this.getId())) {
                 marked = true;
                 break;
             }
@@ -149,7 +147,9 @@ public class LazyBones extends Plugin {
                     createImageIcon("lazybones/view_detailed.png"));
             actions[5] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
-                    wakeUpVDR();
+                    String mac = getProperties().getProperty("WOLMac");
+                    String broadc = getProperties().getProperty("WOLBroadc");
+                    VDRConnection.wakeUpVDR(mac, broadc);
                 }
             };
             actions[5].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
@@ -191,7 +191,9 @@ public class LazyBones extends Plugin {
                     createImageIcon("lazybones/view_detailed.png"));
             actions[4] = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
-                    wakeUpVDR();
+                    String mac = getProperties().getProperty("WOLMac");
+                    String broadc = getProperties().getProperty("WOLBroadc");
+                    VDRConnection.wakeUpVDR(mac, broadc);
                 }
             };
             actions[4].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
@@ -213,52 +215,7 @@ public class LazyBones extends Plugin {
         return new ActionMenu(action, actions);
     }
 
-    protected void wakeUpVDR() {
-        // TODO config werte einsetzen
-        String ipStr = "";
-        String macStr = "";
-        final int PORT = 9;
-        
-        try {
-            byte[] macBytes = getMacBytes(macStr);
-            byte[] bytes = new byte[6 + 16 * macBytes.length];
-            for (int i = 0; i < 6; i++) {
-                bytes[i] = (byte) 0xff;
-            }
-            for (int i = 6; i < bytes.length; i += macBytes.length) {
-                System.arraycopy(macBytes, 0, bytes, i, macBytes.length);
-            }
-            
-            InetAddress address = InetAddress.getByName(ipStr);
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, PORT);
-            DatagramSocket socket = new DatagramSocket();
-            socket.send(packet);
-            socket.close();
-            
-            LOG.log("Wake-on-LAN packet sent.", Logger.CONNECTION, Logger.INFO);
-        }
-        catch (Exception e) {
-            LOG.log("Couldn't send Wake-on-Lan packet: \n\t" + e, Logger.CONNECTION, Logger.ERROR);
-        }
-        
-    }
     
-    private static byte[] getMacBytes(String macStr) throws IllegalArgumentException {
-        byte[] bytes = new byte[6];
-        String[] hex = macStr.split("(\\:|\\-)");
-        if (hex.length != 6) {
-            throw new IllegalArgumentException("Invalid MAC address.");
-        }
-        try {
-            for (int i = 0; i < 6; i++) {
-                bytes[i] = (byte) Integer.parseInt(hex[i], 16);
-            }
-        }
-        catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid hex digit in MAC address.");
-        }
-        return bytes;
-    }
 
     public ActionMenu getButtonAction() {
         ButtonAction action = new ButtonAction();
@@ -1120,11 +1077,25 @@ public class LazyBones extends Plugin {
         String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
         showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
         props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
+        
+        String WOLEnabled = props.getProperty("WOLEnabled");
+        WOLEnabled = WOLEnabled == null ? "false" : WOLEnabled;
+        props.setProperty("WOLEnabled", WOLEnabled);
+        String WOLMac = props.getProperty("WOLMac");
+        WOLMac = WOLMac == null ? "00:00:00:00:00:00" : WOLMac;
+        props.setProperty("WOLMac", WOLMac);
+        String WOLBroadc = props.getProperty("WOLBroadc");
+        WOLBroadc = WOLBroadc == null ? "192.168.0.255" : WOLBroadc;
+        props.setProperty("WOLBroadc", WOLBroadc);
 
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
 
+        init();
+    }
+    
+    private void init() {
         getTimersFromVDR();
     }
 
@@ -1280,6 +1251,8 @@ public class LazyBones extends Plugin {
         return null;
     }
     
+    // TODO mapping history hinzufügen, so dass eine einmal getroffene
+    // zuordnung in der zukunft automatisch gemacht werden kann
     private boolean lookUpTimer(Timer timer) {
         LOG.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
         String progID = TimerManager.getInstance().hasBeenMappedBefore(timer);

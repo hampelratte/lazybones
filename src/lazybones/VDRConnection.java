@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.8 2006-03-06 20:42:01 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.9 2006-03-30 11:03:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,10 @@
  */
 package lazybones;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 import de.hampelratte.svdrp.Command;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
@@ -40,9 +44,6 @@ import de.hampelratte.svdrp.Response;
 public class VDRConnection {
     
     private static Logger LOG = Logger.getLogger();
-    
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(VDRConnection.class);
 
     private static Connection connection;
 
@@ -52,7 +53,7 @@ public class VDRConnection {
 
     public static int timeout = 500;
 
-    public static Response send(Command cmd) {
+    public synchronized static Response send(Command cmd) {
         Response res = null;
         try {
             connection = new Connection(VDRConnection.host, VDRConnection.port,
@@ -61,6 +62,7 @@ public class VDRConnection {
             res = connection.send(cmd);
             connection.close();
         } catch (Exception e1) {
+            // TODO wol senden und connectiontester starten
             String mesg = LazyBones.getTranslation(
                     "couldnt_connect", "Couldn't connect to VDR")
                     + ":\n" + e1.toString();
@@ -69,6 +71,10 @@ public class VDRConnection {
         return res;
     }
 
+    /**
+     * @deprecated Please have a look at the class ConnectionTester
+     * @return the connection state
+     */
     public static boolean isAvailable() {
         try {
             connection = new Connection(VDRConnection.host, VDRConnection.port,
@@ -82,5 +88,60 @@ public class VDRConnection {
 
     public static Connection getConnection() {
         return connection;
+    }
+    
+    /**
+     * Sends a Wake-on-Lan packet to broadcast ipStr and MAC macStr
+     * @param macStr The MAC-address of the host, which shall be woken up
+     * @param ipStr The broadcast-address of the net of the host
+     */
+    protected static void wakeUpVDR(String macStr, String ipStr) {
+        final int PORT = 9;
+        
+        try {
+            byte[] macBytes = getMacBytes(macStr);
+            byte[] bytes = new byte[6 + 16 * macBytes.length];
+            for (int i = 0; i < 6; i++) {
+                bytes[i] = (byte) 0xff;
+            }
+            for (int i = 6; i < bytes.length; i += macBytes.length) {
+                System.arraycopy(macBytes, 0, bytes, i, macBytes.length);
+            }
+            
+            InetAddress address = InetAddress.getByName(ipStr);
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, PORT);
+            DatagramSocket socket = new DatagramSocket();
+            socket.send(packet);
+            socket.close();
+            
+            LOG.log("Wake-on-LAN packet sent.", Logger.CONNECTION, Logger.INFO);
+        }
+        catch (Exception e) {
+            LOG.log("Couldn't send Wake-on-Lan packet: \n\t" + e, Logger.CONNECTION, Logger.ERROR);
+        }
+        
+    }
+    
+    /**
+     * Creates a byte[] from a MAC-address String like "00:C0:26:20:33:2F"
+     * @param macStr like "00:C0:26:20:33:2F"
+     * @return a byte array according to the MAC-String
+     * @throws IllegalArgumentException
+     */
+    private static byte[] getMacBytes(String macStr) throws IllegalArgumentException {
+        byte[] bytes = new byte[6];
+        String[] hex = macStr.split("(\\:|\\-)");
+        if (hex.length != 6) {
+            throw new IllegalArgumentException("Invalid MAC address.");
+        }
+        try {
+            for (int i = 0; i < 6; i++) {
+                bytes[i] = (byte) Integer.parseInt(hex[i], 16);
+            }
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid hex digit in MAC address.");
+        }
+        return bytes;
     }
 }
