@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.3 2006-03-30 13:18:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,11 +67,11 @@ public class RemoteControl extends JPanel implements ActionListener {
     private void initGUI() {
         setLayout(new GridBagLayout());
 
-        numBlock = new NumberBlock();
+        numBlock = new NumberBlock(parent);
         add(numBlock, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                 new Insets(5, 5, 10, 5), 0, 0));
-        navBlock = new NavigationBlock();
+        navBlock = new NavigationBlock(parent);
         add(navBlock, new GridBagConstraints(0, 1, 2, 1, 0.1, 0.1,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
                 new Insets(10, 5, 5, 5), 0, 0));
@@ -81,6 +81,7 @@ public class RemoteControl extends JPanel implements ActionListener {
                 new Insets(5, 5, 10, 5), 0, 0));
 
         watch.addActionListener(this);
+        watch.setIcon(parent.getIcon("lazybones/play.png"));
         add(watch, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                 new Insets(10, 5, 5, 5), 0, 0));

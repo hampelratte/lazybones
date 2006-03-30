@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.3 2006-03-30 13:18:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,7 +31,12 @@ package lazybones.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -39,7 +44,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import lazybones.*;
+import lazybones.LazyBones;
+import lazybones.ProgramManager;
+import lazybones.Utilities;
+import lazybones.VDRChannel;
+import lazybones.VDRConnection;
 import tvbrowser.core.ChannelList;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -76,8 +85,8 @@ public class ChannelPanel implements ActionListener {
     }
     
     private void initComponents() {
-        up.setIcon(lazyBones.getIcon("lazybones/Up12.gif"));
-        down.setIcon(lazyBones.getIcon("lazybones/Down12.gif"));
+        up.setIcon(lazyBones.getIcon("lazybones/go-up16.png"));
+        down.setIcon(lazyBones.getIcon("lazybones/go-down16.png"));
 
         Object[] headers = { "TV-Browser", "VDR" };
         model = new DefaultTableModel(new Object[][] {}, headers) {

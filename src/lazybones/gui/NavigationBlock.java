@@ -1,4 +1,4 @@
-/* $Id: NavigationBlock.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: NavigationBlock.java,v 1.3 2006-03-30 13:18:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,23 +47,24 @@ import lazybones.LazyBones;
  * 
  */
 public class NavigationBlock extends JPanel {
-    private static final long serialVersionUID = 7226115547859845252L;
-
     JButton bMenu = new JButton(LazyBones.getTranslation("Menu", "Menu"));
 
     JButton bBack = new JButton(LazyBones.getTranslation("Back", "Back"));
 
-    JButton bUp = new JButton(LazyBones.getTranslation("Up", "Up"));
+    JButton bUp = new JButton();
 
-    JButton bDown = new JButton(LazyBones.getTranslation("Down", "Down"));
+    JButton bDown = new JButton();
 
-    JButton bLeft = new JButton(LazyBones.getTranslation("Left", "Left"));
+    JButton bLeft = new JButton();
 
-    JButton bRight = new JButton(LazyBones.getTranslation("Right", "Right"));
+    JButton bRight = new JButton();
 
     JButton bOk = new JButton(LazyBones.getTranslation("OK", "OK"));
+    
+    private LazyBones lazyBones;
 
-    public NavigationBlock() {
+    public NavigationBlock(LazyBones lazyBones) {
+        this.lazyBones = lazyBones;
         initGUI();
     }
 
@@ -85,6 +86,11 @@ public class NavigationBlock extends JPanel {
         bLeft.addActionListener(Controller.getController());
         bRight.addActionListener(Controller.getController());
         bOk.addActionListener(Controller.getController());
+        
+        bUp.setIcon(lazyBones.getIcon("lazybones/go-up16.png"));
+        bDown.setIcon(lazyBones.getIcon("lazybones/go-down16.png"));
+        bLeft.setIcon(lazyBones.getIcon("lazybones/go-previous.png"));
+        bRight.setIcon(lazyBones.getIcon("lazybones/go-next.png"));
 
         add(bBack);
         add(bUp);

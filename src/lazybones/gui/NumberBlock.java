@@ -1,4 +1,4 @@
-/* $Id: NumberBlock.java,v 1.2 2006-03-30 11:03:37 hampelratte Exp $
+/* $Id: NumberBlock.java,v 1.3 2006-03-30 13:18:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import lazybones.Controller;
+import lazybones.LazyBones;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
@@ -47,7 +48,7 @@ import lazybones.Controller;
  */
 public class NumberBlock extends JPanel {
 
-    JButton power = new JButton("Power");
+    JButton power = new JButton("");
     
     JButton b0 = new JButton("0");
 
@@ -68,8 +69,11 @@ public class NumberBlock extends JPanel {
     JButton b8 = new JButton("8");
 
     JButton b9 = new JButton("9");
+    
+    private LazyBones lazyBones;
 
-    public NumberBlock() {
+    public NumberBlock(LazyBones lazyBones) {
+        this.lazyBones = lazyBones;
         initGUI();
     }
 
@@ -77,6 +81,7 @@ public class NumberBlock extends JPanel {
         setLayout(new GridLayout(5, 3, 10, 10));
 
         power.setActionCommand("POWER");
+        power.setIcon(lazyBones.getIcon("lazybones/poweroff.png"));
         b0.setActionCommand("0");
         b1.setActionCommand("1");
         b2.setActionCommand("2");
