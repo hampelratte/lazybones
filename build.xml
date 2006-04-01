@@ -15,6 +15,7 @@
 	<property name="doc.dir" value="${res.dir}/docs"/>
 	<property name="jar.file" value="${tvbrowser.runtime.dir}/plugins/LazyBones.jar"/>
 	<property name="nacho" value="nachocalendar-0.22.jar" />
+	<property name="tableLayout" value="TableLayout.jar" />
 	<property name="svdrp.src.dir" value="svdrp4j/src" />
 
 
@@ -35,6 +36,7 @@
 	<target name="jar" depends="compile">
 		<mkdir dir="${classes.dir}/lazybones" />
 		<unjar src="${lib.dir}/${nacho}" dest="${classes.dir}"/>
+		<unjar src="${lib.dir}/${tableLayout}" dest="${classes.dir}"/>
 		<copy todir="${classes.dir}/lazybones">
 		      <fileset dir="${res.dir}/images" includes="*.png"/>
 		      <fileset dir="${res.dir}/images" includes="*.gif"/>
