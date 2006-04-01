@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.5 2006-04-01 14:10:58 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.6 2006-04-01 14:32:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -119,7 +119,7 @@ public class ChannelPanel implements ActionListener {
 		
         JPanel panel = new JPanel(layout);
         panel.add(scrollpane, "1,1,5,2");
-		panel.add(refresh,    "1,3,1,3");
+        panel.add(refresh,    "1,3,1,3");
         panel.add(sort,       "2,3,2,3");
         panel.add(up,         "4,3,4,3");
         panel.add(down,       "5,3,5,3");
