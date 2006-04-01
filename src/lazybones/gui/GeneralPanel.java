@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.4 2006-03-30 13:57:10 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.5 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,23 +29,16 @@
  */
 package lazybones.gui;
 
+import info.clearthought.layout.TableLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.VDRConnection;
-
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
 
 public class GeneralPanel implements ActionListener {
     private Logger LOG = Logger.getLogger();
@@ -70,8 +63,6 @@ public class GeneralPanel implements ActionListener {
 	private final String ttFuzzyness = LazyBones.getTranslation(
 			"percentageOfEquality.tooltip",
 			"Percentage of equality of program titles");
-
-	private LazyBones control;
 
     private JTextField host;
 
@@ -116,34 +107,33 @@ public class GeneralPanel implements ActionListener {
     private JCheckBox showTimerOptionsDialog;
 	
 
-	public GeneralPanel(LazyBones control) {
-        this.control = control;
+	public GeneralPanel() {
         initComponents();
     }
     
     private void initComponents() {
         host = new JTextField(10);
-        host.setText(control.getProperties().getProperty("host"));
+        host.setText(LazyBones.getProperties().getProperty("host"));
         port = new JTextField(10);
-        port.setText(control.getProperties().getProperty("port"));
+        port.setText(LazyBones.getProperties().getProperty("port"));
         timeout = new JTextField(10);
-        timeout.setText(control.getProperties().getProperty("timeout"));
+        timeout.setText(LazyBones.getProperties().getProperty("timeout"));
         
         cWOLEnabled = new JCheckBox();
         boolean wolEnabled = Boolean.TRUE.toString().equals(
-                control.getProperties().getProperty("WOLEnabled"));
+                LazyBones.getProperties().getProperty("WOLEnabled"));
         cWOLEnabled.setSelected(wolEnabled);
         cWOLEnabled.addActionListener(this);
-        String mac = control.getProperties().getProperty("WOLMac");
+        String mac = LazyBones.getProperties().getProperty("WOLMac");
         tWOLMac = new JTextField();
         tWOLMac.setText(mac);
         tWOLMac.setEnabled(wolEnabled);
-        String broadc = control.getProperties().getProperty("WOLBroadc");
+        String broadc = LazyBones.getProperties().getProperty("WOLBroadc");
         tWOLBroadc = new JTextField();
         tWOLBroadc.setText(broadc);
         tWOLBroadc.setEnabled(wolEnabled);
 
-        int percentageThreshold = Integer.parseInt(control.getProperties().getProperty(
+        int percentageThreshold = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "percentageThreshold"));
         percentageOfEquality = new JSpinner();
         percentageOfEquality.setModel(new SpinnerNumberModel(percentageThreshold,0,100,1));
@@ -156,67 +146,70 @@ public class GeneralPanel implements ActionListener {
 
 		supressMatchDialog = new JCheckBox();
         supressMatchDialog.setSelected(Boolean.TRUE.toString().equals(
-				control.getProperties().getProperty("supressMatchDialog")));
+				LazyBones.getProperties().getProperty("supressMatchDialog")));
         supressMatchDialog.setToolTipText(ttSupressMatchDialog);
         
         logConnectionErrors = new JCheckBox();
         logConnectionErrors.setSelected(Boolean.TRUE.toString().equals(
-                control.getProperties().getProperty("logConnectionErrors")));
+                LazyBones.getProperties().getProperty("logConnectionErrors")));
         
         logEPGErrors = new JCheckBox();
         logEPGErrors.setSelected(Boolean.TRUE.toString().equals(
-                control.getProperties().getProperty("logEPGErrors")));
+                LazyBones.getProperties().getProperty("logEPGErrors")));
         
         showTimerOptionsDialog = new JCheckBox();
         showTimerOptionsDialog.setSelected(Boolean.TRUE.toString().equals(
-                control.getProperties().getProperty("showTimerOptionsDialog")));
+                LazyBones.getProperties().getProperty("showTimerOptionsDialog")));
     }
 
     public JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:150dlu, 3dlu, 120dlu",
-				"pref, 2dlu, pref, 2dlu, pref, 15dlu, pref, 2dlu, pref," +
-                " 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu," +
-                " pref, 2dlu, pref, 2dlu, pref");
-		PanelBuilder builder = new PanelBuilder(layout);
-		builder.setDefaultDialogBorder();
-		CellConstraints cc = new CellConstraints();
+        final double P = TableLayout.PREFERRED;
+        double[][] size = {{10, P, 10, P, 10},
+                           {10, P, 10, P, 10, P, 20, P, 10}};
+        TableLayout surround = new TableLayout(size);
+		JPanel panel = new JPanel(surround);
 
-		builder.addLabel(lHost,              cc.xy (1,  1));
-		builder.add(host,                    cc.xyw(3,  1, 1));
+		panel.add(new JLabel(lHost), "1,1,1,1");
+		panel.add(host,              "3,1,3,1");
 		
-		builder.addLabel(lPort,              cc.xy (1,  3));
-		builder.add(port,                    cc.xyw(3,  3, 1));
+		panel.add(new JLabel(lPort), "1,3,1,3");
+		panel.add(port,              "3,3,3,3");
 		
-		builder.addLabel(lTimeout,           cc.xy (1,  5));
-		builder.add(timeout,                 cc.xyw(3,  5, 1));
+		panel.add(new JLabel(lTimeout), "1,5,1,5");
+		panel.add(timeout,              "3,5,3,5");
 
-		builder.addSeparator(lExperts,       cc.xyw(1,  7, 3));
+        double[][] size2 = {{10, P, 10, P, 10},
+                            {10, P, 10, P, 10, P, 10, P, 10, P, 10, P, 10, P, 10, P, 10}};
+        TableLayout layout2 = new TableLayout(size2);
+        JPanel experts = new JPanel(layout2);
+        experts.setBorder(BorderFactory.createTitledBorder(lExperts));
         
-        builder.addLabel(lWOLEnabled,        cc.xy (1,  9));
-        builder.add(cWOLEnabled,             cc.xy (3,  9));
+        experts.add(new JLabel(lWOLEnabled), "1,1,1,1");
+        experts.add(cWOLEnabled,             "3,1,3,1");
         
-        builder.addLabel(lWOLMac,            cc.xy (1,  11));
-        builder.add(tWOLMac,                 cc.xy (3,  11));
+        experts.add(new JLabel(lWOLMac),     "1,3,1,3");
+        experts.add(tWOLMac,                 "3,3,3,3");
         
-        builder.addLabel(lWOLBroadc,         cc.xy (1,  13));
-        builder.add(tWOLBroadc,              cc.xy (3,  13));
+        experts.add(new JLabel(lWOLBroadc),  "1,5,1,5");
+        experts.add(tWOLBroadc,              "3,5,3,5");
 		
-		builder.add(labPercentageOfEquality, cc.xy (1,  15));
-		builder.add(percentageOfEquality,    cc.xy (3,  15));
+        experts.add(labPercentageOfEquality, "1,7,1,7");
+        experts.add(percentageOfEquality,    "3,7,3,7");
 		
-        builder.addLabel(lSupressMatchDialog,cc.xy (1, 17));
-		builder.add(supressMatchDialog,      cc.xyw(3, 17, 1));
+        experts.add(new JLabel(lSupressMatchDialog),     "1,9,1,9");
+        experts.add(supressMatchDialog,                  "3,9,3,9");
         
-        builder.addLabel(lLogConnectionErrors,   cc.xy (1, 19));
-        builder.add(logConnectionErrors,         cc.xyw(3, 19, 1));
+        experts.add(new JLabel(lLogConnectionErrors),    "1,11,1,11");
+        experts.add(logConnectionErrors,                 "3,11,3,11");
         
-        builder.addLabel(lLogEPGErrors,          cc.xy (1, 21));
-        builder.add(logEPGErrors,                cc.xyw(3, 21, 1));
+        experts.add(new JLabel(lLogEPGErrors),           "1,13,1,13");
+        experts.add(logEPGErrors,                        "3,13,3,13");
         
-        builder.addLabel(lShowTimerOptionsDialog,cc.xy (1, 23));
-        builder.add(showTimerOptionsDialog,      cc.xyw(3, 23, 1));
+        experts.add(new JLabel(lShowTimerOptionsDialog), "1,15,1,15");
+        experts.add(showTimerOptionsDialog,              "3,15,3,15");
 
-		return builder.getPanel();
+        panel.add(experts, "1,7,3,7");
+		return panel;
 	}
 
     public void saveSettings() {
@@ -248,22 +241,22 @@ public class GeneralPanel implements ActionListener {
         VDRConnection.port = p;
         VDRConnection.timeout = t;
 
-        control.getProperties().setProperty("host", h);
-        control.getProperties().setProperty("port", Integer.toString(p));
-        control.getProperties().setProperty("timeout", Integer.toString(t));
-        control.getProperties().setProperty("WOLMac", tWOLMac.getText());
-        control.getProperties().setProperty("WOLBroadc", tWOLBroadc.getText());
-        control.getProperties().setProperty("percentageThreshold",
+        LazyBones.getProperties().setProperty("host", h);
+        LazyBones.getProperties().setProperty("port", Integer.toString(p));
+        LazyBones.getProperties().setProperty("timeout", Integer.toString(t));
+        LazyBones.getProperties().setProperty("WOLMac", tWOLMac.getText());
+        LazyBones.getProperties().setProperty("WOLBroadc", tWOLBroadc.getText());
+        LazyBones.getProperties().setProperty("percentageThreshold",
                 percentageOfEquality.getValue().toString());
-        control.getProperties().setProperty("supressMatchDialog",
+        LazyBones.getProperties().setProperty("supressMatchDialog",
 				"" + supressMatchDialog.isSelected());
-        control.getProperties().setProperty("logConnectionErrors",
+        LazyBones.getProperties().setProperty("logConnectionErrors",
                 "" + logConnectionErrors.isSelected());
-        control.getProperties().setProperty("logEPGErrors",
+        LazyBones.getProperties().setProperty("logEPGErrors",
                 "" + logEPGErrors.isSelected());
-        control.getProperties().setProperty("showTimerOptionsDialog",
+        LazyBones.getProperties().setProperty("showTimerOptionsDialog",
                 "" + showTimerOptionsDialog.isSelected());
-        control.getProperties().setProperty("WOLEnabled",
+        LazyBones.getProperties().setProperty("WOLEnabled",
                 "" + cWOLEnabled.isSelected());
     }
 

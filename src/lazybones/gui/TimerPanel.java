@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,8 @@
  */
 package lazybones.gui;
 
+import info.clearthought.layout.TableLayout;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -36,13 +38,7 @@ import javax.swing.SpinnerNumberModel;
 
 import lazybones.LazyBones;
 
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
 public class TimerPanel {
-    private LazyBones control;
-
     private final String lBefore = LazyBones.getTranslation("before",
 			"Buffer before program");
 
@@ -65,19 +61,18 @@ public class TimerPanel {
     private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
     private JSpinner lifetime;
 
-    public TimerPanel(LazyBones control) {
-        this.control = control;
+    public TimerPanel() {
         initComponents();
     }
     
     private void initComponents() {
-        int int_before = Integer.parseInt(control.getProperties().getProperty(
+        int int_before = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "timer.before"));
-        int int_after = Integer.parseInt(control.getProperties().getProperty(
+        int int_after = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "timer.after"));
-        int int_prio = Integer.parseInt(control.getProperties().getProperty(
+        int int_prio = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "timer.prio"));
-        int int_lifetime = Integer.parseInt(control.getProperties().getProperty(
+        int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "timer.lifetime"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
@@ -108,35 +103,38 @@ public class TimerPanel {
     }
 
     public JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:75dlu, 3dlu, 25dlu",
-			"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
-		PanelBuilder builder = new PanelBuilder(layout);
-		builder.setDefaultDialogBorder();
-		CellConstraints cc = new CellConstraints();
-		
-		builder.add(labBefore, cc.xy (1,  1));
-		builder.add(before,    cc.xy (3,  1));
-		
-		builder.add(labAfter,  cc.xy (1,  3));
-		builder.add(after,     cc.xy (3,  3));
+        final double P = TableLayout.PREFERRED;
+        double[][] size = {{0, P, P}, //cols
+                           {0, P, P, P, P}}; // rows
         
-        builder.add(lPrio,     cc.xy (1,  5));
-        builder.add(prio,      cc.xy (3,  5));
+        TableLayout layout = new TableLayout(size);
+        layout.setHGap(10);
+        layout.setVGap(10);
+		
+        JPanel panel = new JPanel(layout);
+		panel.add(labBefore, "1,1,1,1");
+		panel.add(before,    "2,1,2,1");
+		
+        panel.add(labAfter,  "1,2,1,2");
+        panel.add(after,     "2,2,2,2");
         
-        builder.add(lLifetime, cc.xy (1,  7));
-        builder.add(lifetime,  cc.xy (3,  7));
+        panel.add(lPrio,     "1,3,1,3");
+        panel.add(prio,      "2,3,2,3");
+        
+        panel.add(lLifetime, "1,4,1,4");
+        panel.add(lifetime,  "2,4,2,4");
 	
-		return builder.getPanel();
+		return panel;
     }
 
     public void saveSettings() {
-        control.getProperties().setProperty("timer.before",
+        LazyBones.getProperties().setProperty("timer.before",
                 before.getValue().toString());
-        control.getProperties().setProperty("timer.after",
+        LazyBones.getProperties().setProperty("timer.after",
                 after.getValue().toString());
-        control.getProperties().setProperty("timer.prio",
+        LazyBones.getProperties().setProperty("timer.prio",
                 prio.getValue().toString());
-        control.getProperties().setProperty("timer.lifetime",
+        LazyBones.getProperties().setProperty("timer.lifetime",
                 lifetime.getValue().toString());
     }
 }

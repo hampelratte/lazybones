@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.3 2006-03-30 13:18:44 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.4 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,8 @@
  */
 package lazybones.gui;
 
+import info.clearthought.layout.TableLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -50,12 +52,6 @@ import lazybones.Utilities;
 import lazybones.VDRChannel;
 import lazybones.VDRConnection;
 import tvbrowser.core.ChannelList;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.LSTC;
 import devplugin.Channel;
@@ -113,28 +109,22 @@ public class ChannelPanel implements ActionListener {
     }
 
     public JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:85dlu:GROW, 3dlu, 120dlu, 3dlu, 3dlu",
-			"160dlu:GROW, 2dlu, pref");
-		PanelBuilder builder = new PanelBuilder(layout);
-		builder.setDefaultDialogBorder();
-		CellConstraints cc = new CellConstraints();
+        final double P = TableLayout.PREFERRED;
+        double[][] size = {{0, P, P, TableLayout.FILL, P, P, 0}, //cols
+                           {0, P, P, 0}}; // rows
+        
+        TableLayout layout = new TableLayout(size);
+        layout.setHGap(10);
+        layout.setVGap(10);
 		
-        builder.add(scrollpane,       cc.xyw(1,  1, 5));
-		builder.add(buttonBarPanel(), cc.xyw(1,  3, 5));
+        JPanel panel = new JPanel(layout);
+        panel.add(scrollpane, "1,1,5,1");
+		panel.add(refresh,    "1,2,1,2");
+        panel.add(sort,       "2,2,2,2");
+        panel.add(up,         "4,2,4,2");
+        panel.add(down,       "5,2,5,2");
 		
-		return builder.getPanel();
-    }
-    
-    private JPanel buttonBarPanel() {
-        ButtonBarBuilder bb = ButtonBarBuilder.createLeftToRightBuilder();
-        bb.addFixed(refresh);
-        bb.addRelatedGap();
-        bb.addGridded(sort);
-        bb.addGlue();
-        bb.addGridded(up);
-        bb.addRelatedGap();
-        bb.addGridded(down);
-        return bb.getPanel();
+		return panel;
     }
 
     public void actionPerformed(ActionEvent e) {

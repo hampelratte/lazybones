@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: PreviewSettingsPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,8 @@
  */
 package lazybones.gui;
 
+import info.clearthought.layout.TableLayout;
+
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -40,13 +42,7 @@ import javax.swing.*;
 
 import lazybones.LazyBones;
 
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
 public class PreviewSettingsPanel implements ItemListener {
-    private LazyBones control;
-    
     private String lMethod = LazyBones.getTranslation("method", "Method");
     
     private JComboBox method = new JComboBox();
@@ -57,13 +53,13 @@ public class PreviewSettingsPanel implements ItemListener {
 
     private JPanel httpPanel = new JPanel();
     
-    private final String lURL = LazyBones.getTranslation("url",
-            "URL to preview picture");
+    private final JLabel lURL = new JLabel(LazyBones.getTranslation("url",
+            "URL to preview picture"));
 
     private JTextField url;
 
-    private final String lPicturePath = LazyBones.getTranslation("path",
-            "Path to preview picture");
+    private final JLabel lPicturePath = new JLabel(LazyBones.getTranslation("path",
+            "Path to preview picture"));
 
     private final String lDescription = LazyBones.getTranslation(
 					"desc_url", "The URL is the URL, where"
@@ -76,17 +72,15 @@ public class PreviewSettingsPanel implements ItemListener {
     
     private JComponent note;
 
-    public PreviewSettingsPanel(LazyBones control) {
-        this.control = control;
+    public PreviewSettingsPanel() {
         initComponents();
     }
     
     private void initComponents() {
         url = new JTextField(20);
-        url.setText(control.getProperties().getProperty("preview.url"));
+        url.setText(LazyBones.getProperties().getProperty("preview.url"));
         picturePath = new JTextField(20);
-        picturePath
-                .setText(control.getProperties().getProperty("preview.path"));
+        picturePath.setText(LazyBones.getProperties().getProperty("preview.path"));
 
         JTextArea description;
         description = new JTextArea(lDescription, 10, 40);
@@ -100,21 +94,19 @@ public class PreviewSettingsPanel implements ItemListener {
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
-        FormLayout layout = new FormLayout("left:75dlu, 3dlu, 120dlu",
-        "pref, 2dlu, pref, 10dlu, top:pref:grow");
-        PanelBuilder builder = new PanelBuilder(layout);
-        builder.setDefaultDialogBorder();
-        CellConstraints cc = new CellConstraints();
-        
-        builder.addLabel(lURL,         cc.xy (1,  1));
-        builder.add(url,               cc.xyw(3,  1, 1));
-        
-        builder.addLabel(lPicturePath, cc.xy (1,  3));
-        builder.add(picturePath,       cc.xyw(3,  3, 1));
-        
-        builder.add(note,              cc.xyw(1,  5, 3));
-        
-        httpPanel = builder.getPanel();
+        final double P = TableLayout.PREFERRED;
+        double[][] size = {{0, P, TableLayout.FILL, 0}, //cols
+                           {0, P, P, P}}; // rows
+        TableLayout layout = new TableLayout(size);
+        layout.setHGap(10);
+        layout.setVGap(10);
+        httpPanel.setLayout(layout);
+                
+        httpPanel.add(lURL,         "1,1,1,1");
+        httpPanel.add(url,          "2,1,2,1");
+        httpPanel.add(lPicturePath, "1,2,1,2");
+        httpPanel.add(picturePath,  "2,2,2,2");
+        httpPanel.add(note,         "1,3,2,3");
         
         cardsContainer.add(httpPanel, "HTTP");
         cardsContainer.add(new JPanel(), "SVDRP");
@@ -122,7 +114,7 @@ public class PreviewSettingsPanel implements ItemListener {
         method.addItem("HTTP");
         method.addItem("SVDRP");
         method.addItemListener(this);
-        String m = control.getProperties().getProperty("preview.method");
+        String m = LazyBones.getProperties().getProperty("preview.method");
         for(int i=0; i<method.getItemCount(); i++) {
             String item = (String)method.getItemAt(i);
             if(m.equals(item)) {
@@ -157,10 +149,10 @@ public class PreviewSettingsPanel implements ItemListener {
     }
 
     public void saveSettings() {
-        control.getProperties().setProperty("preview.url", url.getText());
-        control.getProperties().setProperty("preview.path",
+        LazyBones.getProperties().setProperty("preview.url", url.getText());
+        LazyBones.getProperties().setProperty("preview.path",
                 picturePath.getText());
-        control.getProperties().setProperty("preview.method",
+        LazyBones.getProperties().setProperty("preview.method",
                 method.getSelectedItem().toString());
     }
 

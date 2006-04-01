@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -70,7 +70,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane = new JTabbedPane();
             tabbedPane.setPreferredSize(new Dimension(380, 380));
 
-            generalPanel = new GeneralPanel(control);
+            generalPanel = new GeneralPanel();
             tabbedPane.addTab(LazyBones.getTranslation("general", ""), generalPanel
 					.getPanel());
 
@@ -78,15 +78,15 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.addTab(LazyBones.getTranslation("channels", ""), channelPanel
 					.getPanel());
 
-            playerPanel = new PlayerPanel(control);
+            playerPanel = new PlayerPanel();
             tabbedPane.addTab(LazyBones.getTranslation("player", ""), playerPanel
 					.getPanel());
 
-            timerPanel = new TimerPanel(control);
+            timerPanel = new TimerPanel();
             tabbedPane.addTab(LazyBones.getTranslation("timer", ""), timerPanel
 					.getPanel());
 
-            previewPanel = new PreviewSettingsPanel(control);
+            previewPanel = new PreviewSettingsPanel();
             tabbedPane.addTab(LazyBones.getTranslation("remoteControl", ""), previewPanel
 					.getPanel());
         }

@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: PlayerPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,25 +29,22 @@
  */
 package lazybones.gui;
 
+import info.clearthought.layout.TableLayout;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import lazybones.LazyBones;
 
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
 public class PlayerPanel {
-    private LazyBones control;
-
-    private final String lPlayer = LazyBones.getTranslation("player", "Player");
+    private final JLabel lPlayer = new JLabel(LazyBones.getTranslation("player", "Player"));
 
     private JTextField player;
 
-    private final String lParams = LazyBones.getTranslation("params", "Parameters");
+    private final JLabel lParams = new JLabel(LazyBones.getTranslation("params", "Parameters"));
 
     private JTextField params;
 
@@ -61,18 +58,17 @@ public class PlayerPanel {
     
     private JComboBox streamType;
 
-    public PlayerPanel(LazyBones control) {
-        this.control = control;
+    public PlayerPanel() {
         initComponents();
     }
     
     private void initComponents() {
         player = new JTextField(20);
-        player.setText(control.getProperties().getProperty("player"));
+        player.setText(LazyBones.getProperties().getProperty("player"));
         params = new JTextField(20);
-        params.setText(control.getProperties().getProperty("player_params"));
+        params.setText(LazyBones.getProperties().getProperty("player_params"));
         switchBefore = new JCheckBox(lSwitchBefore);
-        switchBefore.setSelected(new Boolean(control.getProperties()
+        switchBefore.setSelected(new Boolean(LazyBones.getProperties()
                 .getProperty("switchBefore")).booleanValue());
         switchBefore.setToolTipText(ttSwitchBefore);
         streamType = new JComboBox();
@@ -80,7 +76,7 @@ public class PlayerPanel {
         streamType.addItem("PS");
         streamType.addItem("PES");
         streamType.addItem("ES");
-        String streamString = control.getProperties().getProperty("streamtype");
+        String streamString = LazyBones.getProperties().getProperty("streamtype");
         for(int i=0; i<streamType.getItemCount(); i++) {
             if(streamType.getItemAt(i).equals(streamString)) {
                 streamType.setSelectedIndex(i);
@@ -89,30 +85,29 @@ public class PlayerPanel {
     }
 
     public JPanel getPanel() {
-		FormLayout layout = new FormLayout("left:35dlu, 3dlu, 120dlu",
-			"pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
-		PanelBuilder builder = new PanelBuilder(layout);
-		builder.setDefaultDialogBorder();
-		CellConstraints cc = new CellConstraints();
-		
-		builder.addLabel(lPlayer, cc.xy (1,  1));
-		builder.add(player,       cc.xyw(3,  1, 1));
-		
-		builder.addLabel(lParams, cc.xy (1,  3));
-		builder.add(params,       cc.xyw(3,  3, 1));
-
-        builder.add(streamType, cc.xyw(3,  5, 1));
+        final double P = TableLayout.PREFERRED;
+        double[][] size = {{0, P, P}, //cols
+                           {0, P, P, P, P}}; // rows
+        TableLayout layout = new TableLayout(size);
+        layout.setHGap(10);
+        layout.setVGap(10);
         
-		builder.add(switchBefore, cc.xyw(3,  7, 1));
+        JPanel panel = new JPanel(layout);
+        panel.add(lPlayer,      "1,1,1,1");
+        panel.add(player,       "2,1,2,1");
+        panel.add(lParams,      "1,2,1,2");
+        panel.add(params,       "2,2,2,2");
+        panel.add(streamType,   "2,3,2,3");
+        panel.add(switchBefore, "2,4,2,4");
 
-		return builder.getPanel();
+		return panel;
     }
 
     public void saveSettings() {
-        control.getProperties().setProperty("player", player.getText());
-        control.getProperties().setProperty("player_params", params.getText());
-        control.getProperties().setProperty("switchBefore",
+        LazyBones.getProperties().setProperty("player", player.getText());
+        LazyBones.getProperties().setProperty("player_params", params.getText());
+        LazyBones.getProperties().setProperty("switchBefore",
                 new Boolean(switchBefore.isSelected()).toString());
-        control.getProperties().setProperty("streamtype", streamType.getSelectedItem().toString());
+        LazyBones.getProperties().setProperty("streamtype", streamType.getSelectedItem().toString());
     }
 }

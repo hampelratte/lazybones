@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -58,10 +58,7 @@ public class PreviewPanel extends JLabel {
 
     private PreviewGrabber pg;
 
-    private LazyBones control;
-    
-    public PreviewPanel(LazyBones control) {
-        this.control = control;
+    public PreviewPanel() {
         initGUI();
     }
 
@@ -97,7 +94,7 @@ public class PreviewPanel extends JLabel {
                 try {
                     Thread.sleep(1000);
                     grab.setResolution(getWidth() + " " + getHeight());
-                    String method = control.getProperties().getProperty(
+                    String method = LazyBones.getProperties().getProperty(
                             "preview.method");
                     if ("HTTP".equals(method)) {
                         image = getHTTPImage();
@@ -119,13 +116,13 @@ public class PreviewPanel extends JLabel {
         
         private ImageIcon getHTTPImage() {
             LOG.log("Grabbing image over HTTP", Logger.OTHER, Logger.DEBUG);
-            grab.setFilename(control.getProperties()
+            grab.setFilename(LazyBones.getProperties()
                     .getProperty("preview.path"));
             ImageIcon preview = null;
             try {
                 Response res = VDRConnection.send(grab);
                 if (res.getCode() == 250) {
-                    URL url = new URL(control.getProperties().getProperty(
+                    URL url = new URL(LazyBones.getProperties().getProperty(
                             "preview.url"));
                     HttpURLConnection con = (HttpURLConnection) url
                             .openConnection();
