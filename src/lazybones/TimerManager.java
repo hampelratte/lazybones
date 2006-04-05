@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.5 2005-12-16 20:16:34 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.6 2006-04-05 08:36:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,6 +31,7 @@ package lazybones;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
@@ -54,6 +55,20 @@ public class TimerManager {
      * The VDR timers from the last session, which have been stored to disk
      */
     private ArrayList storedTimers = new ArrayList();
+    
+    /**
+     * Stores mappings the user has made for later use.
+     * The user has to map one Program only once. Later 
+     * the mapping will be looked up here 
+     */
+    private HashMap vdr2tvb = new HashMap();
+    
+    /**
+     * Stores mappings the user has made for later use.
+     * The user has to map one Program only once. Later 
+     * the mapping will be looked up here 
+     */
+    private HashMap tvb2vdr = new HashMap();
 
     private TimerManager() {
         timers = new ArrayList();
@@ -202,4 +217,36 @@ public class TimerManager {
         // timer couldn't be found -> this is a new timer
         storedTimers.add(timer);
     }
+
+    /**
+     * 
+     * @see TimerManager#tvb2vdr
+     */
+	public HashMap getTvb2vdr() {
+		return tvb2vdr;
+	}
+
+	/**
+	 * 
+	 * @see TimerManager#vdr2tvb
+	 */
+	public HashMap getVdr2tvb() {
+		return vdr2tvb;
+	}
+
+	/**
+     * 
+     * @see TimerManager#tvb2vdr
+     */
+	public void setTvb2vdr(HashMap tvb2vdr) {
+		this.tvb2vdr = tvb2vdr;
+	}
+
+	/**
+	 * 
+	 * @see TimerManager#vdr2tvb
+	 */
+	public void setVdr2tvb(HashMap vdr2tvb) {
+		this.vdr2tvb = vdr2tvb;
+	}
 }
