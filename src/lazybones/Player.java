@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.10 2006-03-06 20:42:01 hampelratte Exp $
+/* $Id: Player.java,v 1.11 2006-04-05 08:40:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -63,7 +63,7 @@ public class Player {
                 playerThread.stopThread();
             }
 
-            boolean switchBefore = new Boolean(control.getProperties()
+            boolean switchBefore = new Boolean(LazyBones.getProperties()
                     .getProperty("switchBefore")).booleanValue();
             if (switchBefore) {
                 Response res = VDRConnection.send(new CHAN(Integer
@@ -76,7 +76,7 @@ public class Player {
                 }
             }
 
-            String parameters = control.getProperties().getProperty(
+            String parameters = LazyBones.getProperties().getProperty(
                     "player_params");
             String[] arguments;
             if (parameters.trim().length() > 0) {
@@ -86,9 +86,9 @@ public class Player {
             } else {
                 arguments = new String[2];
             }
-            arguments[0] = control.getProperties().getProperty("player");
-            String host = control.getProperties().getProperty("host");
-            String streamtype = control.getProperties().getProperty("streamtype");
+            arguments[0] = LazyBones.getProperties().getProperty("player");
+            String host = LazyBones.getProperties().getProperty("host");
+            String streamtype = LazyBones.getProperties().getProperty("streamtype");
             arguments[arguments.length - 1] = "http://" + host + ":3000/" +
                     streamtype + "/" + channel;
             playerThread = new PlayerThread(arguments);

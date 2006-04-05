@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.39 2006-03-30 13:19:46 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.40 2006-04-05 08:40:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,7 +40,19 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Properties;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -49,7 +61,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import lazybones.gui.*;
+import lazybones.gui.PreviewPanel;
+import lazybones.gui.ProgramSelectionDialog;
+import lazybones.gui.RemoteControl;
+import lazybones.gui.TimerList;
+import lazybones.gui.TimerOptionsDialog;
+import lazybones.gui.TimerSelectionDialog;
+import lazybones.gui.VDRSettingsPanel;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -62,8 +80,17 @@ import de.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import de.hampelratte.svdrp.util.EPGParser;
 import de.hampelratte.svdrp.util.TimerParser;
-import devplugin.*;
+import devplugin.ActionMenu;
+import devplugin.ButtonAction;
+import devplugin.Channel;
+import devplugin.ChannelDayProgram;
 import devplugin.Date;
+import devplugin.Marker;
+import devplugin.Plugin;
+import devplugin.PluginInfo;
+import devplugin.PluginTreeNode;
+import devplugin.Program;
+import devplugin.Version;
 
 /**
  * A VDRRemoteControl Plugin
@@ -83,7 +110,7 @@ public class LazyBones extends Plugin {
 
     private PreviewPanel pp;
 
-    private Properties props;
+    private static Properties props;
     
     private TimerList timerList;
     
@@ -279,7 +306,6 @@ public class LazyBones extends Plugin {
                         if (selectedProgram != null) {
                             Timer t = ((TimerProgram) selectedProgram)
                                     .getTimer();
-                            System.out.println(t);
                             // start the recording x min before the beggining of
                             // the program
                             t.getStartTime().add(Calendar.MINUTE,
@@ -581,7 +607,7 @@ public class LazyBones extends Plugin {
                 new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                         new Insets(5, 5, 5, 5), 0, 0));
-        pp = new PreviewPanel(this);
+        pp = new PreviewPanel();
         remoteControl.getContentPane().add(
                 pp,
                 new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
@@ -893,7 +919,7 @@ public class LazyBones extends Plugin {
     }
 
     public void loadSettings(Properties props) {
-        this.props = props;
+        LazyBones.props = props;
 
         String host = props.getProperty("host");
         host = host == null ? "localhost" : host;
@@ -980,7 +1006,7 @@ public class LazyBones extends Plugin {
         return props;
     }
 
-    public Properties getProperties() {
+    public static Properties getProperties() {
         return props;
     }
 
@@ -1157,7 +1183,8 @@ public class LazyBones extends Plugin {
                     }
                 }
             }
-        } else {
+        } else  {
+        	// TODO lookup old mappings
             LOG.log("No mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
         }
 
