@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.5 2006-04-01 14:02:10 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.6 2006-07-21 12:01:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -183,7 +183,7 @@ public class GeneralPanel implements ActionListener {
         TableLayout layout2 = new TableLayout(size2);
         JPanel experts = new JPanel(layout2);
         experts.setBorder(BorderFactory.createTitledBorder(lExperts));
-        
+        /*
         experts.add(new JLabel(lWOLEnabled), "1,1,1,1");
         experts.add(cWOLEnabled,             "3,1,3,1");
         
@@ -192,7 +192,7 @@ public class GeneralPanel implements ActionListener {
         
         experts.add(new JLabel(lWOLBroadc),  "1,5,1,5");
         experts.add(tWOLBroadc,              "3,5,3,5");
-		
+		*/
         experts.add(labPercentageOfEquality, "1,7,1,7");
         experts.add(percentageOfEquality,    "3,7,3,7");
 		
