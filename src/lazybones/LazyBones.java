@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.40 2006-04-05 08:40:39 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.41 2006-07-21 12:04:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -748,8 +748,7 @@ public class LazyBones extends Plugin {
                 props.getProperty("supressMatchDialog"))) {
             return;
         }
-        Iterator iterator = TimerManager.getInstance().getNotAssignedTimers()
-                .iterator();
+        Iterator iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
         LOG.log("Not assigned timers: "
                 + TimerManager.getInstance().getNotAssignedTimers().size(),
                 Logger.OTHER, Logger.DEBUG);
@@ -765,8 +764,8 @@ public class LazyBones extends Plugin {
                 LOG.log(mesg, Logger.EPG, Logger.ERROR);
                 break;
             case Timer.NO_CHANNEL:
-                LOG.log(LazyBones.getTranslation("no_channel_defined",
-                        "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
+                mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString()); 
+                LOG.log(mesg, Logger.EPG, Logger.ERROR);
                 break;
             case Timer.NO_PROGRAM:
                 // do nothing
@@ -845,14 +844,11 @@ public class LazyBones extends Plugin {
             // calculate the precentage of common words
             int percentage = 0;
             if(!timer.getPath().equals("")) {
-                int percentagePath = Utilities.percentageOfEquality(timer.getPath(), progMin
-                        .getTitle());
-                int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), progMin
-                        .getTitle());
+                int percentagePath = Utilities.percentageOfEquality(timer.getPath(), progMin.getTitle());
+                int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), progMin.getTitle());
                 percentage = Math.max(percentagePath, percentageTitle);
             } else {
-                percentage = Utilities.percentageOfEquality(timer.getTitle(), progMin
-                    .getTitle());
+                percentage = Utilities.percentageOfEquality(timer.getTitle(), progMin.getTitle());
             }
 
             // override the percentage
@@ -864,8 +860,7 @@ public class LazyBones extends Plugin {
             
             LOG.log("Percentage:"+percentage + " " + timer.toString(), Logger.OTHER, Logger.DEBUG);
 
-            int threshold = Integer.parseInt(props
-                    .getProperty("percentageThreshold"));
+            int threshold = Integer.parseInt(props.getProperty("percentageThreshold"));
             // if the percentage of common words is
             // higher than the config value percentageThreshold, mark this
             // program
@@ -951,14 +946,11 @@ public class LazyBones extends Plugin {
         props.setProperty("timer.lifetime", timer_lifetime);
 
         String preview_url = props.getProperty("preview.url");
-        preview_url = preview_url == null ? "http://htpc:8000/preview.jpg"
-                : preview_url;
+        preview_url = preview_url == null ? "http://localhost:8000/preview.jpg" : preview_url;
         String preview_path = props.getProperty("preview.path");
-        preview_path = preview_path == null ? "/pub/web/preview.jpg"
-                : preview_path;
+        preview_path = preview_path == null ? "/pub/web/preview.jpg" : preview_path;
         String preview_method = props.getProperty("preview.method");
-        preview_method = preview_method == null ? "HTTP"
-                : preview_method;
+        preview_method = preview_method == null ? "HTTP" : preview_method;
         props.setProperty("preview.url", preview_url);
         props.setProperty("preview.path", preview_path);
         props.setProperty("preview.method", preview_method);
@@ -999,7 +991,20 @@ public class LazyBones extends Plugin {
     }
     
     private void init() {
-        getTimersFromVDR();
+        Thread t = new Thread() {
+            public void run() {
+                while(!(getParentFrame()!=null && getParentFrame().isVisible())) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {}
+                }
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {}
+                getTimersFromVDR();
+            }
+        };
+        t.start();
     }
 
     public Properties storeSettings() {
@@ -1287,9 +1292,7 @@ public class LazyBones extends Plugin {
                 if(wolEnabled) {
                     actions[5] = new AbstractAction() {
                         public void actionPerformed(ActionEvent evt) {
-                            String mac = getProperties().getProperty("WOLMac");
-                            String broadc = getProperties().getProperty("WOLBroadc");
-                            VDRConnection.wakeUpVDR(mac, broadc);
+                            VDRConnection.wakeUpVDR();
                         }
                     };
                     actions[5].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
@@ -1332,9 +1335,7 @@ public class LazyBones extends Plugin {
                 if(wolEnabled) {
                     actions[4] = new AbstractAction() {
                         public void actionPerformed(ActionEvent evt) {
-                            String mac = getProperties().getProperty("WOLMac");
-                            String broadc = getProperties().getProperty("WOLBroadc");
-                            VDRConnection.wakeUpVDR(mac, broadc);
+                            VDRConnection.wakeUpVDR();
                         }
                     };
                     actions[4].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
