@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.2 2005-11-23 18:47:10 hampelratte Exp $
+/* $Id: Logger.java,v 1.3 2006-07-21 11:59:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,18 +31,21 @@ package lazybones;
 
 import java.util.logging.Level;
 
-import javax.swing.JOptionPane;
+import lazybones.gui.LogMessage;
+import lazybones.gui.LogMessageDialog;
 
 public class Logger {
 
     public static final java.util.logging.Logger LOG = java.util.logging.Logger
             .getLogger(LazyBones.class.getName());
-
+    
     public final static int CONNECTION = 0;
 
     public final static int EPG = 1;
 
     public final static int OTHER = 2;
+    
+    public final static int WAKE_ON_LAN = 3;
 
     public final static LoggingLevel DEBUG = new LoggingLevel(
             "LAZYBONES DEBUG", 56738);
@@ -77,12 +80,17 @@ public class Logger {
     }
 
     public void log(Object o, int type, LoggingLevel level) {
+        
         switch (type) {
+        case WAKE_ON_LAN:
+            LOG.log(level, o.toString());
+            break;
         case CONNECTION:
             if (logConnectionErrors) {
                 LOG.log(level, o.toString());
                 if (level == ERROR || level == FATAL) {
-                    new MessagePopup(o.toString());
+                    LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
+                    LogMessageDialog.getInstance().setVisible(true);
                 }
             }
             break;
@@ -90,36 +98,25 @@ public class Logger {
             if (logEPGErrors) {
                 LOG.log(level, o.toString());
                 if (level == ERROR || level == FATAL) {
-                    new MessagePopup(o.toString());
+                    LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
+                    LogMessageDialog.getInstance().setVisible(true);
                 }
             }
             break;
         default:
             LOG.log(level, o.toString());
             if (level == ERROR || level == FATAL) {
-                new MessagePopup(o.toString());
+                LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
+                LogMessageDialog.getInstance().setVisible(true);
             }
             break;
         }
     }
+    
 
-    private static class LoggingLevel extends Level {
+    public static class LoggingLevel extends Level {
         private LoggingLevel(String name, int level) {
             super(name, level);
-        }
-    }
-
-    private class MessagePopup extends Thread {
-
-        private String message;
-
-        MessagePopup(String message) {
-            this.message = message;
-            start();
-        }
-
-        public void run() {
-            JOptionPane.showMessageDialog(null, message);
         }
     }
 }
