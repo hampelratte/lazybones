@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.4 2006-07-26 22:21:29 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.5 2006-07-26 23:45:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -72,12 +72,15 @@ public class TimerSelectionDialog implements ActionListener {
     
     private Program[] programs;
     
+    private Program originalProgram;
+    
     private Timer timerOptions;
 
-    public TimerSelectionDialog(LazyBones control, Program[] programs, Timer timerOptions) {
+    public TimerSelectionDialog(LazyBones control, Program[] programs, Timer timerOptions, Program prog) {
         this.control = control;
         this.programs = programs;
         this.timerOptions = timerOptions;
+        this.originalProgram = prog;
         initGUI();
     }
 
@@ -152,7 +155,7 @@ public class TimerSelectionDialog implements ActionListener {
                 t.setHasFirstTime(timerOptions.hasFirstTime());
                 t.setFirstTime(timerOptions.getFirstTime());
                 t.setRepeatingDays(timerOptions.getRepeatingDays());
-                control.timerSelectionCallBack(selectedProgram);
+                control.timerSelectionCallBack(selectedProgram, originalProgram);
             }
         } 
         dialog.dispose();

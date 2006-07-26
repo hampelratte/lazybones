@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.42 2006-07-26 22:21:29 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.43 2006-07-26 23:45:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,19 +40,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -61,13 +49,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import lazybones.gui.PreviewPanel;
-import lazybones.gui.ProgramSelectionDialog;
-import lazybones.gui.RemoteControl;
-import lazybones.gui.TimerList;
-import lazybones.gui.TimerOptionsDialog;
-import lazybones.gui.TimerSelectionDialog;
-import lazybones.gui.VDRSettingsPanel;
+import lazybones.gui.*;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -80,18 +62,10 @@ import de.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import de.hampelratte.svdrp.util.EPGParser;
 import de.hampelratte.svdrp.util.TimerParser;
-import devplugin.ActionMenu;
-import devplugin.ButtonAction;
-import devplugin.Channel;
-import devplugin.ChannelDayProgram;
+import devplugin.*;
 import devplugin.Date;
-import devplugin.Marker;
-import devplugin.Plugin;
-import devplugin.PluginInfo;
-import devplugin.PluginTreeNode;
-import devplugin.Program;
-import devplugin.Version;
 
+//TODO mal probieren vor levenshtein die titel auf gleiche länge zu kürzen
 /**
  * A VDRRemoteControl Plugin
  * 
@@ -286,6 +260,12 @@ public class LazyBones extends Plugin {
         }
     }
     
+    /**
+     * Called by TimerOptionsDialog, when the user confirms the dialog
+     * @param timer The new created / updated Timer
+     * @param prog The according Program
+     * @param update If the Timer is a new one or if the timer has been edited
+     */
     public void createTimerCallBack(Timer timer, Program prog, boolean update) {
         int id = -1;
         if(prog != null) {
@@ -329,8 +309,7 @@ public class LazyBones extends Plugin {
                         || timer.isRepeating()) {
                     percentage = 100;
                 }
-                int threshold = Integer.parseInt(props
-                        .getProperty("percentageThreshold"));
+                int threshold = Integer.parseInt(props.getProperty("percentageThreshold"));
                 if (percentage > threshold) {
                     Response response = VDRConnection.send(new NEWT(timer.toNEWT()));
                     if (response.getCode() == 250) {
@@ -345,8 +324,23 @@ public class LazyBones extends Plugin {
                                 Logger.ERROR);
                     }
                 } else {
-                    // TODO mapping history einbauen
-                    showTimerConfirmDialog(timer, prog);
+                    LOG.log("Looking in tvb2vdr for timer "+timer, Logger.OTHER, Logger.DEBUG);
+                    // lookup in mapping history
+                    TimerManager tm = TimerManager.getInstance();
+                    String timerTitle = (String)tm.getTvb2vdr().get(prog.getTitle());
+                    if(timer.getTitle().equals(timerTitle)) {
+                        Response response = VDRConnection.send(new NEWT(timer.toNEWT()));
+                        if (response.getCode() == 250) {
+                            timerCreatedOK(prog, timer);
+                        } else {
+                            LOG.log(LazyBones.getTranslation("couldnt_create",
+                                    "Couldn\'t create timer:")
+                                    + " " + response.getMessage(), Logger.OTHER,
+                                    Logger.ERROR);
+                        }
+                    } else { // no mapping found -> ask the user
+                        showTimerConfirmDialog(timer, prog);
+                    }
                 }
             } else { // VDR has no EPG data
                 noEPGAvailable(prog, id);
@@ -397,7 +391,11 @@ public class LazyBones extends Plugin {
         }
     }
     
-    public void timerSelectionCallBack(Program selectedProgram) {
+    /**
+     * Called by TimerSelectionDialog, if a VDR-Program has been selected
+     * @param selectedProgram
+     */
+    public void timerSelectionCallBack(Program selectedProgram, Program originalProgram) {
         int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
         
@@ -417,6 +415,9 @@ public class LazyBones extends Plugin {
                     + " " + response.getMessage(),
                     Logger.OTHER, Logger.ERROR);
         }
+        
+        LOG.log("Storing " + originalProgram.getTitle() + "-"+t.getTitle()+ " in tvb2vdr", Logger.OTHER, Logger.DEBUG);
+        TimerManager.getInstance().getTvb2vdr().put(originalProgram.getTitle(), t.getTitle());
     }
 
     public void timerCreatedOK(Program prog, Timer timer) {
@@ -492,7 +493,7 @@ public class LazyBones extends Plugin {
         programs = temp;
 
         // show dialog
-        new TimerSelectionDialog(this, programs, timerOptions);
+        new TimerSelectionDialog(this, programs, timerOptions, prog);
     }
 
     /**
@@ -635,6 +636,9 @@ public class LazyBones extends Plugin {
             // load stored timers. 
             // if no connection is available, we use these ones
             TimerManager.getInstance().setStoredTimers((ArrayList) in.readObject());
+            
+            // load stored mappings
+            TimerManager.getInstance().setTvb2vdr((HashMap) in.readObject());
         } catch (Exception e) {
             LOG.log("Couldn't read data", Logger.OTHER, Logger.ERROR);
             e.printStackTrace(System.out);
@@ -902,6 +906,7 @@ public class LazyBones extends Plugin {
         try {
             out.writeObject(ProgramManager.getChannelMapping());
             out.writeObject(TimerManager.getInstance().getTimers());
+            out.writeObject(TimerManager.getInstance().getTvb2vdr());
         } catch (IOException e) {
             e.printStackTrace(System.out);
         }
