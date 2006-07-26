@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.8 2006-07-26 22:21:29 hampelratte Exp $
+/* $Id: TimerList.java,v 1.9 2006-07-26 22:36:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,12 +33,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
+import java.util.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -57,9 +52,7 @@ import devplugin.Channel;
 import devplugin.Date;
 import devplugin.Program;
 
-// TODO wenn ein timer außerhalb des dialogs gelöscht wird, muss der dialog aktualisiert werden
-// observer auf timermanager oder sowas in der art.
-public class TimerList extends JDialog implements ActionListener {
+public class TimerList extends JDialog implements ActionListener, Observer {
 
     private static Logger LOG = Logger.getLogger();
     private JScrollPane scrollPane = null;
@@ -75,6 +68,7 @@ public class TimerList extends JDialog implements ActionListener {
         super(control.getParent(), false);
         this.control = control;
         initGUI();
+        TimerManager.getInstance().addObserver(this);
     }
 
     /**
@@ -228,5 +222,12 @@ public class TimerList extends JDialog implements ActionListener {
             return calendar;
         }
         
+    }
+
+
+    public void update(Observable arg0, Object arg1) {
+        if(arg0 == TimerManager.getInstance()) {
+            getTimers();
+        }
     }
 }

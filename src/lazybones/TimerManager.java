@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.6 2006-04-05 08:36:26 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.7 2006-07-26 22:36:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Observable;
 
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
@@ -42,7 +43,7 @@ import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
  * 
  * Class to manage all timers. No program logic, just a container
  */
-public class TimerManager {
+public class TimerManager extends Observable {
 
     private static TimerManager instance;
 
@@ -110,14 +111,21 @@ public class TimerManager {
                 }
             }
         }
+        
+        setChanged();
+        notifyObservers(timers);
     }
 
     public void removeTimer(Timer timer) {
         timers.remove(timer);
+        setChanged();
+        notifyObservers(timers);
     }
     
     public void removeAll() {
         timers.clear();
+        setChanged();
+        notifyObservers(timers);
     }
 
     /**
