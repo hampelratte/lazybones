@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.3 2006-03-30 13:57:10 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.4 2006-07-26 22:21:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,7 +43,10 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import lazybones.LazyBones;
+import lazybones.Timer;
+import lazybones.TimerProgram;
 import util.ui.ProgramList;
+import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Program;
 
 /**
@@ -66,14 +69,20 @@ public class TimerSelectionDialog implements ActionListener {
     private LazyBones control;
 
     private JDialog dialog;
+    
+    private Program[] programs;
+    
+    private Timer timerOptions;
 
-    public TimerSelectionDialog(LazyBones control) {
+    public TimerSelectionDialog(LazyBones control, Program[] programs, Timer timerOptions) {
         this.control = control;
+        this.programs = programs;
+        this.timerOptions = timerOptions;
         initGUI();
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), true);
+        dialog = new JDialog(control.getParent(), false);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_vdrselect", "Select VDR-program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -117,9 +126,7 @@ public class TimerSelectionDialog implements ActionListener {
 
         ok.addActionListener(this);
         cancel.addActionListener(this);
-    }
-
-    public void showSelectionDialog(Program[] programs) {
+        
         dialog.setSize(1024, 768);
         model.removeAllElements();
         for (int i = 0; i < programs.length; i++) {
@@ -129,19 +136,25 @@ public class TimerSelectionDialog implements ActionListener {
         dialog.setVisible(true);
     }
 
-    public Program getProgram() {
-        return selectedProgram;
-    }
-
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
             int index = list.getSelectedIndex();
-            if (index >= 0)
+            if (index >= 0) {
                 selectedProgram = (Program) model.get(list.getSelectedIndex());
-        } else if (e.getSource() == cancel) {
-            selectedProgram = null;
-        }
-
+                TimerProgram program = (TimerProgram) selectedProgram;
+                VDRTimer t = program.getTimer();
+                t.setTitle(timerOptions.getTitle());
+                t.setDescription(timerOptions.getDescription());
+                t.setLifetime(timerOptions.getLifetime());
+                t.setPriority(timerOptions.getPriority());
+                t.setStartTime(timerOptions.getStartTime());
+                t.setEndTime(timerOptions.getEndTime());
+                t.setHasFirstTime(timerOptions.hasFirstTime());
+                t.setFirstTime(timerOptions.getFirstTime());
+                t.setRepeatingDays(timerOptions.getRepeatingDays());
+                control.timerSelectionCallBack(selectedProgram);
+            }
+        } 
         dialog.dispose();
     }
 }

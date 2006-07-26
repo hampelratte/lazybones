@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.3 2006-07-26 22:21:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,6 +53,8 @@ import devplugin.Program;
  */
 
 /*
+ * FIXME wenn die letzte sendung ausgewählt wird, die im tv-browser bekannt ist, dann fehlen die späteren sendungen zur auswahl.
+ * 
  * IDEA not assigned timers könnten im kontextmenu aufgelistet werden unter dem
  * punkt, diesem programm diesen timer zuordnen. so würde der programselectiondialog
  * wegfallen und das auswählen der sendungen ist viel flexibler.
@@ -77,17 +79,28 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
     private JDialog dialog;
 
-    private Program[] programs;
 
     private Timer timer;
 
-    public ProgramSelectionDialog(LazyBones control) {
+    public ProgramSelectionDialog(LazyBones control, Program[] programs, Timer timer) {
         this.control = control;
+        this.timer = timer;
+        
+        if (programs.length > 0) {
+            initGUI();
+            dialog.setSize(600, 400);
+            model.removeAllElements();
+            for (int i = 0; i < programs.length; i++) {
+                model.addElement(programs[i]);
+            }
+            
+            dialog.setVisible(true);
+        }
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), true);
-        dialog.setTitle(LazyBones.getTranslation("LazyBones.windowtitle_programselect", "Select Program"));
+        dialog = new JDialog(control.getParent(), false);
+        dialog.setTitle(LazyBones.getTranslation("windowtitle_programselect", "Select Program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -147,12 +160,6 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         cancel.addActionListener(this);
     }
 
-    public void showSelectionDialog(Program[] programs, Timer timer) {
-        this.programs = programs;
-        this.timer = timer;
-        start();
-    }
-
     public Program getProgram() {
         return selectedProgram;
     }
@@ -172,33 +179,5 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         }
 
         dialog.dispose();
-    }
-
-    public void run() {
-        if (programs.length <= 0) {
-        	return;
-        }
-        /*
-         * wait for TV-Browser started up properly,
-         */
-        while (control.getParent() == null) {
-        	try {
-        		Thread.sleep(200);
-			} catch (InterruptedException e) {
-			}
-        }
-        initGUI();
-        dialog.setSize(600, 400);
-        model.removeAllElements();
-        for (int i = 0; i < programs.length; i++) {
-            model.addElement(programs[i]);
-        }
-		
-        SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				//dialog.pack();
-				dialog.setVisible(true);
-			}
-		});
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.3 2006-03-30 13:57:10 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.4 2006-07-26 22:21:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -56,7 +56,7 @@ import devplugin.Program;
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
-public class TimerOptionsDialog extends Thread implements ActionListener,
+public class TimerOptionsDialog implements ActionListener,
         ItemListener {
     private JLabel lChannels = new JLabel(LazyBones.getTranslation("channel", "Channel"));
 
@@ -106,24 +106,23 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
     private JPanel panel = new JPanel();
 
     private Timer timer;
-
-    private boolean confirmation = false;
+    
+    private Program prog;
 
     private boolean update = false;
     
-    private boolean initialized = false;
-
-    public TimerOptionsDialog(LazyBones control, Timer timer, boolean update) {
+    public TimerOptionsDialog(LazyBones control, Timer timer, Program prog, boolean update) {
         this.update = update;
         this.control = control;
         this.timer = timer;
+        this.prog = prog;
         dayChooser = new DayChooser(timer);
         day = new BrowseTextField(dayChooser);
         initGUI();
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), true);
+        dialog = new JDialog(control.getParent(), false);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
         panel.setLayout(new GridBagLayout());
         dialog.getContentPane().add(panel);
@@ -276,12 +275,14 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             endtime.setEnabled(false);
         }
         
-        initialized = true;
+        dialog.setSize(400, 500);
+        dialog.setLocation(50, 50);
+        dialog.setVisible(true);
+        dialog.pack();
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
-            confirmation = true;
             timer.setFile(title.getText());
             Channel c = (Channel) channels.getSelectedItem();
             VDRChannel vdrc = (VDRChannel) ProgramManager.getChannelMapping().get(c.getId());
@@ -298,23 +299,10 @@ public class TimerOptionsDialog extends Thread implements ActionListener,
             timer.setLifetime(((Integer) lifetime.getValue()).intValue());
             timer.setDescription(description.getText());
             dialog.dispose();
+            control.createTimerCallBack(timer, prog, update);
         } else if (e.getSource() == cancel) {
-            confirmation = false;
             dialog.dispose();
         } 
-    }
-
-    public void start() {
-        if(initialized) {
-            dialog.setSize(400, 500);
-            dialog.setLocation(50, 50);
-            dialog.setVisible(true);
-            dialog.pack();
-        }
-    }
-
-    public boolean getConfirmation() {
-        return confirmation;
     }
 
     public void itemStateChanged(ItemEvent e) {

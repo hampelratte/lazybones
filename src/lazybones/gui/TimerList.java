@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.7 2006-03-30 13:57:10 hampelratte Exp $
+/* $Id: TimerList.java,v 1.8 2006-07-26 22:21:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -57,6 +57,8 @@ import devplugin.Channel;
 import devplugin.Date;
 import devplugin.Program;
 
+// TODO wenn ein timer außerhalb des dialogs gelöscht wird, muss der dialog aktualisiert werden
+// observer auf timermanager oder sowas in der art.
 public class TimerList extends JDialog implements ActionListener {
 
     private static Logger LOG = Logger.getLogger();
@@ -70,7 +72,7 @@ public class TimerList extends JDialog implements ActionListener {
     private LazyBones control;
 
     public TimerList(LazyBones control) {
-        super(control.getParent(), true);
+        super(control.getParent(), false);
         this.control = control;
         initGUI();
     }
