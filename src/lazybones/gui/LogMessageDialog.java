@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.3 2006-07-29 15:51:45 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.4 2006-07-29 16:13:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,7 +61,7 @@ public class LogMessageDialog extends JDialog {
     private void initGUI() {
         setTitle("Lazy Bones - " + LazyBones.getTranslation("Error", "Error"));
         setSize(700, 400);
-        getContentPane().setLayout(new lazybones.gui.VerticalFlowLayout(10,10));
+        getContentPane().setLayout(new BorderLayout(10,10));
         
         icons.put(Logger.ERROR, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
         icons.put(Logger.FATAL, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
@@ -72,7 +73,7 @@ public class LogMessageDialog extends JDialog {
         model = new DefaultListModel();
         list.setModel(model);
         list.setCellRenderer(new LogListCellRenderer());
-        getContentPane().add(new JScrollPane(list));
+        getContentPane().add(new JScrollPane(list), BorderLayout.CENTER);
         JButton okButton = new JButton(LazyBones.getTranslation("OK","OK"));
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -80,7 +81,7 @@ public class LogMessageDialog extends JDialog {
                 setVisible(false);
             } 
         });
-        getContentPane().add(okButton);
+        getContentPane().add(okButton, BorderLayout.SOUTH);
         
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowListener() {
