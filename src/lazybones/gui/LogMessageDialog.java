@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.1 2006-07-21 11:59:37 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.2 2006-07-29 15:44:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -52,6 +52,7 @@ public class LogMessageDialog extends JDialog {
     private HashMap icons = new HashMap();
 
     private LogMessageDialog() {
+        super(MainFrame.getInstance(), true);
         initGUI();
     }
     

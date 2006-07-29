@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.3 2006-07-21 11:59:40 hampelratte Exp $
+/* $Id: Logger.java,v 1.4 2006-07-29 15:44:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -79,7 +79,7 @@ public class Logger {
         return instance;
     }
 
-    public void log(Object o, int type, LoggingLevel level) {
+    public void log(final Object o, final int type, final LoggingLevel level) {
         
         switch (type) {
         case WAKE_ON_LAN:
@@ -89,8 +89,13 @@ public class Logger {
             if (logConnectionErrors) {
                 LOG.log(level, o.toString());
                 if (level == ERROR || level == FATAL) {
-                    LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
-                    LogMessageDialog.getInstance().setVisible(true);
+                    Thread t = new Thread() {
+                        public void run() {
+                            LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
+                            LogMessageDialog.getInstance().setVisible(true);
+                        }       
+                    };
+                    t.start();
                 }
             }
             break;
@@ -98,16 +103,26 @@ public class Logger {
             if (logEPGErrors) {
                 LOG.log(level, o.toString());
                 if (level == ERROR || level == FATAL) {
-                    LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
-                    LogMessageDialog.getInstance().setVisible(true);
+                    Thread t = new Thread() {
+                        public void run() {
+                            LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
+                            LogMessageDialog.getInstance().setVisible(true);
+                        }       
+                    };
+                    t.start();
                 }
             }
             break;
         default:
             LOG.log(level, o.toString());
             if (level == ERROR || level == FATAL) {
-                LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
-                LogMessageDialog.getInstance().setVisible(true);
+                Thread t = new Thread() {
+                    public void run() {
+                        LogMessageDialog.getInstance().addMessage(new LogMessage(o.toString(), level));
+                        LogMessageDialog.getInstance().setVisible(true);
+                    }       
+                };
+                t.start();
             }
             break;
         }
