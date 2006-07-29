@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.2 2006-07-29 15:44:35 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.3 2006-07-29 15:51:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -99,7 +99,7 @@ public class LogMessageDialog extends JDialog {
     }
 
 
-    public static LogMessageDialog getInstance() {
+    synchronized public static LogMessageDialog getInstance() {
         if (instance == null) {
             instance = new LogMessageDialog();
         }
