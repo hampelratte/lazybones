@@ -1,4 +1,4 @@
-/* $Id: BrowseTextField.java,v 1.2 2006-03-30 13:57:10 hampelratte Exp $
+/* $Id: BrowseTextField.java,v 1.3 2006-08-30 21:41:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,33 +33,23 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
+import javax.swing.*;
 
 
-public class BrowseTextField extends JPanel implements ActionListener {
-
-    private static final long serialVersionUID = 4091440584044481373L;
+public class BrowseTextField extends JPanel implements ActionListener, PropertyChangeListener {
 
     private JToggleButton button = new JToggleButton("...");
 
     private JTextField textfield = new JTextField(10);
 
-    private Popup popup;
-
     private BrowsePanel panel;
-
-    private boolean dialogVisible = false;
 
     public BrowseTextField(BrowsePanel panel) {
         this.panel = panel;
         panel.setTextField(textfield);
-        panel.setBorder(BorderFactory.createLineBorder(Color.RED));
 
         /*
          * panel.setBackground(UIManager.getColor("ToolTip.background")); for
@@ -75,26 +65,18 @@ public class BrowseTextField extends JPanel implements ActionListener {
     }
 
     public void showDialog() {
-        PopupFactory factory = PopupFactory.getSharedInstance();
-        int x = (int) button.getLocationOnScreen().getX() + button.getWidth()
-                + 10;
-        int y = (int) button.getLocationOnScreen().getY();
-        popup = factory.getPopup(this, panel, x, y);
-        popup.show();
-    }
-
-    public void hideDialog() {
-        popup.hide();
+        int x = (int) button.getWidth() + 10;
+        int y = 0;
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(panel);
+        menu.setBorder(BorderFactory.createLineBorder(Color.RED));
+        menu.show(button,x,y);
+        menu.addPropertyChangeListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
-            if (dialogVisible) {
-                hideDialog();
-            } else {
-                showDialog();
-            }
-            dialogVisible = !dialogVisible;
+            showDialog();
         }
     }
 
@@ -109,5 +91,13 @@ public class BrowseTextField extends JPanel implements ActionListener {
 
     public void setText(String text) {
         textfield.setText(text);
+    }
+
+    public void propertyChange(PropertyChangeEvent pce) {
+        if( "visible".equals(pce.getPropertyName()) ) {
+            if( ((Boolean)pce.getNewValue()).booleanValue() == false ) {
+                button.setSelected(false);
+            }
+        }
     }
 }
