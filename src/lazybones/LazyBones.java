@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.44 2006-08-30 19:35:21 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.45 2006-08-30 19:48:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -314,8 +314,8 @@ public class LazyBones extends Plugin {
                     Response response = VDRConnection.send(new NEWT(timer.toNEWT()));
                     
                     if (response == null) {
-                        String mesg = LazyBones.getTranslation(
-                                "couldnt_change", "Couldn\'t change timer:")
+                        String mesg = LazyBones.getTranslation("couldnt_create",
+                                "Couldn\'t create timer:")
                                 + "\n"
                                 + LazyBones.getTranslation("couldnt_connect",
                                         "Couldn\'t connect to VDR");
