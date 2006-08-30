@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.43 2006-07-26 23:45:07 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.44 2006-08-30 19:35:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -312,6 +312,17 @@ public class LazyBones extends Plugin {
                 int threshold = Integer.parseInt(props.getProperty("percentageThreshold"));
                 if (percentage > threshold) {
                     Response response = VDRConnection.send(new NEWT(timer.toNEWT()));
+                    
+                    if (response == null) {
+                        String mesg = LazyBones.getTranslation(
+                                "couldnt_change", "Couldn\'t change timer:")
+                                + "\n"
+                                + LazyBones.getTranslation("couldnt_connect",
+                                        "Couldn\'t connect to VDR");
+                        LOG.log(mesg, Logger.CONNECTION, Logger.ERROR);                
+                        return;
+                    }
+                    
                     if (response.getCode() == 250) {
                         // since we dont have the ID of the new timer, we
                         // have to
@@ -593,7 +604,7 @@ public class LazyBones extends Plugin {
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
-        return new PluginInfo(name, description, author, new Version(0, 3));
+        return new PluginInfo(name, description, author, new Version(0,3, false, "CVS-2006-08-30"));
     }
 
     /**
