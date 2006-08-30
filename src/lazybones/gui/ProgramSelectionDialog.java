@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.3 2006-07-26 22:21:29 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.4 2006-08-30 19:38:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -99,7 +99,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), false);
+        dialog = new JDialog(control.getParent(), true);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_programselect", "Select Program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();

@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.4 2006-07-26 22:21:29 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.5 2006-08-30 19:38:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -122,7 +122,7 @@ public class TimerOptionsDialog implements ActionListener,
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), false);
+        dialog = new JDialog(control.getParent(), true);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
         panel.setLayout(new GridBagLayout());
         dialog.getContentPane().add(panel);
