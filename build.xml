@@ -29,6 +29,7 @@
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${classes.dir}" />
 				<pathelement location="${lib.dir}/${nacho}" />
+				<pathelement location="${lib.dir}/${tableLayout}" />
 			</classpath>
 		</javac>
 	</target>
