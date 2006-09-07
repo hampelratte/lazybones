@@ -1,4 +1,4 @@
-/* $Id: SpinnerTimeModel.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: SpinnerTimeModel.java,v 1.2 2006-09-07 13:38:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,7 @@ public class SpinnerTimeModel implements SpinnerModel {
 
     private Time time = new Time();
 
-    private Vector changeListener = new Vector();
+    private Vector<ChangeListener> changeListener = new Vector<ChangeListener>();
 
     public Object getNextValue() {
         time.increase();

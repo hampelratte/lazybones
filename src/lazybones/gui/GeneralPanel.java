@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.6 2006-07-21 12:01:11 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.7 2006-09-07 13:38:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,13 +50,13 @@ public class GeneralPanel implements ActionListener {
 	private final String lTimeout = LazyBones.getTranslation("timeout", "Timeout");
 
 	private final String lExperts = LazyBones.getTranslation("experts", "Experts");
-    
+    /*
     private final String lWOLEnabled = LazyBones.getTranslation("WOLEnabled", "Enable Wake-on-LAN");
     
     private final String lWOLMac = LazyBones.getTranslation("WOLMac", "Wake-on-LAN Mac-Adress");
     
     private final String lWOLBroadc = LazyBones.getTranslation("WOLBroadc", "Wake-on-LAN Broadcast-Adress");
-
+    */
 	private final String lFuzzyness = LazyBones.getTranslation("percentageOfEquality",
 			"Fuzzylevel program titles");
 

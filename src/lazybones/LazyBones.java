@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.45 2006-08-30 19:48:56 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.46 2006-09-07 13:38:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -335,10 +335,10 @@ public class LazyBones extends Plugin {
                                 Logger.ERROR);
                     }
                 } else {
-                    LOG.log("Looking in tvb2vdr for timer "+timer, Logger.OTHER, Logger.DEBUG);
+                    LOG.log("Looking in title mapping for timer "+timer, Logger.OTHER, Logger.DEBUG);
                     // lookup in mapping history
                     TimerManager tm = TimerManager.getInstance();
-                    String timerTitle = (String)tm.getTvb2vdr().get(prog.getTitle());
+                    String timerTitle = (String)tm.getTitleMapping().getVdrTitle(prog.getTitle());
                     if(timer.getTitle().equals(timerTitle)) {
                         Response response = VDRConnection.send(new NEWT(timer.toNEWT()));
                         if (response.getCode() == 250) {
@@ -428,7 +428,7 @@ public class LazyBones extends Plugin {
         }
         
         LOG.log("Storing " + originalProgram.getTitle() + "-"+t.getTitle()+ " in tvb2vdr", Logger.OTHER, Logger.DEBUG);
-        TimerManager.getInstance().getTvb2vdr().put(originalProgram.getTitle(), t.getTitle());
+        TimerManager.getInstance().getTitleMapping().put(originalProgram.getTitle(), t.getTitle());
     }
 
     public void timerCreatedOK(Program prog, Timer timer) {
@@ -462,7 +462,7 @@ public class LazyBones extends Plugin {
 
         Channel chan = prog.getChannel();
 
-        TreeSet programSet = new TreeSet();
+        TreeSet<Timer> programSet = new TreeSet<Timer>();
         for (int i = 10; i <= 120; i += 10) {
             // get the program before the given one
             Calendar c = GregorianCalendar.getInstance();
@@ -535,7 +535,7 @@ public class LazyBones extends Plugin {
             return;
 
         // get all programs 3 hours before and after the given program
-        HashSet programSet = new HashSet();
+        HashSet<Program> programSet = new HashSet<Program>();
         for (int i = 0; i <= 180; i++) { 
             // get the program before the given one
             Calendar c = GregorianCalendar.getInstance();
@@ -646,10 +646,10 @@ public class LazyBones extends Plugin {
 
             // load stored timers. 
             // if no connection is available, we use these ones
-            TimerManager.getInstance().setStoredTimers((ArrayList) in.readObject());
+            TimerManager.getInstance().setStoredTimers((ArrayList<Timer>) in.readObject());
             
             // load stored mappings
-            TimerManager.getInstance().setTvb2vdr((HashMap) in.readObject());
+            TimerManager.getInstance().setTitleMapping((TitleMapping) in.readObject());
         } catch (Exception e) {
             LOG.log("Couldn't read data", Logger.OTHER, Logger.ERROR);
             e.printStackTrace(System.out);
@@ -814,7 +814,7 @@ public class LazyBones extends Plugin {
 
         Iterator it = getPluginManager().getChannelDayProgram(date, chan);
         if (it != null) {
-            TreeMap candidates = new TreeMap();
+            TreeMap<Integer, Program> candidates = new TreeMap<Integer, Program>();
             while (it.hasNext()) { // iterate over all programs of one day and
                                     // compare start and end time
                 Program prog = (Program) it.next();
@@ -843,8 +843,12 @@ public class LazyBones extends Plugin {
                 }
             }
 
+            // get the best fitting candidate. this is the first key, because
+            // TreeMap is sorted
+            Program progMin = (Program) candidates.get(candidates.firstKey());
+            
             if (candidates.size() == 0) {
-                boolean found = lookUpTimer(timer);
+                boolean found = lookUpTimer(timer, progMin);
                 if (found) {
                     return;
                 } else {
@@ -852,10 +856,6 @@ public class LazyBones extends Plugin {
                     return;
                 }
             }
-
-            // get the best fitting candidate. this is the first key, because
-            // TreeMap is sorted
-            Program progMin = (Program) candidates.get(candidates.firstKey());
 
             // calculate the precentage of common words
             int percentage = 0;
@@ -890,7 +890,7 @@ public class LazyBones extends Plugin {
                     timer.getStartTime().set(Calendar.YEAR, d.getYear());
                 }
             } else {
-                boolean found = lookUpTimer(timer);
+                boolean found = lookUpTimer(timer, progMin);
                 if (!found) { // we have no mapping
                     LOG.log("Couldn't find a program with that title: "
                             + timer.getTitle(), Logger.OTHER, Logger.WARN);
@@ -917,7 +917,7 @@ public class LazyBones extends Plugin {
         try {
             out.writeObject(ProgramManager.getChannelMapping());
             out.writeObject(TimerManager.getInstance().getTimers());
-            out.writeObject(TimerManager.getInstance().getTvb2vdr());
+            out.writeObject(TimerManager.getInstance().getTitleMapping());
         } catch (IOException e) {
             e.printStackTrace(System.out);
         }
@@ -1046,7 +1046,7 @@ public class LazyBones extends Plugin {
      * @param prog the ChannelDayProgram, which has to be marked
      */
     private void markPrograms(ChannelDayProgram prog) {
-        ArrayList affectedTimers = new ArrayList();
+        ArrayList<Timer> affectedTimers = new ArrayList<Timer>();
         Iterator iterator = TimerManager.getInstance().getTimers().iterator();
         while (iterator.hasNext()) {
             Timer timer = (Timer) iterator.next();
@@ -1151,9 +1151,7 @@ public class LazyBones extends Plugin {
         return null;
     }
     
-    // TODO mapping history hinzufügen, so dass eine einmal getroffene
-    // zuordnung in der zukunft automatisch gemacht werden kann
-    private boolean lookUpTimer(Timer timer) {
+    private boolean lookUpTimer(Timer timer, Program candidate) {
         LOG.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
         String progID = TimerManager.getInstance().hasBeenMappedBefore(timer);
         if (progID != null) { // we have a mapping of this timer to a program
@@ -1181,8 +1179,17 @@ public class LazyBones extends Plugin {
                 }
             }
         } else  {
-        	// TODO lookup old mappings
             LOG.log("No mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+            LOG.log("Looking up old mappings", Logger.OTHER, Logger.DEBUG);
+            TimerManager tm = TimerManager.getInstance();
+            String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
+            if(candidate.getTitle().equals(progTitle)) {
+                candidate.mark(this);
+                timer.setTvBrowserProgID(candidate.getID());
+                LOG.log("Old mapping found for: " + timer.toString(),
+                        Logger.OTHER, Logger.DEBUG);
+                return true;
+            }
         }
 
         return false;

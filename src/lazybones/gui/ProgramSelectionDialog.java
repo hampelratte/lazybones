@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.4 2006-08-30 19:38:17 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.5 2006-09-07 13:38:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -170,6 +170,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
             if (index >= 0) {
                 selectedProgram = (Program) model.get(list.getSelectedIndex());
                 control.timerCreatedOK(selectedProgram, timer);
+                TimerManager.getInstance().getTitleMapping().put(selectedProgram.getTitle(), timer.getTitle());
             }
         } else if (e.getSource() == cancel) {
             selectedProgram = null;

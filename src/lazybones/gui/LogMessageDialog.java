@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.4 2006-07-29 16:13:50 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.5 2006-09-07 13:38:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,6 +41,7 @@ import javax.swing.*;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
+import lazybones.Logger.LoggingLevel;
 
 import tvbrowser.ui.mainframe.MainFrame;
 
@@ -50,7 +51,7 @@ public class LogMessageDialog extends JDialog {
     
     public JList list;
     public DefaultListModel model;
-    private HashMap icons = new HashMap();
+    private HashMap<LoggingLevel,Icon> icons = new HashMap<LoggingLevel,Icon>();
 
     private LogMessageDialog() {
         super(MainFrame.getInstance(), true);

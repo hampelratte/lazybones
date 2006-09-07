@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.9 2006-07-26 22:36:14 hampelratte Exp $
+/* $Id: TimerList.java,v 1.10 2006-09-07 13:38:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -128,7 +128,7 @@ public class TimerList extends JDialog implements ActionListener, Observer {
         model.removeAllElements();
         ArrayList timers = TimerManager.getInstance().getTimers();
         
-        ArrayList programs = new ArrayList();
+        ArrayList<TimerProgram> programs = new ArrayList<TimerProgram>();
         for (Iterator iter = timers.iterator(); iter.hasNext();) {
             Timer timer = (Timer) iter.next();
             Calendar time;
@@ -144,7 +144,7 @@ public class TimerList extends JDialog implements ActionListener, Observer {
         }
     }
     
-    private void addProgramm(ArrayList programs, Timer timer, Calendar time) {
+    private void addProgramm(ArrayList<TimerProgram> programs, Timer timer, Calendar time) {
         Channel chan = ProgramManager.getInstance().getChannel(timer);
         if(chan != null) {
             TimerProgram p = new TimerProgram(chan, new Date(time), time

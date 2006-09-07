@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.6 2006-04-01 14:32:17 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.7 2006-09-07 13:38:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -168,7 +168,7 @@ public class ChannelPanel implements ActionListener {
             if (res != null) {
                 String channels = res.getMessage();
                 StringTokenizer st1 = new StringTokenizer(channels, "\n");
-                ArrayList vdrchans = new ArrayList();
+                ArrayList<VDRChannel> vdrchans = new ArrayList<VDRChannel>();
                 while (st1.hasMoreTokens()) {
                     String line = st1.nextToken();
                     int pos = line.indexOf(" ");
@@ -250,7 +250,7 @@ public class ChannelPanel implements ActionListener {
     }
 
     public void saveSettings() {
-        Hashtable channelMapping = new Hashtable();
+        Hashtable<String,VDRChannel> channelMapping = new Hashtable<String,VDRChannel>();
         for (int i = 0; i < model.getRowCount(); i++) {
             devplugin.Channel c = (devplugin.Channel) model.getValueAt(i, 0);
 
@@ -268,7 +268,7 @@ public class ChannelPanel implements ActionListener {
     
     public void trySort() {
         for (int i = 0; i < model.getRowCount(); i++) {
-            ArrayList list = new ArrayList();
+            ArrayList<Container> list = new ArrayList<Container>();
             Object tvbc = model.getValueAt(i,0);
             if(tvbc == null) {
                 continue;
