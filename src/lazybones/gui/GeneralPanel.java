@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.7 2006-09-07 13:38:27 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.8 2006-09-07 14:54:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -234,7 +234,7 @@ public class GeneralPanel implements ActionListener {
                                             "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
             LOG.log(mesg, Logger.OTHER, Logger.ERROR);
             t = 500;
-            port.setText("500");
+            timeout.setText("500");
         }
 
         VDRConnection.host = h;
