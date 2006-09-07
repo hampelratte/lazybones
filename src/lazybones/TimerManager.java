@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.7 2006-07-26 22:36:13 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.8 2006-09-07 13:35:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,10 +31,10 @@ package lazybones;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Observable;
 
+import lazybones.gui.TitleMapping;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 /**
@@ -50,29 +50,22 @@ public class TimerManager extends Observable {
     /**
      * Stores all timers as Timer objects
      */
-    private ArrayList timers;
+    private ArrayList<Timer> timers;
     
     /**
      * The VDR timers from the last session, which have been stored to disk
      */
-    private ArrayList storedTimers = new ArrayList();
+    private ArrayList<Timer> storedTimers = new ArrayList<Timer>();
     
     /**
      * Stores mappings the user has made for later use.
      * The user has to map one Program only once. Later 
      * the mapping will be looked up here 
      */
-    private HashMap vdr2tvb = new HashMap();
-    
-    /**
-     * Stores mappings the user has made for later use.
-     * The user has to map one Program only once. Later 
-     * the mapping will be looked up here 
-     */
-    private HashMap tvb2vdr = new HashMap();
+    private TitleMapping titleMapping = new TitleMapping();
 
     private TimerManager() {
-        timers = new ArrayList();
+        timers = new ArrayList<Timer>();
     }
 
     public static TimerManager getInstance() {
@@ -166,7 +159,7 @@ public class TimerManager extends Observable {
      * @return an ArrayList with Timer objects
      */
     public ArrayList getNotAssignedTimers() {
-        ArrayList list = new ArrayList();
+        ArrayList<Timer> list = new ArrayList<Timer>();
         for (Iterator it = timers.iterator(); it.hasNext();) {
             Timer timer = (Timer) it.next();
             if(!timer.isAssigned()) {
@@ -188,7 +181,7 @@ public class TimerManager extends Observable {
         return storedTimers;
     }
 
-    public void setStoredTimers(ArrayList storedTimers) {
+    public void setStoredTimers(ArrayList<Timer> storedTimers) {
         this.storedTimers = storedTimers;
     }
     
@@ -228,33 +221,17 @@ public class TimerManager extends Observable {
 
     /**
      * 
-     * @see TimerManager#tvb2vdr
+     * @see TimerManager#titleMapping
      */
-	public HashMap getTvb2vdr() {
-		return tvb2vdr;
-	}
-
-	/**
-	 * 
-	 * @see TimerManager#vdr2tvb
-	 */
-	public HashMap getVdr2tvb() {
-		return vdr2tvb;
+	public TitleMapping getTitleMapping() {
+		return titleMapping;
 	}
 
 	/**
      * 
-     * @see TimerManager#tvb2vdr
+     * @see TimerManager#titleMapping
      */
-	public void setTvb2vdr(HashMap tvb2vdr) {
-		this.tvb2vdr = tvb2vdr;
-	}
-
-	/**
-	 * 
-	 * @see TimerManager#vdr2tvb
-	 */
-	public void setVdr2tvb(HashMap vdr2tvb) {
-		this.vdr2tvb = vdr2tvb;
+	public void setTitleMapping(TitleMapping titleMapping) {
+		this.titleMapping = titleMapping;
 	}
 }
