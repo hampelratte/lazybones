@@ -1,4 +1,4 @@
-/* $Id: TimerProgram.java,v 1.4 2005-11-26 01:29:06 hampelratte Exp $
+/* $Id: TimerProgram.java,v 1.5 2006-09-07 12:28:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,12 +43,8 @@ public class TimerProgram extends MutableProgram {
 
     private Timer timer;
 
-    public TimerProgram(Channel arg0, Date arg1) {
-        super(arg0, arg1);
-    }
-
     public TimerProgram(Channel arg0, Date arg1, int arg2, int arg3) {
-        super(arg0, arg1, arg2, arg3);
+        super(arg0, arg1, arg2, arg3, false);
     }
 
     public Timer getTimer() {
