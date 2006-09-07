@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.47 2006-09-07 13:53:42 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.48 2006-09-07 13:56:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -604,7 +604,7 @@ public class LazyBones extends Plugin {
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
-        return new PluginInfo(name, description, author, new Version(0,3, false, "CVS-2006-08-30"));
+        return new PluginInfo(name, description, author, new Version(0,3/*, false, "CVS-2006-08-30"*/));
     }
 
     /**
