@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.4 2006-09-07 13:34:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,28 +31,24 @@ package lazybones.gui;
 
 import info.clearthought.layout.TableLayout;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.*;
 
 import lazybones.LazyBones;
+import lazybones.TimerManager;
 
-public class TimerPanel {
-    private final String lBefore = LazyBones.getTranslation("before",
-			"Buffer before program");
-
-	private final String ttBefore = LazyBones.getTranslation("before.tooltip",
-			"Time buffer before program");
-
+public class TimerPanel implements MouseListener, ActionListener {
+    private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");
+	private final String ttBefore = LazyBones.getTranslation("before.tooltip", "Time buffer before program");
 	private JSpinner before;
 
-	private final String lAfter = LazyBones.getTranslation("after",
-			"Buffer after program");
-
-	private final String ttAfter = LazyBones.getTranslation("after.tooltip",
-			"Time buffer after program");
-
+	private final String lAfter = LazyBones.getTranslation("after", "Buffer after program");
+	private final String ttAfter = LazyBones.getTranslation("after.tooltip", "Time buffer after program");
     private JSpinner after;
 	private JLabel labBefore, labAfter; 
     
@@ -60,6 +56,15 @@ public class TimerPanel {
     private JSpinner prio;
     private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
     private JSpinner lifetime;
+
+    private String lMappings = LazyBones.getTranslation("mappings", "Title mappings");
+    private JLabel labMappings;
+    private JTable mappingTable;
+    private JScrollPane mappingPane;
+    private JButton addRow;
+    private JButton delRow;
+    
+    private JPopupMenu mappingPopup = new JPopupMenu();
 
     public TimerPanel() {
         initComponents();
@@ -84,8 +89,7 @@ public class TimerPanel {
         labBefore.setLabelFor(before);
 
         after = new JSpinner();
-        ((JSpinner.DefaultEditor) after.getEditor()).getTextField().setColumns(
-				2);
+        ((JSpinner.DefaultEditor) after.getEditor()).getTextField().setColumns(2);
         after.setToolTipText(ttAfter);
         after.setValue(new Integer(int_after));
         labAfter = new JLabel(lAfter);
@@ -93,38 +97,75 @@ public class TimerPanel {
         labAfter.setLabelFor(after);
         
         prio = new JSpinner();
-        ((JSpinner.DefaultEditor) prio.getEditor()).getTextField()
-        .setColumns(2);
+        ((JSpinner.DefaultEditor) prio.getEditor()).getTextField().setColumns(2);
         prio.setModel(new SpinnerNumberModel(int_prio,0,99,1));
         lifetime = new JSpinner();
-        ((JSpinner.DefaultEditor) lifetime.getEditor()).getTextField()
-        .setColumns(2);
+        ((JSpinner.DefaultEditor) lifetime.getEditor()).getTextField().setColumns(2);
         lifetime.setModel(new SpinnerNumberModel(int_lifetime,0,99,1));
+        
+        labMappings = new JLabel(lMappings);
+        mappingTable = new JTable(TimerManager.getInstance().getTitleMapping());
+        mappingPane = new JScrollPane(mappingTable);
+        mappingTable.addMouseListener(this);
+        mappingPane.addMouseListener(this);
+        
+        JMenuItem itemAdd = new JMenuItem(LazyBones.getTranslation("add_row", "Add row"));
+        itemAdd.setActionCommand("ADD");
+        itemAdd.addActionListener(this);
+        JMenuItem itemDel = new JMenuItem(LazyBones.getTranslation("del_rows", "Delete selected rows"));
+        itemDel.setActionCommand("DEL");
+        itemDel.addActionListener(this);
+        mappingPopup.add(itemAdd);
+        mappingPopup.add(itemDel);
+        
+        addRow = new JButton(LazyBones.getTranslation("add_row", "Add row"));
+        addRow.setActionCommand("ADD");
+        addRow.addActionListener(this);
+        delRow = new JButton(LazyBones.getTranslation("del_rows", "Delete selected rows"));
+        delRow.setActionCommand("DEL");
+        delRow.addActionListener(this);
     }
 
     public JPanel getPanel() {
         final double P = TableLayout.PREFERRED;
-        double[][] size = {{0, P, P}, //cols
-                           {0, P, P, P, P}}; // rows
+        final double F = TableLayout.FILL;
+        double[][] size = {{0, P, F, P, P, 0},  // cols
+                           {0, P, 0, P, F, 0}}; // rows
         
         TableLayout layout = new TableLayout(size);
         layout.setHGap(10);
         layout.setVGap(10);
 		
+        JPanel buffers = new JPanel(new GridLayout(2,2,5,5));
+        buffers.add(labBefore);
+        buffers.add(before);
+        buffers.add(labAfter);
+        buffers.add(after);
+        
+        JPanel prioLifetime = new JPanel(new GridLayout(2,2,5,5));
+        prioLifetime.add(lPrio);
+        prioLifetime.add(prio);
+        prioLifetime.add(lLifetime);
+        prioLifetime.add(lifetime);
+        
         JPanel panel = new JPanel(layout);
-		panel.add(labBefore, "1,1,1,1");
-		panel.add(before,    "2,1,2,1");
-		
-        panel.add(labAfter,  "1,2,1,2");
-        panel.add(after,     "2,2,2,2");
+		panel.add(buffers, "1,1,1,1");
+        panel.add(prioLifetime, "3,1,4,1");
+		        
+        panel.add(labMappings, "1,3,1,3");
+        panel.add(mappingPane, "1,4,3,4");
         
-        panel.add(lPrio,     "1,3,1,3");
-        panel.add(prio,      "2,3,2,3");
+        double[][] size2 = {{P},     // cols
+                            {P, P}}; // rows
+        TableLayout layout2 = new TableLayout(size2);
+        layout2.setVGap(10);
+        JPanel dummy = new JPanel(layout2);
+        dummy.add(addRow, "0,0,0,0");
+        dummy.add(delRow, "0,1,0,1");
         
-        panel.add(lLifetime, "1,4,1,4");
-        panel.add(lifetime,  "2,4,2,4");
-	
-		return panel;
+        panel.add(dummy, "4,4,4,4");
+
+        return panel;
     }
 
     public void saveSettings() {
@@ -136,5 +177,29 @@ public class TimerPanel {
                 prio.getValue().toString());
         LazyBones.getProperties().setProperty("timer.lifetime",
                 lifetime.getValue().toString());
+    }
+
+    public void mouseClicked(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+        if ((e.getSource() == mappingPane || 
+             e.getSource() == mappingTable) && e.getButton() == MouseEvent.BUTTON3) {
+            mappingPopup.show(e.getComponent(), e.getX(), e.getY());
+        } 
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if("ADD".equals(e.getActionCommand())) {
+            TitleMapping mapping = TimerManager.getInstance().getTitleMapping();
+            mapping.put("", "");
+        } else if("DEL".equals(e.getActionCommand())) {
+            TitleMapping mapping = TimerManager.getInstance().getTitleMapping();
+            int[] indices = mappingTable.getSelectedRows();
+            for (int i = indices.length-1; i >= 0; i--) {
+                mapping.removeRow(indices[i]);
+            }
+        }
     }
 }
