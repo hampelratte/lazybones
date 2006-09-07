@@ -1,4 +1,4 @@
-/* $Id: ProgramComparator.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: ProgramComparator.java,v 1.4 2006-09-07 13:53:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,11 +41,9 @@ import devplugin.Program;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
  */
-public class ProgramComparator implements Comparator {
+public class ProgramComparator implements Comparator<Program> {
 
-    public int compare(Object o1, Object o2) {
-        Program prog1 = (Program) o1;
-        Program prog2 = (Program) o2;
+    public int compare(Program prog1, Program prog2) {
         if (!prog1.getChannel().getId().equals(prog2.getChannel().getId()))
             return -1;
 

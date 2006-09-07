@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.46 2006-09-07 13:38:28 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.47 2006-09-07 13:53:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -639,6 +639,7 @@ public class LazyBones extends Plugin {
         return new VDRSettingsPanel(this);
     }
 
+    @SuppressWarnings("unchecked")
     public void readData(ObjectInputStream in) {
         try {
             // load channel mapping

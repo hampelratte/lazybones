@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.7 2006-09-07 13:38:27 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.8 2006-09-07 13:53:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -266,6 +266,7 @@ public class ChannelPanel implements ActionListener {
         ProgramManager.setChannelMapping(channelMapping);
     }
     
+    @SuppressWarnings("unchecked")
     public void trySort() {
         for (int i = 0; i < model.getRowCount(); i++) {
             ArrayList<Container> list = new ArrayList<Container>();

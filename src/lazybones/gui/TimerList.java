@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.10 2006-09-07 13:38:27 hampelratte Exp $
+/* $Id: TimerList.java,v 1.11 2006-09-07 13:53:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -190,25 +190,22 @@ public class TimerList extends JDialog implements ActionListener, Observer {
      *
      * Compares two Programs according to their start time
      */
-    private class ProgramComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            if(o1 instanceof Program & o2 instanceof Program) {
-                Program p1 = (Program)o1;
-                Program p2 = (Program)o2;
-                Calendar c1 = getStartTime(p1);
-                Calendar c2 = getStartTime(p2);
-                if(c1.getTimeInMillis() < c2.getTimeInMillis()) {
-                    return -1;
-                } else if (c1.getTimeInMillis() > c2.getTimeInMillis()) {
-                    return 1;
-                }
+    private class ProgramComparator implements Comparator<Program> {
+        public int compare(Program p1, Program p2) {
+            Calendar c1 = getStartTime(p1);
+            Calendar c2 = getStartTime(p2);
+            if (c1.getTimeInMillis() < c2.getTimeInMillis()) {
+                return -1;
+            } else if (c1.getTimeInMillis() > c2.getTimeInMillis()) {
+                return 1;
             }
             return 0;
         }
         
         /**
          * 
-         * @param p a Program object
+         * @param p
+         *            a Program object
          * @return The start time of the Program
          */
         private Calendar getStartTime(Program p) {
