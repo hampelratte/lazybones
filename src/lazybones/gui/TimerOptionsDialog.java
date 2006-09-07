@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.5 2006-08-30 19:38:17 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.6 2006-09-07 19:30:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -327,10 +327,9 @@ public class TimerOptionsDialog implements ActionListener,
                  */
                 description.setText(timer.getDescription());
             } else {
-                Date date;
-                    date = new Date(timer.getStartTime());
+                Date date = new Date(timer.getStartTime());
                 Program prog = Plugin.getPluginManager().getProgram(date,
-                        timer.getTvBrowserProgID());
+                        timer.getTvBrowserProgIDs().get(0));
                 description.setText(prog.getDescription());
                 description.append("\n\n" + prog.getChannel().getCopyrightNotice());
             }

@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.3 2005-12-16 20:16:34 hampelratte Exp $
+/* $Id: Timer.java,v 1.4 2006-09-07 19:30:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,8 @@
  */
 package lazybones;
 
+import java.util.ArrayList;
+
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 public class Timer extends VDRTimer {
@@ -41,7 +43,7 @@ public class Timer extends VDRTimer {
     
     private int reason = Timer.NO_REASON;
     
-    private String tvBrowserProgID;
+    private ArrayList<String> tvBrowserProgIDs = new ArrayList<String>();
     
     public Timer() {}
     
@@ -62,25 +64,25 @@ public class Timer extends VDRTimer {
         super.setTitle(timer.getTitle());
     }
     
-    public String getTvBrowserProgID() {
-        return tvBrowserProgID;
+    public ArrayList<String> getTvBrowserProgIDs() {
+        return tvBrowserProgIDs;
     }
 
-    public void setTvBrowserProgID(String tvBrowserProgID) {
-        this.tvBrowserProgID = tvBrowserProgID;
+    public void setTvBrowserProgIDs(ArrayList<String> tvBrowserProgIDs) {
+        this.tvBrowserProgIDs = tvBrowserProgIDs;
     }
     
     /**
      * @return Returns if this timer could be assigned to a Program
      */
     public boolean isAssigned() {
-        return tvBrowserProgID != null;
+        return tvBrowserProgIDs.size() > 0;
     }
 
     public Object clone() {
         VDRTimer vdrtimer = (VDRTimer)super.clone();
         Timer clone = new Timer(vdrtimer);
-        clone.setTvBrowserProgID(getTvBrowserProgID());
+        clone.setTvBrowserProgIDs(getTvBrowserProgIDs());
         clone.setReason(getReason());
         return clone;
     }
@@ -91,5 +93,9 @@ public class Timer extends VDRTimer {
 
     public void setReason(int reason) {
         this.reason = reason;
+    }
+
+    public void addTvBrowserProgID(String id) {
+        tvBrowserProgIDs.add(id);
     }
 }

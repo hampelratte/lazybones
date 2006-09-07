@@ -1,4 +1,4 @@
-/* $Id: TitleMapping.java,v 1.1 2006-09-07 12:29:48 hampelratte Exp $
+/* $Id: TitleMapping.java,v 1.2 2006-09-07 19:30:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,6 +44,10 @@ public class TitleMapping implements Serializable, TableModel {
     private ArrayList<String> tvbTitles = new ArrayList<String>();
 
     public void put(String tvbTitle, String vdrTitle) {
+        if(tvbTitle.equals(vdrTitle)) { // such a mapping would be stupid
+            return;
+        }
+        
         if(vdrTitles.contains(vdrTitle)) {
             int index = vdrTitles.indexOf(vdrTitle);
             tvbTitles.set(index, tvbTitle);

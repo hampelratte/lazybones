@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.48 2006-09-07 13:56:58 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.49 2006-09-07 19:30:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -124,11 +124,13 @@ public class LazyBones extends Plugin {
         if (res == null) {
             return;
         } else if (res.getCode() == 250) {
-            String progID = timer.getTvBrowserProgID();
-            if(progID != null) {
+            ArrayList<String> progIDs = timer.getTvBrowserProgIDs();
+            for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
+                // TODO alle programme unmarken
                 Program prog = ProgramManager.getInstance().getProgram(timer);
                 prog.unmark(this);
             }
+                        
             getTimersFromVDR();
             updateTree();
         } else {
@@ -213,7 +215,7 @@ public class LazyBones extends Plugin {
 
             Timer timer = new Timer();
             timer.setChannel(id);
-            timer.setTvBrowserProgID(prog.getID());
+            timer.addTvBrowserProgID(prog.getID());
             int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
             timer.setPriority(prio);
             int lifetime = Integer.parseInt(getProperties().getProperty("timer.lifetime"));
@@ -378,7 +380,7 @@ public class LazyBones extends Plugin {
             newTimer.setLifetime(lifetime);
             newTimer.setPriority(prio);
             newTimer.setTitle(prog.getTitle());
-            newTimer.setTvBrowserProgID(prog.getID());
+            newTimer.addTvBrowserProgID(prog.getID());
 
             Date d = prog.getDate();
             Calendar startTime = d.getCalendar();
@@ -432,7 +434,7 @@ public class LazyBones extends Plugin {
     }
 
     public void timerCreatedOK(Program prog, Timer timer) {
-        timer.setTvBrowserProgID(prog.getID());
+        timer.addTvBrowserProgID(prog.getID());
         TimerManager.getInstance().replaceStoredTimer(timer);
         
         // since we dont have the ID of the new timer, we have
@@ -672,13 +674,15 @@ public class LazyBones extends Plugin {
         ArrayList timers = tm.getTimers();
         for (Iterator it = timers.iterator(); it.hasNext();) {
             Timer timer = (Timer) it.next();
-            String progID = timer.getTvBrowserProgID();
-            if(progID != null) { // timer could be assigned
-                Date date = new Date(timer.getStartTime());
-                Program prog = LazyBones.getPluginManager()
-                    .getProgram(date, progID);
-                if(prog != null) {
-                    prog.unmark(this);
+            
+            for (Iterator iter = timer.getTvBrowserProgIDs().iterator(); iter.hasNext();) {
+                String progID = (String) iter.next();
+                if(progID != null) { // timer could be assigned
+                    Date date = new Date(timer.getStartTime());
+                    Program prog = LazyBones.getPluginManager().getProgram(date, progID);
+                    if(prog != null) {
+                        prog.unmark(this);
+                    }
                 }
             }
         }
@@ -800,9 +804,6 @@ public class LazyBones extends Plugin {
      * @param chan
      */
     private void markSingularTimer(Timer timer, Channel chan) {
-        // TODO eventuell erkennen: ein timer kann auch mehrere sendungen
-        // aufnehmen (doppelpacks z.b.)
-
         // create a clone of the timer and subtract the recording buffers
         Timer bufferLessTimer = (Timer) timer.clone();
         removeTimerBuffers(bufferLessTimer);
@@ -815,7 +816,13 @@ public class LazyBones extends Plugin {
 
         Iterator it = getPluginManager().getChannelDayProgram(date, chan);
         if (it != null) {
+            // contains programs, which could be the right program for the timer
             TreeMap<Integer, Program> candidates = new TreeMap<Integer, Program>();
+            
+            // contains programs, which start and stop between the start and the stop time
+            // of the timer and could be part of a Doppelpack
+            ArrayList<Program> doppelPack = new ArrayList<Program>();
+            
             while (it.hasNext()) { // iterate over all programs of one day and
                                     // compare start and end time
                 Program prog = (Program) it.next();
@@ -835,28 +842,59 @@ public class LazyBones extends Plugin {
 
                 int deltaStart = startTime - timerstart;
                 int deltaEnd = endTime - timerend;
-                // System.out.println(timer.getTitle() + " " + deltaStart + ":"
-                // + deltaEnd);
 
+                // MAYBE zeittoleranz als option anbieten
                 // collect candidates
-                if (Math.abs(deltaStart) <= 45 && Math.abs(deltaEnd) <= 45) {
+                if (Math.abs(deltaStart) <= 15 && Math.abs(deltaEnd) <= 15) {
                     candidates.put(new Integer(Math.abs(deltaStart)), prog);
+                }
+                
+                // collect doppelpack candidates
+                // use timer with buffers
+                timerStartCal = timer.getStartTime();
+                hour = timerStartCal.get(Calendar.HOUR_OF_DAY);
+                minute = timerStartCal.get(Calendar.MINUTE);
+                timerstart = hour * 60 + minute;
+                timerEndCal = timer.getEndTime();
+                hour = timerEndCal.get(Calendar.HOUR_OF_DAY);
+                minute = timerEndCal.get(Calendar.MINUTE);
+                timerend = hour * 60 + minute;
+                timerend = timerend < timerstart ? timerend + 1440 : timerend;
+                if(startTime >= timerstart && endTime <= timerend) {
+                    doppelPack.add(prog);
                 }
             }
 
+            if (candidates.size() == 0) {
+                if (doppelPack.size() > 1) {
+                    String title = doppelPack.get(0).getTitle();
+                    for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
+                        if( !title.equals( ((Program)iter.next()).getTitle() ) ) {
+                            boolean found = lookUpTimer(timer, null);
+                            if(!found) {
+                                timer.setReason(Timer.NOT_FOUND);
+                            }
+                            return;
+                        } 
+                    }
+                    LOG.log("Doppelpack found: " + title, Logger.OTHER, Logger.DEBUG);
+                    for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
+                        Program prog = (Program) iter.next();
+                        prog.mark(this);
+                        timer.addTvBrowserProgID(prog.getID());
+                    }
+                } else {
+                    boolean found = lookUpTimer(timer, null);
+                    if (!found) {
+                        timer.setReason(Timer.NOT_FOUND);
+                    }
+                }
+                return;
+            }
+            
             // get the best fitting candidate. this is the first key, because
             // TreeMap is sorted
             Program progMin = (Program) candidates.get(candidates.firstKey());
-            
-            if (candidates.size() == 0) {
-                boolean found = lookUpTimer(timer, progMin);
-                if (found) {
-                    return;
-                } else {
-                    timer.setReason(Timer.NOT_FOUND);
-                    return;
-                }
-            }
 
             // calculate the precentage of common words
             int percentage = 0;
@@ -883,7 +921,7 @@ public class LazyBones extends Plugin {
             // program
             if (percentage >= threshold) {
                 progMin.mark(this);
-                timer.setTvBrowserProgID(progMin.getID());
+                timer.addTvBrowserProgID(progMin.getID());
                 if (timer.isRepeating()) {
                     Date d = progMin.getDate();
                     timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
@@ -1099,9 +1137,18 @@ public class LazyBones extends Plugin {
             if(timer.isAssigned()) {
                 Timer bufferLess = (Timer)timer.clone();
                 removeTimerBuffers(bufferLess);
-                Program prog = ProgramManager.getInstance().getProgram(bufferLess);
-                if(prog != null) {
-                    node.addProgram(prog);
+                for (Iterator iter = timer.getTvBrowserProgIDs().iterator(); iter.hasNext();) {
+                    String progID = (String)iter.next();
+                    Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), progID);
+                    if(prog != null) {
+                        node.addProgram(prog);
+                    } else { // can be null, if program time is near 00:00, because then
+                             // the wrong day is taken to ask tvb for the programm
+                        prog = ProgramManager.getInstance().getProgram(timer.getEndTime(), progID);
+                        if(prog != null) {
+                            node.addProgram(prog);
+                        }
+                    }
                 }
             }
         }
@@ -1154,42 +1201,48 @@ public class LazyBones extends Plugin {
     
     private boolean lookUpTimer(Timer timer, Program candidate) {
         LOG.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
-        String progID = TimerManager.getInstance().hasBeenMappedBefore(timer);
-        if (progID != null) { // we have a mapping of this timer to a program
-            if(progID.equals("NO_PROGRAM")) {
-                LOG.log("Timer " + timer.toString()+" should never be assigned",Logger.OTHER, Logger.DEBUG);
-                timer.setReason(Timer.NO_PROGRAM);
-                return true;
-            } else {
-                Channel c = ProgramManager.getInstance().getChannel(timer);
-                if (c != null) {
-                    Date date = new Date(timer.getStartTime());
-                    Iterator iterator = getPluginManager()
-                            .getChannelDayProgram(date, c);
-                    while (iterator.hasNext()) {
-                        Program p = (Program) iterator.next();
-                        if (p.getID().equals(progID)
-                                && p.getDate().equals(date)) {
-                            p.mark(this);
-                            timer.setTvBrowserProgID(p.getID());
-                            LOG.log("Mapping found for: " + timer.toString(),
-                                    Logger.OTHER, Logger.DEBUG);
-                            return true;
+        ArrayList<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
+        if (progIDs != null) { // we have a mapping of this timer to a program
+            for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
+                String progID = (String) iter.next();
+
+                if(progID.equals("NO_PROGRAM")) {
+                    LOG.log("Timer " + timer.toString()+" should never be assigned",Logger.OTHER, Logger.DEBUG);
+                    timer.setReason(Timer.NO_PROGRAM);
+                    return true;
+                } else {
+                    Channel c = ProgramManager.getInstance().getChannel(timer);
+                    if (c != null) {
+                        Date date = new Date(timer.getStartTime());
+                        Iterator iterator = getPluginManager()
+                                .getChannelDayProgram(date, c);
+                        while (iterator.hasNext()) {
+                            Program p = (Program) iterator.next();
+                            if (p.getID().equals(progID)
+                                    && p.getDate().equals(date)) {
+                                p.mark(this);
+                                timer.setTvBrowserProgIDs(progIDs);
+                                LOG.log("Mapping found for: " + timer.toString(),
+                                        Logger.OTHER, Logger.DEBUG);
+                                return true;
+                            }
                         }
                     }
                 }
             }
         } else  {
             LOG.log("No mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
-            LOG.log("Looking up old mappings", Logger.OTHER, Logger.DEBUG);
-            TimerManager tm = TimerManager.getInstance();
-            String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
-            if(candidate.getTitle().equals(progTitle)) {
-                candidate.mark(this);
-                timer.setTvBrowserProgID(candidate.getID());
-                LOG.log("Old mapping found for: " + timer.toString(),
-                        Logger.OTHER, Logger.DEBUG);
-                return true;
+            if(candidate != null) {
+                LOG.log("Looking up old mappings", Logger.OTHER, Logger.DEBUG);
+                TimerManager tm = TimerManager.getInstance();
+                String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
+                if(candidate.getTitle().equals(progTitle)) {
+                    candidate.mark(this);
+                    timer.addTvBrowserProgID(candidate.getID());
+                    LOG.log("Old mapping found for: " + timer.toString(),
+                            Logger.OTHER, Logger.DEBUG);
+                    return true;
+                }
             }
         }
 

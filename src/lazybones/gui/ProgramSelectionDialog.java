@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.5 2006-09-07 13:38:27 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.6 2006-09-07 19:30:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,10 +53,8 @@ import devplugin.Program;
  */
 
 /*
- * FIXME wenn die letzte sendung ausgewählt wird, die im tv-browser bekannt ist, dann fehlen die späteren sendungen zur auswahl.
- * 
  * IDEA not assigned timers könnten im kontextmenu aufgelistet werden unter dem
- * punkt, diesem programm diesen timer zuordnen. so würde der programselectiondialog
+ * punkt "diesem programm diesen timer zuordnen". so würde der programselectiondialog
  * wegfallen und das auswählen der sendungen ist viel flexibler.
  * 
  * timer, die nicht zugeordnet werden können, weil das programm im tvbrowser falsch ist,
@@ -149,7 +147,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         gbc.weighty = 1.0;
         dialog.getContentPane().add(new JScrollPane(list), gbc);
 
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         ok.setText(LazyBones.getTranslation("ok", "OK"));
         never.setText(LazyBones.getTranslation("never","Never assign"));
@@ -166,11 +164,13 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
-            int index = list.getSelectedIndex();
-            if (index >= 0) {
-                selectedProgram = (Program) model.get(list.getSelectedIndex());
-                control.timerCreatedOK(selectedProgram, timer);
-                TimerManager.getInstance().getTitleMapping().put(selectedProgram.getTitle(), timer.getTitle());
+            int[] indices = list.getSelectedIndices();
+            for (int i = 0; i < indices.length; i++) {
+                if (indices[i] >= 0) {
+                    selectedProgram = (Program) model.get(indices[i]);
+                    control.timerCreatedOK(selectedProgram, timer);
+                    TimerManager.getInstance().getTitleMapping().put(selectedProgram.getTitle(), timer.getTitle());
+                }
             }
         } else if (e.getSource() == cancel) {
             selectedProgram = null;

@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.3 2006-03-30 13:57:10 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.4 2006-09-07 19:30:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -74,8 +74,7 @@ public class ProgramManager {
             Calendar progStart = GregorianCalendar.getInstance();
             progStart.set(Calendar.YEAR, prog.getDate().getYear());
             progStart.set(Calendar.MONTH, prog.getDate().getMonth()-1);
-            progStart
-                    .set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
+            progStart.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
             progStart.set(Calendar.HOUR_OF_DAY, prog.getHours());
             progStart.set(Calendar.MINUTE, prog.getMinutes());
 
@@ -101,8 +100,11 @@ public class ProgramManager {
         Calendar time = GregorianCalendar.getInstance();
         long middleTime = startTime + duration/2;
         time.setTimeInMillis(middleTime);
-        
         return getProgramAt(timer.getStartTime(), time, chan);
+    }
+    
+    public Program getProgram(Calendar time, String progID) {
+        return LazyBones.getPluginManager().getProgram(new devplugin.Date(time), progID);
     }
     
     public Channel getChannel(Timer timer) {

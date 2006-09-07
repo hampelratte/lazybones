@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.8 2006-09-07 13:35:41 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.9 2006-09-07 19:30:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -147,8 +147,11 @@ public class TimerManager extends Observable {
     public Timer getTimer(String progID) {
         for (Iterator it = timers.iterator(); it.hasNext();) {
             Timer timer = (Timer) it.next();
-            if (progID.equals(timer.getTvBrowserProgID())) {
-                return timer;
+            ArrayList<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
+            for (Iterator iter = tvBrowserProdIDs.iterator(); iter.hasNext();) {
+                if (progID.equals((String) iter.next())) {
+                    return timer;
+                }
             }
         }
         return null;
@@ -190,14 +193,16 @@ public class TimerManager extends Observable {
      * @param timer
      * @return the ProgramID or null
      */
-    public String hasBeenMappedBefore(Timer timer) {
+    public ArrayList<String> hasBeenMappedBefore(Timer timer) {
         for (Iterator it = storedTimers.iterator(); it.hasNext();) {
             Timer storedTimer = (Timer) it.next();
             if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
                 if(storedTimer.getReason() == Timer.NO_PROGRAM) {
-                    return "NO_PROGRAM";
+                    ArrayList<String> timers = new ArrayList<String>();
+                    timers.add("NO_PROGRAM");
+                    return timers;
                 } else {
-                    return storedTimer.getTvBrowserProgID();
+                    return storedTimer.getTvBrowserProgIDs();
                 }
             }
         }
