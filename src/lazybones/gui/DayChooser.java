@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.2 2006-03-06 20:42:02 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.3 2006-09-12 18:33:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,15 +47,12 @@ import net.sf.nachocalendar.event.DateSelectionListener;
 import net.sf.nachocalendar.model.DateSelectionModel;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
-// TODO beautify this panel
 public class DayChooser extends BrowsePanel implements ActionListener,
         DateSelectionListener {
 
     private static final long serialVersionUID = -2936338063641916673L;
 
     private VDRTimer timer;
-
-    // private Calendar startDate;
 
     private JCheckBox monday = new JCheckBox(LazyBones.getTranslation("monday", "Monday"));
 
