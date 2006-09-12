@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.49 2006-09-07 19:30:03 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.50 2006-09-12 18:33:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -65,7 +65,6 @@ import de.hampelratte.svdrp.util.TimerParser;
 import devplugin.*;
 import devplugin.Date;
 
-//TODO mal probieren vor levenshtein die titel auf gleiche länge zu kürzen
 /**
  * A VDRRemoteControl Plugin
  * 
@@ -126,7 +125,6 @@ public class LazyBones extends Plugin {
         } else if (res.getCode() == 250) {
             ArrayList<String> progIDs = timer.getTvBrowserProgIDs();
             for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
-                // TODO alle programme unmarken
                 Program prog = ProgramManager.getInstance().getProgram(timer);
                 prog.unmark(this);
             }
@@ -606,7 +604,7 @@ public class LazyBones extends Plugin {
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
-        return new PluginInfo(name, description, author, new Version(0,3/*, false, "CVS-2006-08-30"*/));
+        return new PluginInfo(name, description, author, new Version(0, 4, false, "CVS-2006-09-12"));
     }
 
     /**
@@ -867,21 +865,19 @@ public class LazyBones extends Plugin {
 
             if (candidates.size() == 0) {
                 if (doppelPack.size() > 1) {
-                    String title = doppelPack.get(0).getTitle();
+                    ArrayList<String> list = new ArrayList<String>();
                     for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
-                        if( !title.equals( ((Program)iter.next()).getTitle() ) ) {
-                            boolean found = lookUpTimer(timer, null);
-                            if(!found) {
-                                timer.setReason(Timer.NOT_FOUND);
+                        String title = ((Program)iter.next()).getTitle();
+                        if(list.contains(title)) {
+                            LOG.log("Doppelpack found: " + title, Logger.OTHER, Logger.DEBUG);
+                            for (Iterator iter2 = doppelPack.iterator(); iter2.hasNext();) {
+                                Program prog = (Program) iter2.next();
+                                prog.mark(this);
+                                timer.addTvBrowserProgID(prog.getID());
                             }
-                            return;
-                        } 
-                    }
-                    LOG.log("Doppelpack found: " + title, Logger.OTHER, Logger.DEBUG);
-                    for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
-                        Program prog = (Program) iter.next();
-                        prog.mark(this);
-                        timer.addTvBrowserProgID(prog.getID());
+                        } else {
+                            list.add(title);
+                        }
                     }
                 } else {
                     boolean found = lookUpTimer(timer, null);
