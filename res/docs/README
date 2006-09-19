@@ -13,9 +13,14 @@ Configuration details can be found at:
 http://wiki.tvbrowser.org/index.php/LazyBones
 
 
-License (BSD-License)
+License
 ================================================================================
-see LICENSE file
+This software uses NachoCalendar (http://nachocalendar.sourceforge.net/), which
+is published under the GNU Lesser General Public License 
+(http://www.gnu.org/copyleft/lesser.html).
+
+The software itself is published under a BSD license. Read the LICENSE file for
+details.
 
 
 Help / Contact
