@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.50 2006-09-12 18:33:14 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.51 2006-09-19 18:42:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -125,10 +125,18 @@ public class LazyBones extends Plugin {
         } else if (res.getCode() == 250) {
             ArrayList<String> progIDs = timer.getTvBrowserProgIDs();
             for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
-                Program prog = ProgramManager.getInstance().getProgram(timer);
-                prog.unmark(this);
+                String id = (String) iter.next();
+                Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), id);
+                if(prog != null) {
+                    prog.unmark(this);
+                } else { // can be null, if program time is near 00:00, because then
+                         // the wrong day is taken to ask tvb for the programm
+                    prog = ProgramManager.getInstance().getProgram(timer.getEndTime(), id);
+                    if(prog != null) {
+                        prog.unmark(this);
+                    }
+                }
             }
-                        
             getTimersFromVDR();
             updateTree();
         } else {
@@ -865,18 +873,48 @@ public class LazyBones extends Plugin {
 
             if (candidates.size() == 0) {
                 if (doppelPack.size() > 1) {
+                    timer.setReason(Timer.NOT_FOUND); // if no doppelpack is found, this timer
+                    // is a timer with weird start and end times
+                    // then we have to show a ProgramConfirmDialog, so we set
+                    // the reason to not found and if a doppelpack is detected we
+                    // set the reason to no_reason
                     ArrayList<String> list = new ArrayList<String>();
+                    String doppelpackTitle = null;
                     for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
                         String title = ((Program)iter.next()).getTitle();
                         if(list.contains(title)) {
                             LOG.log("Doppelpack found: " + title, Logger.OTHER, Logger.DEBUG);
-                            for (Iterator iter2 = doppelPack.iterator(); iter2.hasNext();) {
-                                Program prog = (Program) iter2.next();
+                            timer.setReason(Timer.NO_REASON);
+                            doppelpackTitle = title;
+                        } else {
+                            list.add(title);
+                        }
+                    }
+                    
+                    // mark all doppelpack programs
+                    if(doppelpackTitle != null) {
+                        for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
+                            Program prog = (Program) iter.next();
+                            if(prog.getTitle().equals(doppelpackTitle)) {
                                 prog.mark(this);
                                 timer.addTvBrowserProgID(prog.getID());
                             }
+                        }
+
+                    }
+                    
+                    // this timer is no doppelpack, but the times are weird
+                    // we now look if the user made a mapping before
+                    if(timer.getReason() == Timer.NOT_FOUND) {
+                        // lookup old mappings
+                        boolean found = lookUpTimer(timer, null);
+                        if (!found) { // we have no mapping
+                            LOG.log("Couldn't find a program with that title: "
+                                    + timer.getTitle(), Logger.OTHER, Logger.WARN);
+                            LOG.log("Couldn't assign timer: " + timer, Logger.OTHER, Logger.WARN);
+                            timer.setReason(Timer.NOT_FOUND);
                         } else {
-                            list.add(title);
+                            timer.setReason(Timer.NO_REASON);
                         }
                     }
                 } else {
