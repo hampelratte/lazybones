@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.11 2006-04-05 08:40:39 hampelratte Exp $
+/* $Id: Player.java,v 1.12 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,6 +33,7 @@ import java.io.InputStream;
 
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.CHAN;
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 import devplugin.Program;
 
 /**
@@ -49,8 +50,8 @@ public class Player {
     public static void play(Program prog, LazyBones control) {
     	Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o != null) {
-            VDRChannel chan = (VDRChannel) o;
-            int id = chan.getId();
+            Channel chan = (Channel) o;
+            int id = chan.getChannelNumber();
             Player.play(id, control);
         } else {
             LOG.log("Couldn't start Player", Logger.OTHER, Logger.ERROR);

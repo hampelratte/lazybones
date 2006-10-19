@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.8 2006-09-07 13:53:42 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.9 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -49,16 +48,14 @@ import javax.swing.table.DefaultTableModel;
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Utilities;
-import lazybones.VDRChannel;
 import lazybones.VDRConnection;
 import tvbrowser.core.ChannelList;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.LSTC;
-import devplugin.Channel;
+import de.hampelratte.svdrp.responses.highlevel.Channel;
+import de.hampelratte.svdrp.util.ChannelParser;
 
 public class ChannelPanel implements ActionListener {
-    private static final long serialVersionUID = -655724917391419096L;
-
     private DefaultTableModel model;
 
     private JTable table = new JTable();
@@ -165,45 +162,22 @@ public class ChannelPanel implements ActionListener {
     private void refreshChannelList() {
         try {
             Response res = VDRConnection.send(new LSTC());
-            if (res != null) {
-                String channels = res.getMessage();
-                StringTokenizer st1 = new StringTokenizer(channels, "\n");
-                ArrayList<VDRChannel> vdrchans = new ArrayList<VDRChannel>();
-                while (st1.hasMoreTokens()) {
-                    String line = st1.nextToken();
-                    int pos = line.indexOf(" ");
-                    VDRChannel chan = new VDRChannel();
-                    int id = Integer.parseInt(line.substring(0, pos));
-                    chan.setId(id);
-                    String restOfLine = line.substring(pos + 1);
-                    StringTokenizer st2 = new StringTokenizer(restOfLine, ";");
-                    String name = st2.nextToken();
-                    if (name.indexOf(':') > 0) {
-                        name = name.substring(0, name.indexOf(':'));
-                    }
-                    if (name.indexOf(',') > 0) {
-                        name = name.substring(0, name.indexOf(','));
-                    }
-                    chan.setName(name);
-                    // IDEA eventuell eine grenze in den optionen einbauen
-                    if (/*chan.getId() < 500 &&*/ !tableContains(chan)) {
-                        vdrchans.add(chan);
-                    }
-                }
+            if (res != null & res.getCode() == 250) {
+                ArrayList<Channel> vdrchans = ChannelParser.parse(res.getMessage());
 
                 // add vdrchannels
                 int max = model.getRowCount() -1;
                 int count = 0;
-                for (Iterator iter = vdrchans.iterator(); iter.hasNext();) {
-                    VDRChannel element = (VDRChannel) iter.next();
+                for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
+                    Channel chan = iter.next();
                     if(count <= max) {
                         if(model.getValueAt(count, 1) != null) {
-                            model.addRow(new Object[] { null, element });
+                            model.addRow(new Object[] { null, chan });
                         } else {
-                            model.setValueAt(element, count, 1);
+                            model.setValueAt(chan, count, 1);
                         }
                     } else { 
-                        model.addRow(new Object[] { null, element });
+                        model.addRow(new Object[] { null, chan });
                     }
                     count++;
                 }
@@ -211,19 +185,6 @@ public class ChannelPanel implements ActionListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    private boolean tableContains(VDRChannel channel) {
-        for (int i = 0; i < table.getRowCount(); i++) {
-            Object o = model.getValueAt(i, 1);
-            if (o != null) {
-                VDRChannel tableChannel = (VDRChannel) o;
-                if (tableChannel.equals(channel)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private void restoreSelection(int[] indices) {
@@ -250,7 +211,7 @@ public class ChannelPanel implements ActionListener {
     }
 
     public void saveSettings() {
-        Hashtable<String,VDRChannel> channelMapping = new Hashtable<String,VDRChannel>();
+        Hashtable<String,Channel> channelMapping = new Hashtable<String,Channel>();
         for (int i = 0; i < model.getRowCount(); i++) {
             devplugin.Channel c = (devplugin.Channel) model.getValueAt(i, 0);
 
@@ -258,7 +219,7 @@ public class ChannelPanel implements ActionListener {
                 String id = c.getId();
                 Object o = model.getValueAt(i, 1);
                 if (o != null) {
-                    VDRChannel vdrc = (VDRChannel) o;
+                    Channel vdrc = (Channel) o;
                     channelMapping.put(id, vdrc);
                 }
             }
@@ -274,7 +235,7 @@ public class ChannelPanel implements ActionListener {
             if(tvbc == null) {
                 continue;
             }
-            String tvbChan = ((Channel)tvbc).getName();
+            String tvbChan = ((devplugin.Channel)tvbc).getName();
             tvbChan = tvbChan.toLowerCase();
             
             for (int j = 0; j < model.getRowCount(); j++) {
@@ -284,7 +245,7 @@ public class ChannelPanel implements ActionListener {
                     System.out.println("schiebe leere zelle nach unten");
                     continue;
                 }
-                String vdrChan = ((VDRChannel)o).getName();
+                String vdrChan = ((Channel)o).getName();
                 vdrChan = vdrChan.toLowerCase();
                 int pos = vdrChan.indexOf(" ");
                 if(pos > 0) {
@@ -295,7 +256,7 @@ public class ChannelPanel implements ActionListener {
             }
             
             Collections.sort(list);
-            Container c = (Container)list.get(list.size()-1);
+            Container c = list.get(list.size()-1);
             int index = c.getIndex();
             if (index != i && i < model.getRowCount()) {
                 swapCells(1, i, index);

@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.10 2006-07-21 12:04:59 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.11 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,10 +35,8 @@ import java.net.InetAddress;
 
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
 
 import tvbrowser.ui.mainframe.MainFrame;
-
 import de.hampelratte.svdrp.Command;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
@@ -60,9 +58,8 @@ public class VDRConnection {
 
     public static int timeout = 500;
     
-    private static boolean wakeUpRunning = false;
 
-    public synchronized static Response send(Command cmd) {
+    public synchronized static Response send(final Command cmd) {
         Response res = null;
         try {
             connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout);
@@ -70,7 +67,6 @@ public class VDRConnection {
             res = connection.send(cmd);
             connection.close();
         } catch (Exception e1) {
-            System.out.println("wakeUpRunning="+wakeUpRunning);
             String mesg = LazyBones.getTranslation("couldnt_connect", "Couldn't connect to VDR") + ":\n" + e1.toString();
             LOG.log(mesg, Logger.WAKE_ON_LAN, Logger.ERROR);
             
@@ -83,30 +79,25 @@ public class VDRConnection {
                     LOG.log("Starting WOL-Process",Logger.CONNECTION, Logger.DEBUG);
                     //ConnectionTester.getInstance().startThread();
                     VDRConnection.wakeUpVDR();
+                    
+                    // TODO WOL timeout als option bereitstellen
+                    int timeout = 30; // wait 120 secs for VDR to boot
+                    ProgressMonitor pm = new ProgressMonitor(MainFrame.getInstance(), "Warten auf VDR", timeout + " secs remaining", 0, timeout);
+                    
+                    ConnectionTester ct = new VDRConnection().new ConnectionTester(timeout, pm);
+                    new Thread(ct).start();
+                    
+                    while(ct.isRunning()) {
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {}    
+                    }
+                    
+                    return send(cmd);
                 }
             } else {
                 LOG.log(mesg, Logger.CONNECTION, Logger.ERROR);
             }
-            
-            if(wakeUpRunning) {
-                // TODO als option bereitstellen
-                int timeout = 120; // wait 120 secs for VDR to boot 
-                TimeoutProgessMonitor tpm = new VDRConnection().new TimeoutProgessMonitor(timeout, cmd);
-                SwingUtilities.invokeLater(tpm);
-                //Thread t = new Thread(tpm);
-                //t.start();
-                wakeUpRunning = false;
-                
-                /*
-                try {
-                    System.out.println("for join");
-                    tpm.join();
-                    System.out.println("nach join");
-                    res = tpm.getResponse();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }*/
-            } 
         }
         return res;
     }
@@ -136,7 +127,6 @@ public class VDRConnection {
      * @param ipStr The broadcast-address of the net of the host
      */
     protected static void wakeUpVDR() {
-        wakeUpRunning = true;
         final int PORT = 9;
         String macStr = LazyBones.getProperties().getProperty("WOLMac");
         String ipStr = LazyBones.getProperties().getProperty("WOLBroadc");
@@ -161,7 +151,6 @@ public class VDRConnection {
         }
         catch (Exception e) {
             LOG.log("Couldn't send Wake-on-Lan packet: \n\t" + e, Logger.CONNECTION, Logger.ERROR);
-            wakeUpRunning = false;
         }
         
     }
@@ -189,65 +178,53 @@ public class VDRConnection {
         return bytes;
     }
     
-    private class TimeoutProgessMonitor extends ProgressMonitor implements Runnable {
-        
-        private int value;
+    private class ConnectionTester implements Runnable {
+
         private int timeout;
-        private Command cmd;
-        private Response res;
-        private String note;
+        private ProgressMonitor pm;
+        private boolean running = true;
         
-        TimeoutProgessMonitor(int timeout, Command cmd) {
-            super(MainFrame.getInstance(), "Waiting for VDR...", "", 0, timeout);
+        ConnectionTester(int timeout, ProgressMonitor pm) {
             this.timeout = timeout;
-            this.cmd = cmd;
+            this.pm = pm;
         }
         
-        public Response getResponse() {
-            return res;
+        public boolean isRunning() {
+            return running;
         }
 
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-            note = (timeout-value) + " Seconds remaining";
-            setProgress(value);
-            setNote(note);
-        }
-        
         public void run() {
+            running = true;
             for (int i = 0; i < timeout; i++) {
-                setValue(i);
-                if (isCanceled()) {
+                pm.setProgress(i);
+                pm.setNote( (timeout-i) + " Seconds übrig");
+                if (pm.isCanceled()) {
                     break;
                 }
 
                 try {
-                    Connection connection = new Connection(VDRConnection.host, VDRConnection.port,
-                            VDRConnection.timeout);
+                    Connection connection = new Connection(VDRConnection.host,
+                            VDRConnection.port, VDRConnection.timeout);
                     Connection.DEBUG = true;
                     Response resp = connection.send(new STAT());
-                    if(resp != null) {
-                        wakeUpRunning = false;
-                        LOG.log("WOL-Process finished", Logger.CONNECTION, Logger.DEBUG);
-                        LOG.log("Sending old command " + cmd,Logger.CONNECTION,Logger.DEBUG);
-                        res = connection.send(cmd);
+                    if (resp != null) {
+                        LOG.log("WOL-Process finished", Logger.CONNECTION,
+                                Logger.DEBUG);
+                        pm.close();
                         break;
-                    } 
+                    }
                     connection.close();
-                } catch (Exception e) {}
-                
+                } catch (Exception e) {
+                }
+
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            close();
-            System.out.println("thread ended");
+            pm.close();
+            running = false;
         }
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.4 2006-09-07 19:30:03 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.5 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,7 +35,7 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import devplugin.Channel;
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 import devplugin.Date;
 import devplugin.Program;
 
@@ -65,7 +65,7 @@ public class ProgramManager {
      * liegen (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt
      * und das Program nicht findet 
      */
-    public Program getProgramAt(Calendar startTime, Calendar middleTime, Channel chan) {
+    public Program getProgramAt(Calendar startTime, Calendar middleTime, devplugin.Channel chan) {
         Iterator dayProgram = LazyBones.getPluginManager().getChannelDayProgram(
                 new Date(startTime), chan);
         while (dayProgram != null && dayProgram.hasNext()) {
@@ -91,7 +91,7 @@ public class ProgramManager {
     
     public Program getProgram(Timer timer) {
         // determine channel
-        Channel chan = getChannel(timer);
+        devplugin.Channel chan = getChannel(timer);
 
         // determine middle of the program
         long startTime = timer.getStartTime().getTimeInMillis();
@@ -107,21 +107,21 @@ public class ProgramManager {
         return LazyBones.getPluginManager().getProgram(new devplugin.Date(time), progID);
     }
     
-    public Channel getChannel(Timer timer) {
-        Channel chan = null;
+    public devplugin.Channel getChannel(Timer timer) {
+        devplugin.Channel chan = null;
         Enumeration en = ProgramManager.getChannelMapping().keys();
         while (en.hasMoreElements()) {
             String channelID = (String) en.nextElement();
-            VDRChannel channel = (VDRChannel) ProgramManager.getChannelMapping().get(channelID);
-            if (channel.getId() == timer.getChannel()) {
+            Channel channel = (Channel) ProgramManager.getChannelMapping().get(channelID);
+            if (channel.getChannelNumber() == timer.getChannel()) {
                 chan = getChannelById(channelID);
             }
         }
         return chan;
     }
 
-    public Channel getChannelById(String id) {
-        Channel[] channels = LazyBones.getPluginManager().getSubscribedChannels();
+    public devplugin.Channel getChannelById(String id) {
+        devplugin.Channel[] channels = LazyBones.getPluginManager().getSubscribedChannels();
         for (int i = 0; i < channels.length; i++) {
             if (channels[i].getId().equals(id)) {
                 return channels[i];

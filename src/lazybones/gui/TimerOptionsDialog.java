@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.6 2006-09-07 19:30:04 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.7 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,9 +44,8 @@ import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Time;
 import lazybones.Timer;
-import lazybones.VDRChannel;
 import tvbrowser.core.ChannelList;
-import devplugin.Channel;
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
@@ -284,9 +283,9 @@ public class TimerOptionsDialog implements ActionListener,
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
             timer.setFile(title.getText());
-            Channel c = (Channel) channels.getSelectedItem();
-            VDRChannel vdrc = (VDRChannel) ProgramManager.getChannelMapping().get(c.getId());
-            timer.setChannel(vdrc.getId());
+            devplugin.Channel c = (devplugin.Channel) channels.getSelectedItem();
+            Channel vdrc = (Channel) ProgramManager.getChannelMapping().get(c.getId());
+            timer.setChannel(vdrc.getChannelNumber());
             Calendar start = timer.getStartTime();
             start.set(Calendar.HOUR_OF_DAY, ((Time) starttime.getValue()).getHour());
             start.set(Calendar.MINUTE, ((Time) starttime.getValue()).getMinute());

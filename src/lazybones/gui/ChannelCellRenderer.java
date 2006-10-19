@@ -1,4 +1,4 @@
-/* $Id: ChannelCellRenderer.java,v 1.1 2006-03-06 19:51:51 hampelratte Exp $
+/* $Id: ChannelCellRenderer.java,v 1.2 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,8 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ChannelCellRenderer extends DefaultTableCellRenderer {
 
@@ -89,7 +91,12 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
                 setBorder(noFocusBorder);
             }
 
-            setValue(value);
+            if(value != null) {
+                Channel chan = (Channel)value;
+                setValue(chan.getShortName().length() > 0 ? chan.getShortName() : chan.getName());
+            } else {
+                setValue(null);
+            }
         }
 
         return this;

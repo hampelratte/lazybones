@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.51 2006-09-19 18:42:17 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.52 2006-10-19 20:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -60,8 +60,10 @@ import de.hampelratte.svdrp.commands.NEWT;
 import de.hampelratte.svdrp.commands.UPDT;
 import de.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 import de.hampelratte.svdrp.util.EPGParser;
 import de.hampelratte.svdrp.util.TimerParser;
+
 import devplugin.*;
 import devplugin.Date;
 
@@ -196,7 +198,7 @@ public class LazyBones extends Plugin {
                     "No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
             return;
         }
-        int id = ((VDRChannel) o).getId();
+        int id = ((Channel) o).getChannelNumber();
         Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at "
                 + Long.toString(millis / 1000)));
 
@@ -216,7 +218,7 @@ public class LazyBones extends Plugin {
             boolean isOlderThan1_3 = version.getMajor() < 1
                     || (version.getMajor() == 1 && version.getMinor() < 3);
             EPGEntry vdrEPG = isOlderThan1_3 ? filterEPGDate(epgList,
-                    ((VDRChannel) o).getName(), millis) : (EPGEntry) epgList
+                    ((Channel) o).getName(), millis) : (EPGEntry) epgList
                     .get(0);
 
             Timer timer = new Timer();
@@ -282,7 +284,7 @@ public class LazyBones extends Plugin {
                 LOG.log(LazyBones.getTranslation("no_channel_defined","No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
                 return;
             }
-            id = ((VDRChannel) o).getId();
+            id = ((Channel) o).getChannelNumber();
         }
         
         if (update) {
@@ -468,7 +470,7 @@ public class LazyBones extends Plugin {
         cal.set(Calendar.MINUTE, prog.getMinutes());
         cal.add(Calendar.MINUTE, prog.getLength() / 2);
 
-        Channel chan = prog.getChannel();
+        devplugin.Channel chan = prog.getChannel();
 
         TreeSet<Timer> programSet = new TreeSet<Timer>();
         for (int i = 10; i <= 120; i += 10) {
@@ -529,11 +531,11 @@ public class LazyBones extends Plugin {
         start.setTimeInMillis(cal.getTimeInMillis());
 
         Enumeration en = ProgramManager.getChannelMapping().keys();
-        Channel chan = null;
+        devplugin.Channel chan = null;
         while (en.hasMoreElements()) {
             String channelID = (String) en.nextElement();
-            VDRChannel channel = (VDRChannel) ProgramManager.getChannelMapping().get(channelID);
-            if (channel.getId() == timer.getChannel()) {
+            Channel channel = (Channel) ProgramManager.getChannelMapping().get(channelID);
+            if (channel.getChannelNumber() == timer.getChannel()) {
                 chan = ProgramManager.getInstance().getChannelById(channelID);
             }
         }
@@ -576,10 +578,10 @@ public class LazyBones extends Plugin {
         new ProgramSelectionDialog(this, programs, timer);
     }
 
-    protected Timer getVDRProgramAt(Calendar cal, Channel chan) {
+    protected Timer getVDRProgramAt(Calendar cal, devplugin.Channel chan) {
         long millis = cal.getTimeInMillis() / 1000;
         Object o = ProgramManager.getChannelMapping().get(chan.getId());
-        int id = ((VDRChannel) o).getId();
+        int id = ((Channel) o).getChannelNumber();
 
         LSTE cmd = new LSTE(Integer.toString(id), "at " + Long.toString(millis));
         Response res = VDRConnection.send(cmd);
@@ -746,7 +748,7 @@ public class LazyBones extends Plugin {
         // for every timer
         while (iter.hasNext()) {
             Timer timer = (Timer) iter.next();
-            Channel chan = ProgramManager.getInstance().getChannel(timer);
+            devplugin.Channel chan = ProgramManager.getInstance().getChannel(timer);
             if (chan == null) {
                 timer.setReason(Timer.NO_CHANNEL);
 
@@ -809,7 +811,7 @@ public class LazyBones extends Plugin {
      * @param timer
      * @param chan
      */
-    private void markSingularTimer(Timer timer, Channel chan) {
+    private void markSingularTimer(Timer timer, devplugin.Channel chan) {
         // create a clone of the timer and subtract the recording buffers
         Timer bufferLessTimer = (Timer) timer.clone();
         removeTimerBuffers(bufferLessTimer);
@@ -1123,8 +1125,8 @@ public class LazyBones extends Plugin {
         Iterator iterator = TimerManager.getInstance().getTimers().iterator();
         while (iterator.hasNext()) {
             Timer timer = (Timer) iterator.next();
-            Channel timerChannel = ProgramManager.getInstance().getChannel(timer);
-            Channel progChannel = prog.getChannel();
+            devplugin.Channel timerChannel = ProgramManager.getInstance().getChannel(timer);
+            devplugin.Channel progChannel = prog.getChannel();
             
             // timer couldn't be assigned before
             if(!timer.isAssigned()) {
@@ -1245,7 +1247,7 @@ public class LazyBones extends Plugin {
                     timer.setReason(Timer.NO_PROGRAM);
                     return true;
                 } else {
-                    Channel c = ProgramManager.getInstance().getChannel(timer);
+                    devplugin.Channel c = ProgramManager.getInstance().getChannel(timer);
                     if (c != null) {
                         Date date = new Date(timer.getStartTime());
                         Iterator iterator = getPluginManager()
