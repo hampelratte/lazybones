@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.4 2006-09-07 13:34:36 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.5 2006-10-19 21:14:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,9 +29,9 @@
  */
 package lazybones.gui;
 
-import info.clearthought.layout.TableLayout;
-
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -56,6 +56,9 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JSpinner prio;
     private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
     private JSpinner lifetime;
+    
+    private JLabel lNumberOfCards = new JLabel(LazyBones.getTranslation("numberOfCards", "Number of DVB cards"));
+    private JSpinner numberOfCards;
 
     private String lMappings = LazyBones.getTranslation("mappings", "Title mappings");
     private JLabel labMappings;
@@ -79,6 +82,8 @@ public class TimerPanel implements MouseListener, ActionListener {
                 "timer.prio"));
         int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "timer.lifetime"));
+        int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty(
+                "numberOfCards"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
         before.setToolTipText(ttBefore);
@@ -102,6 +107,10 @@ public class TimerPanel implements MouseListener, ActionListener {
         lifetime = new JSpinner();
         ((JSpinner.DefaultEditor) lifetime.getEditor()).getTextField().setColumns(2);
         lifetime.setModel(new SpinnerNumberModel(int_lifetime,0,99,1));
+        
+        numberOfCards = new JSpinner();
+        ((JSpinner.DefaultEditor) numberOfCards.getEditor()).getTextField().setColumns(2);
+        numberOfCards.setModel(new SpinnerNumberModel(int_numberOfCards,1,10,1));
         
         labMappings = new JLabel(lMappings);
         mappingTable = new JTable(TimerManager.getInstance().getTitleMapping());
@@ -127,44 +136,96 @@ public class TimerPanel implements MouseListener, ActionListener {
     }
 
     public JPanel getPanel() {
-        final double P = TableLayout.PREFERRED;
-        final double F = TableLayout.FILL;
-        double[][] size = {{0, P, F, P, P, 0},  // cols
-                           {0, P, 0, P, F, 0}}; // rows
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
         
-        TableLayout layout = new TableLayout(size);
-        layout.setHGap(10);
-        layout.setVGap(10);
-		
-        JPanel buffers = new JPanel(new GridLayout(2,2,5,5));
-        buffers.add(labBefore);
-        buffers.add(before);
-        buffers.add(labAfter);
-        buffers.add(after);
+        // left column of spinners
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(15,15,5,5);
+        panel.add(labBefore, gbc);
         
-        JPanel prioLifetime = new JPanel(new GridLayout(2,2,5,5));
-        prioLifetime.add(lPrio);
-        prioLifetime.add(prio);
-        prioLifetime.add(lLifetime);
-        prioLifetime.add(lifetime);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(15,5,5,5);
+        panel.add(before, gbc);
         
-        JPanel panel = new JPanel(layout);
-		panel.add(buffers, "1,1,1,1");
-        panel.add(prioLifetime, "3,1,4,1");
-		        
-        panel.add(labMappings, "1,3,1,3");
-        panel.add(mappingPane, "1,4,3,4");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(5,15,5,5);
+        panel.add(labAfter, gbc);
         
-        double[][] size2 = {{P},     // cols
-                            {P, P}}; // rows
-        TableLayout layout2 = new TableLayout(size2);
-        layout2.setVGap(10);
-        JPanel dummy = new JPanel(layout2);
-        dummy.add(addRow, "0,0,0,0");
-        dummy.add(delRow, "0,1,0,1");
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(5,5,5,5);
+        panel.add(after, gbc);
         
-        panel.add(dummy, "4,4,4,4");
-
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(15,15,30,5);
+        panel.add(lNumberOfCards, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(15,5,30,5);
+        panel.add(numberOfCards, gbc);
+        
+        // right column of spinners
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(15,50,5,5);
+        panel.add(lPrio, gbc);
+        
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(15,5,5,5);
+        panel.add(prio, gbc);
+        
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(5,50,5,5);
+        panel.add(lLifetime, gbc);
+        
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(5,5,5,5);
+        panel.add(lifetime, gbc);
+        
+        
+        // mapping
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(5,15,5,5);
+        panel.add(labMappings, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 4;
+        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.insets = new Insets(0,15,15,5);
+        panel.add(mappingPane, gbc);
+        
+        // buttons
+        gbc.gridx = 4;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.insets = new Insets(0,5,5,15);
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(addRow, gbc);
+        
+        gbc.gridx = 4;
+        gbc.gridy = 5;
+        gbc.insets = new Insets(5,5,5,15);
+        panel.add(delRow, gbc);
+        
         return panel;
     }
 
@@ -177,6 +238,8 @@ public class TimerPanel implements MouseListener, ActionListener {
                 prio.getValue().toString());
         LazyBones.getProperties().setProperty("timer.lifetime",
                 lifetime.getValue().toString());
+        LazyBones.getProperties().setProperty("numberOfCards",
+                numberOfCards.getValue().toString());
     }
 
     public void mouseClicked(MouseEvent e) {}
