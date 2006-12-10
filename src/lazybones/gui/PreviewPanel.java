@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.4 2006-12-10 14:25:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -105,10 +106,12 @@ public class PreviewPanel extends JLabel {
                         setIcon(image);
                     } else {
                         LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
+                        setFont(new Font("SansSerif", Font.PLAIN, 24));
+                        setText("  " + LazyBones.getTranslation("no_preview","Couldn't load screenshot."));
                         stopGrabbing();
                     }
                 } catch (InterruptedException e) {
-                    System.out.println("Problem with grabber thread:");
+                    LOG.log("Problem with grabber thread:", Logger.OTHER, Logger.ERROR);
                     e.printStackTrace();
                 } 
             }
@@ -122,10 +125,8 @@ public class PreviewPanel extends JLabel {
             try {
                 Response res = VDRConnection.send(grab);
                 if (res.getCode() == 250) {
-                    URL url = new URL(LazyBones.getProperties().getProperty(
-                            "preview.url"));
-                    HttpURLConnection con = (HttpURLConnection) url
-                            .openConnection();
+                    URL url = new URL(LazyBones.getProperties().getProperty("preview.url"));
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     InputStream in = con.getInputStream();
                     byte[] buffer = new byte[1024];
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -136,8 +137,6 @@ public class PreviewPanel extends JLabel {
                     in.close();
                     con.disconnect();
                     preview = new ImageIcon(bos.toByteArray());
-                    setIcon(preview);
-                    repaint();
                 }
             } catch (Exception e) {
                 //System.out.println("Couldn't grab image:");
