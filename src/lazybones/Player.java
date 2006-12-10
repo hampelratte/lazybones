@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.12 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: Player.java,v 1.13 2006-12-10 15:30:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,18 +47,18 @@ public class Player {
     
     private static Logger LOG = Logger.getLogger();
 
-    public static void play(Program prog, LazyBones control) {
+    public static void play(Program prog) {
     	Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
         if (o != null) {
             Channel chan = (Channel) o;
             int id = chan.getChannelNumber();
-            Player.play(id, control);
+            Player.play(id);
         } else {
             LOG.log("Couldn't start Player", Logger.OTHER, Logger.ERROR);
         }
     }
 
-    public static void play(int channel, LazyBones control) {
+    public static void play(int channel) {
         try {
             if (playerThread != null && playerThread.isRunning()) {
                 playerThread.stopThread();
