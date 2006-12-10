@@ -1,4 +1,4 @@
-/* $Id: TimerList.java,v 1.11 2006-09-07 13:53:43 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.1 2006-12-10 15:32:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,7 @@ import java.util.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
@@ -52,7 +52,7 @@ import devplugin.Channel;
 import devplugin.Date;
 import devplugin.Program;
 
-public class TimerList extends JDialog implements ActionListener, Observer {
+public class TimerManagerPanel extends JPanel implements ActionListener, Observer {
 
     private static Logger LOG = Logger.getLogger();
     private JScrollPane scrollPane = null;
@@ -64,8 +64,7 @@ public class TimerList extends JDialog implements ActionListener, Observer {
     
     private LazyBones control;
 
-    public TimerList(LazyBones control) {
-        super(control.getParent(), false);
+    public TimerManagerPanel(LazyBones control) {
         this.control = control;
         initGUI();
         TimerManager.getInstance().addObserver(this);
@@ -76,7 +75,7 @@ public class TimerList extends JDialog implements ActionListener, Observer {
      * 
      */
     private void initGUI() {
-        this.getContentPane().setLayout(new GridBagLayout());
+        this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         
         gbc.fill = java.awt.GridBagConstraints.BOTH;
@@ -88,7 +87,7 @@ public class TimerList extends JDialog implements ActionListener, Observer {
         gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scrollPane = new JScrollPane(timerList);
-        this.getContentPane().add(scrollPane, gbc);
+        this.add(scrollPane, gbc);
         
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.gridy = 1;
@@ -100,26 +99,21 @@ public class TimerList extends JDialog implements ActionListener, Observer {
         buttonNew = new JButton();
         buttonNew.setText(LazyBones.getTranslation("new_timer","New Timer"));
         buttonNew.addActionListener(this);
-        this.getContentPane().add(buttonNew, gbc);
+        this.add(buttonNew, gbc);
         
         gbc.insets = new java.awt.Insets(0,0,10,0);
         gbc.gridx = 1;
         buttonEdit = new JButton();
         buttonEdit.setText(LazyBones.getTranslation("edit","Edit Timer"));
         buttonEdit.addActionListener(this);
-        this.getContentPane().add(buttonEdit, gbc);
+        this.add(buttonEdit, gbc);
         
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 2;
         buttonRemove = new JButton();
         buttonRemove.setText(LazyBones.getTranslation("dont_capture","Delete Timer"));
         buttonRemove.addActionListener(this);
-        this.getContentPane().add(buttonRemove, gbc);
-        
-        this.setName("timerManager");
-        this.setSize(new java.awt.Dimension(500,600));
-        this.setTitle("Timer Manager");
-        this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        this.add(buttonRemove, gbc);
         
         getTimers();
     }
@@ -175,14 +169,7 @@ public class TimerList extends JDialog implements ActionListener, Observer {
                 control.deleteTimer(timer);
             }
         }
-        getTimers();
     }
-    
-    public void setVisible(boolean visible) {
-        getTimers();
-        super.setVisible(visible);
-    }
-    
     
     /**
      * 

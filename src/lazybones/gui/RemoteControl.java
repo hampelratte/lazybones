@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.3 2006-03-30 13:18:43 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.4 2006-12-10 15:32:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -92,7 +92,7 @@ public class RemoteControl extends JPanel implements ActionListener {
             Response res = VDRConnection.send(new CHAN());
             if (res != null && res.getCode() == 250) {
                 int chan = Integer.parseInt(res.getMessage().split(" ")[0]);
-                Player.play(chan, parent);
+                Player.play(chan);
             }
         }
     }

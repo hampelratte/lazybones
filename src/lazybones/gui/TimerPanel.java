@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.5 2006-10-19 21:14:44 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.6 2006-12-10 15:32:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,51 +44,59 @@ import lazybones.TimerManager;
 
 public class TimerPanel implements MouseListener, ActionListener {
     private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");
-	private final String ttBefore = LazyBones.getTranslation("before.tooltip", "Time buffer before program");
-	private JSpinner before;
 
-	private final String lAfter = LazyBones.getTranslation("after", "Buffer after program");
-	private final String ttAfter = LazyBones.getTranslation("after.tooltip", "Time buffer after program");
+    private final String ttBefore = LazyBones.getTranslation("before.tooltip", "Time buffer before program");
+
+    private JSpinner before;
+
+    private final String lAfter = LazyBones.getTranslation("after", "Buffer after program");
+
+    private final String ttAfter = LazyBones.getTranslation("after.tooltip", "Time buffer after program");
+
     private JSpinner after;
-	private JLabel labBefore, labAfter; 
-    
+
+    private JLabel labBefore, labAfter;
+
     private JLabel lPrio = new JLabel(LazyBones.getTranslation("priority", "Priority"));
+
     private JSpinner prio;
+
     private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
+
     private JSpinner lifetime;
-    
+
     private JLabel lNumberOfCards = new JLabel(LazyBones.getTranslation("numberOfCards", "Number of DVB cards"));
+
     private JSpinner numberOfCards;
 
     private String lMappings = LazyBones.getTranslation("mappings", "Title mappings");
+
     private JLabel labMappings;
+
     private JTable mappingTable;
+
     private JScrollPane mappingPane;
+
     private JButton addRow;
+
     private JButton delRow;
-    
+
     private JPopupMenu mappingPopup = new JPopupMenu();
 
     public TimerPanel() {
         initComponents();
     }
-    
+
     private void initComponents() {
-        int int_before = Integer.parseInt(LazyBones.getProperties().getProperty(
-                "timer.before"));
-        int int_after = Integer.parseInt(LazyBones.getProperties().getProperty(
-                "timer.after"));
-        int int_prio = Integer.parseInt(LazyBones.getProperties().getProperty(
-                "timer.prio"));
-        int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty(
-                "timer.lifetime"));
-        int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty(
-                "numberOfCards"));
+        int int_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+        int int_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+        int int_prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
+        int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
+        int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
         before.setToolTipText(ttBefore);
-        ((JSpinner.DefaultEditor) before.getEditor()).getTextField()
-                .setColumns(2);
+        ((JSpinner.DefaultEditor) before.getEditor()).getTextField().setColumns(2);
         labBefore = new JLabel(lBefore);
         labBefore.setToolTipText(ttBefore);
         labBefore.setLabelFor(before);
@@ -100,24 +108,24 @@ public class TimerPanel implements MouseListener, ActionListener {
         labAfter = new JLabel(lAfter);
         labAfter.setToolTipText(ttAfter);
         labAfter.setLabelFor(after);
-        
+
         prio = new JSpinner();
         ((JSpinner.DefaultEditor) prio.getEditor()).getTextField().setColumns(2);
-        prio.setModel(new SpinnerNumberModel(int_prio,0,99,1));
+        prio.setModel(new SpinnerNumberModel(int_prio, 0, 99, 1));
         lifetime = new JSpinner();
         ((JSpinner.DefaultEditor) lifetime.getEditor()).getTextField().setColumns(2);
-        lifetime.setModel(new SpinnerNumberModel(int_lifetime,0,99,1));
-        
+        lifetime.setModel(new SpinnerNumberModel(int_lifetime, 0, 99, 1));
+
         numberOfCards = new JSpinner();
         ((JSpinner.DefaultEditor) numberOfCards.getEditor()).getTextField().setColumns(2);
-        numberOfCards.setModel(new SpinnerNumberModel(int_numberOfCards,1,10,1));
-        
+        numberOfCards.setModel(new SpinnerNumberModel(int_numberOfCards, 1, 10, 1));
+
         labMappings = new JLabel(lMappings);
         mappingTable = new JTable(TimerManager.getInstance().getTitleMapping());
         mappingPane = new JScrollPane(mappingTable);
         mappingTable.addMouseListener(this);
         mappingPane.addMouseListener(this);
-        
+
         JMenuItem itemAdd = new JMenuItem(LazyBones.getTranslation("add_row", "Add row"));
         itemAdd.setActionCommand("ADD");
         itemAdd.addActionListener(this);
@@ -126,7 +134,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         itemDel.addActionListener(this);
         mappingPopup.add(itemAdd);
         mappingPopup.add(itemDel);
-        
+
         addRow = new JButton(LazyBones.getTranslation("add_row", "Add row"));
         addRow.setActionCommand("ADD");
         addRow.addActionListener(this);
@@ -139,66 +147,65 @@ public class TimerPanel implements MouseListener, ActionListener {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
-        
+
         // left column of spinners
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(15,15,5,5);
+        gbc.insets = new Insets(15, 15, 5, 5);
         panel.add(labBefore, gbc);
-        
+
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.insets = new Insets(15,5,5,5);
+        gbc.insets = new Insets(15, 5, 5, 5);
         panel.add(before, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.insets = new Insets(5,15,5,5);
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(labAfter, gbc);
-        
+
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(after, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.insets = new Insets(15,15,30,5);
+        gbc.insets = new Insets(15, 15, 30, 5);
         panel.add(lNumberOfCards, gbc);
-        
+
         gbc.gridx = 1;
         gbc.gridy = 2;
-        gbc.insets = new Insets(15,5,30,5);
+        gbc.insets = new Insets(15, 5, 30, 5);
         panel.add(numberOfCards, gbc);
-        
+
         // right column of spinners
         gbc.gridx = 2;
         gbc.gridy = 0;
-        gbc.insets = new Insets(15,50,5,5);
+        gbc.insets = new Insets(15, 50, 5, 5);
         panel.add(lPrio, gbc);
-        
+
         gbc.gridx = 3;
         gbc.gridy = 0;
-        gbc.insets = new Insets(15,5,5,5);
+        gbc.insets = new Insets(15, 5, 5, 5);
         panel.add(prio, gbc);
-        
+
         gbc.gridx = 2;
         gbc.gridy = 1;
-        gbc.insets = new Insets(5,50,5,5);
+        gbc.insets = new Insets(5, 50, 5, 5);
         panel.add(lLifetime, gbc);
-        
+
         gbc.gridx = 3;
         gbc.gridy = 1;
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(lifetime, gbc);
-        
-        
+
         // mapping
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.insets = new Insets(5,15,5,5);
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(labMappings, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 4;
@@ -206,61 +213,63 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.insets = new Insets(0,15,15,5);
+        gbc.insets = new Insets(0, 15, 15, 5);
         panel.add(mappingPane, gbc);
-        
+
         // buttons
         gbc.gridx = 4;
         gbc.gridy = 4;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.insets = new Insets(0,5,5,15);
+        gbc.insets = new Insets(0, 5, 5, 15);
         gbc.weightx = 0.0;
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(addRow, gbc);
-        
+
         gbc.gridx = 4;
         gbc.gridy = 5;
-        gbc.insets = new Insets(5,5,5,15);
+        gbc.insets = new Insets(5, 5, 5, 15);
         panel.add(delRow, gbc);
-        
+
         return panel;
     }
 
     public void saveSettings() {
-        LazyBones.getProperties().setProperty("timer.before",
-                before.getValue().toString());
-        LazyBones.getProperties().setProperty("timer.after",
-                after.getValue().toString());
-        LazyBones.getProperties().setProperty("timer.prio",
-                prio.getValue().toString());
-        LazyBones.getProperties().setProperty("timer.lifetime",
-                lifetime.getValue().toString());
-        LazyBones.getProperties().setProperty("numberOfCards",
-                numberOfCards.getValue().toString());
+        LazyBones.getProperties().setProperty("timer.before", before.getValue().toString());
+        LazyBones.getProperties().setProperty("timer.after", after.getValue().toString());
+        LazyBones.getProperties().setProperty("timer.prio", prio.getValue().toString());
+        LazyBones.getProperties().setProperty("timer.lifetime", lifetime.getValue().toString());
+        LazyBones.getProperties().setProperty("numberOfCards", numberOfCards.getValue().toString());
     }
 
-    public void mouseClicked(MouseEvent e) {}
-    public void mouseEntered(MouseEvent e) {}
-    public void mouseExited(MouseEvent e) {}
-    public void mousePressed(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    public void mouseExited(MouseEvent e) {
+    }
+
+    public void mousePressed(MouseEvent e) {
+    }
+
     public void mouseReleased(MouseEvent e) {
-        if ((e.getSource() == mappingPane || 
-             e.getSource() == mappingTable) && e.getButton() == MouseEvent.BUTTON3) {
+        if ((e.getSource() == mappingPane || e.getSource() == mappingTable) && e.getButton() == MouseEvent.BUTTON3) {
             mappingPopup.show(e.getComponent(), e.getX(), e.getY());
-        } 
+        }
     }
 
     public void actionPerformed(ActionEvent e) {
-        if("ADD".equals(e.getActionCommand())) {
+        if ("ADD".equals(e.getActionCommand())) {
             TitleMapping mapping = TimerManager.getInstance().getTitleMapping();
             mapping.put("", "");
-        } else if("DEL".equals(e.getActionCommand())) {
+        } else if ("DEL".equals(e.getActionCommand())) {
             TitleMapping mapping = TimerManager.getInstance().getTitleMapping();
             int[] indices = mappingTable.getSelectedRows();
-            for (int i = indices.length-1; i >= 0; i--) {
+            for (int i = indices.length - 1; i >= 0; i--) {
                 mapping.removeRow(indices[i]);
             }
         }

@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.52 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.53 2006-12-10 15:32:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,13 +30,8 @@
 package lazybones;
 
 import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -58,12 +53,11 @@ import de.hampelratte.svdrp.commands.LSTE;
 import de.hampelratte.svdrp.commands.LSTT;
 import de.hampelratte.svdrp.commands.NEWT;
 import de.hampelratte.svdrp.commands.UPDT;
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 import de.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
 import de.hampelratte.svdrp.util.EPGParser;
 import de.hampelratte.svdrp.util.TimerParser;
-
 import devplugin.*;
 import devplugin.Date;
 
@@ -81,13 +75,9 @@ public class LazyBones extends Plugin {
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(LazyBones.class);
 
-    private JDialog remoteControl;
-
-    private PreviewPanel pp;
+    private JDialog mainDialog;
 
     private static Properties props;
-    
-    private TimerList timerList;
     
     private ActionMenuFactory amf = new ActionMenuFactory();
     
@@ -99,24 +89,23 @@ public class LazyBones extends Plugin {
         ButtonAction action = new ButtonAction();
         action.setActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (remoteControl == null) {
-                    initRemoteControl();
+                if (mainDialog == null) {
+                    initMainDialog();
                 }
-                pp.startGrabbing();
-                remoteControl.setVisible(true);
+                mainDialog.setVisible(true);
             }
         });
 
         action.setBigIcon(createImageIcon("lazybones/vdr24.png"));
         action.setSmallIcon(createImageIcon("lazybones/vdr16.png"));
-        action.setShortDescription(LazyBones.getTranslation("vdr", "Video Disk Recorder"));
-        action.setText(LazyBones.getTranslation("vdr", "Video Disk Recorder"));
+        action.setShortDescription(LazyBones.getTranslation("lazybones", "Lazy Bones"));
+        action.setText(LazyBones.getTranslation("lazybones", "Lazy Bones"));
 
         return new ActionMenu(action);
     }
 
     private void watch(Program program) {
-        Player.play(program, this);
+        Player.play(program);
     }
 
     
@@ -610,7 +599,7 @@ public class LazyBones extends Plugin {
     }
 
     public PluginInfo getInfo() {
-        String name = LazyBones.getTranslation("vdr", "Video Disk Recorder");
+        String name = LazyBones.getTranslation("lazybones", "Lazy Bones");
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
@@ -620,29 +609,9 @@ public class LazyBones extends Plugin {
     /**
      * Called by loadSettings to initialize the GUI and other things
      */
-    private void initRemoteControl() {
-        remoteControl = new JDialog(getParent(), LazyBones.getTranslation(
-                "remoteControl", "VDR RemoteControl"), false);
-        remoteControl.setSize(800, 450);
-        remoteControl.getContentPane().setLayout(new GridBagLayout());
-        remoteControl.getContentPane().add(
-                new RemoteControl(this),
-                new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5), 0, 0));
-        pp = new PreviewPanel();
-        remoteControl.getContentPane().add(
-                pp,
-                new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5), 0, 0));
-        remoteControl.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        remoteControl.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent event) {
-                pp.stopGrabbing();
-                remoteControl.setVisible(false);
-            }
-        });
+    private void initMainDialog() {
+        mainDialog = new MainDialog(getParent(), LazyBones.getTranslation(
+                "lazybones", "Lazy Bones"), false, this);
     }
 
     public devplugin.SettingsTab getSettingsTab() {
@@ -723,13 +692,6 @@ public class LazyBones extends Plugin {
         updateTree();
     }
     
-    private TimerList getTimerList() {
-        if(timerList == null) {
-            timerList = new TimerList(this);
-        }
-        return timerList;
-    }
-
     /**
      * Called to mark all Programs
      * 
@@ -1036,6 +998,10 @@ public class LazyBones extends Plugin {
         props.setProperty("timer.after", timer_after);
         props.setProperty("timer.prio", timer_prio);
         props.setProperty("timer.lifetime", timer_lifetime);
+        
+        String numberOfCards = props.getProperty("numberOfCards");
+        numberOfCards = numberOfCards == null ? "1" : numberOfCards;
+        props.setProperty("numberOfCards", numberOfCards);
 
         String preview_url = props.getProperty("preview.url");
         preview_url = preview_url == null ? "http://localhost:8000/preview.jpg" : preview_url;
@@ -1308,10 +1274,8 @@ public class LazyBones extends Plugin {
 
                 }
             };
-            action.putValue(Action.NAME, LazyBones.getTranslation("vdr",
-                    "Video Disk Recorder"));
-            action.putValue(Action.SMALL_ICON,
-                    createImageIcon("lazybones/vdr16.png"));
+            action.putValue(Action.NAME, LazyBones.getTranslation("lazybones", "Lazy Bones"));
+            action.putValue(Action.SMALL_ICON, createImageIcon("lazybones/vdr16.png"));
 
             Marker[] markers = program.getMarkerArr();
             boolean marked = false;
@@ -1322,7 +1286,7 @@ public class LazyBones extends Plugin {
                 }
             }
 
-            int size = 4;
+            int size = 3;
             if(marked) {
                 size++;
             }
@@ -1342,52 +1306,34 @@ public class LazyBones extends Plugin {
                         deleteTimer(program);
                     }
                 };
-                actions[1].putValue(Action.NAME, LazyBones.getTranslation("dont_capture",
-                        "Delete timer"));
-                actions[1].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/cancel.png"));
+                actions[1].putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
+                actions[1].putValue(Action.SMALL_ICON, createImageIcon("lazybones/cancel.png"));
 
                 actions[2] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        Timer timer = (Timer) TimerManager.getInstance().getTimer(
-                                program.getID());
+                        Timer timer = (Timer) TimerManager.getInstance().getTimer(program.getID());
                         editTimer(timer);
                     }
                 };
-                actions[2].putValue(Action.NAME, LazyBones.getTranslation("edit",
-                        "Edit Timer"));
-                actions[2].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/edit.png"));
+                actions[2].putValue(Action.NAME, LazyBones.getTranslation("edit", "Edit Timer"));
+                actions[2].putValue(Action.SMALL_ICON, createImageIcon("lazybones/edit.png"));
 
                 actions[3] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         getTimersFromVDR();
                     }
                 };
-                actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync",
-                        "Synchronize with VDR"));
-                actions[3].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/reload.png"));
-                
-                actions[4] = new AbstractAction() {
-                    public void actionPerformed(ActionEvent evt) {
-                        getTimerList().setVisible(true);
-                    }
-                };
-                actions[4].putValue(Action.NAME, LazyBones.getTranslation("showAllTimers",
-                        "Show all timers"));
-                actions[4].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/show_timers.png"));
-                if(wolEnabled) {
-                    actions[5] = new AbstractAction() {
+                actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
+                actions[3].putValue(Action.SMALL_ICON, createImageIcon("lazybones/reload.png"));
+
+                if (wolEnabled) {
+                    actions[4] = new AbstractAction() {
                         public void actionPerformed(ActionEvent evt) {
                             VDRConnection.wakeUpVDR();
                         }
                     };
-                    actions[5].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
-                            "Wake VDR up"));
-                    actions[5].putValue(Action.SMALL_ICON,
-                            createImageIcon("lazybones/bell16.png"));
+                    actions[4].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR", "Wake VDR up"));
+                    actions[4].putValue(Action.SMALL_ICON, createImageIcon("lazybones/bell16.png"));
                 }
             } else {
                 actions = new Action[size];
@@ -1397,40 +1343,25 @@ public class LazyBones extends Plugin {
                         createTimer(program);
                     }
                 };
-                actions[1].putValue(Action.NAME, LazyBones.getTranslation("capture",
-                        "Capture with VDR"));
-                actions[1].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/capture.png"));
+                actions[1].putValue(Action.NAME, LazyBones.getTranslation("capture", "Capture with VDR"));
+                actions[1].putValue(Action.SMALL_ICON, createImageIcon("lazybones/capture.png"));
 
                 actions[2] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         getTimersFromVDR();
                     }
                 };
-                actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync",
-                        "Synchronize with VDR"));
-                actions[2].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/reload.png"));
-                
-                actions[3] = new AbstractAction() {
-                    public void actionPerformed(ActionEvent evt) {
-                        getTimerList().setVisible(true);
-                    }
-                };
-                actions[3].putValue(Action.NAME, LazyBones.getTranslation("showAllTimers",
-                        "Show all timers"));
-                actions[3].putValue(Action.SMALL_ICON,
-                        createImageIcon("lazybones/show_timers.png"));
-                if(wolEnabled) {
-                    actions[4] = new AbstractAction() {
+                actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
+                actions[2].putValue(Action.SMALL_ICON, createImageIcon("lazybones/reload.png"));
+
+                if (wolEnabled) {
+                    actions[3] = new AbstractAction() {
                         public void actionPerformed(ActionEvent evt) {
                             VDRConnection.wakeUpVDR();
                         }
                     };
-                    actions[4].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR",
-                            "Wake VDR up"));
-                    actions[4].putValue(Action.SMALL_ICON,
-                            createImageIcon("lazybones/bell16.png"));
+                    actions[3].putValue(Action.NAME, LazyBones.getTranslation("wakeUpVDR", "Wake VDR up"));
+                    actions[3].putValue(Action.SMALL_ICON, createImageIcon("lazybones/bell16.png"));
                 }
             }
 
@@ -1439,10 +1370,8 @@ public class LazyBones extends Plugin {
                     watch(program);
                 }
             };
-            actions[0].putValue(Action.NAME, LazyBones.getTranslation("watch",
-                    "Watch this channel"));
-            actions[0].putValue(Action.SMALL_ICON,
-                    createImageIcon("lazybones/play.png"));
+            actions[0].putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
+            actions[0].putValue(Action.SMALL_ICON, createImageIcon("lazybones/play.png"));
 
             return new ActionMenu(action, actions);
         }
