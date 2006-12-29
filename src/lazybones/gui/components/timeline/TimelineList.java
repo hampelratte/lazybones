@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.2 2006-12-29 23:36:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -149,7 +149,6 @@ public class TimelineList extends JPanel implements Observer {
     }
     
     public void update(Observable o, Object arg) {
-        System.out.println("drin");
         if(o == TimerManager.getInstance()) {
             if(arg instanceof TimersChangedEvent) {
                 TimersChangedEvent tce = (TimersChangedEvent) arg;
