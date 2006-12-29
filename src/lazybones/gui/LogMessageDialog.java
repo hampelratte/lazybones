@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.5 2006-09-07 13:38:27 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.6 2006-12-29 23:34:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,8 +43,6 @@ import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.Logger.LoggingLevel;
 
-import tvbrowser.ui.mainframe.MainFrame;
-
 public class LogMessageDialog extends JDialog {
     
     private static LogMessageDialog instance;
@@ -54,7 +52,7 @@ public class LogMessageDialog extends JDialog {
     private HashMap<LoggingLevel,Icon> icons = new HashMap<LoggingLevel,Icon>();
 
     private LogMessageDialog() {
-        super(MainFrame.getInstance(), true);
+        super(LazyBones.getInstance().getParent(), true);
         initGUI();
     }
     
@@ -109,8 +107,8 @@ public class LogMessageDialog extends JDialog {
     }
     
     public void setVisible(boolean visible) {
-        int parentWidth = MainFrame.getInstance().getWidth();
-        int parentHeight = MainFrame.getInstance().getHeight();
+        int parentWidth = LazyBones.getInstance().getParent().getWidth();
+        int parentHeight = LazyBones.getInstance().getParent().getHeight();
         int posX = (parentWidth - getWidth()) / 2;
         int posY = (parentHeight - getHeight()) / 2;
         setLocation(posX, posY);

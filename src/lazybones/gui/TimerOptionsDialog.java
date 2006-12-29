@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.7 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.8 2006-12-29 23:34:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -285,7 +285,7 @@ public class TimerOptionsDialog implements ActionListener,
             timer.setFile(title.getText());
             devplugin.Channel c = (devplugin.Channel) channels.getSelectedItem();
             Channel vdrc = (Channel) ProgramManager.getChannelMapping().get(c.getId());
-            timer.setChannel(vdrc.getChannelNumber());
+            timer.setChannelNumber(vdrc.getChannelNumber());
             Calendar start = timer.getStartTime();
             start.set(Calendar.HOUR_OF_DAY, ((Time) starttime.getValue()).getHour());
             start.set(Calendar.MINUTE, ((Time) starttime.getValue()).getMinute());

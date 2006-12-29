@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.53 2006-12-10 15:32:35 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.54 2006-12-29 23:34:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -81,13 +81,20 @@ public class LazyBones extends Plugin {
     
     private ActionMenuFactory amf = new ActionMenuFactory();
     
+    private static LazyBones instance;
+    
+    public static LazyBones getInstance() {
+        return instance;
+    }
+    
     public ActionMenu getContextMenuActions(final Program program) {
         return amf.createActionMenu(program);
     }
 
+    private ButtonAction buttonAction;
     public ActionMenu getButtonAction() {
-        ButtonAction action = new ButtonAction();
-        action.setActionListener(new ActionListener() {
+        buttonAction = new ButtonAction();
+        buttonAction.setActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (mainDialog == null) {
                     initMainDialog();
@@ -96,18 +103,17 @@ public class LazyBones extends Plugin {
             }
         });
 
-        action.setBigIcon(createImageIcon("lazybones/vdr24.png"));
-        action.setSmallIcon(createImageIcon("lazybones/vdr16.png"));
-        action.setShortDescription(LazyBones.getTranslation("lazybones", "Lazy Bones"));
-        action.setText(LazyBones.getTranslation("lazybones", "Lazy Bones"));
+        buttonAction.setBigIcon(createImageIcon("lazybones/vdr24.png"));
+        buttonAction.setSmallIcon(createImageIcon("lazybones/vdr16.png"));
+        buttonAction.setShortDescription(LazyBones.getTranslation("lazybones", "Lazy Bones"));
+        buttonAction.setText(LazyBones.getTranslation("lazybones", "Lazy Bones"));
 
-        return new ActionMenu(action);
+        return new ActionMenu(buttonAction);
     }
 
     private void watch(Program program) {
         Player.play(program);
     }
-
     
     public void deleteTimer(Timer timer) {
         Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
@@ -155,7 +161,7 @@ public class LazyBones extends Plugin {
     
     public void createTimer() {
         Timer timer = new Timer();
-        timer.setChannel(1);
+        timer.setChannelNumber(1);
         Program prog = ProgramManager.getInstance().getProgram(timer);
         
         boolean showTimerOptions = Boolean.TRUE.toString().equals(props.getProperty("showTimerOptionsDialog"));
@@ -211,7 +217,7 @@ public class LazyBones extends Plugin {
                     .get(0);
 
             Timer timer = new Timer();
-            timer.setChannel(id);
+            timer.setChannelNumber(id);
             timer.addTvBrowserProgID(prog.getID());
             int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
             timer.setPriority(prio);
@@ -371,7 +377,7 @@ public class LazyBones extends Plugin {
         if (dontCare || result == JOptionPane.OK_OPTION) {
             Timer newTimer = new Timer();
             newTimer.setActive(true);
-            newTimer.setChannel(channelID);
+            newTimer.setChannelNumber(channelID);
             int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
             int lifetime = Integer.parseInt(getProperties().getProperty("timer.lifetime"));
             newTimer.setLifetime(lifetime);
@@ -524,7 +530,7 @@ public class LazyBones extends Plugin {
         while (en.hasMoreElements()) {
             String channelID = (String) en.nextElement();
             Channel channel = (Channel) ProgramManager.getChannelMapping().get(channelID);
-            if (channel.getChannelNumber() == timer.getChannel()) {
+            if (channel.getChannelNumber() == timer.getChannelNumber()) {
                 chan = ProgramManager.getInstance().getChannelById(channelID);
             }
         }
@@ -579,7 +585,7 @@ public class LazyBones extends Plugin {
             if (epg.size() > 0) {
                 EPGEntry entry = (EPGEntry) epg.get(0);
                 VDRTimer timer = new VDRTimer();
-                timer.setChannel(id);
+                timer.setChannelNumber(id);
                 timer.setTitle(entry.getTitle());
                 timer.setStartTime(entry.getStartTime());
                 timer.setEndTime(entry.getEndTime());
@@ -686,7 +692,7 @@ public class LazyBones extends Plugin {
 
         // mark all "timed" programs (haltOnNoChannel = false, because we can
         // have multiple channels)
-        markPrograms(TimerManager.getInstance().getTimers(), false);
+        markPrograms(tm.getTimers(), false);
 
         // update the plugin tree
         updateTree();
@@ -1049,6 +1055,7 @@ public class LazyBones extends Plugin {
     }
     
     private void init() {
+        instance = this;
         Thread t = new Thread() {
             public void run() {
                 while(!(getParentFrame()!=null && getParentFrame().isVisible())) {

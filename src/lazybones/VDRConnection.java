@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.11 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.12 2006-12-29 23:34:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,7 +36,6 @@ import java.net.InetAddress;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
-import tvbrowser.ui.mainframe.MainFrame;
 import de.hampelratte.svdrp.Command;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
@@ -82,7 +81,7 @@ public class VDRConnection {
                     
                     // TODO WOL timeout als option bereitstellen
                     int timeout = 30; // wait 120 secs for VDR to boot
-                    ProgressMonitor pm = new ProgressMonitor(MainFrame.getInstance(), "Warten auf VDR", timeout + " secs remaining", 0, timeout);
+                    ProgressMonitor pm = new ProgressMonitor(LazyBones.getInstance().getParent(), "Warten auf VDR", timeout + " secs remaining", 0, timeout);
                     
                     ConnectionTester ct = new VDRConnection().new ConnectionTester(timeout, pm);
                     new Thread(ct).start();

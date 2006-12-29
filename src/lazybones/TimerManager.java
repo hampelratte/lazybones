@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.9 2006-09-07 19:30:03 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.10 2006-12-29 23:34:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -58,6 +58,11 @@ public class TimerManager extends Observable {
     private ArrayList<Timer> storedTimers = new ArrayList<Timer>();
     
     /**
+     * 
+     */
+    private ConflictFinder conflictFinder;
+    
+    /**
      * Stores mappings the user has made for later use.
      * The user has to map one Program only once. Later 
      * the mapping will be looked up here 
@@ -68,7 +73,7 @@ public class TimerManager extends Observable {
         timers = new ArrayList<Timer>();
     }
 
-    public static TimerManager getInstance() {
+    public synchronized static TimerManager getInstance() {
         if (instance == null) {
             instance = new TimerManager();
         }
@@ -106,25 +111,25 @@ public class TimerManager extends Observable {
         }
         
         setChanged();
-        notifyObservers(timers);
+        notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_ADDED, timer));
     }
 
     public void removeTimer(Timer timer) {
         timers.remove(timer);
         setChanged();
-        notifyObservers(timers);
+        notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_REMOVED, timer));
     }
     
     public void removeAll() {
         timers.clear();
         setChanged();
-        notifyObservers(timers);
+        notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, timers));
     }
 
     /**
      * @return an ArrayList of Timer objects
      */
-    public ArrayList getTimers() {
+    public ArrayList<Timer> getTimers() {
         return timers;
     }
     
@@ -138,6 +143,20 @@ public class TimerManager extends Observable {
         }
     }
 
+    /**
+     * Returns timer conflicts. If there are more concurrent 
+     * timers on different transponders, than dvb cards,
+     * some programs cannot be recorded.
+     */
+    public ArrayList getConflicts() {
+        if(conflictFinder == null ) {
+            conflictFinder = new ConflictFinder();
+        }
+        ArrayList conflicts = conflictFinder.getConflicts();
+        return conflicts;
+    }
+    
+    
     /**
      * 
      * @param progID

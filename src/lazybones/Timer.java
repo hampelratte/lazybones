@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.4 2006-09-07 19:30:03 hampelratte Exp $
+/* $Id: Timer.java,v 1.5 2006-12-29 23:34:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,14 +48,15 @@ public class Timer extends VDRTimer {
     public Timer() {}
     
     public Timer(VDRTimer timer) {
+        super.setID(timer.getID());
         super.setActive(timer.isActive());
-        super.setChannel(timer.getChannel());
+        super.setChannelNumber(timer.getChannelNumber());
         super.setDescription(timer.getDescription());
         super.setEndTime(timer.getEndTime());
         super.setFile(timer.getFile());
         super.setFirstTime(timer.getFirstTime());
         super.setHasFirstTime(timer.hasFirstTime());
-        super.setID(timer.getID());
+        super.setChannelNumber(timer.getChannelNumber());
         super.setLifetime(timer.getLifetime());
         super.setPath(timer.getPath());
         super.setPriority(timer.getPriority());
@@ -97,5 +98,20 @@ public class Timer extends VDRTimer {
 
     public void addTvBrowserProgID(String id) {
         tvBrowserProgIDs.add(id);
+    }
+    
+    /**
+     * Returns, if <code>this</code> starts between the start time
+     * and the end time of the given timer <code>timer</code>.
+     * @param timer
+     * @return
+     */
+    public boolean startsDuringTimer(Timer timer) {
+        if (this.getStartTime().compareTo(timer.getStartTime()) >= 0 && 
+            this.getStartTime().compareTo(timer.getEndTime()) <= 0) 
+        {
+            return true;
+        }
+        return false;
     }
 }

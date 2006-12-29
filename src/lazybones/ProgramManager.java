@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.5 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.6 2006-12-29 23:34:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -113,7 +113,7 @@ public class ProgramManager {
         while (en.hasMoreElements()) {
             String channelID = (String) en.nextElement();
             Channel channel = (Channel) ProgramManager.getChannelMapping().get(channelID);
-            if (channel.getChannelNumber() == timer.getChannel()) {
+            if (channel.getChannelNumber() == timer.getChannelNumber()) {
                 chan = getChannelById(channelID);
             }
         }

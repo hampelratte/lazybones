@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.4 2006-07-29 15:44:36 hampelratte Exp $
+/* $Id: Logger.java,v 1.5 2006-12-29 23:34:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,20 +47,15 @@ public class Logger {
     
     public final static int WAKE_ON_LAN = 3;
 
-    public final static LoggingLevel DEBUG = new LoggingLevel(
-            "LAZYBONES DEBUG", 56738);
+    public final static LoggingLevel DEBUG = new LoggingLevel("LAZYBONES DEBUG", 56738);
 
-    public final static LoggingLevel INFO = new LoggingLevel("LAZYBONES INFO",
-            56739);
+    public final static LoggingLevel INFO = new LoggingLevel("LAZYBONES INFO", 56739);
 
-    public final static LoggingLevel WARN = new LoggingLevel("LAZYBONES WARN",
-            56740);
+    public final static LoggingLevel WARN = new LoggingLevel("LAZYBONES WARN", 56740);
 
-    public final static LoggingLevel ERROR = new LoggingLevel(
-            "LAZYBONES ERROR", 56741);
+    public final static LoggingLevel ERROR = new LoggingLevel("LAZYBONES ERROR", 56741);
 
-    public final static LoggingLevel FATAL = new LoggingLevel(
-            "LAZYBONES FATAL", 56742);
+    public final static LoggingLevel FATAL = new LoggingLevel("LAZYBONES FATAL", 56742);
 
     private static Logger instance;
 

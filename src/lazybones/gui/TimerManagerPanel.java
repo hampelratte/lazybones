@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.1 2006-12-10 15:32:34 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.2 2006-12-29 23:34:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,31 +33,28 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
-import lazybones.TimerProgram;
-import util.ui.ProgramList;
-import devplugin.Channel;
-import devplugin.Date;
 import devplugin.Program;
 
 public class TimerManagerPanel extends JPanel implements ActionListener, Observer {
 
-    private static Logger LOG = Logger.getLogger();
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
-    private ProgramList timerList = new ProgramList(model);
+    private JList timerList = new JList(model);
     private JButton buttonNew = null;
     private JButton buttonEdit = null;
     private JButton buttonRemove = null;
@@ -86,6 +83,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.insets = new java.awt.Insets(10,10,10,10);
         gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        timerList.setCellRenderer(new TimerListCellRenderer());
         scrollPane = new JScrollPane(timerList);
         this.add(scrollPane, gbc);
         
@@ -115,103 +113,66 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         buttonRemove.addActionListener(this);
         this.add(buttonRemove, gbc);
         
+        timerList.addMouseListener(new MouseListener() {
+            public void mousePressed(MouseEvent e) {
+                if(e.isPopupTrigger()) {
+                    int index = timerList.locationToIndex(e.getPoint());
+                    Timer timer = (Timer) timerList.getModel().getElementAt(index);
+                    Program program = ProgramManager.getInstance().getProgram(timer);
+                    
+                    if(program == null) return;
+                    
+                    JPopupMenu popup = LazyBones.getPluginManager().createPluginContextMenu(program, null);
+                    popup.setLocation(e.getPoint());
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+            public void mouseClicked(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {}
+        });
+        
         getTimers();
     }
     
     private void getTimers() {
         model.removeAllElements();
-        ArrayList timers = TimerManager.getInstance().getTimers();
+        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
         
-        ArrayList<TimerProgram> programs = new ArrayList<TimerProgram>();
+        Collections.sort(timers, new TimerComparator());
+        
         for (Iterator iter = timers.iterator(); iter.hasNext();) {
             Timer timer = (Timer) iter.next();
-            Calendar time;
-            time = timer.getStartTime();
-            addProgramm(programs, timer, time);
-        }
-        
-        Collections.sort(programs, new ProgramComparator());
-        
-        for (Iterator it = programs.iterator(); it.hasNext();) {
-            Object element = it.next();
-            model.addElement(element);
+            model.addElement(timer);
         }
     }
     
-    private void addProgramm(ArrayList<TimerProgram> programs, Timer timer, Calendar time) {
-        Channel chan = ProgramManager.getInstance().getChannel(timer);
-        if(chan != null) {
-            TimerProgram p = new TimerProgram(chan, new Date(time), time
-                    .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
-            p.setTitle(timer.getPath()+timer.getTitle());
-            p.setDescription("");
-            p.setTimer(timer);
-            programs.add(p);
-        } else {
-            LOG.log(LazyBones.getTranslation("no_channel_defined",
-                    "No channel defined", timer.toString()), Logger.EPG, Logger.ERROR);
-        }
-    }
-
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == buttonNew) {
             control.createTimer();
         } else if(e.getSource() == buttonEdit) {
             if(timerList.getSelectedIndex() >= 0) {
-                TimerProgram tp = (TimerProgram)timerList.getSelectedValue();
-                Timer timer = tp.getTimer();
+                Timer timer = (Timer)timerList.getSelectedValue();
                 control.editTimer(timer);
             }
         } else if(e.getSource() == buttonRemove) {
             if(timerList.getSelectedIndex() >= 0) {
-                TimerProgram tp = (TimerProgram)timerList.getSelectedValue();
-                Timer timer = tp.getTimer();
+                Timer timer = (Timer)timerList.getSelectedValue();
                 control.deleteTimer(timer);
             }
         }
     }
-    
-    /**
-     * 
-     * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
-     *
-     * Compares two Programs according to their start time
-     */
-    private class ProgramComparator implements Comparator<Program> {
-        public int compare(Program p1, Program p2) {
-            Calendar c1 = getStartTime(p1);
-            Calendar c2 = getStartTime(p2);
-            if (c1.getTimeInMillis() < c2.getTimeInMillis()) {
-                return -1;
-            } else if (c1.getTimeInMillis() > c2.getTimeInMillis()) {
-                return 1;
-            }
-            return 0;
-        }
-        
-        /**
-         * 
-         * @param p
-         *            a Program object
-         * @return The start time of the Program
-         */
-        private Calendar getStartTime(Program p) {
-            Calendar calendar = GregorianCalendar.getInstance();
-            Date d = p.getDate();
-            calendar.set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
-            calendar.set(Calendar.MONTH, d.getMonth());
-            calendar.set(Calendar.YEAR, d.getYear());
-            calendar.set(Calendar.HOUR_OF_DAY, p.getHours());
-            calendar.set(Calendar.MINUTE, p.getMinutes());
-            return calendar;
-        }
-        
-    }
-
 
     public void update(Observable arg0, Object arg1) {
         if(arg0 == TimerManager.getInstance()) {
             getTimers();
+        }
+    }
+    
+    private class TimerComparator implements Comparator<Timer> {
+        public int compare(Timer t1, Timer t2) {
+            return t1.getStartTime().compareTo(t2.getStartTime());
         }
     }
 }
