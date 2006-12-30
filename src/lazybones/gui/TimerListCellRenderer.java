@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.2 2006-12-30 14:42:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -64,6 +64,12 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     }
 
     private void initGUI() {
+        // set foreground color
+        time.setForeground(Color.BLACK);
+        title.setForeground(Color.BLACK);
+        channel.setForeground(Color.BLACK);
+        date.setForeground(Color.BLACK);
+        
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
         title.setFont(bold);

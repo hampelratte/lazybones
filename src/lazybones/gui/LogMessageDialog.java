@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.6 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.7 2006-12-30 14:42:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -125,6 +126,7 @@ public class LogMessageDialog extends JDialog {
             LogMessage log = (LogMessage)value;
             setText(log.getMessage());
             setIcon((Icon)icons.get(log.getLevel()));
+            setForeground(Color.BLACK);
             return this;
         }
     }
