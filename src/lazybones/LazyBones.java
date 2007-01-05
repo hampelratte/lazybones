@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.54 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.55 2007-01-05 23:11:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -164,6 +164,8 @@ public class LazyBones extends Plugin {
         timer.setChannelNumber(1);
         Program prog = ProgramManager.getInstance().getProgram(timer);
         
+        // in this situation it makes sense to show the timer options
+        // so we override the user setting (hide options dialog)
         boolean showTimerOptions = Boolean.TRUE.toString().equals(props.getProperty("showTimerOptionsDialog"));
         props.setProperty("showTimerOptionsDialog",Boolean.TRUE.toString());
         createTimer(prog);
