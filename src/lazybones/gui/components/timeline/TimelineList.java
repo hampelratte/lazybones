@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.2 2006-12-29 23:36:57 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.3 2007-01-05 23:09:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones.gui.components.timeline;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,6 +62,18 @@ public class TimelineList extends JPanel implements Observer {
         this.padding = padding;
         setLayout(new TimelineLayout(rowHeight, padding));
         TimerManager.getInstance().addObserver(this);
+        
+        Thread repainter = new Thread() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(10 * 1000);
+                        repaint();
+                    } catch (InterruptedException e) {}
+                }
+            }
+        };
+        repainter.start();
     }
 
     public int getRowCount() {
@@ -137,8 +150,53 @@ public class TimelineList extends JPanel implements Observer {
         for (int i = 0; i < 25; i++) {
             g.drawLine((int)(i * pixelsPerHour), 0, (int)(i * pixelsPerHour), getHeight());
         }
-    }
 
+        // paint current time line
+        Calendar currentTime = Calendar.getInstance();
+        if(isToday(getCalendar())) { // are we showing the current day ?
+            g.setColor(Color.RED);
+            double pixelsPerMinute = (double)(getWidth()-1) / (double)(24 * 60);
+            int minute = currentTime.get(Calendar.MINUTE);
+            minute += currentTime.get(Calendar.HOUR_OF_DAY) * 60;
+            int position = (int)(minute * pixelsPerMinute); 
+            g.drawLine(position, 0, position, getHeight());
+        }
+    }
+    
+    /* now done in paintComponent to paint under the TimelineElements
+    @Override
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        
+        // paint current time line
+        Calendar currentTime = Calendar.getInstance();
+        if(isToday(getCalendar())) { // are we showing the current day ?
+            g.setColor(Color.RED);
+            double pixelsPerMinute = (double)(getWidth()-1) / (double)(24 * 60);
+            int minute = currentTime.get(Calendar.MINUTE);
+            minute += currentTime.get(Calendar.HOUR_OF_DAY) * 60;
+            int position = (int)(minute * pixelsPerMinute); 
+            g.drawLine(position, 0, position, getHeight());
+        }
+    }*/
+    
+    
+    /**
+     * Returns, if the day of the given calendar is today
+     * @param cal
+     */
+    private boolean isToday(Calendar cal) {
+        Calendar today = Calendar.getInstance();
+        if(today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR) 
+                && today.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
+                && today.get(Calendar.YEAR) == cal.get(Calendar.YEAR))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
     public void showTimersForCurrentDate(ArrayList<Timer> timers) {
         clear();
         for (Timer timer : timers) {
@@ -198,5 +256,12 @@ public class TimelineList extends JPanel implements Observer {
     
     public void removeTimelineListener(TimelineListener l) {
         listeners.remove(l);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension d = super.getPreferredSize();
+        d.height = (rowHeight + padding) * getRowCount();
+        return d;
     }
 }
