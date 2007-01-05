@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeader.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelineRowHeader.java,v 1.2 2007-01-05 23:10:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,7 +30,6 @@
 package lazybones.gui.components.timeline;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
@@ -47,9 +46,9 @@ public class TimelineRowHeader extends JPanel implements TimelineListener {
     public TimelineRowHeader(TimelineList list, int rowHeight, int padding) {
         this.rowHeight = rowHeight;
         this.padding = padding;
-        setPreferredSize(new Dimension(80, 0));
         setLayout(new TimelineLayout(rowHeight, padding));
         list.addTimelineListener(this);
+        setDoubleBuffered(true);
     }
     
     public void addTimer(Timer timer) {
