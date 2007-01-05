@@ -1,4 +1,4 @@
-/* $Id: TimelineLayout.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelineLayout.java,v 1.2 2007-01-05 23:09:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,8 +39,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.swing.JViewport;
-
 import lazybones.Timer;
 
 public class TimelineLayout implements LayoutManager2 {
@@ -49,7 +47,7 @@ public class TimelineLayout implements LayoutManager2 {
     
     private int padding = 0;
     
-    ArrayList<Component> components = new ArrayList<Component>();
+    private ArrayList<Component> components = new ArrayList<Component>();
 
     public TimelineLayout() {}
     
@@ -75,8 +73,6 @@ public class TimelineLayout implements LayoutManager2 {
     }
 
     public void invalidateLayout(Container target) {
-        // TODO Auto-generated method stub
-
     }
 
     public Dimension maximumLayoutSize(Container target) {
@@ -88,14 +84,12 @@ public class TimelineLayout implements LayoutManager2 {
     }
 
     public void layoutContainer(Container parent) {
-        int width = parent.getWidth();
-        
-        if(parent.getParent() instanceof JViewport) {
-            JViewport viewport = (JViewport) parent.getParent();
-            width = viewport.getExtentSize().width;
+        if(parent.isValid()) {
+            return;
         }
         
-        parent.setSize(width, parent.getHeight());
+        int width = parent instanceof TimelineRowHeader ? 0 : parent.getWidth();
+        int height = parent.getHeight();
         
         double pixelsPerMinute = (double)(width-1) / (double)(24 * 60);
         
@@ -133,11 +127,21 @@ public class TimelineLayout implements LayoutManager2 {
                 te.setLocation(startPos, (rowHeight+padding) * row);
                 te.setSize(length, rowHeight);
             } else if (comp instanceof TimelineRowHeaderElement) {
-                comp.setSize(parent.getPreferredSize().width, rowHeight);
+                comp.setSize(comp.getPreferredSize());
                 comp.setLocation(0, (rowHeight + padding) * rowCount);
                 rowCount++;
+                if(comp.getWidth() > width) {
+                    width = comp.getWidth();
+                }
             }
         }
+        
+        if(components.size() == 0 && parent instanceof TimelineRowHeader) {
+            width=0;
+        }
+        
+        parent.setPreferredSize(new Dimension(width, height));
+        parent.setSize(width, height);
     }
 
     public Dimension minimumLayoutSize(Container parent) {
@@ -145,13 +149,27 @@ public class TimelineLayout implements LayoutManager2 {
         d.width = parent.getWidth();
         d.height = 0;
         for (Iterator iter = components.iterator(); iter.hasNext();) {
-            d.height += rowHeight;
+            Component comp = (Component) iter.next();
+            if(comp.getWidth() > d.width) {
+                d.width = comp.getWidth();
+            }
+            d.height += rowHeight + padding;
         }
         return d;
     }
 
     public Dimension preferredLayoutSize(Container parent) {
-        return parent.getSize();
+        Dimension d = new Dimension();
+        d.width = parent.getWidth();
+        d.height = 0;
+        for (Iterator iter = components.iterator(); iter.hasNext();) {
+            Component comp = (Component) iter.next();
+            if(comp.getWidth() > d.width) {
+                d.width = comp.getWidth();
+            }
+            d.height += rowHeight + padding;
+        }
+        return d;
     }
 
     public void removeLayoutComponent(Component comp) {
