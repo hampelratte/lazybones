@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.6 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.7 2007-01-05 23:11:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -92,7 +92,10 @@ public class ProgramManager {
     public Program getProgram(Timer timer) {
         // determine channel
         devplugin.Channel chan = getChannel(timer);
-
+        
+        if(chan == null) 
+            return null;
+            
         // determine middle of the program
         long startTime = timer.getStartTime().getTimeInMillis();
         long endTime = timer.getEndTime().getTimeInMillis();
@@ -100,6 +103,7 @@ public class ProgramManager {
         Calendar time = GregorianCalendar.getInstance();
         long middleTime = startTime + duration/2;
         time.setTimeInMillis(middleTime);
+        
         return getProgramAt(timer.getStartTime(), time, chan);
     }
     

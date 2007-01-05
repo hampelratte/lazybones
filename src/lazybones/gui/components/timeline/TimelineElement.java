@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.2 2007-01-05 23:09:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -85,6 +85,10 @@ public class TimelineElement extends JComponent implements MouseListener {
         sb.append(dateFormatter.format(timer.getStartTime().getTime()));
         sb.append(" - ");
         sb.append(dateFormatter.format(timer.getEndTime().getTime()));
+        sb.append("<br>");sb.append("<br>");
+        sb.append("<div width=\"300\">");
+        sb.append(timer.getDescription());
+        sb.append("</div>");
         sb.append("</html>");
         return sb.toString();
     }
