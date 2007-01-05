@@ -1,4 +1,4 @@
-/* $Id: TimelineLayout.java,v 1.2 2007-01-05 23:09:02 hampelratte Exp $
+/* $Id: TimelineLayout.java,v 1.3 2007-01-05 23:22:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -88,7 +88,7 @@ public class TimelineLayout implements LayoutManager2 {
             return;
         }
         
-        int width = parent instanceof TimelineRowHeader ? 0 : parent.getWidth();
+        int width = parent instanceof TimelineRowHeader ? 0 : parent.getParent().getWidth();
         int height = parent.getHeight();
         
         double pixelsPerMinute = (double)(width-1) / (double)(24 * 60);
