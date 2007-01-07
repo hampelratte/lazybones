@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.3 2007-01-05 23:09:51 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.4 2007-01-07 14:54:55 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -150,20 +150,8 @@ public class TimelineList extends JPanel implements Observer {
         for (int i = 0; i < 25; i++) {
             g.drawLine((int)(i * pixelsPerHour), 0, (int)(i * pixelsPerHour), getHeight());
         }
-
-        // paint current time line
-        Calendar currentTime = Calendar.getInstance();
-        if(isToday(getCalendar())) { // are we showing the current day ?
-            g.setColor(Color.RED);
-            double pixelsPerMinute = (double)(getWidth()-1) / (double)(24 * 60);
-            int minute = currentTime.get(Calendar.MINUTE);
-            minute += currentTime.get(Calendar.HOUR_OF_DAY) * 60;
-            int position = (int)(minute * pixelsPerMinute); 
-            g.drawLine(position, 0, position, getHeight());
-        }
     }
     
-    /* now done in paintComponent to paint under the TimelineElements
     @Override
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
@@ -171,14 +159,14 @@ public class TimelineList extends JPanel implements Observer {
         // paint current time line
         Calendar currentTime = Calendar.getInstance();
         if(isToday(getCalendar())) { // are we showing the current day ?
-            g.setColor(Color.RED);
+            g.setColor(new Color(255,0,0,128));
             double pixelsPerMinute = (double)(getWidth()-1) / (double)(24 * 60);
             int minute = currentTime.get(Calendar.MINUTE);
             minute += currentTime.get(Calendar.HOUR_OF_DAY) * 60;
             int position = (int)(minute * pixelsPerMinute); 
             g.drawLine(position, 0, position, getHeight());
         }
-    }*/
+    }
     
     
     /**
