@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.2 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.3 2007-01-07 12:37:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,10 +45,10 @@ import java.util.Observer;
 import javax.swing.*;
 
 import lazybones.LazyBones;
+import lazybones.Logger;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
-import devplugin.Program;
 
 public class TimerManagerPanel extends JPanel implements ActionListener, Observer {
 
@@ -118,11 +118,8 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
                 if(e.isPopupTrigger()) {
                     int index = timerList.locationToIndex(e.getPoint());
                     Timer timer = (Timer) timerList.getModel().getElementAt(index);
-                    Program program = ProgramManager.getInstance().getProgram(timer);
                     
-                    if(program == null) return;
-                    
-                    JPopupMenu popup = LazyBones.getPluginManager().createPluginContextMenu(program, null);
+                    JPopupMenu popup = ProgramManager.getInstance().getContextMenuForTimer(timer);
                     popup.setLocation(e.getPoint());
                     popup.show(e.getComponent(), e.getX(), e.getY());
                 }
@@ -154,7 +151,12 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         } else if(e.getSource() == buttonEdit) {
             if(timerList.getSelectedIndex() >= 0) {
                 Timer timer = (Timer)timerList.getSelectedValue();
-                control.editTimer(timer);
+                try {
+                	control.editTimer(timer);
+                } catch(Exception ex) {
+                    Logger.getLogger().log(ex, Logger.OTHER, Logger.ERROR);
+                    ex.printStackTrace();
+                }
             }
         } else if(e.getSource() == buttonRemove) {
             if(timerList.getSelectedIndex() >= 0) {
