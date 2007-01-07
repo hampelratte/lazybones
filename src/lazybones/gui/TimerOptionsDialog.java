@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.8 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.9 2007-01-07 12:55:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,6 +44,7 @@ import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Time;
 import lazybones.Timer;
+import lazybones.VDRChannelList;
 import tvbrowser.core.ChannelList;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 import devplugin.Date;
@@ -177,8 +178,14 @@ public class TimerOptionsDialog implements ActionListener,
         // the date of the day before.
         Timer tmp = (Timer)timer.clone();
         control.removeTimerBuffers(tmp);
-        Program prog = ProgramManager.getInstance().getProgram(timer);
-        channels.setSelectedItem(ProgramManager.getInstance().getChannel(timer));
+        Program prog = ProgramManager.getInstance().getProgram(tmp);
+        if(prog != null) {
+            channels.setSelectedItem(prog.getChannel());
+        } else {
+            Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+            channels.addItem(chan);
+            channels.setSelectedItem(chan);
+        }
 
         gbc.gridx = 0;
         gbc.gridy = 7;
@@ -240,14 +247,12 @@ public class TimerOptionsDialog implements ActionListener,
         gbc.gridx = 1;
         gbc.gridy = 5;
         panel.add(priority, gbc);
-        priority
-                .setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
+        priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
 
         gbc.gridx = 1;
         gbc.gridy = 6;
         panel.add(lifetime, gbc);
-        lifetime
-                .setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
+        lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
         
         gbc.gridx = 1;
         gbc.gridy = 7;
@@ -283,8 +288,14 @@ public class TimerOptionsDialog implements ActionListener,
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
             timer.setFile(title.getText());
-            devplugin.Channel c = (devplugin.Channel) channels.getSelectedItem();
-            Channel vdrc = (Channel) ProgramManager.getChannelMapping().get(c.getId());
+            Channel vdrc = null;
+            Object selected = channels.getSelectedItem();
+            if(selected instanceof devplugin.Channel) {
+                devplugin.Channel c = (devplugin.Channel) selected;
+                vdrc = (Channel) ProgramManager.getChannelMapping().get(c.getId());
+            } else if( selected instanceof Channel) {
+                vdrc = (Channel) selected;
+            }
             timer.setChannelNumber(vdrc.getChannelNumber());
             Calendar start = timer.getStartTime();
             start.set(Calendar.HOUR_OF_DAY, ((Time) starttime.getValue()).getHour());
