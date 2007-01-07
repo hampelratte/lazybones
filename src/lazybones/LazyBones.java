@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.55 2007-01-05 23:11:57 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.56 2007-01-07 12:31:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,14 +37,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.*;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
-import lazybones.gui.*;
+import lazybones.gui.MainDialog;
+import lazybones.gui.ProgramSelectionDialog;
+import lazybones.gui.TimerOptionsDialog;
+import lazybones.gui.TimerSelectionDialog;
+import lazybones.gui.TitleMapping;
+import lazybones.gui.VDRSettingsPanel;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -79,7 +79,7 @@ public class LazyBones extends Plugin {
 
     private static Properties props;
     
-    private ActionMenuFactory amf = new ActionMenuFactory();
+    private ContextMenuFactory cmf = new ContextMenuFactory();
     
     private static LazyBones instance;
     
@@ -88,7 +88,7 @@ public class LazyBones extends Plugin {
     }
     
     public ActionMenu getContextMenuActions(final Program program) {
-        return amf.createActionMenu(program);
+        return cmf.createActionMenu(program);
     }
 
     private ButtonAction buttonAction;
@@ -1276,7 +1276,11 @@ public class LazyBones extends Plugin {
         return super.createImageIcon(name);
     }
     
-    private class ActionMenuFactory {
+    public JPopupMenu getSimpleContextMenu(Timer timer) {
+        return cmf.createSimpleActionMenu(timer);
+    }
+    
+    private class ContextMenuFactory {
         public ActionMenu createActionMenu(final Program program) {
             AbstractAction action = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
@@ -1384,5 +1388,33 @@ public class LazyBones extends Plugin {
 
             return new ActionMenu(action, actions);
         }
+        
+        JPopupMenu simpleMenu;
+        public JPopupMenu createSimpleActionMenu(final Timer timer) {
+            if(simpleMenu == null) {
+                simpleMenu = new JPopupMenu();
+                JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("lazybones/cancel.png"));
+                delItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        deleteTimer(timer);
+                    }
+                    
+                });
+                
+                JMenuItem editItem = new JMenuItem(LazyBones.getTranslation("edit", "Edit Timer"), createImageIcon("lazybones/edit.png"));
+                editItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        editTimer(timer);
+                    }
+                    
+                });
+                
+                simpleMenu.add(editItem);
+                simpleMenu.add(delItem);
+            }
+            
+            return simpleMenu;
+        }
+        
     }
 }
