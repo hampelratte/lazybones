@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.2 2007-01-05 23:09:16 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.3 2007-01-07 12:30:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,11 +45,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 
-import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import devplugin.Channel;
-import devplugin.Program;
 
 public class TimelineElement extends JComponent implements MouseListener {
     private Timer timer;
@@ -137,8 +135,7 @@ public class TimelineElement extends JComponent implements MouseListener {
 
     public void mousePressed(MouseEvent e) {
         if(e.isPopupTrigger()) {
-            Program prog = ProgramManager.getInstance().getProgram(timer);
-            JPopupMenu popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
+            JPopupMenu popup = ProgramManager.getInstance().getContextMenuForTimer(timer);
             popup.setLocation(e.getPoint());
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
