@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.2 2006-12-30 14:42:13 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.3 2007-01-07 14:46:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -116,7 +116,8 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
                 channel.setText(chan.getName());
             } else {
                 de.hampelratte.svdrp.responses.highlevel.Channel c = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
-                channel.setText(c.getName());
+                if(c != null)
+                    channel.setText(c.getName());
             }
             
             return this;

@@ -1,4 +1,4 @@
-/* $Id: VDRChannelList.java,v 1.1 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: VDRChannelList.java,v 1.2 2007-01-07 14:46:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,6 +67,10 @@ public class VDRChannelList {
     }
     
     public Channel getChannelByNumber(int channelNumber) {
+        if(channels == null) {
+            return null;
+        }
+        
         for (Iterator<Channel> iter = channels.iterator(); iter.hasNext();) {
             Channel chan = iter.next();
             if(chan.getChannelNumber() == channelNumber) {
