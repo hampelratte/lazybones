@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.2 2007-01-07 12:37:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,6 +47,7 @@ import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.gui.components.timeline.Timeline;
 
+//TODO nur tage zeigen an denen timer starten oder enden
 public class TimelinePanel extends JPanel implements ActionListener {
     
     private LazyBones lazyBones;
