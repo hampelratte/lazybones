@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.7 2007-01-05 23:11:26 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.8 2007-01-07 12:32:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,11 +29,14 @@
  */
 package lazybones;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+
+import javax.swing.JPopupMenu;
 
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 import devplugin.Date;
@@ -140,5 +143,17 @@ public class ProgramManager {
 
     public static void setChannelMapping(Hashtable channelMapping) {
         ProgramManager.channelMapping = channelMapping;
+    }
+    
+    public JPopupMenu getContextMenuForTimer(Timer timer) {
+        ArrayList tvBrowserProgIds = timer.getTvBrowserProgIDs();
+        JPopupMenu popup;
+        if(tvBrowserProgIds.size() > 0) {
+            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), (String)tvBrowserProgIds.get(0));
+            popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
+        } else {
+            popup = LazyBones.getInstance().getSimpleContextMenu(timer);
+        }
+        return popup;
     }
 }
