@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.1 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.2 2007-01-26 22:43:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,58 +29,150 @@
  */
 package lazybones;
 
+import java.text.DateFormat;
 import java.util.*;
 
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ConflictFinder implements Observer {
-    
+    private static ConflictFinder instance;    
     private ArrayList conflicts = new ArrayList();
+    private ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
+    private HashMap<Integer, Integer> transponderUse = new HashMap<Integer,Integer>();
+    private HashSet<Timer> runningEvents = new HashSet<Timer>();
+    private int conflictCount = 0;
     
-    public ConflictFinder() {
+    private ConflictFinder() {
         TimerManager.getInstance().addObserver(this);
+        findConflicts();
+    }
+    
+    public static ConflictFinder getInstance() {
+        if (instance == null) {
+            instance = new ConflictFinder();
+        }
+        return instance;
+    }
+    
+    private void clear() {
+        conflicts.clear();
+        startStopEvents.clear();
+        transponderUse.clear();
+        runningEvents.clear();
+        conflictCount = 0;
     }
     
     private void findConflicts() {
+        // clear old data
+        clear();
+       
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
-        ArrayList<Channel> channels = VDRChannelList.getInstance().getChannels();
-        
-        conflicts.clear();
         ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        
+        // fill startStopEvents // TODO repeating timers berücksichtigen
         for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
             Timer timer = iter.next();
-
-            ArrayList<Timer> conflictsForCurrentTimer = new ArrayList<Timer>();
-            for (Iterator<Timer> iterator = timers.iterator(); iterator.hasNext();) {
-                Timer timer2 = iterator.next();
-                
-                // check if these timers run concurrent
-                if(timer2.startsDuringTimer(timer)) {
-                    
+            startStopEvents.add(new StartStopEvent(timer, true));
+            startStopEvents.add(new StartStopEvent(timer, false));
+        }
+        Collections.sort(startStopEvents);
+        
+        // run over startStopEvents
+        for (Iterator<StartStopEvent> iter = startStopEvents.iterator(); iter.hasNext();) {
+            StartStopEvent event = iter.next();
+            Timer timer = event.getTimer();
+            if(event.isStartEvent()) {
+                increaseTransponderUse(timer);
+                runningEvents.add(timer);
+                if(transponderUse.size() > numberOfCards) {
+                    // TODO we have a conflict;
+                    conflictCount++;
                 }
-                
+            } else {
+                decreaseTransponderUse(timer);
+                runningEvents.remove(timer);
             }
         }
     }
     
-    public ArrayList getConflicts() {
-        findConflicts();
-        return conflicts;
+    public int getConflictCount() {
+        return conflictCount;
     }
-
+    
+    private void increaseTransponderUse(Timer timer) {
+        Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if(transponderUse.containsKey(chan.getFrequency())) {
+            int count = transponderUse.get(chan.getFrequency());
+            count++;
+            transponderUse.put(chan.getFrequency(), count);
+        } else {
+            transponderUse.put(chan.getFrequency(), 1);
+        }
+    }
+    
+    private void decreaseTransponderUse(Timer timer) {
+        Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if(transponderUse.containsKey(chan.getFrequency())) {
+            int count = transponderUse.get(chan.getFrequency());
+            if(count == 1) {
+                transponderUse.remove(chan.getFrequency());
+            } else {
+                count--;
+                transponderUse.put(chan.getFrequency(), count);
+            }
+        }
+    }
+    
     public void update(Observable o, Object obj) {
-        if(obj instanceof TimersChangedEvent) {
-            TimersChangedEvent tce = (TimersChangedEvent) obj;
-            switch(tce.getType()) {
-            case TimersChangedEvent.ALL:
-                findConflicts();
-                break;
-            case TimersChangedEvent.TIMER_ADDED:
-                break;
-            case TimersChangedEvent.TIMER_REMOVED:
-                break;
-            }
-        }
+        findConflicts();
     }
     
+    private class StartStopEvent implements Comparable<StartStopEvent> {
+        private Timer timer;
+
+        private boolean startEvent = true;
+
+        /**
+         * @param timer
+         * @param startEvent
+         */
+        public StartStopEvent(Timer timer, boolean startEvent) {
+            super();
+            this.timer = timer;
+            this.startEvent = startEvent;
+        }
+
+        public boolean isStartEvent() {
+            return startEvent;
+        }
+
+        public void setStartEvent(boolean startEvent) {
+            this.startEvent = startEvent;
+        }
+
+        public Timer getTimer() {
+            return timer;
+        }
+
+        public void setTimer(Timer timer) {
+            this.timer = timer;
+        }
+        
+        public Calendar getEventTime() {
+            return isStartEvent() ? timer.getStartTime() : timer.getEndTime();
+        }
+
+        public int compareTo(StartStopEvent o) {
+            return getEventTime().compareTo(o.getEventTime());
+        }
+        
+        public String toString() {
+            DateFormat df = DateFormat.getDateTimeInstance();
+            Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();
+            return (df.format(cal.getTime()) 
+                    + " Transponder:" + VDRChannelList.getInstance().getChannelByNumber(
+                            timer.getChannelNumber()).getFrequency()+ " " 
+                    + timer);
+        }
+    }
 }
