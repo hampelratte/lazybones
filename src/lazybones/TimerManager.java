@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.10 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.11 2007-01-26 22:44:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,8 +31,10 @@ package lazybones;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Observable;
+import java.util.TreeSet;
 
 import lazybones.gui.TitleMapping;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
@@ -56,11 +58,6 @@ public class TimerManager extends Observable {
      * The VDR timers from the last session, which have been stored to disk
      */
     private ArrayList<Timer> storedTimers = new ArrayList<Timer>();
-    
-    /**
-     * 
-     */
-    private ConflictFinder conflictFinder;
     
     /**
      * Stores mappings the user has made for later use.
@@ -120,6 +117,16 @@ public class TimerManager extends Observable {
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_REMOVED, timer));
     }
     
+    @Override
+    public void notifyObservers() {
+        super.notifyObservers();
+    }
+
+    @Override
+    public void notifyObservers(Object arg) {
+        super.notifyObservers(arg);
+    }
+
     public void removeAll() {
         timers.clear();
         setChanged();
@@ -143,20 +150,6 @@ public class TimerManager extends Observable {
         }
     }
 
-    /**
-     * Returns timer conflicts. If there are more concurrent 
-     * timers on different transponders, than dvb cards,
-     * some programs cannot be recorded.
-     */
-    public ArrayList getConflicts() {
-        if(conflictFinder == null ) {
-            conflictFinder = new ConflictFinder();
-        }
-        ArrayList conflicts = conflictFinder.getConflicts();
-        return conflicts;
-    }
-    
-    
     /**
      * 
      * @param progID
@@ -258,4 +251,73 @@ public class TimerManager extends Observable {
 	public void setTitleMapping(TitleMapping titleMapping) {
 		this.titleMapping = titleMapping;
 	}
+    
+    
+    /**
+     * Returns the next day, on which a timer events starts or stops, after the given calendar
+     * @param currentDay
+     * @return the next day, on which a timer events starts or stops, after the given calendar
+     */
+    public Calendar getNextDayWithEvent(Calendar currentDay) {
+        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        TreeSet<Calendar> events = new TreeSet<Calendar>();
+        for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
+            Timer timer = iter.next();
+            events.add(timer.getStartTime());
+            events.add(timer.getEndTime());
+        }
+        
+        for (Iterator<Calendar> iter = events.iterator(); iter.hasNext();) {
+            Calendar event = iter.next();
+            if( !event.before(currentDay) & !Utilities.sameDay(event, currentDay)) {
+                return event;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * @see #getNextDayWithEvent(Calendar)
+     * @param currentDay
+     * @return
+     */
+    public Calendar getPreviousDayWithEvent(Calendar currentDay) {
+        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        TreeSet<Calendar> events = new TreeSet<Calendar>();
+        for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
+            Timer timer = iter.next();
+            events.add(timer.getStartTime());
+            events.add(timer.getEndTime());
+        }
+        
+        ArrayList<Calendar> eventList = new ArrayList<Calendar>(events);
+        Collections.reverse(eventList);
+        for (Iterator<Calendar> iter = eventList.iterator(); iter.hasNext();) {
+            Calendar event = iter.next();
+            if( !event.after(currentDay) & !Utilities.sameDay(event, currentDay)) {
+                return event;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * @see #getNextDayWithEvent(Calendar)
+     * @param currentDay
+     * @return
+     */
+    public boolean hasNextDayWithEvent(Calendar currentDay) {
+        return getNextDayWithEvent(currentDay) != null;
+    }
+    
+    /**
+     * @see #getPreviousDayWithEvent(Calendar)
+     * @param currentDay
+     * @return
+     */
+    public boolean hasPreviousDayWithEvent(Calendar currentDay) {
+        return getPreviousDayWithEvent(currentDay) != null;
+    }
 }
