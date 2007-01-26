@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.3 2005-08-22 16:24:37 hampelratte Exp $
+/* $Id: Utilities.java,v 1.4 2007-01-26 22:42:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,6 +31,7 @@ package lazybones;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.Calendar;
 
 import javax.swing.JTable;
 import javax.swing.JViewport;
@@ -192,5 +193,18 @@ public class Utilities {
 
         // Scroll the area into view
         viewport.scrollRectToVisible(rect);
+    }
+    
+    
+    /**
+     * 
+     * @param a Calendar
+     * @param b Calendar
+     * @return true if the Calendars describe the same day (day, month, year)
+     */
+    public static boolean sameDay(Calendar a, Calendar b) {
+        return a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR) 
+                && a.get(Calendar.MONTH) == b.get(Calendar.MONTH)
+                && a.get(Calendar.YEAR) == b.get(Calendar.YEAR);
     }
 }
