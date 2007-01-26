@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.2 2007-01-07 12:37:56 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.3 2007-01-26 22:45:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,9 +35,13 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -47,8 +51,7 @@ import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.gui.components.timeline.Timeline;
 
-//TODO nur tage zeigen an denen timer starten oder enden
-public class TimelinePanel extends JPanel implements ActionListener {
+public class TimelinePanel extends JPanel implements ActionListener, Observer {
     
     private LazyBones lazyBones;
     private JLabel date = new JLabel();
@@ -61,6 +64,8 @@ public class TimelinePanel extends JPanel implements ActionListener {
         this.lazyBones = lazyBones;
         timeline = new Timeline();
         initGUI();
+        TimerManager.getInstance().addObserver(this);
+        enableDisableButtons();
     }
 
     private void initGUI() {
@@ -74,13 +79,13 @@ public class TimelinePanel extends JPanel implements ActionListener {
         prevDateButton.setActionCommand("PREVIOUS_DAY");
         
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        northPanel.add(date);
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
+        northPanel.add(date);
         add(northPanel, BorderLayout.NORTH);
         
-        date.setText(df.format(new Date()));
         date.setFont(new Font("SansSerif",Font.PLAIN, 18));
+        setCalendar(GregorianCalendar.getInstance());
 
         add(timeline, BorderLayout.CENTER);
         timeline.getList().showTimersForCurrentDate(TimerManager.getInstance().getTimers());
@@ -88,12 +93,47 @@ public class TimelinePanel extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == nextDateButton) {
-            timeline.getList().getCalendar().add(Calendar.DAY_OF_MONTH, 1);
+            Calendar currentDay = timeline.getList().getCalendar();
+            Calendar nextDay = TimerManager.getInstance().getNextDayWithEvent(currentDay);
+            if(nextDay != null) {
+                setCalendar(nextDay);
+            } 
         } else if(e.getSource() == prevDateButton) {
-            timeline.getList().getCalendar().add(Calendar.DAY_OF_MONTH, -1);
+            Calendar currentDay = timeline.getList().getCalendar();
+            Calendar previousDay = TimerManager.getInstance().getPreviousDayWithEvent(currentDay);
+            if(previousDay != null) {
+                setCalendar(previousDay);
+            } 
         }
         
-        date.setText(df.format(timeline.getList().getCalendar().getTime()));
+        // enable disable next and prev buttons
+        enableDisableButtons();
+        
+        // display the new timers in the timeline
         timeline.getList().showTimersForCurrentDate(TimerManager.getInstance().getTimers());
+    }
+
+    private void enableDisableButtons() {
+        Calendar cal = timeline.getList().getCalendar();
+        boolean enableNextButton = TimerManager.getInstance().hasNextDayWithEvent(cal);
+        nextDateButton.setEnabled(enableNextButton);
+        boolean enablePrevButton = TimerManager.getInstance().hasPreviousDayWithEvent(cal);
+        prevDateButton.setEnabled(enablePrevButton);
+    }
+
+    public void update(Observable o, Object arg) {
+        if(o == TimerManager.getInstance()) {
+            enableDisableButtons();
+        }
+    }
+    
+    private void setCalendar(Calendar calendar) {
+        // set calendar in timeline
+        timeline.getList().setCalendar(calendar);
+        
+        // show new date
+        Date d = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE ", Locale.getDefault());
+        date.setText(sdf.format(d) + " " + df.format(d));
     }
 }
