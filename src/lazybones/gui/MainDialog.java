@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.2 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.3 2007-01-26 22:42:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -81,6 +81,10 @@ public class MainDialog extends JDialog {
         if(visible) {
             pp.startGrabbing();
         }
+    }
+
+    public void showTimeline() {
+        tabbedPane.setSelectedIndex(2);
     }
 
 }
