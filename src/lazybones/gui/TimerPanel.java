@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.6 2006-12-10 15:32:34 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.7 2007-01-28 15:13:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.*;
 
+import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
 
@@ -242,6 +243,9 @@ public class TimerPanel implements MouseListener, ActionListener {
         LazyBones.getProperties().setProperty("timer.prio", prio.getValue().toString());
         LazyBones.getProperties().setProperty("timer.lifetime", lifetime.getValue().toString());
         LazyBones.getProperties().setProperty("numberOfCards", numberOfCards.getValue().toString());
+        
+        ConflictFinder.getInstance().findConflicts();
+        ConflictFinder.getInstance().handleConflicts();
     }
 
     public void mouseClicked(MouseEvent e) {
