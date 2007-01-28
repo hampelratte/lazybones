@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.3 2007-01-07 12:30:50 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.4 2007-01-28 15:15:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,6 +47,7 @@ import javax.swing.border.BevelBorder;
 
 import lazybones.ProgramManager;
 import lazybones.Timer;
+import lazybones.utils.Utilities;
 import devplugin.Channel;
 
 public class TimelineElement extends JComponent implements MouseListener {
@@ -54,6 +55,7 @@ public class TimelineElement extends JComponent implements MouseListener {
     private Calendar currentDate;
     
     public final static Color COLOR = UIManager.getColor("TextField.selectionBackground");
+    public final static Color CONFLICT_COLOR = new Color(255,0,0,90);
     
     public TimelineElement(Timer timer, Calendar currentDate) {
         this.timer = timer;
@@ -120,6 +122,16 @@ public class TimelineElement extends JComponent implements MouseListener {
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         String time = df.format(timer.getStartTime().getTime()) + " - " + df.format(timer.getEndTime().getTime());
         g.drawString(time, 5, 25);
+        
+        if(timer.getConflictStartTime() != null && timer.getConflictEndTime() != null) {
+            long durationMinutes = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getEndTime());
+            double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
+            long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getConflictStartTime());
+            int x = (int)(pixelsPerMinute * startMinute);
+            int width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(timer.getConflictStartTime(), timer.getConflictEndTime()));
+            g.setColor(CONFLICT_COLOR);
+            g.fillRect(x, 0, width, getHeight()-1);
+        }
     }
 
     public void mouseClicked(MouseEvent e) {
