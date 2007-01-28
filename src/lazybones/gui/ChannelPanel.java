@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.9 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.10 2007-01-28 15:14:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,8 +47,8 @@ import javax.swing.table.DefaultTableModel;
 
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
-import lazybones.Utilities;
 import lazybones.VDRConnection;
+import lazybones.utils.Utilities;
 import tvbrowser.core.ChannelList;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.commands.LSTC;

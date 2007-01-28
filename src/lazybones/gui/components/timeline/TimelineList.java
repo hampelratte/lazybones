@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.5 2007-01-26 22:45:48 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.6 2007-01-28 15:15:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -132,6 +132,8 @@ public class TimelineList extends JPanel implements Observer {
         this.calendar.set(Calendar.MINUTE, 0);
         this.calendar.set(Calendar.SECOND, 0);
         this.calendar.set(Calendar.MILLISECOND, 0);
+        
+        showTimersForCurrentDate(TimerManager.getInstance().getTimers());
     }
 
     @Override
@@ -226,7 +228,6 @@ public class TimelineList extends JPanel implements Observer {
         }
     }
     
-    // TODO repeating timers berücksichtigen (auch beim painting)
     private boolean runsOnCurrentDate(Timer timer) {
         Calendar nextDate = (Calendar) getCalendar().clone();
         nextDate.add(Calendar.DAY_OF_MONTH, 1);

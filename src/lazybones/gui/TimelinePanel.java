@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.3 2007-01-26 22:45:23 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.4 2007-01-28 15:14:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -127,7 +127,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         }
     }
     
-    private void setCalendar(Calendar calendar) {
+    public void setCalendar(Calendar calendar) {
         // set calendar in timeline
         timeline.getList().setCalendar(calendar);
         
@@ -135,5 +135,8 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         Date d = calendar.getTime();
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE ", Locale.getDefault());
         date.setText(sdf.format(d) + " " + df.format(d));
+        
+        // update buttons
+        enableDisableButtons();
     }
 }

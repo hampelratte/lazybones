@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.3 2007-01-26 22:42:03 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.4 2007-01-28 15:14:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,6 +50,8 @@ public class MainDialog extends JDialog {
     
     private JTabbedPane tabbedPane = new JTabbedPane();
     
+    private TimelinePanel timelinePanel;
+    
     public MainDialog(Frame parent, String title, boolean modal, LazyBones lazyBones) {
         super(parent, title, modal);
         this.lazyBones = lazyBones;
@@ -64,7 +66,8 @@ public class MainDialog extends JDialog {
         remoteControl.add(pp, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
         tabbedPane.add(LazyBones.getTranslation("timer", "Timers"), new TimerManagerPanel(lazyBones));
-        tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), new TimelinePanel(lazyBones));
+        timelinePanel = new TimelinePanel(lazyBones);
+        tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), timelinePanel);
         
         this.add(tabbedPane);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -87,4 +90,7 @@ public class MainDialog extends JDialog {
         tabbedPane.setSelectedIndex(2);
     }
 
+    public TimelinePanel getTimelinePanel() {
+        return timelinePanel;
+    }
 }
