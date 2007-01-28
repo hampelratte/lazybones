@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.5 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: Timer.java,v 1.6 2007-01-28 15:11:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,9 +27,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+// TODO timer kann mehrere conflicts enthalten -> conflictTimes als liste halten
 package lazybones;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
@@ -44,6 +47,9 @@ public class Timer extends VDRTimer {
     private int reason = Timer.NO_REASON;
     
     private ArrayList<String> tvBrowserProgIDs = new ArrayList<String>();
+    
+    private Calendar conflictStartTime;
+    private Calendar conflictEndTime;
     
     public Timer() {}
     
@@ -113,5 +119,27 @@ public class Timer extends VDRTimer {
             return true;
         }
         return false;
+    }
+
+    public Calendar getConflictEndTime() {
+        return conflictEndTime;
+    }
+
+    public void setConflictEndTime(Calendar conflictEndTime) {
+        this.conflictEndTime = conflictEndTime;
+        if(conflictEndTime != null && conflictEndTime.after(getEndTime())) {
+            this.conflictEndTime = (Calendar) getEndTime().clone();
+        }
+    }
+
+    public Calendar getConflictStartTime() {
+        return conflictStartTime;
+    }
+
+    public void setConflictStartTime(Calendar conflictStartTime) {
+        this.conflictStartTime = conflictStartTime;
+        if(conflictStartTime != null && conflictStartTime.before(getStartTime())) {
+            this.conflictStartTime = (Calendar) getStartTime().clone();
+        }
     }
 }
