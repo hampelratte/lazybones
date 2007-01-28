@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.56 2007-01-07 12:31:46 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.57 2007-01-28 15:06:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,6 +45,7 @@ import lazybones.gui.TimerOptionsDialog;
 import lazybones.gui.TimerSelectionDialog;
 import lazybones.gui.TitleMapping;
 import lazybones.gui.VDRSettingsPanel;
+import lazybones.utils.Utilities;
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -75,7 +76,7 @@ public class LazyBones extends Plugin {
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(LazyBones.class);
 
-    private JDialog mainDialog;
+    private MainDialog mainDialog;
 
     private static Properties props;
     
@@ -96,10 +97,7 @@ public class LazyBones extends Plugin {
         buttonAction = new ButtonAction();
         buttonAction.setActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (mainDialog == null) {
-                    initMainDialog();
-                }
-                mainDialog.setVisible(true);
+                getMainDialog().setVisible(true);
             }
         });
 
@@ -614,14 +612,17 @@ public class LazyBones extends Plugin {
         return new PluginInfo(name, description, author, new Version(0, 4, false, "CVS-2006-09-12"));
     }
 
-    /**
-     * Called by loadSettings to initialize the GUI and other things
-     */
-    private void initMainDialog() {
-        mainDialog = new MainDialog(getParent(), LazyBones.getTranslation(
+    
+    public MainDialog getMainDialog() {
+        if(mainDialog == null) {
+            mainDialog = new MainDialog(getParent(), LazyBones.getTranslation(
                 "lazybones", "Lazy Bones"), false, this);
+        }
+        return mainDialog;
     }
 
+    
+    
     public devplugin.SettingsTab getSettingsTab() {
         return new VDRSettingsPanel(this);
     }
@@ -698,6 +699,10 @@ public class LazyBones extends Plugin {
 
         // update the plugin tree
         updateTree();
+        
+        // detect conflicts
+        ConflictFinder.getInstance().findConflicts();
+        ConflictFinder.getInstance().handleConflicts();
     }
     
     /**
