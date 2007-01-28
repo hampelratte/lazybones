@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.6 2007-01-28 15:11:34 hampelratte Exp $
+/* $Id: Timer.java,v 1.7 2007-01-28 17:04:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,7 +33,9 @@ package lazybones;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import lazybones.utils.Period;
 import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 public class Timer extends VDRTimer {
@@ -48,8 +50,7 @@ public class Timer extends VDRTimer {
     
     private ArrayList<String> tvBrowserProgIDs = new ArrayList<String>();
     
-    private Calendar conflictStartTime;
-    private Calendar conflictEndTime;
+    private List<Period> conflictPeriods = new ArrayList<Period>();
     
     public Timer() {}
     
@@ -121,25 +122,22 @@ public class Timer extends VDRTimer {
         return false;
     }
 
-    public Calendar getConflictEndTime() {
-        return conflictEndTime;
+    public List<Period> getConflictPeriods() {
+        return conflictPeriods;
     }
-
-    public void setConflictEndTime(Calendar conflictEndTime) {
-        this.conflictEndTime = conflictEndTime;
-        if(conflictEndTime != null && conflictEndTime.after(getEndTime())) {
-            this.conflictEndTime = (Calendar) getEndTime().clone();
+    
+    public void addConflictPeriod(Period period) {
+        if(period.getStartTime().before(getStartTime())) {
+            period.setStartTime((Calendar) getStartTime().clone());
         }
-    }
-
-    public Calendar getConflictStartTime() {
-        return conflictStartTime;
-    }
-
-    public void setConflictStartTime(Calendar conflictStartTime) {
-        this.conflictStartTime = conflictStartTime;
-        if(conflictStartTime != null && conflictStartTime.before(getStartTime())) {
-            this.conflictStartTime = (Calendar) getStartTime().clone();
+        if(period.getEndTime().after(getEndTime())) {
+            period.setEndTime((Calendar) getEndTime().clone());
         }
+        getConflictPeriods().add(period);
     }
+
+    /* not needed
+    public void setConflictPeriods(List<Period> conflictPeriods) {
+        this.conflictPeriods = conflictPeriods;
+    }*/
 }

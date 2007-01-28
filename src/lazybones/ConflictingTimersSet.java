@@ -1,4 +1,4 @@
-/* $Id: ConflictingTimersSet.java,v 1.1 2007-01-28 15:06:03 hampelratte Exp $
+/* $Id: ConflictingTimersSet.java,v 1.2 2007-01-28 17:04:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import lazybones.utils.Period;
+
 public class ConflictingTimersSet<E> extends HashSet<E> {
 
     private Calendar conflictStartTime;
@@ -51,7 +53,7 @@ public class ConflictingTimersSet<E> extends HashSet<E> {
 
     public void setConflictEndTime(Calendar conflictEndTime) {
         this.conflictEndTime = conflictEndTime;
-        updateTimersEndTime();
+        addConflictTimeToTimers();
     }
 
     public Calendar getConflictStartTime() {
@@ -60,20 +62,13 @@ public class ConflictingTimersSet<E> extends HashSet<E> {
 
     public void setConflictStartTime(Calendar conflictStartTime) {
         this.conflictStartTime = conflictStartTime;
-        updateTimersStartTime();
     }
     
-    private void updateTimersEndTime() {
+    private void addConflictTimeToTimers() {
         for (Iterator iter = this.iterator(); iter.hasNext();) {
             Timer timer = (Timer) iter.next();
-            timer.setConflictEndTime(conflictEndTime);
-        }
-    }
-    
-    private void updateTimersStartTime() {
-        for (Iterator iter = this.iterator(); iter.hasNext();) {
-            Timer timer = (Timer) iter.next();
-            timer.setConflictStartTime(conflictStartTime);
+            Period p = new Period(conflictStartTime, conflictEndTime);
+            timer.addConflictPeriod(p);
         }
     }
 }

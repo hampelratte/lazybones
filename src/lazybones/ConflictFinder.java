@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.3 2007-01-28 15:05:49 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.4 2007-01-28 17:04:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -65,8 +65,7 @@ public class ConflictFinder implements Observer {
         // reset timer conflict times
         for (Iterator iter = TimerManager.getInstance().getTimers().iterator(); iter.hasNext();) {
             Timer timer = (Timer) iter.next();
-            timer.setConflictStartTime(null);
-            timer.setConflictEndTime(null);
+            timer.getConflictPeriods().clear();
         }
     }
     
@@ -128,7 +127,7 @@ public class ConflictFinder implements Observer {
             Set conflicts = ConflictFinder.getInstance().getConflicts();
             for (Iterator iter = conflicts.iterator(); iter.hasNext();) {
                 logMsg.append("Conflict found: ");
-                ConflictingTimersSet<Timer> set = (ConflictingTimersSet<Timer>) iter.next();
+                ConflictingTimersSet set = (ConflictingTimersSet) iter.next();
                 for (Iterator iterator = set.iterator(); iterator.hasNext();) {
                     Timer timer = (Timer) iterator.next();
                     logMsg.append(timer.getTitle() + ", ");
@@ -140,7 +139,7 @@ public class ConflictFinder implements Observer {
             
             // set timeline date to the date of one conflict
             TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
-            ConflictingTimersSet<Timer> set = (ConflictingTimersSet<Timer>) conflicts.iterator().next();
+            ConflictingTimersSet set = (ConflictingTimersSet) conflicts.iterator().next();
             tp.setCalendar(set.getConflictStartTime());
         }
         
