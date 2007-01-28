@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.2 2007-01-26 22:43:42 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.3 2007-01-28 15:05:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,15 +32,18 @@ package lazybones;
 import java.text.DateFormat;
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
+import lazybones.gui.TimelinePanel;
+import lazybones.utils.StartStopEvent;
+import lazybones.utils.Utilities;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ConflictFinder implements Observer {
     private static ConflictFinder instance;    
-    private ArrayList conflicts = new ArrayList();
-    private ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
+    private HashSet<Set> conflicts = new HashSet<Set>();
     private HashMap<Integer, Integer> transponderUse = new HashMap<Integer,Integer>();
     private HashSet<Timer> runningEvents = new HashSet<Timer>();
-    private int conflictCount = 0;
     
     private ConflictFinder() {
         TimerManager.getInstance().addObserver(this);
@@ -54,30 +57,34 @@ public class ConflictFinder implements Observer {
         return instance;
     }
     
-    private void clear() {
+    private void reset() {
         conflicts.clear();
-        startStopEvents.clear();
         transponderUse.clear();
         runningEvents.clear();
-        conflictCount = 0;
+        
+        // reset timer conflict times
+        for (Iterator iter = TimerManager.getInstance().getTimers().iterator(); iter.hasNext();) {
+            Timer timer = (Timer) iter.next();
+            timer.setConflictStartTime(null);
+            timer.setConflictEndTime(null);
+        }
     }
     
-    private void findConflicts() {
+    @SuppressWarnings("unchecked")
+    public void findConflicts() {
+        Logger.getLogger().log("Looking for conflicts", Logger.OTHER, Logger.DEBUG);
+        
         // clear old data
-        clear();
+        reset();
        
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
+        Logger.getLogger().log("Number of cards: " + numberOfCards, Logger.OTHER, Logger.DEBUG);
         ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
-        
-        // fill startStopEvents // TODO repeating timers berücksichtigen
-        for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
-            Timer timer = iter.next();
-            startStopEvents.add(new StartStopEvent(timer, true));
-            startStopEvents.add(new StartStopEvent(timer, false));
-        }
-        Collections.sort(startStopEvents);
+        List<StartStopEvent> startStopEvents = Utilities.createStartStopEventList(timers); 
         
         // run over startStopEvents
+        boolean conflictFound = false;
+        ConflictingTimersSet<Timer> conflictingTimersSet = new ConflictingTimersSet<Timer>();
         for (Iterator<StartStopEvent> iter = startStopEvents.iterator(); iter.hasNext();) {
             StartStopEvent event = iter.next();
             Timer timer = event.getTimer();
@@ -85,18 +92,67 @@ public class ConflictFinder implements Observer {
                 increaseTransponderUse(timer);
                 runningEvents.add(timer);
                 if(transponderUse.size() > numberOfCards) {
-                    // TODO we have a conflict;
-                    conflictCount++;
+                    conflictFound = true;
+                    conflictingTimersSet.addAll(runningEvents);
+                    if(conflictingTimersSet.getConflictStartTime() == null) {
+                        conflictingTimersSet.setConflictStartTime(event.getEventTime());
+                    }
                 }
             } else {
                 decreaseTransponderUse(timer);
+                if(conflictFound && transponderUse.size() <= numberOfCards) {
+                    conflictFound = false;
+                    conflictingTimersSet.setConflictEndTime(event.getEventTime());
+                    conflicts.add(conflictingTimersSet);
+                    conflictingTimersSet = new ConflictingTimersSet<Timer>();
+                }
                 runningEvents.remove(timer);
             }
         }
     }
     
+    public void handleConflicts() {
+        Logger.getLogger().log("Handling conflicts", Logger.OTHER, Logger.DEBUG);
+        // check, if there are timer conflicts
+        if(getConflictCount() > 0) {
+            String msg = LazyBones.getTranslation("conflict_found", 
+                    LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!", 
+                    Integer.toString(ConflictFinder.getInstance().getConflictCount()));
+            JOptionPane.showMessageDialog(LazyBones.getInstance().getParent(), msg);
+            Logger.getLogger().log(msg, Logger.OTHER, Logger.INFO);
+            LazyBones.getInstance().getMainDialog().setVisible(true);
+            LazyBones.getInstance().getMainDialog().showTimeline();
+
+            // debug output
+            StringBuffer logMsg = new StringBuffer();
+            Set conflicts = ConflictFinder.getInstance().getConflicts();
+            for (Iterator iter = conflicts.iterator(); iter.hasNext();) {
+                logMsg.append("Conflict found: ");
+                ConflictingTimersSet<Timer> set = (ConflictingTimersSet<Timer>) iter.next();
+                for (Iterator iterator = set.iterator(); iterator.hasNext();) {
+                    Timer timer = (Timer) iterator.next();
+                    logMsg.append(timer.getTitle() + ", ");
+                }
+                logMsg.append(" Conflict start: " +  DateFormat.getDateTimeInstance().format(set.getConflictStartTime().getTime()));
+                logMsg.append(" Conflict end: " +  DateFormat.getDateTimeInstance().format(set.getConflictEndTime().getTime()));
+                Logger.getLogger().log(logMsg.toString(), Logger.OTHER, Logger.DEBUG);
+            }
+            
+            // set timeline date to the date of one conflict
+            TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
+            ConflictingTimersSet<Timer> set = (ConflictingTimersSet<Timer>) conflicts.iterator().next();
+            tp.setCalendar(set.getConflictStartTime());
+        }
+        
+        LazyBones.getInstance().getMainDialog().getTimelinePanel().repaint();
+    }
+
     public int getConflictCount() {
-        return conflictCount;
+        return conflicts.size();
+    }
+    
+    public Set<Set> getConflicts() {
+        return conflicts;
     }
     
     private void increaseTransponderUse(Timer timer) {
@@ -125,54 +181,5 @@ public class ConflictFinder implements Observer {
     
     public void update(Observable o, Object obj) {
         findConflicts();
-    }
-    
-    private class StartStopEvent implements Comparable<StartStopEvent> {
-        private Timer timer;
-
-        private boolean startEvent = true;
-
-        /**
-         * @param timer
-         * @param startEvent
-         */
-        public StartStopEvent(Timer timer, boolean startEvent) {
-            super();
-            this.timer = timer;
-            this.startEvent = startEvent;
-        }
-
-        public boolean isStartEvent() {
-            return startEvent;
-        }
-
-        public void setStartEvent(boolean startEvent) {
-            this.startEvent = startEvent;
-        }
-
-        public Timer getTimer() {
-            return timer;
-        }
-
-        public void setTimer(Timer timer) {
-            this.timer = timer;
-        }
-        
-        public Calendar getEventTime() {
-            return isStartEvent() ? timer.getStartTime() : timer.getEndTime();
-        }
-
-        public int compareTo(StartStopEvent o) {
-            return getEventTime().compareTo(o.getEventTime());
-        }
-        
-        public String toString() {
-            DateFormat df = DateFormat.getDateTimeInstance();
-            Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();
-            return (df.format(cal.getTime()) 
-                    + " Transponder:" + VDRChannelList.getInstance().getChannelByNumber(
-                            timer.getChannelNumber()).getFrequency()+ " " 
-                    + timer);
-        }
     }
 }
