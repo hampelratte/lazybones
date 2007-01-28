@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.4 2007-01-28 15:15:11 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.5 2007-01-28 17:03:55 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,6 +37,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.Locale;
 
 import javax.swing.BorderFactory;
@@ -47,6 +48,7 @@ import javax.swing.border.BevelBorder;
 
 import lazybones.ProgramManager;
 import lazybones.Timer;
+import lazybones.utils.Period;
 import lazybones.utils.Utilities;
 import devplugin.Channel;
 
@@ -113,9 +115,11 @@ public class TimelineElement extends JComponent implements MouseListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
+        // paint background
         g.setColor(COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
         
+        // paint text
         g.setColor(UIManager.getColor("Label.foreground"));
         g.setFont(new Font("SansSerif", Font.PLAIN, 9));
         g.drawString(timer.getTitle(), 5, 12);
@@ -123,14 +127,18 @@ public class TimelineElement extends JComponent implements MouseListener {
         String time = df.format(timer.getStartTime().getTime()) + " - " + df.format(timer.getEndTime().getTime());
         g.drawString(time, 5, 25);
         
-        if(timer.getConflictStartTime() != null && timer.getConflictEndTime() != null) {
-            long durationMinutes = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getEndTime());
-            double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
-            long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getConflictStartTime());
-            int x = (int)(pixelsPerMinute * startMinute);
-            int width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(timer.getConflictStartTime(), timer.getConflictEndTime()));
-            g.setColor(CONFLICT_COLOR);
-            g.fillRect(x, 0, width, getHeight()-1);
+        // paint conflicts
+        g.setColor(CONFLICT_COLOR);
+        if(timer.getConflictPeriods() != null && timer.getConflictPeriods().size() > 0) {
+            for (Iterator iter = timer.getConflictPeriods().iterator(); iter.hasNext();) {
+                Period period = (Period) iter.next();
+                long durationMinutes = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getEndTime());
+                double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
+                long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), period.getStartTime());
+                int x = (int)(pixelsPerMinute * startMinute);
+                int width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(period.getStartTime(), period.getEndTime()));
+                g.fillRect(x, 0, width, getHeight()-1);
+            }
         }
     }
 
