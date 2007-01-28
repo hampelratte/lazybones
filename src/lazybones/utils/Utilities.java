@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.4 2007-01-26 22:42:44 hampelratte Exp $
+/* $Id: Utilities.java,v 1.1 2007-01-28 15:04:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,14 +27,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.utils;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.JViewport;
+
+import lazybones.Timer;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -206,5 +212,21 @@ public class Utilities {
         return a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR) 
                 && a.get(Calendar.MONTH) == b.get(Calendar.MONTH)
                 && a.get(Calendar.YEAR) == b.get(Calendar.YEAR);
+    }
+
+    public static List<StartStopEvent> createStartStopEventList(List<Timer> timers) {
+        ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
+        for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
+            Timer timer = iter.next();
+            startStopEvents.add(new StartStopEvent(timer, true));
+            startStopEvents.add(new StartStopEvent(timer, false));
+        }
+        Collections.sort(startStopEvents);
+        return startStopEvents;
+    }
+    
+    public static long getDurationInMinutes(Calendar startTime, Calendar endTime) {
+        long durationMillis = endTime.getTimeInMillis() - startTime.getTimeInMillis();
+        return durationMillis / 1000 / 60;
     }
 }
