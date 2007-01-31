@@ -1,4 +1,4 @@
-/* $Id: VDRChannelList.java,v 1.2 2007-01-07 14:46:38 hampelratte Exp $
+/* $Id: VDRChannelList.java,v 1.3 2007-01-31 18:46:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,7 @@
  */
 package lazybones;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
 
 import de.hampelratte.svdrp.Response;
@@ -42,13 +42,9 @@ public class VDRChannelList {
 
     private static VDRChannelList instance;
 
-    private ArrayList<Channel> channels = null;
+    private List<Channel> channels = null;
 
-    private VDRChannelList() {
-        update();
-    }
-
-    private void update() {
+    public void update() {
         Response res = VDRConnection.send(new LSTC());
         if (res != null && res.getCode() == 250) {
             channels = ChannelParser.parse(res.getMessage());
@@ -62,10 +58,14 @@ public class VDRChannelList {
         return instance;
     }
     
-    public ArrayList<Channel> getChannels() {
+    public List<Channel> getChannels() {
         return channels;
     }
     
+    public void setChannels(List<Channel> channels) {
+        this.channels = channels;
+    }
+
     public Channel getChannelByNumber(int channelNumber) {
         if(channels == null) {
             return null;

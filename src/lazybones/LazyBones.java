@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.58 2007-01-31 17:33:59 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.59 2007-01-31 18:46:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -639,6 +639,9 @@ public class LazyBones extends Plugin {
             
             // load stored mappings
             TimerManager.getInstance().setTitleMapping((TitleMapping) in.readObject());
+            
+            // load stored channel list
+            VDRChannelList.getInstance().setChannels((List<Channel>)in.readObject());
         } catch (Exception e) {
             LOG.log("Couldn't read data", Logger.OTHER, Logger.ERROR);
             e.printStackTrace(System.out);
@@ -968,6 +971,7 @@ public class LazyBones extends Plugin {
             out.writeObject(ProgramManager.getChannelMapping());
             out.writeObject(TimerManager.getInstance().getTimers());
             out.writeObject(TimerManager.getInstance().getTitleMapping());
+            out.writeObject(VDRChannelList.getInstance().getChannels());
         } catch (IOException e) {
             e.printStackTrace(System.out);
         }
@@ -1073,6 +1077,12 @@ public class LazyBones extends Plugin {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {}
+                
+                // upload channel list from vdr
+                LOG.log("Updating channel list", Logger.OTHER, Logger.DEBUG);
+                VDRChannelList.getInstance().update();
+                
+                // get all timers from vdr
                 getTimersFromVDR();
             }
         };
