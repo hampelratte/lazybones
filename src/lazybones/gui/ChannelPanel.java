@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.11 2007-02-01 19:07:59 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.12 2007-02-01 19:30:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -159,6 +159,7 @@ public class ChannelPanel implements ActionListener {
 
     private void refreshChannelList() {
         try {
+            VDRChannelList.getInstance().update();
             List<Channel> vdrchans = VDRChannelList.getInstance().getChannels();
             if (vdrchans != null) {
                 // add vdrchannels
