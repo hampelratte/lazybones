@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.4 2006-12-10 14:25:17 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.5 2007-02-01 19:30:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -108,6 +108,7 @@ public class PreviewPanel extends JLabel {
                         LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
                         setFont(new Font("SansSerif", Font.PLAIN, 24));
                         setText("  " + LazyBones.getTranslation("no_preview","Couldn't load screenshot."));
+                        setIcon(null);
                         stopGrabbing();
                     }
                 } catch (InterruptedException e) {
