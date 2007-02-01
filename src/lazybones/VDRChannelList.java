@@ -1,4 +1,4 @@
-/* $Id: VDRChannelList.java,v 1.3 2007-01-31 18:46:52 hampelratte Exp $
+/* $Id: VDRChannelList.java,v 1.4 2007-02-01 19:07:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,6 @@ import de.hampelratte.svdrp.commands.LSTC;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 import de.hampelratte.svdrp.util.ChannelParser;
 
-// TODO überall benutzen
 public class VDRChannelList {
 
     private static VDRChannelList instance;

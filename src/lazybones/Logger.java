@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.5 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: Logger.java,v 1.6 2007-02-01 19:07:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -75,6 +75,8 @@ public class Logger {
     }
 
     public void log(final Object o, final int type, final LoggingLevel level) {
+        
+        if(o == null) return;
         
         switch (type) {
         case WAKE_ON_LAN:

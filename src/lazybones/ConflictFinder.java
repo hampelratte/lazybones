@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.4 2007-01-28 17:04:19 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.5 2007-02-01 19:07:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -156,7 +156,7 @@ public class ConflictFinder implements Observer {
     
     private void increaseTransponderUse(Timer timer) {
         Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
-        if(transponderUse.containsKey(chan.getFrequency())) {
+        if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
             int count = transponderUse.get(chan.getFrequency());
             count++;
             transponderUse.put(chan.getFrequency(), count);

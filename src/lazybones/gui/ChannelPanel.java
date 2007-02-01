@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.10 2007-01-28 15:14:26 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.11 2007-02-01 19:07:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -47,13 +48,10 @@ import javax.swing.table.DefaultTableModel;
 
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
-import lazybones.VDRConnection;
+import lazybones.VDRChannelList;
 import lazybones.utils.Utilities;
 import tvbrowser.core.ChannelList;
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.commands.LSTC;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
-import de.hampelratte.svdrp.util.ChannelParser;
 
 public class ChannelPanel implements ActionListener {
     private DefaultTableModel model;
@@ -161,16 +159,13 @@ public class ChannelPanel implements ActionListener {
 
     private void refreshChannelList() {
         try {
-            Response res = VDRConnection.send(new LSTC());
-            if (res != null & res.getCode() == 250) {
-                ArrayList<Channel> vdrchans = ChannelParser.parse(res.getMessage());
-
+            List<Channel> vdrchans = VDRChannelList.getInstance().getChannels();
+            if (vdrchans != null) {
                 // add vdrchannels
-                int max = model.getRowCount() -1;
                 int count = 0;
                 for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
                     Channel chan = iter.next();
-                    if(count <= max) {
+                    if(count < model.getRowCount()) {
                         if(model.getValueAt(count, 1) != null) {
                             model.addRow(new Object[] { null, chan });
                         } else {

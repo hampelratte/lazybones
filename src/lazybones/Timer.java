@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.7 2007-01-28 17:04:19 hampelratte Exp $
+/* $Id: Timer.java,v 1.8 2007-02-01 19:07:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-// TODO timer kann mehrere conflicts enthalten -> conflictTimes als liste halten
 package lazybones;
 
 import java.util.ArrayList;
