@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.59 2007-01-31 18:46:52 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.60 2007-02-07 18:50:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -376,7 +376,7 @@ public class LazyBones extends Plugin {
         }
         if (dontCare || result == JOptionPane.OK_OPTION) {
             Timer newTimer = new Timer();
-            newTimer.setActive(true);
+            newTimer.setState(VDRTimer.ACTIVE);
             newTimer.setChannelNumber(channelID);
             int prio = Integer.parseInt(getProperties().getProperty("timer.prio"));
             int lifetime = Integer.parseInt(getProperties().getProperty("timer.lifetime"));
