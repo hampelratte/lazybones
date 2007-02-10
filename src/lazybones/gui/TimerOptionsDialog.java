@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.9 2007-01-07 12:55:36 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.10 2007-02-10 15:09:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,6 +47,7 @@ import lazybones.Timer;
 import lazybones.VDRChannelList;
 import tvbrowser.core.ChannelList;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
+import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
@@ -108,6 +109,14 @@ public class TimerOptionsDialog implements ActionListener,
     private Timer timer;
     
     private Program prog;
+    
+    private JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
+    
+    private JCheckBox cbActive = new JCheckBox();
+    
+    private JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
+    
+    private JCheckBox cbVps = new JCheckBox();
 
     private boolean update = false;
     
@@ -138,34 +147,42 @@ public class TimerOptionsDialog implements ActionListener,
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        panel.add(lActive, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(lVps, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         panel.add(lTitle, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 3;
         panel.add(lChannels, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 4;
         panel.add(lDay, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 5;
         panel.add(lStarttime, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 6;
         panel.add(lEndtime, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 7;
         panel.add(lPriority, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 8;
         panel.add(lLifetime, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 3;
         panel.add(channels, gbc);
         devplugin.Channel[] c = ChannelList.getSubscribedChannels();
         for (int i = 0; i < c.length; i++) {
@@ -188,11 +205,11 @@ public class TimerOptionsDialog implements ActionListener,
         }
 
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 9;
         panel.add(lDescription, gbc);
         
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 10;
         gbc.gridwidth = 2;
         gbc.weighty = 1.0;
         description.setRows(10);
@@ -208,7 +225,7 @@ public class TimerOptionsDialog implements ActionListener,
         panel.add(new JScrollPane(description), gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = 11;
         gbc.gridwidth = 1;
         gbc.weighty = 0.1;
         panel.add(cancel, gbc);
@@ -217,17 +234,27 @@ public class TimerOptionsDialog implements ActionListener,
 
         gbc.gridx = 1;
         gbc.gridy = 0;
+        panel.add(cbActive, gbc);
+        cbActive.setSelected(timer.isActive());
+        
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        panel.add(cbVps, gbc);
+        cbVps.setSelected(timer.getState() == VDRTimer.VPS);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         panel.add(title, gbc);
         title.setText(timer.getFile());
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 4;
         panel.add(day, gbc);
         day.setText(timer.getDayString());
         day.setEditable(false);
 
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 5;
         panel.add(starttime, gbc);
         SpinnerTimeModel model = new SpinnerTimeModel();
         int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);
@@ -236,7 +263,7 @@ public class TimerOptionsDialog implements ActionListener,
         starttime.setModel(model);
 
         gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 6;
         panel.add(endtime, gbc);
         model = new SpinnerTimeModel();
         hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
@@ -245,17 +272,17 @@ public class TimerOptionsDialog implements ActionListener,
         endtime.setModel(model);
 
         gbc.gridx = 1;
-        gbc.gridy = 5;
+        gbc.gridy = 7;
         panel.add(priority, gbc);
         priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
 
         gbc.gridx = 1;
-        gbc.gridy = 6;
+        gbc.gridy = 8;
         panel.add(lifetime, gbc);
         lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
         
         gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridy = 9;
         panel.add(comboDesc, gbc);
         comboDesc.addItem("VDR");
         comboDesc.addItem("TV-Browser");
@@ -263,7 +290,7 @@ public class TimerOptionsDialog implements ActionListener,
         comboDesc.setEnabled(!update);
 
         gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridy = 11;
         panel.add(ok, gbc);
 
         ok.setText(LazyBones.getTranslation("ok", "OK"));
@@ -308,6 +335,9 @@ public class TimerOptionsDialog implements ActionListener,
             timer.setPriority(((Integer) priority.getValue()).intValue());
             timer.setLifetime(((Integer) lifetime.getValue()).intValue());
             timer.setDescription(description.getText());
+            int state = cbActive.isSelected() ? (cbVps.isSelected() ? VDRTimer.VPS : VDRTimer.ACTIVE) : VDRTimer.INACTIVE;
+            timer.setState(state);
+            System.out.println(timer.toNEWT());
             dialog.dispose();
             control.createTimerCallBack(timer, prog, update);
         } else if (e.getSource() == cancel) {
