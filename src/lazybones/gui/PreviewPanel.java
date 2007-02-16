@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.5 2007-02-01 19:30:59 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.6 2007-02-16 22:20:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -104,9 +104,11 @@ public class PreviewPanel extends JLabel {
                     }
                     if (image != null) {
                         setIcon(image);
+                        setText("");
                     } else {
                         LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
                         setFont(new Font("SansSerif", Font.PLAIN, 24));
+                        // TODO bessere ausgabe je nach fehler
                         setText("  " + LazyBones.getTranslation("no_preview","Couldn't load screenshot."));
                         setIcon(null);
                         stopGrabbing();
@@ -140,8 +142,7 @@ public class PreviewPanel extends JLabel {
                     preview = new ImageIcon(bos.toByteArray());
                 }
             } catch (Exception e) {
-                //System.out.println("Couldn't grab image:");
-                //e.printStackTrace();
+                LOG.log("Couldn't grab image: " + e, Logger.OTHER, Logger.DEBUG);
             }
             return preview;
         }

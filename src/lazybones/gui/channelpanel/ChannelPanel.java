@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.12 2007-02-01 19:30:40 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.1 2007-02-16 22:20:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.channelpanel;
 
 import info.clearthought.layout.TableLayout;
 
@@ -40,15 +40,14 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.VDRChannelList;
+import lazybones.gui.channelpanel.dnd.ChannelListTransferHandler;
+import lazybones.gui.channelpanel.dnd.ChannelTableTransferHandler;
 import lazybones.utils.Utilities;
 import tvbrowser.core.ChannelList;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
@@ -67,6 +66,8 @@ public class ChannelPanel implements ActionListener {
     private JButton sort = new JButton(LazyBones.getTranslation("sort_channels", "Sort"));
     
     private JScrollPane scrollpane;
+    
+    private JList list = new JList();
 
     private LazyBones lazyBones;
 
@@ -81,8 +82,6 @@ public class ChannelPanel implements ActionListener {
 
         Object[] headers = { "TV-Browser", "VDR" };
         model = new DefaultTableModel(new Object[][] {}, headers) {
-            private static final long serialVersionUID = 1366598326846158204L;
-
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
@@ -96,6 +95,22 @@ public class ChannelPanel implements ActionListener {
         table.setModel(model);
         table.setDefaultRenderer(Object.class, new ChannelCellRenderer());
         table.getTableHeader().setReorderingAllowed(false);
+        table.setShowHorizontalLines(false);
+        table.setRowHeight(23);
+        
+        // drag and drop for table
+        table.setDragEnabled(true);
+        table.setTransferHandler(new ChannelTableTransferHandler());
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        // drag and drop for list
+        list.setModel(new DefaultListModel());
+        list.setCellRenderer(new ChannelListCellrenderer());
+        list.setDragEnabled(true);
+        list.setTransferHandler(new ChannelListTransferHandler());
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        
         scrollpane = new JScrollPane(table);
         refresh.addActionListener(this);
         sort.addActionListener(this);
@@ -105,7 +120,7 @@ public class ChannelPanel implements ActionListener {
 
     public JPanel getPanel() {
         final double P = TableLayout.PREFERRED;
-        double[][] size = {{0, P, P, TableLayout.FILL, P, P, 0}, //cols
+        double[][] size = {{0, P, P, TableLayout.FILL, P, P, P, 0}, //cols
                            {0, P, TableLayout.FILL, P, 0}}; // rows
         
         TableLayout layout = new TableLayout(size);
@@ -114,6 +129,7 @@ public class ChannelPanel implements ActionListener {
 		
         JPanel panel = new JPanel(layout);
         panel.add(scrollpane, "1,1,5,2");
+        panel.add(new JScrollPane(list), "6,1,1,2");
         panel.add(refresh,    "1,3,1,3");
         panel.add(sort,       "2,3,2,3");
         panel.add(up,         "4,3,4,3");
@@ -151,36 +167,44 @@ public class ChannelPanel implements ActionListener {
             }
             restoreSelection(indices);
             if (!Utilities.isCellVisible(table, indices[indices.length - 1], 1)) {
-                Utilities
-                        .scrollToVisible(table, indices[indices.length - 1], 1);
+                Utilities.scrollToVisible(table, indices[indices.length - 1], 1);
             }
         }
     }
 
     private void refreshChannelList() {
         try {
+            DefaultListModel model = (DefaultListModel) list.getModel();
+            model.clear();
             VDRChannelList.getInstance().update();
             List<Channel> vdrchans = VDRChannelList.getInstance().getChannels();
             if (vdrchans != null) {
-                // add vdrchannels
-                int count = 0;
+                // add vdrchannels to channel list
                 for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
                     Channel chan = iter.next();
-                    if(count < model.getRowCount()) {
-                        if(model.getValueAt(count, 1) != null) {
-                            model.addRow(new Object[] { null, chan });
-                        } else {
-                            model.setValueAt(chan, count, 1);
-                        }
-                    } else { 
-                        model.addRow(new Object[] { null, chan });
+                    int index = getChannelIndex(chan);
+                    if(index == -1) {
+                        model.addElement(chan);
                     }
-                    count++;
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    private int getChannelIndex(Channel chan) {
+        for(int i = 0; i<model.getRowCount(); i++) {
+            Object o = model.getValueAt(i, 1);
+            if(o != null && o instanceof Channel) {
+                Channel c = (Channel) o;
+                if(c.equals(chan)) {
+                    return i;
+                }
+            }
+        }
+        
+        return -1;
     }
 
     private void restoreSelection(int[] indices) {

@@ -1,4 +1,4 @@
-/* $Id: ChannelCellRenderer.java,v 1.2 2006-10-19 20:01:16 hampelratte Exp $
+/* $Id: ChannelCellRenderer.java,v 1.1 2007-02-16 22:20:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,49 +27,62 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.channelpanel;
 
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import tvbrowser.ui.programtable.ChannelLabel;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ChannelCellRenderer extends DefaultTableCellRenderer {
 
-    private static final long serialVersionUID = -1450755081437236476L;
-
-    private Color unselectedForeground;
-
-    private Color unselectedBackground;
+    private Color uneven = new Color(240,240,240);
 
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
         if (column == 0) {
-            super
-                    .setForeground((unselectedForeground != null) ? unselectedForeground
-                            : table.getForeground());
-            super
-                    .setBackground((unselectedBackground != null) ? unselectedBackground
-                            : table.getBackground());
-
-            setFont(table.getFont());
-            setBorder(noFocusBorder);
-            setValue(value);
+            if( !(value instanceof devplugin.Channel) ) {
+                return null;
+            }
+            
+            ChannelLabel channelLabel = new ChannelLabel((devplugin.Channel) value);
+            channelLabel.setFont(table.getFont());
+            channelLabel.setBorder(noFocusBorder);
+            channelLabel.setHorizontalAlignment(JLabel.LEFT);
+            channelLabel.setOpaque(true);
+            
+            // set colors
+            if (isSelected) {
+                channelLabel.setForeground(table.getSelectionForeground());
+                channelLabel.setBackground(table.getSelectionBackground());
+            } else {
+                if( (row & 1) == 0 ) { // even lines
+                    channelLabel.setBackground(table.getBackground());
+                    channelLabel.setForeground(table.getForeground());
+                } else { // uneven lines
+                    channelLabel.setBackground(uneven);
+                    channelLabel.setForeground(table.getForeground());
+                }
+            }
+            return channelLabel;
         } else {
             if (isSelected) {
                 super.setForeground(table.getSelectionForeground());
                 super.setBackground(table.getSelectionBackground());
             } else {
-                super
-                        .setForeground((unselectedForeground != null) ? unselectedForeground
-                                : table.getForeground());
-                super
-                        .setBackground((unselectedBackground != null) ? unselectedBackground
-                                : table.getBackground());
+                if( (row & 1) == 0 ) { // even lines
+                    super.setForeground(table.getForeground());
+                    super.setBackground(table.getBackground());
+                } else { // uneven lines
+                    super.setForeground(table.getForeground());
+                    super.setBackground(uneven);
+                }
             }
 
             setFont(table.getFont());
