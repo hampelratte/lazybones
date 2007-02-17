@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.2 2007-02-17 21:19:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -58,7 +58,7 @@ import lazybones.utils.Utilities;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ChannelPanel implements ActionListener {
-    private DefaultTableModel model;
+    private DefaultTableModel tableModel;
 
     private ChannelTable table = new ChannelTable();
 
@@ -86,7 +86,7 @@ public class ChannelPanel implements ActionListener {
         down.setIcon(lazyBones.getIcon("lazybones/go-down16.png"));
 
         Object[] headers = { "TV-Browser", "VDR" };
-        model = new DefaultTableModel(new Object[][] {}, headers) {
+        tableModel = new DefaultTableModel(new Object[][] {}, headers) {
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
@@ -95,9 +95,9 @@ public class ChannelPanel implements ActionListener {
         Hashtable channelMapping = ProgramManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
-            model.addRow(row);
+            tableModel.addRow(row);
         }
-        table.setModel(model);
+        table.setModel(tableModel);
         table.setDefaultRenderer(Object.class, new ChannelCellRenderer());
         table.getTableHeader().setReorderingAllowed(false);
         table.setShowHorizontalLines(false);
@@ -144,7 +144,11 @@ public class ChannelPanel implements ActionListener {
         if (e.getSource() == refresh) {
             refreshChannelList();
         } else if (e.getSource() == sort) {
-            trySort();
+            try {
+                tryToAssignChannels();
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
         } else if (e.getSource() == up) {
             int[] indices = table.getSelectedRows();
             Arrays.sort(indices);
@@ -161,7 +165,7 @@ public class ChannelPanel implements ActionListener {
         } else if (e.getSource() == down) {
             int[] indices = table.getSelectedRows();
             Arrays.sort(indices);
-            if (indices[indices.length - 1] < model.getRowCount() - 1) {
+            if (indices[indices.length - 1] < tableModel.getRowCount() - 1) {
                 for (int i = indices.length - 1; i >= 0; i--) {
                     moveDown(indices[i]);
                     indices[i]++;
@@ -196,8 +200,8 @@ public class ChannelPanel implements ActionListener {
     }
     
     private int getChannelIndex(Channel chan) {
-        for(int i = 0; i<model.getRowCount(); i++) {
-            Object o = model.getValueAt(i, 1);
+        for(int i = 0; i<tableModel.getRowCount(); i++) {
+            Object o = tableModel.getValueAt(i, 1);
             if(o != null && o instanceof Channel) {
                 Channel c = (Channel) o;
                 if(c.equals(chan)) {
@@ -218,10 +222,10 @@ public class ChannelPanel implements ActionListener {
     }
 
     private void swapCells(int col, int from, int to) {
-        Object objTo = model.getValueAt(to, col);
-        Object objFrom = model.getValueAt(from, col);
-        model.setValueAt(objFrom, to, col);
-        model.setValueAt(objTo, from, col);
+        Object objTo = tableModel.getValueAt(to, col);
+        Object objFrom = tableModel.getValueAt(from, col);
+        tableModel.setValueAt(objFrom, to, col);
+        tableModel.setValueAt(objTo, from, col);
     }
 
     private void moveUp(int i) {
@@ -234,12 +238,12 @@ public class ChannelPanel implements ActionListener {
 
     public void saveSettings() {
         Hashtable<String,Channel> channelMapping = new Hashtable<String,Channel>();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            devplugin.Channel c = (devplugin.Channel) model.getValueAt(i, 0);
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            devplugin.Channel c = (devplugin.Channel) tableModel.getValueAt(i, 0);
 
             if (c != null) {
                 String id = c.getId();
-                Object o = model.getValueAt(i, 1);
+                Object o = tableModel.getValueAt(i, 1);
                 if (o != null) {
                     Channel vdrc = (Channel) o;
                     channelMapping.put(id, vdrc);
@@ -250,38 +254,34 @@ public class ChannelPanel implements ActionListener {
     }
     
     @SuppressWarnings("unchecked")
-    public void trySort() {
-        for (int i = 0; i < model.getRowCount(); i++) {
+    public void tryToAssignChannels() {
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
             ArrayList<Container> list = new ArrayList<Container>();
-            Object tvbc = model.getValueAt(i,0);
+            Object tvbc = tableModel.getValueAt(i,0);
             if(tvbc == null) {
                 continue;
             }
             String tvbChan = ((devplugin.Channel)tvbc).getName();
             tvbChan = tvbChan.toLowerCase();
             
-            for (int j = 0; j < model.getRowCount(); j++) {
-                Object o = model.getValueAt(j,1);
-                if(o == null) {
-                    swapCells(1, j, model.getRowCount()-1);
-                    System.out.println("schiebe leere zelle nach unten");
-                    continue;
-                }
-                String vdrChan = ((Channel)o).getName();
+            DefaultListModel listModel = (DefaultListModel) this.list.getModel();
+            for (int j = 0; j < listModel.getSize(); j++) {
+                Object o = listModel.getElementAt(j);
+                Channel chan = (Channel) o;
+                String vdrChan = chan.getName();
                 vdrChan = vdrChan.toLowerCase();
-                int pos = vdrChan.indexOf(" ");
-                if(pos > 0) {
-                    vdrChan = vdrChan.substring(0, pos);
-                }
+                vdrChan = vdrChan.split("\\s|-")[0];
                 int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
-                list.add(new Container(percent, j));
+                list.add(new Container(percent, i, chan));
             }
             
             Collections.sort(list);
             Container c = list.get(list.size()-1);
             int index = c.getIndex();
-            if (index != i && i < model.getRowCount()) {
-                swapCells(1, i, index);
+            Object o = tableModel.getValueAt(index, 1);
+            if( o == null || "".equals(o.toString()) ) {
+                tableModel.setValueAt(c.getChannel(), index, 1);
+                listModel.removeElement(c.getChannel());
             }
         }
     }
@@ -289,10 +289,12 @@ public class ChannelPanel implements ActionListener {
     private class Container implements Comparable {
         private int percent;
         private int index;
+        private Channel channel;
         
-        Container(int _percent, int _index) {
-            percent = _percent;
-            index = _index;
+        Container(int percent, int index, Channel channel) {
+            this.percent = percent;
+            this.index = index;
+            this.channel = channel;
         }
 
         public int compareTo(Object o) {
@@ -318,7 +320,15 @@ public class ChannelPanel implements ActionListener {
         }
         
         public String toString() {
-            return percent+"% "+index;
+            return percent+"% "+index + " " + channel.toString();
+        }
+
+        public Channel getChannel() {
+            return channel;
+        }
+
+        public void setChannel(Channel channel) {
+            this.channel = channel;
         }
     }
 
