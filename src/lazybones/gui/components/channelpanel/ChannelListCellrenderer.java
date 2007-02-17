@@ -1,4 +1,4 @@
-/* $Id: ChannelTransferHandler.java,v 1.1 2007-02-16 22:20:25 hampelratte Exp $
+/* $Id: ChannelListCellrenderer.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,56 +27,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.channelpanel.dnd;
+package lazybones.gui.components.channelpanel;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
+import java.awt.Component;
 
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
 
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
-public abstract class ChannelTransferHandler extends TransferHandler {
-    
-    protected abstract Channel exportChannel(JComponent c);
-    protected abstract void importChannel(JComponent c, Channel chan);
-    protected abstract void cleanup(JComponent c, boolean remove);
-    
-    protected Transferable createTransferable(JComponent c) {
-        return exportChannel(c);
-    }
-    
-    public int getSourceActions(JComponent c) {
-        return COPY_OR_MOVE;
-    }
-    
-    public boolean importData(JComponent c, Transferable t) {
-        if (canImport(c, t.getTransferDataFlavors())) {
-            try {
-                Channel chan = (Channel)t.getTransferData(new DataFlavor(Channel.class, "VDR Channel"));
-                importChannel(c, chan);
-                return true;
-            } catch (UnsupportedFlavorException ufe) {
-            } catch (IOException ioe) {
-            }
-        }
+public class ChannelListCellrenderer extends DefaultListCellRenderer {
 
-        return false;
-    }
-    
-    protected void exportDone(JComponent c, Transferable data, int action) {
-        cleanup(c, action == MOVE);
-    }
-    
-    public boolean canImport(JComponent c, DataFlavor[] flavors) {
-        for (int i = 0; i < flavors.length; i++) {
-            if (new DataFlavor(Channel.class , "VDR Channel").equals(flavors[i])) {
-                return true;
-            }
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        if(value instanceof Channel) {
+            Channel chan = (Channel) value;
+            return super.getListCellRendererComponent(list, chan.getName(), index, isSelected, cellHasFocus);
+        } else {
+            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }
-        return false;
     }
+
 }

@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.4 2007-02-16 22:20:25 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.5 2007-02-17 14:29:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import lazybones.LazyBones;
-import lazybones.gui.channelpanel.ChannelPanel;
+import lazybones.gui.components.channelpanel.ChannelPanel;
 import util.ui.ImageUtilities;
 
 /**

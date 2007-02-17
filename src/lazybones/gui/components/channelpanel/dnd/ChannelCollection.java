@@ -1,4 +1,4 @@
-/* $Id: ChannelListTransferHandler.java,v 1.1 2007-02-16 22:20:25 hampelratte Exp $
+/* $Id: ChannelCollection.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,43 +27,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.channelpanel.dnd;
+package lazybones.gui.components.channelpanel.dnd;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JList;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import de.hampelratte.svdrp.responses.highlevel.Channel;
+public class ChannelCollection<Channel> extends ArrayList implements Transferable {
 
-public class ChannelListTransferHandler extends ChannelTransferHandler {
-
-    @Override
-    protected void cleanup(JComponent c, boolean remove) {
-        if(remove) {
-            JList list = (JList) c;
-            DefaultListModel model = (DefaultListModel) list.getModel();
-            int index = list.getSelectedIndex();
-            model.remove(index);
+    public static final DataFlavor FLAVOR = new DataFlavor(ChannelCollection.class, "VDR Channels");
+    
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        if(flavor.equals(FLAVOR)) {
+            return this;
         }
+        return null;
     }
 
-    @Override
-    protected Channel exportChannel(JComponent c) {
-        JList list = (JList) c;
-        Channel chan = (Channel) list.getSelectedValue();
-        return chan;
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[] {FLAVOR};
     }
 
-    @Override
-    protected void importChannel(JComponent c, Channel chan) {
-        JList list = (JList) c;
-        int row = list.getSelectedIndex();
-        DefaultListModel model = (DefaultListModel) list.getModel();
-        if(row >= 0) {
-            model.add(row, chan);
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        if(flavor.equals(FLAVOR)) {
+            return true;
         } else {
-            model.addElement(chan);
+            return false;
         }
-        list.repaint();
     }
 }

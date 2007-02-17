@@ -1,4 +1,4 @@
-/* $Id: ChannelCellRenderer.java,v 1.1 2007-02-16 22:20:25 hampelratte Exp $
+/* $Id: ChannelCellRenderer.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.channelpanel;
+package lazybones.gui.components.channelpanel;
 
 import java.awt.Color;
 import java.awt.Component;

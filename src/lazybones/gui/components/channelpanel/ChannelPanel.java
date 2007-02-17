@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.1 2007-02-16 22:20:25 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,10 +27,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.channelpanel;
+package lazybones.gui.components.channelpanel;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -40,22 +41,26 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.VDRChannelList;
-import lazybones.gui.channelpanel.dnd.ChannelListTransferHandler;
-import lazybones.gui.channelpanel.dnd.ChannelTableTransferHandler;
+import lazybones.gui.components.channelpanel.dnd.ChannelList;
+import lazybones.gui.components.channelpanel.dnd.ChannelListDropTargetListener;
+import lazybones.gui.components.channelpanel.dnd.ChannelTable;
+import lazybones.gui.components.channelpanel.dnd.ChannelTableDropTargetListener;
 import lazybones.utils.Utilities;
-import tvbrowser.core.ChannelList;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ChannelPanel implements ActionListener {
     private DefaultTableModel model;
 
-    private JTable table = new JTable();
+    private ChannelTable table = new ChannelTable();
 
     private JButton up = new JButton();
 
@@ -67,7 +72,7 @@ public class ChannelPanel implements ActionListener {
     
     private JScrollPane scrollpane;
     
-    private JList list = new JList();
+    private ChannelList list = new ChannelList();
 
     private LazyBones lazyBones;
 
@@ -86,7 +91,7 @@ public class ChannelPanel implements ActionListener {
                 return false;
             }
         };
-        devplugin.Channel[] c = ChannelList.getSubscribedChannels();
+        devplugin.Channel[] c = tvbrowser.core.ChannelList.getSubscribedChannels();
         Hashtable channelMapping = ProgramManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
@@ -99,16 +104,13 @@ public class ChannelPanel implements ActionListener {
         table.setRowHeight(23);
         
         // drag and drop for table
-        table.setDragEnabled(true);
-        table.setTransferHandler(new ChannelTableTransferHandler());
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        new DropTarget(table, new ChannelTableDropTargetListener(table));
+        
+        list.setCellRenderer(new ChannelListCellrenderer());
+        list.setModel(new DefaultListModel());
         
         // drag and drop for list
-        list.setModel(new DefaultListModel());
-        list.setCellRenderer(new ChannelListCellrenderer());
-        list.setDragEnabled(true);
-        list.setTransferHandler(new ChannelListTransferHandler());
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        new DropTarget(list, new ChannelListDropTargetListener(list));
         
         
         scrollpane = new JScrollPane(table);
