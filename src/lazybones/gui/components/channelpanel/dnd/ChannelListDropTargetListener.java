@@ -1,4 +1,4 @@
-/* $Id: ChannelListDropTargetListener.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
+/* $Id: ChannelListDropTargetListener.java,v 1.2 2007-03-03 17:51:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,12 +29,14 @@
  */
 package lazybones.gui.components.channelpanel.dnd;
 
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.util.Collections;
 import java.util.Iterator;
 
 import javax.swing.DefaultListModel;
@@ -73,6 +75,8 @@ public class ChannelListDropTargetListener implements DropTargetListener {
     public void drop(DropTargetDropEvent e) {
         e.acceptDrop(e.getDropAction());
         Transferable tr = e.getTransferable();
+        Point location = e.getLocation();
+        int row = list.locationToIndex(location);
         
         DataFlavor[] flavors = tr.getTransferDataFlavors();
         for (int i = 0; i < flavors.length; i++) {
@@ -86,12 +90,14 @@ public class ChannelListDropTargetListener implements DropTargetListener {
                     e1.printStackTrace();
                     return;
                 }
+                Collections.reverse(list);
                 for (Iterator iter = list.iterator(); iter.hasNext();) {
                     Channel chan = (Channel) iter.next();
-                    model.addElement(chan);
+                    model.add(row, chan);
                 }
             }
         }
+        e.dropComplete(true);
     }
 
     public void dropActionChanged(DropTargetDragEvent dtde) {

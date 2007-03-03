@@ -1,4 +1,4 @@
-/* $Id: ChannelList.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
+/* $Id: ChannelList.java,v 1.2 2007-03-03 17:51:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,10 +29,14 @@
  */
 package lazybones.gui.components.channelpanel.dnd;
 
+import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
+import java.util.Iterator;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+
+import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ChannelList extends JList {
     private ChannelCollection list;
@@ -65,17 +69,32 @@ public class ChannelList extends JList {
                 // initial cursor, transferrable, dsource listener
                 dge.startDrag(DragSource.DefaultMoveDrop, list, dragSourceListener);
             } catch (InvalidDnDOperationException idoe) {
-                System.err.println(idoe);
+                idoe.printStackTrace();
             }
         }
     }
     
     class ChannelListDragSourceListener implements DragSourceListener {
-
         public void dragDropEnd(DragSourceDropEvent e) {
-            DefaultListModel model = (DefaultListModel) getModel();
-            for (int i = indices.length-1; i >= 0; i--) {
-                model.removeElementAt(indices[i]);
+            if(e.getDropSuccess()) {
+                Transferable tr = e.getDragSourceContext().getTransferable();
+                int row = locationToIndex(e.getLocation());
+                try {
+                    ChannelCollection cc = (ChannelCollection) tr.getTransferData(ChannelCollection.FLAVOR); 
+                    DefaultListModel model = (DefaultListModel) getModel();
+                    for (Iterator iter = cc.iterator(); iter.hasNext();) {
+                        Channel chan = (Channel) iter.next();
+                        for (int i = 0; i < model.getSize(); i++) {
+                            Channel c = (Channel) model.getElementAt(i);
+                            if(chan == c && i != row) {
+                                model.remove(i);
+                                continue;
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
