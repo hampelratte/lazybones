@@ -10,12 +10,15 @@
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />
 	<property name="build.dir" value="build" />
+	<property name="license.dir" value="licenses" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="res.dir" value="res" />
 	<property name="doc.dir" value="${res.dir}/docs"/>
 	<property name="jar.file" value="${tvbrowser.runtime.dir}/plugins/LazyBones.jar"/>
 	<property name="nacho" value="nachocalendar-0.22.jar" />
 	<property name="tableLayout" value="TableLayout.jar" />
+	<property name="xstream" value="xstream-1.2.1.jar" />
+	<property name="xpp3" value="xpp3_min-1.1.3.4.O.jar" />
 	<property name="svdrp.src.dir" value="svdrp4j/src" />
 
 
@@ -30,6 +33,8 @@
 				<pathelement location="${classes.dir}" />
 				<pathelement location="${lib.dir}/${nacho}" />
 				<pathelement location="${lib.dir}/${tableLayout}" />
+				<pathelement location="${lib.dir}/${xstream}" />
+				<pathelement location="${lib.dir}/${xpp3}" />
 			</classpath>
 		</javac>
 	</target>
@@ -38,10 +43,15 @@
 		<mkdir dir="${classes.dir}/lazybones" />
 		<unjar src="${lib.dir}/${nacho}" dest="${classes.dir}"/>
 		<unjar src="${lib.dir}/${tableLayout}" dest="${classes.dir}"/>
+		<unjar src="${lib.dir}/${xstream}" dest="${classes.dir}"/>
+		<unjar src="${lib.dir}/${xpp3}" dest="${classes.dir}"/>
 		<copy todir="${classes.dir}/lazybones">
-		      <fileset dir="${res.dir}/images" includes="*.png"/>
-		      <fileset dir="${res.dir}/images" includes="*.gif"/>
-		      <fileset dir="${res.dir}/language" includes="**/*.properties"/>
+			<fileset dir="${res.dir}/images" includes="*.png"/>
+			<fileset dir="${res.dir}/images" includes="*.gif"/>
+			<fileset dir="${res.dir}/language" includes="**/*.properties"/>
+        </copy>
+		<copy todir="${classes.dir}">
+			<fileset dir="${license.dir}" includes="**/*.*"/>
         </copy>
 		<jar destfile="${jar.file}" basedir="${classes.dir}">
 		</jar>
