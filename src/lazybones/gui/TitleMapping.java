@@ -1,4 +1,4 @@
-/* $Id: TitleMapping.java,v 1.2 2006-09-07 19:30:03 hampelratte Exp $
+/* $Id: TitleMapping.java,v 1.3 2007-03-06 20:17:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,6 +31,7 @@ package lazybones.gui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.event.TableModelEvent;
@@ -44,10 +45,6 @@ public class TitleMapping implements Serializable, TableModel {
     private ArrayList<String> tvbTitles = new ArrayList<String>();
 
     public void put(String tvbTitle, String vdrTitle) {
-        if(tvbTitle.equals(vdrTitle)) { // such a mapping would be stupid
-            return;
-        }
-        
         if(vdrTitles.contains(vdrTitle)) {
             int index = vdrTitles.indexOf(vdrTitle);
             tvbTitles.set(index, tvbTitle);
@@ -140,6 +137,23 @@ public class TitleMapping implements Serializable, TableModel {
             tvbTitles.set(rowIndex, aValue.toString());
         } else {
             vdrTitles.set(rowIndex, aValue.toString());
+        }
+    }
+    
+    public HashMap getAsMap() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        for (int i = 0; i < tvbTitles.size(); i++) {
+            map.put(tvbTitles.get(i), vdrTitles.get(i));
+        }
+        return map;
+    }
+    
+    public void setMappingFromMap(HashMap map) {
+        for (Iterator iter = map.keySet().iterator(); iter.hasNext();) {
+            String key = (String) iter.next();
+            String value = (String) map.get(key);
+            tvbTitles.add(key);
+            vdrTitles.add(value);
         }
     }
 }

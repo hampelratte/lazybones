@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.12 2007-01-28 15:12:50 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.13 2007-03-06 20:18:54 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,12 +29,7 @@
  */
 package lazybones;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Observable;
-import java.util.TreeSet;
+import java.util.*;
 
 import lazybones.gui.TitleMapping;
 import lazybones.utils.Utilities;
@@ -241,16 +236,16 @@ public class TimerManager extends Observable {
      * 
      * @see TimerManager#titleMapping
      */
-	public TitleMapping getTitleMapping() {
-		return titleMapping;
+	public HashMap getTitleMappingValues() {
+		return titleMapping.getAsMap();
 	}
 
 	/**
      * 
      * @see TimerManager#titleMapping
      */
-	public void setTitleMapping(TitleMapping titleMapping) {
-		this.titleMapping = titleMapping;
+	public void setTitleMappingValues(HashMap titleMapping) {
+		this.titleMapping.setMappingFromMap(titleMapping);
 	}
     
     
@@ -320,5 +315,13 @@ public class TimerManager extends Observable {
      */
     public boolean hasPreviousDayWithEvent(Calendar currentDay) {
         return getPreviousDayWithEvent(currentDay) != null;
+    }
+
+    public TitleMapping getTitleMapping() {
+        return this.titleMapping;
+    }
+
+    public void setTitleMapping(TitleMapping mapping) {
+        this.titleMapping = mapping;
     }
 }
