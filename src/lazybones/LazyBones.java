@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.60 2007-02-07 18:50:17 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.61 2007-03-06 20:21:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,9 +32,6 @@ package lazybones;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
 
 import javax.swing.*;
@@ -43,9 +40,11 @@ import lazybones.gui.MainDialog;
 import lazybones.gui.ProgramSelectionDialog;
 import lazybones.gui.TimerOptionsDialog;
 import lazybones.gui.TimerSelectionDialog;
-import lazybones.gui.TitleMapping;
 import lazybones.gui.VDRSettingsPanel;
 import lazybones.utils.Utilities;
+
+import com.thoughtworks.xstream.XStream;
+
 import de.hampelratte.svdrp.Connection;
 import de.hampelratte.svdrp.Response;
 import de.hampelratte.svdrp.VDRVersion;
@@ -113,6 +112,9 @@ public class LazyBones extends Plugin {
         Player.play(program);
     }
     
+    // TODO in beiden deleteTimer methoden, erst gucken, ob der timer läuft
+    // wenn ja, dann erst deaktivieren und dann löschen. am besten für 
+    // eine eigene action dafür bauen, die aufgerufen wird (eventuell auch für alle anderen svdrp commandos was bauen)
     public void deleteTimer(Timer timer) {
         Response res = VDRConnection.send(new DELT(Integer.toString(timer.getID())));
         if (res == null) {
@@ -622,41 +624,10 @@ public class LazyBones extends Plugin {
     }
 
     
-    
     public devplugin.SettingsTab getSettingsTab() {
         return new VDRSettingsPanel(this);
     }
-
-    @SuppressWarnings("unchecked")
-    public void readData(ObjectInputStream in) {
-        try {
-            // load channel mapping
-            ProgramManager.setChannelMapping((Hashtable) in.readObject());
-
-            // load stored timers. 
-            // if no connection is available, we use these ones
-            TimerManager.getInstance().setStoredTimers((ArrayList<Timer>) in.readObject());
-            
-            // load stored mappings
-            TimerManager.getInstance().setTitleMapping((TitleMapping) in.readObject());
-            
-            // load stored channel list
-            VDRChannelList.getInstance().setChannels((List<Channel>)in.readObject());
-        } catch (Exception e) {
-            LOG.log("Couldn't read data", Logger.OTHER, Logger.ERROR);
-            e.printStackTrace(System.out);
-        }
-
-        Calendar today = GregorianCalendar.getInstance();
-
-        for (ListIterator iter = TimerManager.getInstance().getStoredTimers()
-                .listIterator(); iter.hasNext();) {
-            Timer timer = (Timer) iter.next();
-            if (timer.getEndTime().before(today) & !timer.isRepeating()) {
-                iter.remove();
-            }
-        }
-    }
+    
 
     protected void getTimersFromVDR() {
         TimerManager tm = TimerManager.getInstance();
@@ -965,18 +936,6 @@ public class LazyBones extends Plugin {
         timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
     }
 
-
-    public void writeData(ObjectOutputStream out) {
-        try {
-            out.writeObject(ProgramManager.getChannelMapping());
-            out.writeObject(TimerManager.getInstance().getTimers());
-            out.writeObject(TimerManager.getInstance().getTitleMapping());
-            out.writeObject(VDRChannelList.getInstance().getChannels());
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-    }
-
     public void onDeactivation() {
         try {
             Player.stop();
@@ -986,7 +945,10 @@ public class LazyBones extends Plugin {
 
     public void loadSettings(Properties props) {
         LazyBones.props = props;
-
+        
+        // load data
+        loadData();
+        
         String host = props.getProperty("host");
         host = host == null ? "localhost" : host;
         props.setProperty("host", host);
@@ -1061,10 +1023,57 @@ public class LazyBones extends Plugin {
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
-
+        
         init();
     }
     
+    @SuppressWarnings("unchecked")
+    private void loadData() {
+        XStream xstream = new XStream();
+        
+        // load title mapping
+        try {
+            HashMap titleMapping = (HashMap) xstream.fromXML(props.getProperty("titleMapping"));
+            TimerManager.getInstance().setTitleMappingValues(titleMapping);
+        } catch (Exception e) {
+            LOG.log("Couldn't load title mapping: " + e, Logger.OTHER, Logger.WARN);
+        }
+        
+        // load channel mapping
+        try {
+            Hashtable channelMapping = (Hashtable) xstream.fromXML(props.getProperty("channelMapping"));
+            ProgramManager.setChannelMapping(channelMapping);
+        } catch (Exception e) {
+            LOG.log("Couldn't load channel mapping: " + e, Logger.OTHER, Logger.WARN);
+        }
+        
+        // load timers
+        try {
+            ArrayList timers = (ArrayList) xstream.fromXML(props.getProperty("timers"));
+            TimerManager.getInstance().setStoredTimers(timers);
+        } catch (Exception e) {
+            LOG.log("Couldn't load timers: " + e, Logger.OTHER, Logger.WARN);
+        }
+        
+        // load channel list
+        try {
+            List channelList = (List) xstream.fromXML(props.getProperty("channelList")); 
+            VDRChannelList.getInstance().setChannels(channelList);
+        } catch (Exception e) {
+            LOG.log("Couldn't load channel list: " + e, Logger.OTHER, Logger.WARN);
+        }
+        
+        // remove outdated timers
+        Calendar today = GregorianCalendar.getInstance();
+        for (ListIterator iter = TimerManager.getInstance().getStoredTimers()
+                .listIterator(); iter.hasNext();) {
+            Timer timer = (Timer) iter.next();
+            if (timer.getEndTime().before(today) & !timer.isRepeating()) {
+                iter.remove();
+            }
+        }
+    }
+
     private void init() {
         instance = this;
         Thread t = new Thread() {
@@ -1090,7 +1099,16 @@ public class LazyBones extends Plugin {
     }
 
     public Properties storeSettings() {
+        storeData();        
         return props;
+    }
+
+    private void storeData() {
+        XStream xstream = new XStream();
+        props.setProperty( "channelMapping", xstream.toXML(ProgramManager.getChannelMapping()) );
+        props.setProperty( "timers", xstream.toXML(TimerManager.getInstance().getTimers()) );
+        props.setProperty( "titleMapping", xstream.toXML(TimerManager.getInstance().getTitleMappingValues()) );
+        props.setProperty( "channelList", xstream.toXML(VDRChannelList.getInstance().getChannels()) );
     }
 
     public static Properties getProperties() {
