@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.6 2006-09-07 19:30:04 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.7 2007-03-06 20:19:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,15 +50,6 @@ import devplugin.Program;
  * has to choose the right program, then.
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
- */
-
-/*
- * IDEA not assigned timers könnten im kontextmenu aufgelistet werden unter dem
- * punkt "diesem programm diesen timer zuordnen". so würde der programselectiondialog
- * wegfallen und das auswählen der sendungen ist viel flexibler.
- * 
- * timer, die nicht zugeordnet werden können, weil das programm im tvbrowser falsch ist,
- * können dann auch ignoriert werden
  */
 public class ProgramSelectionDialog extends Thread implements ActionListener {
     private JButton ok = new JButton();
