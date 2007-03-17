@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.3 2007-03-17 15:40:43 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.4 2007-03-17 15:56:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -111,9 +111,9 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
             DefaultTableModel model =
                  (DefaultTableModel)source.getModel();
 
-            //If we are moving items around in the same table, we
-            //move the overwritten channels to the arisen empty cells
-            // else we move them to list
+            // If we are moving items around in the same table, we
+            // move the overwritten channels to the arisen empty cells
+            // else remove them 
             if (addCount > 0) {
                 int i = 0;
                 for (Iterator iter = overwrittenChannels.iterator(); iter.hasNext();) {
