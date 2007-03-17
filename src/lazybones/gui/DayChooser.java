@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.3 2006-09-12 18:33:53 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,13 +39,14 @@ import java.util.GregorianCalendar;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+
 import lazybones.LazyBones;
 import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DatePanel;
 import net.sf.nachocalendar.event.DateSelectionEvent;
 import net.sf.nachocalendar.event.DateSelectionListener;
 import net.sf.nachocalendar.model.DateSelectionModel;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 public class DayChooser extends BrowsePanel implements ActionListener,
         DateSelectionListener {

@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.3 2007-03-17 12:59:46 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,7 +31,6 @@ package lazybones.gui.components.channelpanel;
 
 import info.clearthought.layout.TableLayout;
 
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -43,19 +42,20 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import org.hampelratte.svdrp.responses.highlevel.Channel;
 
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.VDRChannelList;
-import lazybones.gui.components.channelpanel.dnd.ChannelList;
-import lazybones.gui.components.channelpanel.dnd.ChannelListDropTargetListener;
-import lazybones.gui.components.channelpanel.dnd.ChannelTable;
-import lazybones.gui.components.channelpanel.dnd.ChannelTableDropTargetListener;
+import lazybones.gui.components.channelpanel.dnd.ListTransferHandler;
+import lazybones.gui.components.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ChannelPanel implements ActionListener {
     private DefaultTableModel tableModel;
@@ -72,9 +72,9 @@ public class ChannelPanel implements ActionListener {
     
     private JScrollPane listScrollpane;
     
-    private ChannelList list = new ChannelList();
+    private JList list = new JList();
     
-    private ChannelTable table = new ChannelTable();
+    private JTable table = new JTable();
 
     private LazyBones lazyBones;
 
@@ -104,16 +104,13 @@ public class ChannelPanel implements ActionListener {
         table.getTableHeader().setReorderingAllowed(false);
         table.setShowHorizontalLines(false);
         table.setRowHeight(23);
-        
-        // drag and drop for table
-        new DropTarget(table, new ChannelTableDropTargetListener(table, list));
+        table.setDragEnabled(true);
+        table.setTransferHandler(new TableTransferHandler(list));
         
         list.setCellRenderer(new ChannelListCellrenderer());
         list.setModel(new DefaultListModel());
-        
-        // drag and drop for list
-        new DropTarget(list, new ChannelListDropTargetListener(list));
-        
+        list.setDragEnabled(true);
+        list.setTransferHandler(new ListTransferHandler());
         
         tableScrollpane = new JScrollPane(table);
         listScrollpane = new JScrollPane(list);

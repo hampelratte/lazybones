@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.13 2006-12-10 15:30:36 hampelratte Exp $
+/* $Id: Player.java,v 1.14 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,9 +31,10 @@ package lazybones;
 
 import java.io.InputStream;
 
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.commands.CHAN;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.CHAN;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+
 import devplugin.Program;
 
 /**

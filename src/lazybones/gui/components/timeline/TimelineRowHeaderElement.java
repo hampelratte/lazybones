@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeaderElement.java,v 1.3 2007-01-07 14:46:39 hampelratte Exp $
+/* $Id: TimelineRowHeaderElement.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -61,7 +61,7 @@ public class TimelineRowHeaderElement extends JPanel {
             ChannelLabel label = new ChannelLabel(tvbChannel);
             add(label);
         } else {
-            de.hampelratte.svdrp.responses.highlevel.Channel vdrChannel = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+            org.hampelratte.svdrp.responses.highlevel.Channel vdrChannel = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
             if(vdrChannel != null) {
                 JLabel l = new JLabel(vdrChannel.getName());
                 l.setFont(l.getFont().deriveFont(Font.BOLD));

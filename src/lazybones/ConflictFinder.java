@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.5 2007-02-01 19:07:58 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.6 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,10 +34,11 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+
 import lazybones.gui.TimelinePanel;
 import lazybones.utils.StartStopEvent;
 import lazybones.utils.Utilities;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ConflictFinder implements Observer {
     private static ConflictFinder instance;    

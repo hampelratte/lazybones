@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.6 2006-08-30 19:38:16 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.7 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,11 +42,12 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+
 import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerProgram;
 import util.ui.ProgramList;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Program;
 
 /**

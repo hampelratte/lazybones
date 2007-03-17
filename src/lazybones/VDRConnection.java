@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.12 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.13 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,10 +36,11 @@ import java.net.InetAddress;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
-import de.hampelratte.svdrp.Command;
-import de.hampelratte.svdrp.Connection;
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.commands.STAT;
+import org.hampelratte.svdrp.Command;
+import org.hampelratte.svdrp.Connection;
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.STAT;
+
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>

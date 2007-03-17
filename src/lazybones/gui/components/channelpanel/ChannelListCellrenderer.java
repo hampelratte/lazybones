@@ -1,4 +1,4 @@
-/* $Id: ChannelListCellrenderer.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
+/* $Id: ChannelListCellrenderer.java,v 1.2 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,7 +34,8 @@ import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
-import de.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+
 
 public class ChannelListCellrenderer extends DefaultListCellRenderer {
 

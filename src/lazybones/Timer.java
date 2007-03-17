@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.10 2007-03-06 20:19:18 hampelratte Exp $
+/* $Id: Timer.java,v 1.11 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,8 +34,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+
 import lazybones.utils.Period;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 public class Timer extends VDRTimer {
     

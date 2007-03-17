@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.61 2007-03-06 20:21:30 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.62 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,6 +36,20 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.hampelratte.svdrp.Connection;
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.VDRVersion;
+import org.hampelratte.svdrp.commands.DELT;
+import org.hampelratte.svdrp.commands.LSTE;
+import org.hampelratte.svdrp.commands.LSTT;
+import org.hampelratte.svdrp.commands.NEWT;
+import org.hampelratte.svdrp.commands.UPDT;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.util.EPGParser;
+import org.hampelratte.svdrp.util.TimerParser;
+
 import lazybones.gui.MainDialog;
 import lazybones.gui.ProgramSelectionDialog;
 import lazybones.gui.TimerOptionsDialog;
@@ -45,19 +59,6 @@ import lazybones.utils.Utilities;
 
 import com.thoughtworks.xstream.XStream;
 
-import de.hampelratte.svdrp.Connection;
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.VDRVersion;
-import de.hampelratte.svdrp.commands.DELT;
-import de.hampelratte.svdrp.commands.LSTE;
-import de.hampelratte.svdrp.commands.LSTT;
-import de.hampelratte.svdrp.commands.NEWT;
-import de.hampelratte.svdrp.commands.UPDT;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
-import de.hampelratte.svdrp.responses.highlevel.EPGEntry;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
-import de.hampelratte.svdrp.util.EPGParser;
-import de.hampelratte.svdrp.util.TimerParser;
 import devplugin.*;
 import devplugin.Date;
 

@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.11 2007-02-16 22:19:37 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.12 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,14 +40,15 @@ import java.util.Calendar;
 
 import javax.swing.*;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Time;
 import lazybones.Timer;
 import lazybones.VDRChannelList;
 import tvbrowser.core.ChannelList;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
-import de.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;

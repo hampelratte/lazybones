@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.8 2007-01-07 12:32:15 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.9 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,7 +38,8 @@ import java.util.Iterator;
 
 import javax.swing.JPopupMenu;
 
-import de.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+
 import devplugin.Date;
 import devplugin.Program;
 

@@ -1,4 +1,4 @@
-/* $Id: PreviewPanel.java,v 1.6 2007-02-16 22:20:25 hampelratte Exp $
+/* $Id: PreviewPanel.java,v 1.7 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,12 +40,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.GRAB;
+import org.hampelratte.svdrp.responses.R216;
+
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.VDRConnection;
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.commands.GRAB;
-import de.hampelratte.svdrp.responses.R216;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>

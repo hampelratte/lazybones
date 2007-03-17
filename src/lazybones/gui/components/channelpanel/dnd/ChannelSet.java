@@ -1,4 +1,4 @@
-/* $Id: ChannelCollection.java,v 1.3 2007-03-17 12:59:46 hampelratte Exp $
+/* $Id: ChannelSet.java,v 1.1 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,14 +33,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 
-public class ChannelCollection<Channel> extends ArrayList implements Transferable {
+public class ChannelSet<Channel> extends HashSet implements Transferable {
 
-    public static final DataFlavor FLAVOR = new DataFlavor(ChannelCollection.class, "VDR Channels");
+    public static final DataFlavor FLAVOR = new DataFlavor(ChannelSet.class, "VDR Channels");
 
-    private String eventSource;
-    
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if(flavor.equals(FLAVOR)) {
             return this;
@@ -58,13 +56,5 @@ public class ChannelCollection<Channel> extends ArrayList implements Transferabl
         } else {
             return false;
         }
-    }
-
-    public String getEventSource() {
-        return eventSource;
-    }
-
-    public void setEventSource(String eventSource) {
-        this.eventSource = eventSource;
     }
 }

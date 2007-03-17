@@ -1,4 +1,4 @@
-/* $Id: VDRChannelList.java,v 1.4 2007-02-01 19:07:58 hampelratte Exp $
+/* $Id: VDRChannelList.java,v 1.5 2007-03-17 15:08:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,10 +32,11 @@ package lazybones;
 import java.util.List;
 import java.util.Iterator;
 
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.commands.LSTC;
-import de.hampelratte.svdrp.responses.highlevel.Channel;
-import de.hampelratte.svdrp.util.ChannelParser;
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.LSTC;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.util.ChannelParser;
+
 
 public class VDRChannelList {
 

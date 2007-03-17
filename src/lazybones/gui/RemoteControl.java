@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.4 2006-12-10 15:32:34 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.5 2007-03-17 15:08:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,11 +38,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.CHAN;
+
 import lazybones.LazyBones;
 import lazybones.Player;
 import lazybones.VDRConnection;
-import de.hampelratte.svdrp.Response;
-import de.hampelratte.svdrp.commands.CHAN;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
