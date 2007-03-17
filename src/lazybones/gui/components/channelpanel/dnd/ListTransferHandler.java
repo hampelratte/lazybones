@@ -1,4 +1,4 @@
-/* $Id: ListTransferHandler.java,v 1.2 2007-03-17 15:38:44 hampelratte Exp $
+/* $Id: ListTransferHandler.java,v 1.3 2007-03-17 15:40:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.

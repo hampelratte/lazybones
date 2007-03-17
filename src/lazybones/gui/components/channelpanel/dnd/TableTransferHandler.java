@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.2 2007-03-17 15:38:44 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.3 2007-03-17 15:40:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,7 +32,6 @@ package lazybones.gui.components.channelpanel.dnd;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -42,7 +41,6 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class TableTransferHandler extends ChannelSetTransferHandler {
     private int[] rows = null;
-    private int addIndex = -1; //Location where items were added
     private int addCount = 0;  //Number of items added.
     
     private JList channelList;
@@ -64,6 +62,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         return channelSet;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void importChannels(JComponent c, ChannelSet set) {
         JTable target = (JTable)c;
@@ -86,7 +85,6 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
             index = max;
         } 
         
-        addIndex = index;
         addCount = set.size();
         overwrittenChannels.clear();
         for (Iterator iter = set.iterator(); iter.hasNext();) {
@@ -130,6 +128,5 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         }
         rows = null;
         addCount = 0;
-        addIndex = -1;
     }
 }
