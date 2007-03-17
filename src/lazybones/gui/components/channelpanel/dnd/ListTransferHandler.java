@@ -1,4 +1,4 @@
-/* $Id: ListTransferHandler.java,v 1.1 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: ListTransferHandler.java,v 1.2 2007-03-17 15:38:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones.gui.components.channelpanel.dnd;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
@@ -43,6 +44,8 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
     private int[] indices = null;
     private int addIndex = -1; //Location where items were added
     private int addCount = 0;  //Number of items added.
+    
+    private Set overwrittenChannels;
     
     @SuppressWarnings("unchecked")
     @Override
@@ -109,9 +112,22 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
             for (int i = indices.length - 1; i >= 0; i--) {
                 model.remove(indices[i]);
             }
+            
+            // add channels to this list, which have been replaced in the table
+            if(overwrittenChannels != null) {
+                for (Iterator iter = overwrittenChannels.iterator(); iter.hasNext();) {
+                    Channel chan = (Channel) iter.next();
+                    model.add(indices[0], chan);
+                }
+                overwrittenChannels = null;
+            }
         }
         indices = null;
         addCount = 0;
         addIndex = -1;
+    }
+
+    public void setOverwrittenChannels(Set overwrittenChannels) {
+        this.overwrittenChannels = overwrittenChannels;
     }
 }

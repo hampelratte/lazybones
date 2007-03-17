@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.1 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.2 2007-03-17 15:38:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
     private int addCount = 0;  //Number of items added.
     
     private JList channelList;
+    private HashSet overwrittenChannels = new HashSet();
     
     public TableTransferHandler(JList channelList) {
         this.channelList = channelList;
@@ -87,21 +88,21 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         
         addIndex = index;
         addCount = set.size();
-        HashSet removedChannels = new HashSet();
+        overwrittenChannels.clear();
         for (Iterator iter = set.iterator(); iter.hasNext();) {
             Channel chan = (Channel) iter.next();
             Object o = model.getValueAt(index, 1);
             if(o != null) {
-                removedChannels.add(o);
+                overwrittenChannels.add(o);
             }
             model.setValueAt(chan, index, 1);
             index++;
         }
         
-        DefaultListModel listModel = (DefaultListModel) channelList.getModel();
-        for (Iterator iter = removedChannels.iterator(); iter.hasNext();) {
-            Channel chan = (Channel) iter.next();
-            listModel.addElement(chan);
+        // move overwritten to list
+        if(overwrittenChannels.size() > 0) {
+            ListTransferHandler lth = (ListTransferHandler) channelList.getTransferHandler();
+            lth.setOverwrittenChannels(overwrittenChannels);
         }
     }
     
@@ -113,18 +114,18 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
                  (DefaultTableModel)source.getModel();
 
             //If we are moving items around in the same table, we
-            //need to adjust the rows accordingly, since those
-            //after the insertion point have moved.
-            /*if (addCount > 0) {
-                for (int i = 0; i < rows.length; i++) {
-                    if (rows[i] > addIndex) {
-                        rows[i] += addCount;
-                    }
+            //move the overwritten channels to the arisen empty cells
+            // else we move them to list
+            if (addCount > 0) {
+                int i = 0;
+                for (Iterator iter = overwrittenChannels.iterator(); iter.hasNext();) {
+                    Channel chan = (Channel) iter.next();
+                    model.setValueAt(chan, rows[i++], 1);
                 }
-            }*/
-            
-            for (int i = rows.length - 1; i >= 0; i--) {
-                model.setValueAt(null, rows[i], 1);
+            } else {
+                for (int i = rows.length - 1; i >= 0; i--) {
+                    model.setValueAt(null, rows[i], 1);
+                }
             }
         }
         rows = null;
