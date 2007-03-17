@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.4 2007-03-17 15:56:32 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.5 2007-03-17 16:18:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,6 +53,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
     @SuppressWarnings("unchecked")
     @Override
     protected ChannelSet exportChannels(JComponent c) {
+        addCount = 0;
         JTable table = (JTable)c;
         rows = table.getSelectedRows();
         ChannelSet channelSet = new ChannelSet();
@@ -108,8 +109,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
     protected void cleanup(JComponent c, boolean remove) {
         JTable source = (JTable)c;
         if (remove && rows != null) {
-            DefaultTableModel model =
-                 (DefaultTableModel)source.getModel();
+            DefaultTableModel model = (DefaultTableModel)source.getModel();
 
             // If we are moving items around in the same table, we
             // move the overwritten channels to the arisen empty cells
