@@ -1,4 +1,4 @@
-/* $Id: ChannelListDropTargetListener.java,v 1.2 2007-03-03 17:51:11 hampelratte Exp $
+/* $Id: ChannelListDropTargetListener.java,v 1.3 2007-03-17 12:59:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -93,7 +93,11 @@ public class ChannelListDropTargetListener implements DropTargetListener {
                 Collections.reverse(list);
                 for (Iterator iter = list.iterator(); iter.hasNext();) {
                     Channel chan = (Channel) iter.next();
-                    model.add(row, chan);
+                    if(row >= 0) {
+                        model.add(row, chan);
+                    } else {
+                        model.addElement(chan);
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-/* $Id: ChannelList.java,v 1.2 2007-03-03 17:51:11 hampelratte Exp $
+/* $Id: ChannelList.java,v 1.3 2007-03-17 12:59:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,12 +45,10 @@ public class ChannelList extends JList {
     private DragSourceListener dragSourceListener;
     private int dragAction = DnDConstants.ACTION_MOVE;
     
-    private int[] indices;
-    
     public ChannelList() {
         this.dragSource = DragSource.getDefaultDragSource();
         this.dragGestureListener = new ChannelListDragGestureListener();
-        this.dragSourceListener = new ChannelListDragSourceListener();
+        this.dragSourceListener = new ChannelListDragSourceListener(this);
         
         dragSource.createDefaultDragGestureRecognizer(this, dragAction, dragGestureListener);
     }
@@ -60,7 +58,7 @@ public class ChannelList extends JList {
         public void dragGestureRecognized(DragGestureEvent dge) {
             // create list of dragged channels
             list = new ChannelCollection();
-            indices = getSelectedIndices();
+            int[] indices = getSelectedIndices();
             for (int i = 0; i < indices.length; i++) {
                 list.add(getModel().getElementAt(indices[i]));
             }
@@ -75,6 +73,11 @@ public class ChannelList extends JList {
     }
     
     class ChannelListDragSourceListener implements DragSourceListener {
+        ChannelList list;
+        public ChannelListDragSourceListener(ChannelList list) {
+            this.list = list;
+        }
+
         public void dragDropEnd(DragSourceDropEvent e) {
             if(e.getDropSuccess()) {
                 Transferable tr = e.getDragSourceContext().getTransferable();

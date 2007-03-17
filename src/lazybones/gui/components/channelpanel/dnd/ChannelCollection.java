@@ -1,4 +1,4 @@
-/* $Id: ChannelCollection.java,v 1.2 2007-03-03 17:51:11 hampelratte Exp $
+/* $Id: ChannelCollection.java,v 1.3 2007-03-17 12:59:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,8 @@ public class ChannelCollection<Channel> extends ArrayList implements Transferabl
 
     public static final DataFlavor FLAVOR = new DataFlavor(ChannelCollection.class, "VDR Channels");
 
+    private String eventSource;
+    
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if(flavor.equals(FLAVOR)) {
             return this;
@@ -56,5 +58,13 @@ public class ChannelCollection<Channel> extends ArrayList implements Transferabl
         } else {
             return false;
         }
+    }
+
+    public String getEventSource() {
+        return eventSource;
+    }
+
+    public void setEventSource(String eventSource) {
+        this.eventSource = eventSource;
     }
 }

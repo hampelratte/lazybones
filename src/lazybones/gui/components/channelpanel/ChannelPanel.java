@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.2 2007-02-17 21:19:26 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.3 2007-03-17 12:59:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -60,8 +60,6 @@ import de.hampelratte.svdrp.responses.highlevel.Channel;
 public class ChannelPanel implements ActionListener {
     private DefaultTableModel tableModel;
 
-    private ChannelTable table = new ChannelTable();
-
     private JButton up = new JButton();
 
     private JButton down = new JButton();
@@ -70,9 +68,13 @@ public class ChannelPanel implements ActionListener {
 
     private JButton sort = new JButton(LazyBones.getTranslation("sort_channels", "Sort"));
     
-    private JScrollPane scrollpane;
+    private JScrollPane tableScrollpane;
+    
+    private JScrollPane listScrollpane;
     
     private ChannelList list = new ChannelList();
+    
+    private ChannelTable table = new ChannelTable();
 
     private LazyBones lazyBones;
 
@@ -104,7 +106,7 @@ public class ChannelPanel implements ActionListener {
         table.setRowHeight(23);
         
         // drag and drop for table
-        new DropTarget(table, new ChannelTableDropTargetListener(table));
+        new DropTarget(table, new ChannelTableDropTargetListener(table, list));
         
         list.setCellRenderer(new ChannelListCellrenderer());
         list.setModel(new DefaultListModel());
@@ -113,7 +115,9 @@ public class ChannelPanel implements ActionListener {
         new DropTarget(list, new ChannelListDropTargetListener(list));
         
         
-        scrollpane = new JScrollPane(table);
+        tableScrollpane = new JScrollPane(table);
+        listScrollpane = new JScrollPane(list);
+        
         refresh.addActionListener(this);
         sort.addActionListener(this);
         up.addActionListener(this);
@@ -130,12 +134,12 @@ public class ChannelPanel implements ActionListener {
         layout.setVGap(10);
 		
         JPanel panel = new JPanel(layout);
-        panel.add(scrollpane, "1,1,5,2");
-        panel.add(new JScrollPane(list), "6,1,1,2");
-        panel.add(refresh,    "1,3,1,3");
-        panel.add(sort,       "2,3,2,3");
+        panel.add(tableScrollpane, "1,1,5,2");
+        panel.add(listScrollpane, "6,1,1,2");
+        panel.add(sort,       "3,3,3,3");
         panel.add(up,         "4,3,4,3");
         panel.add(down,       "5,3,5,3");
+        panel.add(refresh,    "6,3,6,3");
 		
 		return panel;
     }
@@ -276,6 +280,9 @@ public class ChannelPanel implements ActionListener {
             }
             
             Collections.sort(list);
+            if(list.size() <= 0) {
+                return;
+            }
             Container c = list.get(list.size()-1);
             int index = c.getIndex();
             Object o = tableModel.getValueAt(index, 1);
@@ -331,5 +338,4 @@ public class ChannelPanel implements ActionListener {
             this.channel = channel;
         }
     }
-
 }

@@ -1,4 +1,4 @@
-/* $Id: ChannelTableDropTargetListener.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
+/* $Id: ChannelTableDropTargetListener.java,v 1.2 2007-03-17 12:59:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,8 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.util.Iterator;
 
-import javax.swing.JTable;
+import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
 
 import lazybones.Logger;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
@@ -46,10 +47,13 @@ public class ChannelTableDropTargetListener implements DropTargetListener {
 
     private Logger logger = Logger.getLogger();
     
-    private JTable table;
+    private ChannelTable table;
     
-    public ChannelTableDropTargetListener(JTable table) {
+    private ChannelList channelList;
+    
+    public ChannelTableDropTargetListener(ChannelTable table, ChannelList channelList) {
         this.table = table;
+        this.channelList = channelList;
     }
     
     public void dragEnter(DropTargetDragEvent dtde) {
@@ -59,39 +63,68 @@ public class ChannelTableDropTargetListener implements DropTargetListener {
     }
 
     public void dragOver(DropTargetDragEvent e) {
-        DataFlavor[] flavors = e.getCurrentDataFlavors();
-        for (int i = 0; i < flavors.length; i++) {
-            if (ChannelCollection.FLAVOR.equals(flavors[i])) {
-                // flavor supported
-                e.acceptDrag(e.getDropAction());
-                return;
-            }
-        }
-        
-        e.rejectDrag();
     }
 
     public void drop(DropTargetDropEvent e) {
-        e.acceptDrop(e.getDropAction());
         Transferable tr = e.getTransferable();
         
         DataFlavor[] flavors = tr.getTransferDataFlavors();
         for (int i = 0; i < flavors.length; i++) {
             if (ChannelCollection.FLAVOR.equals(flavors[i])) {
-                int row = table.rowAtPoint(e.getLocation());
                 ChannelCollection list;
                 try {
                     list = (ChannelCollection) tr.getTransferData(ChannelCollection.FLAVOR);
+                    e.acceptDrop(e.getDropAction());
                 } catch (Exception e1) {
                     logger.log(e1, Logger.OTHER, Logger.WARN);
                     e1.printStackTrace();
+                    e.rejectDrop();
                     return;
-                } 
+                }
+
+                int row = table.rowAtPoint(e.getLocation());
                 for (Iterator iter = list.iterator(); iter.hasNext();) {
                     Channel chan = (Channel) iter.next();
-                    table.getModel().setValueAt(chan, row++, 1);
+                    Object o = table.getModel().getValueAt(row, 1);
+                    if( o != null ) {
+                        int oldRow = table.getRow(chan);
+                        if(oldRow >= 0 ) {
+                            if(oldRow < row) {
+                                moveUpRows(oldRow+1, row);
+                            } else {
+                                moveDownRows(row, oldRow-1);
+                            }
+                        } else {
+                            DefaultTableModel model = (DefaultTableModel) table.getModel();
+                            Object channel = model.getValueAt(table.getRowCount()-1, 1);
+                            DefaultListModel listModel = (DefaultListModel) channelList.getModel();
+                            if(channel != null) {
+                                listModel.addElement(channel);
+                            }
+                            moveDownRows(row, table.getRowCount()-2);
+                        }
+                    }
+                    table.getModel().setValueAt(chan, row, 1);
+                    row++;
                 }
             }
+        }
+        e.dropComplete(true);
+    }
+
+    private void moveDownRows(int start, int end) {
+        for (int i = end; i >= start; i--) {
+            Object o = table.getValueAt(i, 1);
+            System.out.println("Moving down " + o + " from " + i + " to " + (i+1));
+            table.setValueAt(o, i+1, 1);
+        }
+    }
+    
+    private void moveUpRows(int start, int end) {
+        for (int i = start; i <= end; i++) {
+            Object o = table.getValueAt(i, 1);
+            System.out.println("Moving up " + o + " from " + i + " to " + (i-1));
+            table.setValueAt(o, i-1, 1);
         }
     }
 

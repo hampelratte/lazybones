@@ -1,4 +1,4 @@
-/* $Id: ChannelTable.java,v 1.1 2007-02-17 14:29:51 hampelratte Exp $
+/* $Id: ChannelTable.java,v 1.2 2007-03-17 12:59:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,14 +29,17 @@
  */
 package lazybones.gui.components.channelpanel.dnd;
 
+import java.awt.Point;
+import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
 
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 
 import lazybones.Logger;
 import de.hampelratte.svdrp.responses.highlevel.Channel;
 
-public class ChannelTable extends JTable{
+public class ChannelTable extends JTable {
     
     private Logger logger = Logger.getLogger();
     
@@ -51,9 +54,24 @@ public class ChannelTable extends JTable{
     public ChannelTable() {
         this.dragSource = DragSource.getDefaultDragSource();
         this.dragGestureListener = new ChannelTableDragGestureListener();
-        this.dragSourceListener = new ChannelTableDragSourceListener();
+        this.dragSourceListener = new ChannelTableDragSourceListener(this);
         
         dragSource.createDefaultDragGestureRecognizer(this, dragAction, dragGestureListener);
+    }
+    
+    /**
+     * 
+     * @param chan
+     * @return the row index of the given Channel, or -1 if the channel is not found
+     */
+    public int getRow(Channel chan) {
+        for (int i = 0; i < getRowCount(); i++) {
+            Channel c = (Channel) getModel().getValueAt(i, 1);
+            if(c!= null && c.equals(chan)) {
+                return i;
+            }
+        }
+        return -1;
     }
     
     class ChannelTableDragGestureListener implements DragGestureListener {
@@ -61,6 +79,7 @@ public class ChannelTable extends JTable{
         public void dragGestureRecognized(DragGestureEvent dge) {
             // create list of dragged channels
             list = new ChannelCollection();
+            list.setEventSource("ChannelTable");
             indices = getSelectedRows();
             for (int i = 0; i < indices.length; i++) {
                 Object o = getModel().getValueAt(indices[i], 1);
@@ -79,11 +98,31 @@ public class ChannelTable extends JTable{
     }
     
     class ChannelTableDragSourceListener implements DragSourceListener {
-
+        private ChannelTable table;
+        
+        public ChannelTableDragSourceListener(ChannelTable table) {
+            this.table = table;
+        }
+        
         public void dragDropEnd(DragSourceDropEvent e) {
-            for (int i = 0; i < indices.length; i++) {
-                getModel().setValueAt(null, indices[i], 1);
+            
+            System.out.println(e.getLocation());
+            Transferable tr = e.getDragSourceContext().getTransferable();
+            try {
+                ChannelCollection cc = (ChannelCollection) tr.getTransferData(ChannelCollection.FLAVOR);
+                System.out.println("Von hier " + "ChannelTable".equals(cc.getEventSource()));
+                Point point = (Point) e.getLocation().clone();
+                SwingUtilities.convertPointFromScreen(point, table);
+                System.out.println("Hier drin " + contains(point));
+                if(e.getDropSuccess() && !("ChannelTable".equals(cc.getEventSource()) && contains(point)) ) {
+                    for (int i = 0; i < indices.length; i++) {
+                        getModel().setValueAt(null, indices[i], 1);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
+            
         }
 
         public void dragEnter(DragSourceDragEvent dsde) {}
