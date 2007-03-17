@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.5 2007-03-17 18:09:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,8 +29,10 @@
  */
 package lazybones.gui.components.channelpanel;
 
-import info.clearthought.layout.TableLayout;
-
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -48,8 +50,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.VDRChannelList;
@@ -57,16 +57,22 @@ import lazybones.gui.components.channelpanel.dnd.ListTransferHandler;
 import lazybones.gui.components.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+
 public class ChannelPanel implements ActionListener {
     private DefaultTableModel tableModel;
 
     private JButton up = new JButton();
 
     private JButton down = new JButton();
+    
+    private JButton assign = new JButton();
+
+    private JButton remove = new JButton();
 
     private JButton refresh = new JButton(LazyBones.getTranslation("refresh_channels", "Refresh"));
 
-    private JButton sort = new JButton(LazyBones.getTranslation("sort_channels", "Sort"));
+    private JButton autoAssign = new JButton(LazyBones.getTranslation("sort_channels", "Sort"));
     
     private JScrollPane tableScrollpane;
     
@@ -86,6 +92,8 @@ public class ChannelPanel implements ActionListener {
     private void initComponents() {
         up.setIcon(lazyBones.getIcon("lazybones/go-up16.png"));
         down.setIcon(lazyBones.getIcon("lazybones/go-down16.png"));
+        assign.setIcon(lazyBones.getIcon("lazybones/go-previous.png"));
+        remove.setIcon(lazyBones.getIcon("lazybones/go-next.png"));
 
         Object[] headers = { "TV-Browser", "VDR" };
         tableModel = new DefaultTableModel(new Object[][] {}, headers) {
@@ -116,35 +124,78 @@ public class ChannelPanel implements ActionListener {
         listScrollpane = new JScrollPane(list);
         
         refresh.addActionListener(this);
-        sort.addActionListener(this);
+        autoAssign.addActionListener(this);
         up.addActionListener(this);
         down.addActionListener(this);
+        assign.addActionListener(this);
+        remove.addActionListener(this);
     }
 
     public JPanel getPanel() {
-        final double P = TableLayout.PREFERRED;
-        double[][] size = {{0, P, P, TableLayout.FILL, P, P, P, 0}, //cols
-                           {0, P, TableLayout.FILL, P, 0}}; // rows
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
         
-        TableLayout layout = new TableLayout(size);
-        layout.setHGap(10);
-        layout.setVGap(10);
-		
-        JPanel panel = new JPanel(layout);
-        panel.add(tableScrollpane, "1,1,5,2");
-        panel.add(listScrollpane, "6,1,1,2");
-        panel.add(sort,       "3,3,3,3");
-        panel.add(up,         "4,3,4,3");
-        panel.add(down,       "5,3,5,3");
-        panel.add(refresh,    "6,3,6,3");
-		
-		return panel;
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5,5,5,5);
+        
+        // table
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        panel.add(tableScrollpane, gbc);
+
+        // list
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.0;
+        panel.add(listScrollpane, gbc);
+        
+        // assign buttons
+        JPanel assignButtonPanel = new JPanel(new GridLayout(2,1,0,5));
+        assignButtonPanel.add(assign);
+        assignButtonPanel.add(remove);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(assignButtonPanel, gbc);
+        
+        // autoAssign
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        panel.add(autoAssign, gbc);
+        
+        // up
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(up, gbc);
+        
+        // down
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        panel.add(down, gbc);
+        
+        // refresh
+        gbc.gridx = 4;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(refresh, gbc);
+        
+        return panel;
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == refresh) {
             refreshChannelList();
-        } else if (e.getSource() == sort) {
+        } else if (e.getSource() == autoAssign) {
             try {
                 tryToAssignChannels();
             } catch(Exception ex) {
@@ -175,6 +226,35 @@ public class ChannelPanel implements ActionListener {
             restoreSelection(indices);
             if (!Utilities.isCellVisible(table, indices[indices.length - 1], 1)) {
                 Utilities.scrollToVisible(table, indices[indices.length - 1], 1);
+            }
+        } else if (e.getSource() == remove) {
+            int[] rows = table.getSelectedRows();
+            for (int i = 0; i < rows.length; i++) {
+                Object channel = table.getValueAt(rows[i], 1);
+                DefaultListModel model = (DefaultListModel) list.getModel();
+                model.addElement(channel);
+                table.setValueAt(null, rows[i], 1);
+            }
+        } else if (e.getSource() == assign) {
+            int[] rows = list.getSelectedIndices();
+            int tableRow = table.getSelectedRow();
+            if(tableRow < 0) {
+                return;
+            }
+            
+            for (int i = rows.length - 1; i >= 0; i--) {
+                int row = tableRow + i;
+                if(row > table.getRowCount()-1) {
+                    continue;
+                }
+                    
+                Object tableValue = table.getValueAt(row, 1);
+                DefaultListModel model = (DefaultListModel) list.getModel();
+                if(tableValue != null) {
+                    model.addElement(tableValue);
+                }
+                table.setValueAt(model.getElementAt(rows[i]), row, 1);
+                model.remove(rows[i]);
             }
         }
     }
