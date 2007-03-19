@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.5 2007-01-28 17:03:55 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.6 2007-03-19 17:20:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -71,7 +71,7 @@ public class TimelineElement extends JComponent implements MouseListener {
     }
 
     private String createToolTipText(Timer timer) {
-        String title = timer.getTitle().replace("|", "");
+        String title = timer.getDisplayTitle().replace("|", "");
         DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         
         StringBuffer sb = new StringBuffer();
@@ -122,7 +122,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         // paint text
         g.setColor(UIManager.getColor("Label.foreground"));
         g.setFont(new Font("SansSerif", Font.PLAIN, 9));
-        g.drawString(timer.getTitle(), 5, 12);
+        g.drawString(timer.getDisplayTitle(), 5, 12);
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         String time = df.format(timer.getStartTime().getTime()) + " - " + df.format(timer.getEndTime().getTime());
         g.drawString(time, 5, 25);

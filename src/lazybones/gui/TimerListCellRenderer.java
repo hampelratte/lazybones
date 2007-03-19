@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.5 2007-03-19 17:20:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -109,7 +109,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
             
             date.setText(df.format(timer.getStartTime().getTime()));
             time.setText(tf.format(timer.getStartTime().getTime()));
-            title.setText(timer.getTitle());
+            title.setText(timer.getDisplayTitle());
             
             Channel chan = ProgramManager.getInstance().getChannel(timer);
             if(chan != null) {

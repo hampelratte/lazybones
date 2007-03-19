@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.11 2007-03-17 15:08:30 hampelratte Exp $
+/* $Id: Timer.java,v 1.12 2007-03-19 17:20:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -134,5 +134,10 @@ public class Timer extends VDRTimer {
             period.setEndTime((Calendar) getEndTime().clone());
         }
         getConflictPeriods().add(period);
+    }
+    
+    public String getDisplayTitle() {
+        return getPath() + getTitle();
+        
     }
 }
