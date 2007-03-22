@@ -1,4 +1,4 @@
-/* $Id: ChannelCellRenderer.java,v 1.2 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: ChannelCellRenderer.java,v 1.3 2007-03-22 18:48:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -107,7 +107,8 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
 
             if(value != null) {
                 Channel chan = (Channel)value;
-                setValue(chan.getShortName().length() > 0 ? chan.getShortName() : chan.getName());
+                String channelName = chan.getShortName().length() > 0 ? chan.getShortName() : chan.getName();
+                setValue("[" + chan.getChannelNumber()+ "] " + channelName);
             } else {
                 setValue(null);
             }

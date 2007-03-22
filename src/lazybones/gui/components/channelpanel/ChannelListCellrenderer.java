@@ -1,4 +1,4 @@
-/* $Id: ChannelListCellrenderer.java,v 1.2 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: ChannelListCellrenderer.java,v 1.3 2007-03-22 18:48:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,7 @@ public class ChannelListCellrenderer extends DefaultListCellRenderer {
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         if(value instanceof Channel) {
             Channel chan = (Channel) value;
-            return super.getListCellRendererComponent(list, chan.getName(), index, isSelected, cellHasFocus);
+            return super.getListCellRendererComponent(list, "[" + chan.getChannelNumber()+ "] " + chan.getName(), index, isSelected, cellHasFocus);
         } else {
             return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }
