@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.14 2007-03-17 15:08:30 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.15 2007-03-24 19:14:54 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -140,7 +140,7 @@ public class TimerManager extends Observable {
     /**
      * @param vdrTimers an ArrayList of VDRTimer objects
      */
-    public void setTimers(ArrayList vdrTimers, boolean calculateRepeatingTimers) {
+    public void setTimers(List vdrTimers, boolean calculateRepeatingTimers) {
         for (Iterator it = vdrTimers.iterator(); it.hasNext();) {
             VDRTimer element = (VDRTimer) it.next();
             addTimer(new Timer(element), calculateRepeatingTimers);
