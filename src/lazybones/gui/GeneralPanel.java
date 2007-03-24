@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.8 2006-09-07 14:54:02 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.9 2007-03-24 19:18:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,16 +31,13 @@ package lazybones.gui;
 
 import info.clearthought.layout.TableLayout;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.VDRConnection;
 
-public class GeneralPanel implements ActionListener {
+public class GeneralPanel {
     private Logger LOG = Logger.getLogger();
     
 	private final String lHost = LazyBones.getTranslation("host", "Host");
@@ -50,14 +47,8 @@ public class GeneralPanel implements ActionListener {
 	private final String lTimeout = LazyBones.getTranslation("timeout", "Timeout");
 
 	private final String lExperts = LazyBones.getTranslation("experts", "Experts");
-    /*
-    private final String lWOLEnabled = LazyBones.getTranslation("WOLEnabled", "Enable Wake-on-LAN");
-    
-    private final String lWOLMac = LazyBones.getTranslation("WOLMac", "Wake-on-LAN Mac-Adress");
-    
-    private final String lWOLBroadc = LazyBones.getTranslation("WOLBroadc", "Wake-on-LAN Broadcast-Adress");
-    */
-	private final String lFuzzyness = LazyBones.getTranslation("percentageOfEquality",
+
+    private final String lFuzzyness = LazyBones.getTranslation("percentageOfEquality",
 			"Fuzzylevel program titles");
 
 	private final String ttFuzzyness = LazyBones.getTranslation(
@@ -70,12 +61,6 @@ public class GeneralPanel implements ActionListener {
 
     private JTextField timeout;
     
-    private JTextField tWOLMac;
-    
-    private JTextField tWOLBroadc;
-    
-    private JCheckBox cWOLEnabled;
-
     private JLabel labPercentageOfEquality;
     private JSpinner percentageOfEquality;
 
@@ -119,20 +104,6 @@ public class GeneralPanel implements ActionListener {
         timeout = new JTextField(10);
         timeout.setText(LazyBones.getProperties().getProperty("timeout"));
         
-        cWOLEnabled = new JCheckBox();
-        boolean wolEnabled = Boolean.TRUE.toString().equals(
-                LazyBones.getProperties().getProperty("WOLEnabled"));
-        cWOLEnabled.setSelected(wolEnabled);
-        cWOLEnabled.addActionListener(this);
-        String mac = LazyBones.getProperties().getProperty("WOLMac");
-        tWOLMac = new JTextField();
-        tWOLMac.setText(mac);
-        tWOLMac.setEnabled(wolEnabled);
-        String broadc = LazyBones.getProperties().getProperty("WOLBroadc");
-        tWOLBroadc = new JTextField();
-        tWOLBroadc.setText(broadc);
-        tWOLBroadc.setEnabled(wolEnabled);
-
         int percentageThreshold = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "percentageThreshold"));
         percentageOfEquality = new JSpinner();
@@ -183,30 +154,21 @@ public class GeneralPanel implements ActionListener {
         TableLayout layout2 = new TableLayout(size2);
         JPanel experts = new JPanel(layout2);
         experts.setBorder(BorderFactory.createTitledBorder(lExperts));
-        /*
-        experts.add(new JLabel(lWOLEnabled), "1,1,1,1");
-        experts.add(cWOLEnabled,             "3,1,3,1");
-        
-        experts.add(new JLabel(lWOLMac),     "1,3,1,3");
-        experts.add(tWOLMac,                 "3,3,3,3");
-        
-        experts.add(new JLabel(lWOLBroadc),  "1,5,1,5");
-        experts.add(tWOLBroadc,              "3,5,3,5");
-		*/
-        experts.add(labPercentageOfEquality, "1,7,1,7");
-        experts.add(percentageOfEquality,    "3,7,3,7");
+
+        experts.add(labPercentageOfEquality, "1,1,1,1");
+        experts.add(percentageOfEquality,    "3,1,3,1");
 		
-        experts.add(new JLabel(lSupressMatchDialog),     "1,9,1,9");
-        experts.add(supressMatchDialog,                  "3,9,3,9");
+        experts.add(new JLabel(lSupressMatchDialog),     "1,3,1,3");
+        experts.add(supressMatchDialog,                  "3,3,3,3");
         
-        experts.add(new JLabel(lLogConnectionErrors),    "1,11,1,11");
-        experts.add(logConnectionErrors,                 "3,11,3,11");
+        experts.add(new JLabel(lLogConnectionErrors),    "1,5,1,5");
+        experts.add(logConnectionErrors,                 "3,5,3,5");
         
-        experts.add(new JLabel(lLogEPGErrors),           "1,13,1,13");
-        experts.add(logEPGErrors,                        "3,13,3,13");
+        experts.add(new JLabel(lLogEPGErrors),           "1,7,1,7");
+        experts.add(logEPGErrors,                        "3,7,3,7");
         
-        experts.add(new JLabel(lShowTimerOptionsDialog), "1,15,1,15");
-        experts.add(showTimerOptionsDialog,              "3,15,3,15");
+        experts.add(new JLabel(lShowTimerOptionsDialog), "1,9,1,9");
+        experts.add(showTimerOptionsDialog,              "3,9,3,9");
 
         panel.add(experts, "1,7,3,7");
 		return panel;
@@ -244,8 +206,6 @@ public class GeneralPanel implements ActionListener {
         LazyBones.getProperties().setProperty("host", h);
         LazyBones.getProperties().setProperty("port", Integer.toString(p));
         LazyBones.getProperties().setProperty("timeout", Integer.toString(t));
-        LazyBones.getProperties().setProperty("WOLMac", tWOLMac.getText());
-        LazyBones.getProperties().setProperty("WOLBroadc", tWOLBroadc.getText());
         LazyBones.getProperties().setProperty("percentageThreshold",
                 percentageOfEquality.getValue().toString());
         LazyBones.getProperties().setProperty("supressMatchDialog",
@@ -256,14 +216,5 @@ public class GeneralPanel implements ActionListener {
                 "" + logEPGErrors.isSelected());
         LazyBones.getProperties().setProperty("showTimerOptionsDialog",
                 "" + showTimerOptionsDialog.isSelected());
-        LazyBones.getProperties().setProperty("WOLEnabled",
-                "" + cWOLEnabled.isSelected());
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == cWOLEnabled) {
-            tWOLBroadc.setEnabled(cWOLEnabled.isSelected());
-            tWOLMac.setEnabled(cWOLEnabled.isSelected());
-        }
     }
 }

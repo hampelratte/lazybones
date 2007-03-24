@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.6 2007-02-01 19:07:58 hampelratte Exp $
+/* $Id: Logger.java,v 1.7 2007-03-24 19:13:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,8 +45,6 @@ public class Logger {
 
     public final static int OTHER = 2;
     
-    public final static int WAKE_ON_LAN = 3;
-
     public final static LoggingLevel DEBUG = new LoggingLevel("LAZYBONES DEBUG", 56738);
 
     public final static LoggingLevel INFO = new LoggingLevel("LAZYBONES INFO", 56739);
@@ -79,9 +77,6 @@ public class Logger {
         if(o == null) return;
         
         switch (type) {
-        case WAKE_ON_LAN:
-            LOG.log(level, o.toString());
-            break;
         case CONNECTION:
             if (logConnectionErrors) {
                 LOG.log(level, o.toString());
