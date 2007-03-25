@@ -1,4 +1,4 @@
-/* $Id: DeleteTimerAction.java,v 1.1 2007-03-24 19:16:34 hampelratte Exp $
+/* $Id: DeleteTimerAction.java,v 1.2 2007-03-25 13:02:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -69,10 +69,10 @@ public class DeleteTimerAction implements VDRAction {
         }
         
         // check if timer is recording
-        if(timer.getState() == Timer.RECORDING) {
+        if(timer.hasState(Timer.RECORDING)) {
             // we have to deactivate the timer before we
             // are able to delete it
-            timer.setState(Timer.INACTIVE);
+            timer.changeStateTo(Timer.ACTIVE, false);
             response = VDRConnection.send(new UPDT(timer));
             if( response == null || !(response instanceof R250) ) {
                 return false;

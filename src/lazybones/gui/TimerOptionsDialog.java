@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.12 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.13 2007-03-25 13:02:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -241,7 +241,7 @@ public class TimerOptionsDialog implements ActionListener,
         gbc.gridx = 1;
         gbc.gridy = 1;
         panel.add(cbVps, gbc);
-        cbVps.setSelected(timer.getState() == VDRTimer.VPS);
+        cbVps.setSelected(timer.hasState(VDRTimer.VPS));
         
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -336,8 +336,8 @@ public class TimerOptionsDialog implements ActionListener,
             timer.setPriority(((Integer) priority.getValue()).intValue());
             timer.setLifetime(((Integer) lifetime.getValue()).intValue());
             timer.setDescription(description.getText());
-            int state = cbActive.isSelected() ? (cbVps.isSelected() ? VDRTimer.VPS : VDRTimer.ACTIVE) : VDRTimer.INACTIVE;
-            timer.setState(state);
+            timer.changeStateTo(VDRTimer.ACTIVE, cbActive.isSelected());
+            timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
             dialog.dispose();
             control.createTimerCallBack(timer, prog, update);
         } else if (e.getSource() == cancel) {
