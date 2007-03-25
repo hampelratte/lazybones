@@ -5,4 +5,6 @@ Lazy Bones 0.4
 * Added a timer conflict detection
 * Added a timeline, which shows timers and conflicts
 * Improved the channel configuration of the settings dialog
-* Improved the Utilities.percentageOfEquality
+* Improved automatical assignment of channels in the settings dialog
+* Improved assignment of timers to TV-Browser programs
+* Channel list can be restricted by the channelnumber
