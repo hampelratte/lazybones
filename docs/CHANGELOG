@@ -1,0 +1,8 @@
+Lazy Bones 0.4
+===============================================================================
+* Fixed bug in the timer state handling
+* Timers can now be deleted, if they are recording
+* Added a timer conflict detection
+* Added a timeline, which shows timers and conflicts
+* Improved the channel configuration of the settings dialog
+* Improved the Utilities.percentageOfEquality
