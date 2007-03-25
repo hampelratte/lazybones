@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.5 2007-03-17 18:09:20 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.6 2007-03-25 14:35:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -231,9 +231,11 @@ public class ChannelPanel implements ActionListener {
             int[] rows = table.getSelectedRows();
             for (int i = 0; i < rows.length; i++) {
                 Object channel = table.getValueAt(rows[i], 1);
-                DefaultListModel model = (DefaultListModel) list.getModel();
-                model.addElement(channel);
-                table.setValueAt(null, rows[i], 1);
+                if(channel != null) {
+                    DefaultListModel model = (DefaultListModel) list.getModel();
+                    model.addElement(channel);
+                    table.setValueAt(null, rows[i], 1);
+                }
             }
         } else if (e.getSource() == assign) {
             int[] rows = list.getSelectedIndices();
@@ -351,7 +353,6 @@ public class ChannelPanel implements ActionListener {
                 Channel chan = (Channel) o;
                 String vdrChan = chan.getName();
                 vdrChan = vdrChan.toLowerCase();
-                vdrChan = vdrChan.split("\\s|-")[0];
                 int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
                 list.add(new Container(percent, i, chan));
             }
