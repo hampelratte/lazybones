@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.64 2007-03-24 19:12:41 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.65 2007-03-25 18:24:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -114,9 +114,6 @@ public class LazyBones extends Plugin {
         Player.play(program);
     }
     
-    // TODO in beiden deleteTimer methoden, erst gucken, ob der timer läuft
-    // wenn ja, dann erst deaktivieren und dann löschen. am besten für 
-    // eine eigene action dafür bauen, die aufgerufen wird (eventuell auch für alle anderen svdrp commandos was bauen)
     public void deleteTimer(Timer timer) {
         DeleteTimerAction dta = new DeleteTimerAction(timer);
         if(!dta.execute()) {
@@ -854,7 +851,7 @@ public class LazyBones extends Plugin {
                     }
                     
                     // this timer is no doppelpack, but the times are weird
-                    // we now look if the user made a mapping before
+                    // we now look if the user has made a mapping before
                     if(timer.getReason() == Timer.NOT_FOUND) {
                         // lookup old mappings
                         boolean found = lookUpTimer(timer, null);
@@ -1008,6 +1005,13 @@ public class LazyBones extends Plugin {
         String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
         showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
         props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
+        
+        String minChannelNumber = props.getProperty("minChannelNumber");
+        minChannelNumber = minChannelNumber == null ? "0" : minChannelNumber;
+        props.setProperty("minChannelNumber", minChannelNumber);
+        String maxChannelNumber = props.getProperty("maxChannelNumber");
+        maxChannelNumber = maxChannelNumber == null ? "0" : maxChannelNumber;
+        props.setProperty("maxChannelNumber", maxChannelNumber);
         
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);

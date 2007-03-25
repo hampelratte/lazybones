@@ -1,4 +1,4 @@
-/* $Id: VDRChannelList.java,v 1.5 2007-03-17 15:08:30 hampelratte Exp $
+/* $Id: VDRChannelList.java,v 1.6 2007-03-25 18:24:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 
@@ -43,6 +44,8 @@ public class VDRChannelList {
     private static VDRChannelList instance;
 
     private List<Channel> channels = null;
+    
+    private List<Channel> filteredChannels = new ArrayList<Channel>();
 
     public void update() {
         Response res = VDRConnection.send(new LSTC());
@@ -56,6 +59,21 @@ public class VDRChannelList {
             instance = new VDRChannelList();
         }
         return instance;
+    }
+    
+    public List<Channel> getFilteredChannels() {
+        filteredChannels.clear();
+        int min = Integer.parseInt(LazyBones.getProperties().getProperty("minChannelNumber"));
+        int max = Integer.parseInt(LazyBones.getProperties().getProperty("maxChannelNumber"));
+
+        for (Iterator iter = channels.iterator(); iter.hasNext();) {
+            Channel chan = (Channel) iter.next();
+            if(chan.getChannelNumber() >= min && (chan.getChannelNumber() <= max || max == 0 )) {
+                filteredChannels.add(chan);
+            }
+        }
+        
+        return filteredChannels;
     }
     
     public List<Channel> getChannels() {

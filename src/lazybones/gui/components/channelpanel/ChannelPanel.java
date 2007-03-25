@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.6 2007-03-25 14:35:53 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.7 2007-03-25 18:24:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,12 +42,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.LazyBones;
@@ -81,6 +76,10 @@ public class ChannelPanel implements ActionListener {
     private JList list = new JList();
     
     private JTable table = new JTable();
+    
+    private JSpinner minChannelNumber = new JSpinner(new SpinnerNumberModel(0,0,10000,1));
+    
+    private JSpinner maxChannelNumber = new JSpinner(new SpinnerNumberModel(0,0,10000,1));
 
     private LazyBones lazyBones;
 
@@ -123,6 +122,11 @@ public class ChannelPanel implements ActionListener {
         tableScrollpane = new JScrollPane(table);
         listScrollpane = new JScrollPane(list);
         
+        String minChannel = LazyBones.getProperties().getProperty("minChannelNumber");
+        minChannelNumber.setValue(new Integer(minChannel));
+        String maxChannel = LazyBones.getProperties().getProperty("maxChannelNumber");
+        maxChannelNumber.setValue(new Integer(maxChannel));
+        
         refresh.addActionListener(this);
         autoAssign.addActionListener(this);
         up.addActionListener(this);
@@ -142,7 +146,7 @@ public class ChannelPanel implements ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
@@ -152,8 +156,21 @@ public class ChannelPanel implements ActionListener {
         gbc.gridx = 4;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.weightx = 0.0;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
         panel.add(listScrollpane, gbc);
+        
+        // channel interval spinner 
+        JPanel channelInterval = new JPanel();
+        channelInterval.add(new JLabel(LazyBones.getTranslation("channels", "Channels")));
+        channelInterval.add(minChannelNumber);
+        channelInterval.add(new JLabel("-"));
+        channelInterval.add(maxChannelNumber);
+        gbc.gridx = 4;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(0,0,0,0);
+        panel.add(channelInterval, gbc);
         
         // assign buttons
         JPanel assignButtonPanel = new JPanel(new GridLayout(2,1,0,5));
@@ -161,31 +178,34 @@ public class ChannelPanel implements ActionListener {
         assignButtonPanel.add(remove);
         gbc.gridx = 3;
         gbc.gridy = 0;
+        gbc.gridheight = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5,5,5,5);
         panel.add(assignButtonPanel, gbc);
         
         // autoAssign
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
+        gbc.gridheight = 1;
         panel.add(autoAssign, gbc);
         
         // up
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         panel.add(up, gbc);
         
         // down
         gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         panel.add(down, gbc);
         
         // refresh
         gbc.gridx = 4;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(refresh, gbc);
         
@@ -262,11 +282,15 @@ public class ChannelPanel implements ActionListener {
     }
 
     private void refreshChannelList() {
+        // set min and max channel number
+        LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
+        LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
+        
         try {
             DefaultListModel model = (DefaultListModel) list.getModel();
             model.clear();
             VDRChannelList.getInstance().update();
-            List<Channel> vdrchans = VDRChannelList.getInstance().getChannels();
+            List<Channel> vdrchans = VDRChannelList.getInstance().getFilteredChannels();
             if (vdrchans != null) {
                 // add vdrchannels to channel list
                 for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
@@ -320,6 +344,10 @@ public class ChannelPanel implements ActionListener {
     }
 
     public void saveSettings() {
+        // set min and max channel number
+        LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
+        LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
+        
         Hashtable<String,Channel> channelMapping = new Hashtable<String,Channel>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             devplugin.Channel c = (devplugin.Channel) tableModel.getValueAt(i, 0);
