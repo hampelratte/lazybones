@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.1 2007-01-28 15:04:56 hampelratte Exp $
+/* $Id: Utilities.java,v 1.2 2007-03-25 14:36:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,39 +49,34 @@ import lazybones.Timer;
  */
 public class Utilities {
 
-    /*
-     * public static int percentageOfCommonWords(String s, String t) { if (s ==
-     * null || t == null) { return 0; }
-     * 
-     * s = s.toLowerCase(); s = s.replaceAll("-", " "); s = s.replaceAll(":", "
-     * "); s = s.replaceAll(";", " "); s = s.replaceAll("\\|", " "); s =
-     * s.replaceAll("_", " "); s = s.replaceAll("\\.", "\\. "); s = s.trim(); t =
-     * t.toLowerCase(); t = t.replaceAll("-", " "); t = t.replaceAll(":", " ");
-     * t = t.replaceAll(";", " "); t = t.replaceAll("\\|", " "); t =
-     * t.replaceAll("_", " "); t = t.replaceAll("\\.", "\\. "); t = t.trim();
-     * String[] s1Words = s.split(" "); String[] s2Words = t.split(" ");
-     * 
-     * String[] searchWords; String[] title; if (s1Words.length >
-     * s2Words.length) { title = s1Words; searchWords = s2Words; } else { title =
-     * s2Words; searchWords = s1Words; } // count the words, which both titles
-     * have // in common int matchCount = 0; for (int i = 0; i <
-     * searchWords.length; i++) { if (contains(title, searchWords[i])) {
-     * matchCount++; } } // calculate the percentage of common words int percent =
-     * (int) ((double) matchCount * 100 / (double) searchWords.length); //
-     * System.out.println(s1+"="+s2+" "+percent+"%"); return percent; }
-     * 
-     * 
-     * private static boolean contains(String[] array, String query) { for (int
-     * i = 0; i < array.length; i++) { if (array[i].equals(query)) { return
-     * true; } } return false; }
-     * 
-     */
-
     public static int percentageOfEquality(String s, String t) {
         if (s == null || t == null) {
             return 0;
         }
-
+        
+        // check if the strings are equal
+        if(s.equals(t)) {
+            return 100;
+        }
+        
+        // check if one string is a substring of the other
+        String shorter;
+        String longer;
+        if(s.length() > t.length()) {
+            shorter = t;
+            longer = s;
+        } else {
+            shorter = s;
+            longer = t;
+        }
+        if(longer.startsWith(shorter) && longer.length() > shorter.length()) {
+            if(longer.charAt(shorter.length()) == ' ') {
+                return 99;
+            } else {
+                return 98;
+            }
+        }
+        
         s = s.toLowerCase();
         s = s.replaceAll("-", " ");
         s = s.replaceAll(":", " ");
@@ -98,14 +93,14 @@ public class Utilities {
         t = t.replaceAll("_", " ");
         t = t.replaceAll("\\.", "\\. ");
         t = t.trim();
-
+        
+        // calculate levenshteinDistance
         int levenshteinDistance = Utilities.getLevenshteinDistance(s, t);
         int length = Math.max(s.length(), t.length());
 
         // calculate the percentage of equality
-        int percent = 100 - (int) ((double) levenshteinDistance * 100 / (double) length);
-        // System.out.println(s+"="+t+" "+percent+"%");
-        return percent;
+        int percentage = 100 - (int) ((double) levenshteinDistance * 100 / (double) length);
+        return percentage;
     }
 
     public static int getLevenshteinDistance(String s, String t) {
