@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.13 2007-03-25 13:02:02 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.14 2007-03-26 19:02:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -121,6 +121,9 @@ public class TimerOptionsDialog implements ActionListener,
 
     private boolean update = false;
     
+    private int oldHour, oldMinute;
+    
+    
     public TimerOptionsDialog(LazyBones control, Timer timer, Program prog, boolean update) {
         this.update = update;
         this.control = control;
@@ -242,6 +245,7 @@ public class TimerOptionsDialog implements ActionListener,
         gbc.gridy = 1;
         panel.add(cbVps, gbc);
         cbVps.setSelected(timer.hasState(VDRTimer.VPS));
+        cbVps.addActionListener(this);
         
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -342,7 +346,29 @@ public class TimerOptionsDialog implements ActionListener,
             control.createTimerCallBack(timer, prog, update);
         } else if (e.getSource() == cancel) {
             dialog.dispose();
-        } 
+        } else if (e.getSource() == cbVps) {
+            if(update) {
+                return;
+            }
+            
+            // FIXME auch bei einem update müsste die zeit neugesetzt werden
+            // dazu müsste aber ein neuer timer angelegt werden
+            // könnte man mit einer VDRAction lösen
+            if(cbVps.isSelected()) {
+                // store current values
+                oldHour = ((Time) starttime.getValue()).getHour();
+                oldMinute = ((Time) starttime.getValue()).getMinute();
+                
+                // VPS needs the unbuffered start time
+                Calendar start = timer.getUnbufferedStartTime();
+                int hour = start.get(Calendar.HOUR_OF_DAY);
+                int minute = start.get(Calendar.MINUTE);
+                starttime.getModel().setValue(new Time(hour, minute));
+            } else {
+                // set the timer to the original startTime
+                starttime.getModel().setValue(new Time(oldHour, oldMinute));
+            }
+        }
     }
 
     public void itemStateChanged(ItemEvent e) {
