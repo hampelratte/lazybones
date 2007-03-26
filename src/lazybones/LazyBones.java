@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.65 2007-03-25 18:24:10 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.66 2007-03-26 19:01:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -230,11 +230,13 @@ public class LazyBones extends Plugin {
 
             if (vdrEPG != null) {
                 Calendar calStart = vdrEPG.getStartTime();
+                timer.setUnbufferedStartTime((Calendar) calStart.clone());
                 // start the recording x min before the beggining of the program
                 calStart.add(Calendar.MINUTE, -buffer_before);
                 timer.setStartTime(calStart);
 
                 Calendar calEnd = vdrEPG.getEndTime();
+                timer.setUnbufferedEndTime((Calendar) calEnd.clone());
                 // stop the recording x min after the end of the program
                 calEnd.add(Calendar.MINUTE, buffer_after);
                 timer.setEndTime(calEnd);
@@ -395,6 +397,9 @@ public class LazyBones extends Plugin {
             Calendar endTime = (Calendar) startTime.clone();
             endTime.add(Calendar.MINUTE, prog.getLength());
 
+            newTimer.setUnbufferedStartTime((Calendar) startTime.clone());
+            newTimer.setUnbufferedEndTime((Calendar) endTime.clone());
+            
             // add buffers
             startTime.add(Calendar.MINUTE, -buffer_before);
             newTimer.setStartTime(startTime);
