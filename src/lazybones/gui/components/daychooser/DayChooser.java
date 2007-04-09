@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.1 2007-04-09 19:02:47 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.components.daychooser;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
