@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.1 2007-04-09 19:46:54 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.2 2007-04-09 20:23:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,7 +49,7 @@ import lazybones.TimerManager;
 import lazybones.VDRConnection;
 import lazybones.actions.DeleteRecordingAction;
 import lazybones.actions.VDRAction;
-import lazybones.gui.utils.TimerListCellRenderer;
+import lazybones.gui.utils.RecordingListCellRenderer;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
@@ -86,7 +86,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         gbc.insets = new java.awt.Insets(10,10,10,10);
         gbc.gridx = 0;
         recordingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //recordingList.setCellRenderer(new TimerListCellRenderer());
+        recordingList.setCellRenderer(new RecordingListCellRenderer());
         scrollPane = new JScrollPane(recordingList);
         this.add(scrollPane, gbc);
         

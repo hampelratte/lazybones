@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.1 2007-04-09 20:23:43 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.2 2007-04-09 20:24:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,13 +45,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
 import lazybones.LazyBones;
-import lazybones.ProgramManager;
-import lazybones.Timer;
-import lazybones.VDRChannelList;
 
 import org.hampelratte.svdrp.responses.highlevel.Recording;
-
-import devplugin.Channel;
 
 public class RecordingListCellRenderer extends JPanel implements ListCellRenderer {
     
