@@ -1,4 +1,4 @@
-/* $Id: VDRAction.java,v 1.1 2007-03-24 19:16:34 hampelratte Exp $
+/* $Id: VDRAction.java,v 1.2 2007-04-09 18:55:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,8 @@
  */
 package lazybones.actions;
 
+import org.hampelratte.svdrp.Response;
+
 public interface VDRAction {
     
     /**
@@ -36,4 +38,10 @@ public interface VDRAction {
      * @return true, if the action has been succesfully executed 
      */
     public boolean execute();
+    
+    /**
+     * Returns the response of VDR
+     * @return the response of VDR
+     */
+    public Response getResponse();
 }
