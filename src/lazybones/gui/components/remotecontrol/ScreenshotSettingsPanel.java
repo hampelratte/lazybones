@@ -1,4 +1,4 @@
-/* $Id: PreviewSettingsPanel.java,v 1.3 2006-04-01 14:02:10 hampelratte Exp $
+/* $Id: ScreenshotSettingsPanel.java,v 1.1 2007-04-09 19:13:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.components.remotecontrol;
 
 import info.clearthought.layout.TableLayout;
 
@@ -42,7 +42,7 @@ import javax.swing.*;
 
 import lazybones.LazyBones;
 
-public class PreviewSettingsPanel implements ItemListener {
+public class ScreenshotSettingsPanel implements ItemListener {
     private String lMethod = LazyBones.getTranslation("method", "Method");
     
     private JComboBox method = new JComboBox();
@@ -72,7 +72,7 @@ public class PreviewSettingsPanel implements ItemListener {
     
     private JComponent note;
 
-    public PreviewSettingsPanel() {
+    public ScreenshotSettingsPanel() {
         initComponents();
     }
     

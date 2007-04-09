@@ -1,4 +1,4 @@
-/* $Id: NavigationBlock.java,v 1.3 2006-03-30 13:18:44 hampelratte Exp $
+/* $Id: NavigationBlock.java,v 1.1 2007-04-09 19:13:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,7 +31,7 @@
  * Created on 25.03.2005
  *
  */
-package lazybones.gui;
+package lazybones.gui.components.remotecontrol;
 
 import java.awt.GridLayout;
 

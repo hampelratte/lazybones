@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.5 2007-02-17 14:29:52 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.6 2007-04-09 19:13:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,7 @@ import javax.swing.JTabbedPane;
 
 import lazybones.LazyBones;
 import lazybones.gui.components.channelpanel.ChannelPanel;
+import lazybones.gui.components.remotecontrol.ScreenshotSettingsPanel;
 import util.ui.ImageUtilities;
 
 /**
@@ -59,7 +60,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 
     private TimerPanel timerPanel;
 
-    private PreviewSettingsPanel previewPanel;
+    private ScreenshotSettingsPanel previewPanel;
 
     public VDRSettingsPanel(LazyBones control) {
         this.control = control;
@@ -87,7 +88,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.addTab(LazyBones.getTranslation("timer", ""), timerPanel
 					.getPanel());
 
-            previewPanel = new PreviewSettingsPanel();
+            previewPanel = new ScreenshotSettingsPanel();
             tabbedPane.addTab(LazyBones.getTranslation("remoteControl", ""), previewPanel
 					.getPanel());
         }
