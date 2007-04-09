@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.6 2007-04-09 19:21:50 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.7 2007-04-09 19:46:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,9 +67,10 @@ public class MainDialog extends JDialog {
         remoteControl.add(new RemoteControl(lazyBones), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         remoteControl.add(pp, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
-        tabbedPane.add(LazyBones.getTranslation("timer", "Timers"), new TimerManagerPanel(lazyBones));
+        tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel(lazyBones));
         timelinePanel = new TimelinePanel(lazyBones);
         tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), timelinePanel);
+        tabbedPane.add(LazyBones.getTranslation("recordings", "Recordings"), new RecordingManagerPanel());
         
         this.add(tabbedPane);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
