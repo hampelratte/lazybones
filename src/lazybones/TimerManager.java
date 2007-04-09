@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.15 2007-03-24 19:14:54 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.16 2007-04-09 19:23:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,7 +33,7 @@ import java.util.*;
 
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
-import lazybones.gui.TitleMapping;
+import lazybones.gui.utils.TitleMapping;
 import lazybones.utils.Utilities;
 
 /**

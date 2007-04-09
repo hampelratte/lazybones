@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.5 2007-04-09 19:13:15 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.6 2007-04-09 19:21:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import lazybones.LazyBones;
-import lazybones.gui.components.remotecontrol.ScreenshotPanel;
+import lazybones.gui.components.ScreenshotPanel;
 import lazybones.gui.components.remotecontrol.RemoteControl;
 
 public class MainDialog extends JDialog {

@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.7 2007-01-28 15:13:39 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.2 2007-04-09 19:23:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.settings;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,6 +42,7 @@ import javax.swing.*;
 import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
+import lazybones.gui.utils.TitleMapping;
 
 public class TimerPanel implements MouseListener, ActionListener {
     private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");

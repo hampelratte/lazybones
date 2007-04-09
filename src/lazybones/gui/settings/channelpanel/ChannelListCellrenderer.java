@@ -1,4 +1,4 @@
-/* $Id: ChannelSet.java,v 1.2 2007-03-17 15:55:31 hampelratte Exp $
+/* $Id: ChannelListCellrenderer.java,v 1.1 2007-04-09 19:20:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,34 +27,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.components.channelpanel.dnd;
+package lazybones.gui.settings.channelpanel;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.util.LinkedHashSet;
+import java.awt.Component;
 
-public class ChannelSet<Channel> extends LinkedHashSet implements Transferable {
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
 
-    public static final DataFlavor FLAVOR = new DataFlavor(ChannelSet.class, "VDR Channels");
+import org.hampelratte.svdrp.responses.highlevel.Channel;
 
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if(flavor.equals(FLAVOR)) {
-            return this;
-        }
-        return null;
-    }
 
-    public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] {FLAVOR};
-    }
+public class ChannelListCellrenderer extends DefaultListCellRenderer {
 
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        if(flavor.equals(FLAVOR)) {
-            return true;
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        if(value instanceof Channel) {
+            Channel chan = (Channel) value;
+            return super.getListCellRendererComponent(list, "[" + chan.getChannelNumber()+ "] " + chan.getName(), index, isSelected, cellHasFocus);
         } else {
-            return false;
+            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }
     }
+
 }

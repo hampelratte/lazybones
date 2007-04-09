@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.66 2007-03-26 19:01:29 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.67 2007-04-09 19:20:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,7 +41,7 @@ import lazybones.gui.MainDialog;
 import lazybones.gui.ProgramSelectionDialog;
 import lazybones.gui.TimerOptionsDialog;
 import lazybones.gui.TimerSelectionDialog;
-import lazybones.gui.VDRSettingsPanel;
+import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.Connection;

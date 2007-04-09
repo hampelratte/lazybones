@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.5 2007-03-17 16:18:58 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.1 2007-04-09 19:20:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.components.channelpanel.dnd;
+package lazybones.gui.settings.channelpanel.dnd;
 
 import java.util.HashSet;
 import java.util.Iterator;

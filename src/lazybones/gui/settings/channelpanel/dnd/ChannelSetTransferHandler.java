@@ -1,4 +1,4 @@
-package lazybones.gui.components.channelpanel.dnd;
+package lazybones.gui.settings.channelpanel.dnd;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

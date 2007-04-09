@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.3 2007-01-07 12:37:24 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.4 2007-04-09 19:23:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,6 +49,7 @@ import lazybones.Logger;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
+import lazybones.gui.utils.TimerListCellRenderer;
 
 public class TimerManagerPanel extends JPanel implements ActionListener, Observer {
 

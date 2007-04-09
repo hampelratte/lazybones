@@ -1,4 +1,4 @@
-/* $Id: ChannelListCellrenderer.java,v 1.3 2007-03-22 18:48:50 hampelratte Exp $
+/* $Id: ChannelSet.java,v 1.1 2007-04-09 19:20:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,25 +27,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.components.channelpanel;
+package lazybones.gui.settings.channelpanel.dnd;
 
-import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.util.LinkedHashSet;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
+public class ChannelSet<Channel> extends LinkedHashSet implements Transferable {
 
-import org.hampelratte.svdrp.responses.highlevel.Channel;
+    public static final DataFlavor FLAVOR = new DataFlavor(ChannelSet.class, "VDR Channels");
 
-
-public class ChannelListCellrenderer extends DefaultListCellRenderer {
-
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        if(value instanceof Channel) {
-            Channel chan = (Channel) value;
-            return super.getListCellRendererComponent(list, "[" + chan.getChannelNumber()+ "] " + chan.getName(), index, isSelected, cellHasFocus);
-        } else {
-            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        if(flavor.equals(FLAVOR)) {
+            return this;
         }
+        return null;
     }
 
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[] {FLAVOR};
+    }
+
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        if(flavor.equals(FLAVOR)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

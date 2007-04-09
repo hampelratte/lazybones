@@ -1,4 +1,4 @@
-/* $Id: SpinnerTimeModel.java,v 1.2 2006-09-07 13:38:27 hampelratte Exp $
+/* $Id: SpinnerTimeModel.java,v 1.1 2007-04-09 19:23:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.utils;
 
 import java.util.Iterator;
 import java.util.Vector;

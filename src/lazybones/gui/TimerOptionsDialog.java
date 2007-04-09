@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.15 2007-04-09 19:02:46 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.16 2007-04-09 19:23:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,6 +50,7 @@ import lazybones.Timer;
 import lazybones.VDRChannelList;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
+import lazybones.gui.utils.SpinnerTimeModel;
 import tvbrowser.core.ChannelList;
 import devplugin.Date;
 import devplugin.Plugin;

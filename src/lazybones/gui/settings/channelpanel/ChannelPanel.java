@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.7 2007-03-25 18:24:10 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.1 2007-04-09 19:20:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.components.channelpanel;
+package lazybones.gui.settings.channelpanel;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,8 +48,8 @@ import javax.swing.table.DefaultTableModel;
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.VDRChannelList;
-import lazybones.gui.components.channelpanel.dnd.ListTransferHandler;
-import lazybones.gui.components.channelpanel.dnd.TableTransferHandler;
+import lazybones.gui.settings.channelpanel.dnd.ListTransferHandler;
+import lazybones.gui.settings.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;

@@ -1,4 +1,4 @@
-/* $Id: ScreenshotSettingsPanel.java,v 1.1 2007-04-09 19:13:15 hampelratte Exp $
+/* $Id: ScreenshotSettingsPanel.java,v 1.1 2007-04-09 19:20:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.components.remotecontrol;
+package lazybones.gui.settings;
 
 import info.clearthought.layout.TableLayout;
 

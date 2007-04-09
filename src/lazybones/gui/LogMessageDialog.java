@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.7 2006-12-30 14:42:13 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.8 2007-04-09 19:23:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,6 +43,7 @@ import javax.swing.*;
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.Logger.LoggingLevel;
+import lazybones.gui.utils.LogMessage;
 
 public class LogMessageDialog extends JDialog {
     

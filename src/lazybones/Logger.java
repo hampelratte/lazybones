@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.7 2007-03-24 19:13:01 hampelratte Exp $
+/* $Id: Logger.java,v 1.8 2007-04-09 19:23:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,8 +31,8 @@ package lazybones;
 
 import java.util.logging.Level;
 
-import lazybones.gui.LogMessage;
 import lazybones.gui.LogMessageDialog;
+import lazybones.gui.utils.LogMessage;
 
 public class Logger {
 
