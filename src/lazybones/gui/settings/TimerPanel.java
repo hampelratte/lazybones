@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.2 2007-04-09 19:23:41 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.1 2007-04-09 19:20:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,7 @@ import javax.swing.*;
 import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
-import lazybones.gui.utils.TitleMapping;
+import lazybones.gui.TitleMapping;
 
 public class TimerPanel implements MouseListener, ActionListener {
     private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");
