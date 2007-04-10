@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.2 2007-04-09 20:23:44 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.3 2007-04-10 19:56:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
@@ -146,6 +148,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             recordings = RecordingsParser.parse(res.getMessage(), true);
         }
         
+        Collections.sort(recordings, new RecordingComparator());
+        
         if(recordings != null) {
             for (Iterator iter = recordings.iterator(); iter.hasNext();) {
                 Recording rec = (Recording) iter.next();
@@ -171,6 +175,22 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     public void update(Observable arg0, Object arg1) {
         if(arg0 == TimerManager.getInstance()) {
             getRecordings();
+        }
+    }
+    
+    private class RecordingComparator implements Comparator<Recording> {
+        public int compare(Recording r1, Recording r2) {
+            String title1 = r1.getTitle();
+            String title2 = r2.getTitle();
+            
+            if(title1.charAt(0) == '%' || title1.charAt(0) == '@') {
+                title1 = title1.substring(1);
+            }
+            if(title2.charAt(0) == '%' || title2.charAt(0) == '@') {
+                title2 = title2.substring(1);
+            }
+            
+            return title1.compareTo(title2);
         }
     }
 }
