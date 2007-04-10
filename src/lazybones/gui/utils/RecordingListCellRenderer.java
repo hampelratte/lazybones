@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.2 2007-04-09 20:24:20 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.3 2007-04-10 19:44:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -112,6 +112,8 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             
             if(recording.isNew()) {
                 newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
+            } else {
+                newRec.setIcon(null);
             }
             
             return this;
