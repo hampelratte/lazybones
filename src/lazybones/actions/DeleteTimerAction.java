@@ -1,4 +1,4 @@
-/* $Id: DeleteTimerAction.java,v 1.2 2007-03-25 13:02:05 hampelratte Exp $
+/* $Id: DeleteTimerAction.java,v 1.3 2007-04-30 13:36:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,7 +31,11 @@ package lazybones.actions;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
+import lazybones.LazyBones;
 import lazybones.Timer;
+import lazybones.TimerManager;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.TimersOutOfSync;
 
@@ -47,9 +51,20 @@ public class DeleteTimerAction implements VDRAction {
 
     private Timer timer;
     private Response response;
+    private boolean forceDeletion = false;
     
     public DeleteTimerAction(Timer timer) {
         this.timer = timer;
+    }
+    
+    /**
+     * 
+     * @param timer The timer to delete.
+     * @param forceDeletion If set, the timer will be deleted without user confirmation
+     */
+    public DeleteTimerAction(Timer timer, boolean forceDeletion) {
+        this.timer = timer;
+        this.forceDeletion = forceDeletion;
     }
     
     public boolean execute() {
@@ -70,6 +85,15 @@ public class DeleteTimerAction implements VDRAction {
         
         // check if timer is recording
         if(timer.hasState(Timer.RECORDING)) {
+            if(!forceDeletion) {
+                int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getParent(), 
+                        LazyBones.getTranslation("recording_timer_delete", "This timer is currently recording! Do you really want to delete it?"),
+                        "", JOptionPane.YES_NO_OPTION);
+                if(result != JOptionPane.OK_OPTION) {
+                    return true;
+                }
+            }
+            
             // we have to deactivate the timer before we
             // are able to delete it
             timer.changeStateTo(Timer.ACTIVE, false);
@@ -85,6 +109,8 @@ public class DeleteTimerAction implements VDRAction {
             return false;
         }
         
+        // timer has been deleted -> synchronize timer list
+        TimerManager.getInstance().synchronize();
         return true;
     }
 
