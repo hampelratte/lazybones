@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.1 2007-04-09 19:23:40 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.2 2007-04-30 16:43:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,21 +29,13 @@
  */
 package lazybones.gui.utils;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.text.DateFormat;
 import java.util.Locale;
 
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import javax.swing.UIManager;
+import javax.swing.*;
 
+import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.VDRChannelList;
@@ -55,6 +47,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     private JLabel channel = new JLabel();
     private JLabel time = new JLabel();
     private JLabel title = new JLabel();
+    private JLabel recording = new JLabel();
     
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
@@ -73,6 +66,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
         title.setFont(bold);
+        recording.setFont(recording.getFont().deriveFont(9.0f));
         
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -85,13 +79,17 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         add(date, gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        add(channel, gbc);
+        add(channel, gbc);        
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        add(recording, gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(time, gbc);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
         add(title, gbc);
     }
 
@@ -118,6 +116,14 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
                 org.hampelratte.svdrp.responses.highlevel.Channel c = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
                 if(c != null)
                     channel.setText(c.getName());
+            }
+            
+            if(timer.isRecording()) {
+                recording.setIcon( LazyBones.getInstance().getIcon("lazybones/capture.png") );
+                recording.setText(LazyBones.getTranslation("tooltip_recording", "Currently recording"));
+            } else {
+                recording.setIcon(null);
+                recording.setText("");
             }
             
             return this;
