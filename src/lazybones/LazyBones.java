@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.69 2007-04-30 15:43:49 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.70 2007-04-30 17:10:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,7 +36,6 @@ import java.util.*;
 
 import javax.swing.*;
 
-import lazybones.actions.DeleteTimerAction;
 import lazybones.gui.MainDialog;
 import lazybones.gui.ProgramSelectionDialog;
 import lazybones.gui.TimerOptionsDialog;
@@ -110,46 +109,6 @@ public class LazyBones extends Plugin implements Observer {
 
     private void watch(Program program) {
         Player.play(program);
-    }
-    
-    public void deleteTimer(Timer timer) {
-        DeleteTimerAction dta = new DeleteTimerAction(timer);
-        if(!dta.execute()) {
-            logger.log(LazyBones.getTranslation(
-                    "couldnt_delete", "Couldn\'t delete timer:")
-                    + " " + dta.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
-            return;
-        }
-
-        ArrayList<String> progIDs = timer.getTvBrowserProgIDs();
-        for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
-            String id = (String) iter.next();
-            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), id);
-            if(prog != null) {
-                prog.unmark(this);
-            } else { // can be null, if program time is near 00:00, because then
-                     // the wrong day is taken to ask tvb for the programm
-                prog = ProgramManager.getInstance().getProgram(timer.getEndTime(), id);
-                if(prog != null) {
-                    prog.unmark(this);
-                }
-            }
-        }
-        TimerManager.getInstance().synchronize();
-    }
-    
-    public void deleteTimer(Program prog) {
-        Timer timer = TimerManager.getInstance().getTimer(prog.getID());
-        DeleteTimerAction dta = new DeleteTimerAction(timer);
-        if(!dta.execute()) {
-            logger.log(LazyBones.getTranslation(
-                    "couldnt_delete", "Couldn\'t delete timer:")
-                    + " " + dta.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
-            return;
-        }
-        
-        //prog.unmark(this);
-        TimerManager.getInstance().synchronize();
     }
     
     public void createTimer() {
@@ -608,7 +567,7 @@ public class LazyBones extends Plugin implements Observer {
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
-        return new PluginInfo(name, description, author, new Version(0, 4, false, "CVS-2007-03-17"));
+        return new PluginInfo(name, description, author, new Version(0, 4, false, "CVS-2007-04-30"));
     }
 
     
@@ -1305,7 +1264,7 @@ public class LazyBones extends Plugin implements Observer {
 
                 actions[1] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        deleteTimer(program);
+                        TimerManager.getInstance().deleteTimer(program);
                     }
                 };
                 actions[1].putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
@@ -1365,7 +1324,7 @@ public class LazyBones extends Plugin implements Observer {
                 JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("lazybones/cancel.png"));
                 delItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        deleteTimer(timer);
+                        TimerManager.getInstance().deleteTimer(timer);
                     }
                     
                 });

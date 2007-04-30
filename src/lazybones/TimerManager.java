@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.17 2007-04-30 13:34:51 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.18 2007-04-30 17:10:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,6 +31,7 @@ package lazybones;
 
 import java.util.*;
 
+import lazybones.actions.DeleteTimerAction;
 import lazybones.gui.utils.TitleMapping;
 import lazybones.utils.Utilities;
 
@@ -402,5 +403,45 @@ public class TimerManager extends Observable {
                 }
             }
         }
+    }
+    
+    public void deleteTimer(Timer timer) {
+        DeleteTimerAction dta = new DeleteTimerAction(timer);
+        if(!dta.execute()) {
+            logger.log(LazyBones.getTranslation(
+                    "couldnt_delete", "Couldn\'t delete timer:")
+                    + " " + dta.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+            return;
+        }
+
+        ArrayList<String> progIDs = timer.getTvBrowserProgIDs();
+        for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
+            String id = (String) iter.next();
+            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), id);
+            if(prog != null) {
+                prog.unmark(LazyBones.getInstance());
+            } else { // can be null, if program time is near 00:00, because then
+                     // the wrong day is taken to ask tvb for the programm
+                prog = ProgramManager.getInstance().getProgram(timer.getEndTime(), id);
+                if(prog != null) {
+                    prog.unmark(LazyBones.getInstance());
+                }
+            }
+        }
+        TimerManager.getInstance().synchronize();
+    }
+    
+    public void deleteTimer(Program prog) {
+        Timer timer = TimerManager.getInstance().getTimer(prog.getID());
+        DeleteTimerAction dta = new DeleteTimerAction(timer);
+        if(!dta.execute()) {
+            logger.log(LazyBones.getTranslation(
+                    "couldnt_delete", "Couldn\'t delete timer:")
+                    + " " + dta.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+            return;
+        }
+        
+        //prog.unmark(this);
+        TimerManager.getInstance().synchronize();
     }
 }
