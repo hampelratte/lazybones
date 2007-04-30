@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.68 2007-04-30 13:34:25 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.69 2007-04-30 15:43:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -1260,6 +1260,20 @@ public class LazyBones extends Plugin implements Observer {
         return cmf.createSimpleActionMenu(timer);
     }
     
+    public void update(Observable arg0, Object arg1) {
+        // mark all "timed" programs (haltOnNoChannel = false, because we can
+        // have multiple channels)
+        markPrograms(TimerManager.getInstance().getTimers(), false);
+
+        // update the plugin tree
+        updateTree();
+    }
+    
+    public void synchronize() {
+        TimerManager.getInstance().synchronize();
+        RecordingManager.getInstance().synchronize();
+    }
+    
     // TODO standard icons von tvbrowser nehmen und über createImageIcon laden
     private class ContextMenuFactory {
         public ActionMenu createActionMenu(final Program program) {
@@ -1308,7 +1322,7 @@ public class LazyBones extends Plugin implements Observer {
 
                 actions[3] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        TimerManager.getInstance().synchronize();
+                        LazyBones.getInstance().synchronize();
                     }
                 };
                 actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
@@ -1326,7 +1340,7 @@ public class LazyBones extends Plugin implements Observer {
 
                 actions[2] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        TimerManager.getInstance().synchronize();
+                        LazyBones.getInstance().synchronize();
                     }
                 };
                 actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
@@ -1371,14 +1385,5 @@ public class LazyBones extends Plugin implements Observer {
             return simpleMenu;
         }
         
-    }
-
-    public void update(Observable arg0, Object arg1) {
-        // mark all "timed" programs (haltOnNoChannel = false, because we can
-        // have multiple channels)
-        markPrograms(TimerManager.getInstance().getTimers(), false);
-
-        // update the plugin tree
-        updateTree();
     }
 }

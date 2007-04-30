@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.14 2007-03-24 19:15:31 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.15 2007-04-30 15:44:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,14 +29,11 @@
  */
 package lazybones;
 
-import javax.swing.ProgressMonitor;
-
 import lazybones.actions.responses.ConnectionProblem;
 
 import org.hampelratte.svdrp.Command;
 import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.STAT;
 
 
 /**
@@ -45,7 +42,7 @@ import org.hampelratte.svdrp.commands.STAT;
  */
 public class VDRConnection {
     
-    private static Logger LOG = Logger.getLogger();
+    private static Logger logger = Logger.getLogger();
 
     private static Connection connection;
 
@@ -55,9 +52,9 @@ public class VDRConnection {
 
     public static int timeout = 500;
     
-
+    
     /**
-     * Sends a SVDRP command to VDR and returns the a response object, which represents the vdr response
+     * Sends a SVDRP command to VDR and returns a response object, which represents the vdr response
      * @param cmd The SVDRP command to send
      * @return The SVDRP response or null, if the Command couldn't be sent
      */
@@ -69,59 +66,33 @@ public class VDRConnection {
             connection.close();
         } catch (Exception e1) {
             res = new ConnectionProblem();
-            LOG.log(res.getMessage(), Logger.CONNECTION, Logger.ERROR);
+            logger.log(res.getMessage(), Logger.CONNECTION, Logger.ERROR);
         }
         return res;
     }
-
   
-    private class ConnectionTester implements Runnable {
-
-        private int timeout;
-        private ProgressMonitor pm;
-        private boolean running = true;
-        
-        ConnectionTester(int timeout, ProgressMonitor pm) {
-            this.timeout = timeout;
-            this.pm = pm;
-        }
-        
-        public boolean isRunning() {
-            return running;
-        }
-
-        public void run() {
-            running = true;
-            for (int i = 0; i < timeout; i++) {
-                pm.setProgress(i);
-                pm.setNote( (timeout-i) + " Seconds übrig");
-                if (pm.isCanceled()) {
-                    break;
-                }
-
-                try {
-                    Connection connection = new Connection(VDRConnection.host,
-                            VDRConnection.port, VDRConnection.timeout);
-                    Connection.DEBUG = true;
-                    Response resp = connection.send(new STAT());
-                    if (resp != null) {
-                        LOG.log("WOL-Process finished", Logger.CONNECTION,
-                                Logger.DEBUG);
-                        pm.close();
-                        break;
-                    }
-                    connection.close();
-                } catch (Exception e) {
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            pm.close();
-            running = false;
-        }
-    }
+    /*
+     * private class ConnectionTester implements Runnable {
+     * 
+     * private int timeout; private ProgressMonitor pm; private boolean running =
+     * true;
+     * 
+     * ConnectionTester(int timeout, ProgressMonitor pm) { this.timeout =
+     * timeout; this.pm = pm; }
+     * 
+     * public boolean isRunning() { return running; }
+     * 
+     * public void run() { running = true; for (int i = 0; i < timeout; i++) {
+     * pm.setProgress(i); pm.setNote( (timeout-i) + " Seconds übrig"); if
+     * (pm.isCanceled()) { break; }
+     * 
+     * try { Connection connection = new Connection(VDRConnection.host,
+     * VDRConnection.port, VDRConnection.timeout); Connection.DEBUG = true;
+     * Response resp = connection.send(new STAT()); if (resp != null) {
+     * LOG.log("WOL-Process finished", Logger.CONNECTION, Logger.DEBUG);
+     * pm.close(); break; } connection.close(); } catch (Exception e) { }
+     * 
+     * try { Thread.sleep(1000); } catch (InterruptedException e) {
+     * e.printStackTrace(); } } pm.close(); running = false; } }
+     */
 }

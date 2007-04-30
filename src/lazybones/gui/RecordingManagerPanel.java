@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.4 2007-04-25 10:25:48 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.5 2007-04-30 15:45:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,14 +45,13 @@ import java.util.Observer;
 import javax.swing.*;
 
 import lazybones.LazyBones;
-import lazybones.TimerManager;
-import lazybones.VDRConnection;
+import lazybones.Logger;
+import lazybones.RecordingManager;
+import lazybones.actions.DeleteRecordingAction;
+import lazybones.gui.components.EPGInfoPanel;
 import lazybones.gui.utils.RecordingListCellRenderer;
 
-import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
-import org.hampelratte.svdrp.util.RecordingsParser;
 
 public class RecordingManagerPanel extends JPanel implements ActionListener, Observer {
 
@@ -66,7 +65,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     
     public RecordingManagerPanel() {
         initGUI();
-        TimerManager.getInstance().addObserver(this);
+        RecordingManager.getInstance().addObserver(this);
+        RecordingManager.getInstance().synchronize();
     }
 
     /**
@@ -105,8 +105,13 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         menuInfo.addActionListener(this);
         menuInfo.setActionCommand("INFO");
         menuInfo.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-find", 16));
+        JMenuItem menuSync = new JMenuItem(LazyBones.getTranslation("resync", "Synchronize with VDR"));
+        menuSync.addActionListener(this);
+        menuSync.setActionCommand("SYNC");
+        menuSync.setIcon(LazyBones.getInstance().getIcon("lazybones/reload.png"));
         popup.add(menuInfo);
         popup.add(menuDelete);
+        popup.add(menuSync);
         
         recordingList.addMouseListener(new MouseListener() {
             public void mousePressed(MouseEvent e) {
@@ -122,41 +127,45 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             public void mouseExited(MouseEvent e) {}
             public void mouseReleased(MouseEvent e) {}
         });
-        
-        getRecordings();
-    }
-    
-    private void getRecordings() {
-        model.removeAllElements();
-
-        List<Recording> recordings = null;
-        
-        Response res = VDRConnection.send(new LSTR());
-        if(res != null && res.getCode() == 250) {
-            recordings = RecordingsParser.parse(res.getMessage(), true);
-            
-            if(recordings != null) {
-                Collections.sort(recordings, new RecordingComparator());
-                for (Iterator iter = recordings.iterator(); iter.hasNext();) {
-                    Recording rec = (Recording) iter.next();
-                    model.addElement(rec);
-                }
-            }
-        }
     }
     
     public void actionPerformed(ActionEvent e) {
+        Recording rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
+        
         if("DELETE".equals(e.getActionCommand())) {
-            // TODO delete
+            DeleteRecordingAction dra = new DeleteRecordingAction(rec);
+            if(!dra.execute()) {
+                Logger.getLogger().log(dra.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+            } else {
+                updateRecordings();
+            }
         } else if("INFO".equals(e.getActionCommand()) && selectedRow >= 0) {
-            Recording rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
-            System.out.println(rec.getEpgInfo().getDescription());
+            JDialog dialog = new JDialog();
+            dialog.getContentPane().add(new EPGInfoPanel(rec.getEpgInfo()));
+            dialog.setSize(400,300);
+            dialog.setVisible(true);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        } else if("SYNC".equals(e.getActionCommand())) {
+            RecordingManager.getInstance().synchronize();
         }
     }
 
-    public void update(Observable arg0, Object arg1) {
-        if(arg0 == TimerManager.getInstance()) {
-            getRecordings();
+    public void update(Observable arg0, Object recordings) {
+        if(arg0 == RecordingManager.getInstance()) {
+            updateRecordings();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void updateRecordings() {
+        model.removeAllElements();
+        List recordings = RecordingManager.getInstance().getRecordings();
+        if(recordings != null && recordings.size() > 0) {
+            Collections.sort(recordings, new RecordingComparator());
+            for (Iterator iter = recordings.iterator(); iter.hasNext();) {
+                Recording rec = (Recording) iter.next();
+                model.addElement(rec);
+            }
         }
     }
     
@@ -172,7 +181,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
                 title2 = title2.substring(1);
             }
             
-            return title1.compareTo(title2);
+            return title1.toLowerCase().compareTo(title2.toLowerCase());
         }
     }
 }
