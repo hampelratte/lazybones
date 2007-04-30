@@ -1,4 +1,4 @@
-/* $Id: DeleteRecordingAction.java,v 1.2 2007-04-30 13:35:36 hampelratte Exp $
+/* $Id: DeleteRecordingAction.java,v 1.3 2007-04-30 15:45:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones.actions;
 import javax.swing.JOptionPane;
 
 import lazybones.LazyBones;
+import lazybones.RecordingManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
 import lazybones.VDRConnection;
@@ -51,13 +52,22 @@ public class DeleteRecordingAction implements VDRAction {
     }
     
     public boolean execute() {
+        int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
+                LazyBones.getTranslation("recording_delete", "Do you really want to delete this recording?"), 
+                "", JOptionPane.YES_NO_OPTION);
+        if(result != JOptionPane.OK_OPTION) {
+            return true;
+        }
+        
         int recordingNumber = recording.getNumber();
         res = VDRConnection.send(new DELR(recordingNumber));
         if(res.getCode() == 250) {
+            // update recording list
+            RecordingManager.getInstance().synchronize();
             return true;
         } else if(res.getCode() == 550 && res.getMessage().indexOf("in use by timer") >= 0) {
             // recording is still running, we have to delete the timer first
-            int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
+            result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
                     LazyBones.getTranslation("recording_running_delete", "Timer is still recording. Do you really want to delete this recording?"), 
                     "", JOptionPane.YES_NO_OPTION);
             if(result != JOptionPane.OK_OPTION) {
@@ -78,13 +88,12 @@ public class DeleteRecordingAction implements VDRAction {
                     if(res.getCode() != 250) {
                         return false;
                     }
-                    
-                    // update recording list
-                    
                 }
             }
         }
         
+        // update recording list
+        RecordingManager.getInstance().synchronize();
         return true;
     }
 
