@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.16 2007-04-09 19:23:40 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.17 2007-04-30 13:34:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,18 +31,26 @@ package lazybones;
 
 import java.util.*;
 
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-
 import lazybones.gui.utils.TitleMapping;
 import lazybones.utils.Utilities;
+
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.LSTT;
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.util.TimerParser;
+
+import devplugin.Date;
+import devplugin.Program;
 
 /**
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  * 
- * Class to manage all timers. No program logic, just a container
+ * Class to manage all timers.
  */
 public class TimerManager extends Observable {
+    
+    private transient static Logger logger = Logger.getLogger();
 
     private static TimerManager instance;
 
@@ -163,6 +171,22 @@ public class TimerManager extends Observable {
                 }
             }
         }
+        return null;
+    }
+    
+    /**
+     * 
+     * @param timerNumber The number of the timer
+     * @return The timer with the specified number
+     */
+    public Timer getTimer(int timerNumber) {
+        for (Iterator iter = timers.iterator(); iter.hasNext();) {
+            Timer timer = (Timer) iter.next();
+            if(timer.getID() == timerNumber) {
+                return timer;
+            }
+        }
+        
         return null;
     }
     
@@ -324,5 +348,59 @@ public class TimerManager extends Observable {
 
     public void setTitleMapping(TitleMapping mapping) {
         this.titleMapping = mapping;
+    }
+    
+    /**
+     * Fetches the timer list from vdr
+     */
+    public void synchronize() {
+        // unmark all tvbrowser programs
+        unmarkPrograms();
+        
+        // clear timer list
+        removeAll();
+        
+        // fetch current timer list from vdr
+        Response res = VDRConnection.send(new LSTT());
+        if (res != null && res.getCode() == 250) {
+            logger.log("Timers retrieved from VDR",Logger.OTHER, Logger.INFO);
+            String timersString = res.getMessage();
+            List vdrtimers = TimerParser.parse(timersString);
+            setTimers(vdrtimers, true);
+        } else if (res != null && res.getCode() == 550) {
+            // no timers are defined, do nothing
+            logger.log("No timer defined on VDR",Logger.OTHER, Logger.INFO);
+        } else { /* something went wrong, we have no timers -> 
+                  * load the stored ones */
+            logger.log(LazyBones.getTranslation("using_stored_timers",
+                "Couldn't retrieve timers from VDR, using stored ones."), 
+                Logger.CONNECTION, Logger.ERROR);
+            
+            ArrayList vdrtimers = getStoredTimers();
+            setTimers(vdrtimers, false);
+        }
+        
+        // detect conflicts
+        ConflictFinder.getInstance().findConflicts();
+        ConflictFinder.getInstance().handleConflicts();
+    }
+    
+    /**
+     * Unmarks all programs, which are marked by LazyBones
+     */
+    private void unmarkPrograms() {
+        for (Iterator it = timers.iterator(); it.hasNext();) {
+            Timer timer = (Timer) it.next();
+            for (Iterator iter = timer.getTvBrowserProgIDs().iterator(); iter.hasNext();) {
+                String progID = (String) iter.next();
+                if(progID != null) { // timer could be assigned
+                    Date date = new Date(timer.getStartTime());
+                    Program prog = LazyBones.getPluginManager().getProgram(date, progID);
+                    if(prog != null) {
+                        prog.unmark(LazyBones.getInstance());
+                    }
+                }
+            }
+        }
     }
 }

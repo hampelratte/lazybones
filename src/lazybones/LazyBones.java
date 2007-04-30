@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.67 2007-04-09 19:20:19 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.68 2007-04-30 13:34:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,7 +48,6 @@ import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.VDRVersion;
 import org.hampelratte.svdrp.commands.LSTE;
-import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.NEWT;
 import org.hampelratte.svdrp.commands.UPDT;
 import org.hampelratte.svdrp.responses.R250;
@@ -56,7 +55,6 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import org.hampelratte.svdrp.util.EPGParser;
-import org.hampelratte.svdrp.util.TimerParser;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -69,7 +67,7 @@ import devplugin.Date;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
  */
-public class LazyBones extends Plugin {
+public class LazyBones extends Plugin implements Observer {
 
     public static final Logger logger = Logger.getLogger();
 
@@ -137,8 +135,7 @@ public class LazyBones extends Plugin {
                 }
             }
         }
-        getTimersFromVDR();
-        updateTree();
+        TimerManager.getInstance().synchronize();
     }
     
     public void deleteTimer(Program prog) {
@@ -151,9 +148,8 @@ public class LazyBones extends Plugin {
             return;
         }
         
-        prog.unmark(this);
-        getTimersFromVDR();
-        updateTree();
+        //prog.unmark(this);
+        TimerManager.getInstance().synchronize();
     }
     
     public void createTimer() {
@@ -299,7 +295,7 @@ public class LazyBones extends Plugin {
             if (response instanceof R250) {
                 // since we dont have the ID of the new timer, we have to
                 // get the whole timer list again :-(
-                getTimersFromVDR();
+                TimerManager.getInstance().synchronize();
             } else {
                 String mesg =  LazyBones.getTranslation(
                         "couldnt_change", "Couldn\'t change timer:")
@@ -332,7 +328,7 @@ public class LazyBones extends Plugin {
                     if (response instanceof R250) {
                         // since we dont have the ID of the new timer, we
                         // have to get the whole timer list again :-(
-                        getTimersFromVDR();
+                        TimerManager.getInstance().synchronize();
                     } else {
                         logger.log(LazyBones.getTranslation("couldnt_create",
                                 "Couldn\'t create timer:")
@@ -445,7 +441,7 @@ public class LazyBones extends Plugin {
         
         // since we dont have the ID of the new timer, we have
         // to get the whole timer list again :-(
-        getTimersFromVDR();
+        TimerManager.getInstance().synchronize();
     }
 
     /**
@@ -629,57 +625,6 @@ public class LazyBones extends Plugin {
         return new VDRSettingsPanel(this);
     }
     
-
-    protected void getTimersFromVDR() {
-        TimerManager tm = TimerManager.getInstance();
-        ArrayList timers = tm.getTimers();
-        for (Iterator it = timers.iterator(); it.hasNext();) {
-            Timer timer = (Timer) it.next();
-            
-            for (Iterator iter = timer.getTvBrowserProgIDs().iterator(); iter.hasNext();) {
-                String progID = (String) iter.next();
-                if(progID != null) { // timer could be assigned
-                    Date date = new Date(timer.getStartTime());
-                    Program prog = LazyBones.getPluginManager().getProgram(date, progID);
-                    if(prog != null) {
-                        prog.unmark(this);
-                    }
-                }
-            }
-        }
-
-        tm.removeAll();
-        Response res = VDRConnection.send(new LSTT());
-        if (res != null && res.getCode() == 250) {
-            logger.log("Timers retrieved from VDR",Logger.OTHER, Logger.INFO);
-            String timersString = res.getMessage();
-            List vdrtimers = TimerParser.parse(timersString);
-            tm.setTimers(vdrtimers, true);
-        } else if (res != null && res.getCode() == 550) {
-            // no timers are defined, do nothing
-            logger.log("No timer defined on VDR",Logger.OTHER, Logger.INFO);
-        } else { /* something went wrong, we have no timers -> 
-                  * load the stored ones */
-            logger.log(LazyBones.getTranslation("using_stored_timers",
-                "Couldn't retrieve timers from VDR, using stored ones."), 
-                Logger.CONNECTION, Logger.ERROR);
-            
-            ArrayList vdrtimers = tm.getStoredTimers();
-            tm.setTimers(vdrtimers, false);
-        }
-
-        // mark all "timed" programs (haltOnNoChannel = false, because we can
-        // have multiple channels)
-        markPrograms(tm.getTimers(), false);
-
-        // update the plugin tree
-        updateTree();
-        
-        // detect conflicts
-        ConflictFinder.getInstance().findConflicts();
-        ConflictFinder.getInstance().handleConflicts();
-    }
-    
     /**
      * Called to mark all Programs
      * 
@@ -688,8 +633,8 @@ public class LazyBones extends Plugin {
      * @param haltOnNoChannel
      *            Determines, if the method should terminate, if the channel
      *            couldn't be found for a timer. This is useful, if all timers
-     *            have the same channel (see markPrograms(ChannelDayProgram
-     *            prog))
+     *            have the same channel ({@see #markPrograms(ChannelDayProgram
+     *            prog)})
      * @see LazyBones#markPrograms(ChannelDayProgram)
      */
     private void markPrograms(ArrayList affectedTimers, boolean haltOnNoChannel) {
@@ -1074,6 +1019,10 @@ public class LazyBones extends Plugin {
 
     private void init() {
         instance = this;
+        
+        // observe the timer list
+        TimerManager.getInstance().addObserver(this);
+        
         Thread t = new Thread() {
             public void run() {
                 while(!(getParentFrame()!=null && getParentFrame().isVisible())) {
@@ -1090,7 +1039,7 @@ public class LazyBones extends Plugin {
                 VDRChannelList.getInstance().update();
                 
                 // get all timers from vdr
-                getTimersFromVDR();
+                TimerManager.getInstance().synchronize();
             }
         };
         t.start();
@@ -1311,6 +1260,7 @@ public class LazyBones extends Plugin {
         return cmf.createSimpleActionMenu(timer);
     }
     
+    // TODO standard icons von tvbrowser nehmen und über createImageIcon laden
     private class ContextMenuFactory {
         public ActionMenu createActionMenu(final Program program) {
             AbstractAction action = new AbstractAction() {
@@ -1358,7 +1308,7 @@ public class LazyBones extends Plugin {
 
                 actions[3] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        getTimersFromVDR();
+                        TimerManager.getInstance().synchronize();
                     }
                 };
                 actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
@@ -1376,7 +1326,7 @@ public class LazyBones extends Plugin {
 
                 actions[2] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        getTimersFromVDR();
+                        TimerManager.getInstance().synchronize();
                     }
                 };
                 actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
@@ -1421,5 +1371,14 @@ public class LazyBones extends Plugin {
             return simpleMenu;
         }
         
+    }
+
+    public void update(Observable arg0, Object arg1) {
+        // mark all "timed" programs (haltOnNoChannel = false, because we can
+        // have multiple channels)
+        markPrograms(TimerManager.getInstance().getTimers(), false);
+
+        // update the plugin tree
+        updateTree();
     }
 }
