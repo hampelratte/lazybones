@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.6 2007-03-19 17:20:41 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.7 2007-04-30 16:52:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -126,6 +126,12 @@ public class TimelineElement extends JComponent implements MouseListener {
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         String time = df.format(timer.getStartTime().getTime()) + " - " + df.format(timer.getEndTime().getTime());
         g.drawString(time, 5, 25);
+        
+        // paint recording indicator
+        if(timer.isRecording()) {
+            g.setColor(Color.RED);
+            g.fillOval(5, 30, 7, 7);
+        }
         
         // paint conflicts
         g.setColor(CONFLICT_COLOR);
