@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.7 2007-04-09 19:46:32 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.8 2007-04-30 11:32:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import lazybones.LazyBones;
 import lazybones.gui.components.ScreenshotPanel;
@@ -48,11 +50,14 @@ public class MainDialog extends JDialog {
 
     private LazyBones lazyBones;
     
-    private ScreenshotPanel pp = new ScreenshotPanel();
+    private ScreenshotPanel screenshotPanel = new ScreenshotPanel();
     
     private JTabbedPane tabbedPane = new JTabbedPane();
     
     private TimelinePanel timelinePanel;
+    
+    private static final int INDEX_TIMELINE = 0;
+    private static final int INDEX_RC = 3;
     
     public MainDialog(Frame parent, String title, boolean modal, LazyBones lazyBones) {
         super(parent, title, modal);
@@ -65,32 +70,45 @@ public class MainDialog extends JDialog {
         JPanel remoteControl = new JPanel();
         remoteControl.setLayout(new GridBagLayout());
         remoteControl.add(new RemoteControl(lazyBones), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-        remoteControl.add(pp, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-        tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
-        tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel(lazyBones));
+        remoteControl.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         timelinePanel = new TimelinePanel(lazyBones);
+        
+        // !! don't change the order without changing INDEX_TIMELINE and INDEX_RC !!  
         tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), timelinePanel);
+        tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel(lazyBones));
         tabbedPane.add(LazyBones.getTranslation("recordings", "Recordings"), new RecordingManagerPanel());
+        tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
         
         this.add(tabbedPane);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
-                pp.stopGrabbing();
                 setVisible(false);
+            }
+        });
+        
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if(isVisible() && tabbedPane.getSelectedIndex() == INDEX_RC) {
+                    screenshotPanel.startGrabbing();
+                } else {
+                    screenshotPanel.stopGrabbing();
+                }
             }
         });
     }
     
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        if(visible) {
-            pp.startGrabbing();
+        if(visible && tabbedPane.getSelectedIndex() == INDEX_RC) {
+            screenshotPanel.startGrabbing();
+        } else {
+            screenshotPanel.stopGrabbing();
         }
     }
 
     public void showTimeline() {
-        tabbedPane.setSelectedIndex(2);
+        tabbedPane.setSelectedIndex(INDEX_TIMELINE);
     }
 
     public TimelinePanel getTimelinePanel() {
