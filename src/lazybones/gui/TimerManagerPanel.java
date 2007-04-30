@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.4 2007-04-09 19:23:41 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.5 2007-04-30 18:40:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -162,7 +162,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         } else if(e.getSource() == buttonRemove) {
             if(timerList.getSelectedIndex() >= 0) {
                 Timer timer = (Timer)timerList.getSelectedValue();
-                control.deleteTimer(timer);
+                TimerManager.getInstance().deleteTimer(timer);
             }
         }
     }
