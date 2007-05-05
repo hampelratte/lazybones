@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.71 2007-05-04 14:54:58 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.72 2007-05-05 18:06:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -976,32 +976,20 @@ public class LazyBones extends Plugin implements Observer {
         }
     }
 
+    public void handleTvBrowserStartFinished() {
+        // upload channel list from vdr
+        logger.log("Updating channel list", Logger.OTHER, Logger.DEBUG);
+        VDRChannelList.getInstance().update();
+        
+        // get all timers from vdr
+        TimerManager.getInstance().synchronize();
+    }
+    
     private void init() {
         instance = this;
         
         // observe the timer list
         TimerManager.getInstance().addObserver(this);
-        
-        Thread t = new Thread() {
-            public void run() {
-                while(!(getParentFrame()!=null && getParentFrame().isVisible())) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {}
-                }
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {}
-                
-                // upload channel list from vdr
-                logger.log("Updating channel list", Logger.OTHER, Logger.DEBUG);
-                VDRChannelList.getInstance().update();
-                
-                // get all timers from vdr
-                TimerManager.getInstance().synchronize();
-            }
-        };
-        t.start();
     }
 
     public Properties storeSettings() {
