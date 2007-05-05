@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.7 2007-04-30 16:52:49 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.8 2007-05-05 20:32:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 
+import lazybones.ChannelManager;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.utils.Period;
@@ -77,7 +78,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         StringBuffer sb = new StringBuffer();
         sb.append("<html>");
         sb.append("<b>"); sb.append(title); sb.append("</b><br>");
-        Channel chan = ProgramManager.getInstance().getChannel(timer);
+        Channel chan = ChannelManager.getInstance().getChannel(timer);
         if(chan != null) {
             sb.append(chan.getName());
         } else {

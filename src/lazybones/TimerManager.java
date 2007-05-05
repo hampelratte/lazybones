@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.18 2007-04-30 17:10:32 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.19 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,13 +31,26 @@ package lazybones;
 
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 import lazybones.actions.DeleteTimerAction;
+import lazybones.gui.TimerOptionsDialog;
+import lazybones.gui.TimerSelectionDialog;
 import lazybones.gui.utils.TitleMapping;
 import lazybones.utils.Utilities;
 
+import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.VDRVersion;
+import org.hampelratte.svdrp.commands.LSTE;
 import org.hampelratte.svdrp.commands.LSTT;
+import org.hampelratte.svdrp.commands.NEWT;
+import org.hampelratte.svdrp.commands.UPDT;
+import org.hampelratte.svdrp.responses.R250;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.util.EPGParser;
 import org.hampelratte.svdrp.util.TimerParser;
 
 import devplugin.Date;
@@ -206,6 +219,10 @@ public class TimerManager extends Observable {
         return list;
     }
     
+    /**
+     * For DEBUG only - print all timers to System.out
+     *
+     */
     public void printTimers() {
         System.out.println("########## Listing timers #################");
         for (Iterator it = timers.iterator(); it.hasNext();) {
@@ -431,6 +448,337 @@ public class TimerManager extends Observable {
         TimerManager.getInstance().synchronize();
     }
     
+    public void createTimer() {
+        Timer timer = new Timer();
+        timer.setChannelNumber(1);
+        Program prog = ProgramManager.getInstance().getProgram(timer);
+        
+        // in this situation it makes sense to show the timer options
+        // so we override the user setting (hide options dialog)
+        boolean showTimerOptions = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
+        LazyBones.getProperties().setProperty("showTimerOptionsDialog",Boolean.TRUE.toString());
+        createTimer(prog);
+        LazyBones.getProperties().setProperty("showTimerOptionsDialog",Boolean.toString(showTimerOptions));
+    }
+    
+    public void createTimer(Program prog) {
+        if (prog.isExpired()) {
+            logger.log(LazyBones.getTranslation(
+                    "expired", "This program has expired"), Logger.OTHER, Logger.ERROR);
+            return;
+        }
+
+        Calendar cal = GregorianCalendar.getInstance();
+        Date date = prog.getDate();
+        cal.set(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
+        cal.set(Calendar.MONTH, date.getMonth() - 1);
+        cal.set(Calendar.YEAR, date.getYear());
+        cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        cal.set(Calendar.MINUTE, prog.getMinutes());
+        cal.add(Calendar.MINUTE, prog.getLength() / 2);
+        long millis = cal.getTimeInMillis();
+
+        Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
+        if (o == null) {
+            logger.log(LazyBones.getTranslation("no_channel_defined",
+                    "No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
+            return;
+        }
+        int id = ((Channel) o).getChannelNumber();
+        Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at "
+                + Long.toString(millis / 1000)));
+
+        if (res != null && res.getCode() == 215) {
+            List epgList = EPGParser.parse(res.getMessage());
+
+            if (epgList.size() <= 0) {
+                noEPGAvailable(prog, id);
+                return;
+            }
+
+            /*
+             * VDR 1.3 already returns the matching entry, for 1.2 we need to
+             * search for a match
+             */
+            VDRVersion version = Connection.getVersion();
+            boolean isOlderThan1_3 = version.getMajor() < 1
+                    || (version.getMajor() == 1 && version.getMinor() < 3);
+            EPGEntry vdrEPG = isOlderThan1_3 ? Utilities.filterEPGDate(epgList,
+                    ((Channel) o).getName(), millis) : (EPGEntry) epgList
+                    .get(0);
+
+            Timer timer = new Timer();
+            timer.setChannelNumber(id);
+            timer.addTvBrowserProgID(prog.getID());
+            int prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
+            timer.setPriority(prio);
+            int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
+            timer.setLifetime(lifetime);
+
+            int buffer_before = Integer.parseInt(LazyBones.getProperties()
+                    .getProperty("timer.before"));
+            int buffer_after = Integer.parseInt(LazyBones.getProperties()
+                    .getProperty("timer.after"));
+
+            if (vdrEPG != null) {
+                Calendar calStart = vdrEPG.getStartTime();
+                timer.setUnbufferedStartTime((Calendar) calStart.clone());
+                // start the recording x min before the beggining of the program
+                calStart.add(Calendar.MINUTE, -buffer_before);
+                timer.setStartTime(calStart);
+
+                Calendar calEnd = vdrEPG.getEndTime();
+                timer.setUnbufferedEndTime((Calendar) calEnd.clone());
+                // stop the recording x min after the end of the program
+                calEnd.add(Calendar.MINUTE, buffer_after);
+                timer.setEndTime(calEnd);
+
+                timer.setFile(vdrEPG.getTitle());
+                timer.setDescription(vdrEPG.getDescription());
+            } else { // VDR has no EPG data
+                noEPGAvailable(prog, id);
+                return;
+            }
+
+            boolean showOptionsDialog = Boolean.TRUE.toString().equals(
+                    LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
+            
+            if(showOptionsDialog) {
+                new TimerOptionsDialog(timer, prog, false);
+            } else {
+                createTimerCallBack(timer, prog, false);
+            }
+            
+
+        } else if(res != null && res.getCode() == 550 & "No schedule found\n".equals(res.getMessage())) {
+            noEPGAvailable(prog, id);
+        } else {
+            String msg = res != null ? res.getMessage() : "Reason unknown";
+            logger.log(LazyBones.getTranslation("couldnt_create",
+                    "Couldn\'t create timer\n: ") + " " + msg,Logger.OTHER, Logger.ERROR);
+        }
+    }
+    
+    private void noEPGAvailable(Program prog, int channelID) {
+        int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+        int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+
+        boolean dontCare = Boolean.FALSE.toString().equals(LazyBones.getProperties().getProperty("logEPGErrors"));
+        int result = JOptionPane.NO_OPTION;
+        if(!dontCare) {
+            result = JOptionPane.showConfirmDialog(null, LazyBones.getTranslation(
+                "noEPGdata", ""), "", JOptionPane.YES_NO_OPTION);
+        }
+        if (dontCare || result == JOptionPane.OK_OPTION) {
+            Timer newTimer = new Timer();
+            newTimer.setState(VDRTimer.ACTIVE);
+            newTimer.setChannelNumber(channelID);
+            int prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
+            int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
+            newTimer.setLifetime(lifetime);
+            newTimer.setPriority(prio);
+            newTimer.setTitle(prog.getTitle());
+            newTimer.addTvBrowserProgID(prog.getID());
+
+            Date d = prog.getDate();
+            Calendar startTime = d.getCalendar();
+
+            int start = prog.getStartTime();
+            int hour = start / 60;
+            int minute = start % 60;
+            startTime.set(Calendar.HOUR_OF_DAY, hour);
+            startTime.set(Calendar.MINUTE, minute);
+
+            Calendar endTime = (Calendar) startTime.clone();
+            endTime.add(Calendar.MINUTE, prog.getLength());
+
+            newTimer.setUnbufferedStartTime((Calendar) startTime.clone());
+            newTimer.setUnbufferedEndTime((Calendar) endTime.clone());
+            
+            // add buffers
+            startTime.add(Calendar.MINUTE, -buffer_before);
+            newTimer.setStartTime(startTime);
+            endTime.add(Calendar.MINUTE, buffer_after);
+            newTimer.setEndTime(endTime);
+
+            new TimerOptionsDialog(newTimer, prog, false);
+        }
+    }
+    
+    /**
+     * Called by TimerOptionsDialog, when the user confirms the dialog
+     * @param timer The new created / updated Timer
+     * @param prog The according Program
+     * @param update If the Timer is a new one or if the timer has been edited
+     */
+    public void createTimerCallBack(Timer timer, Program prog, boolean update) {
+        int id = -1;
+        if(prog != null) {
+            Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
+            if (o == null) {
+                logger.log(LazyBones.getTranslation("no_channel_defined","No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
+                return;
+            }
+            id = ((Channel) o).getChannelNumber();
+        }
+        
+        if (update) {
+            Response response = VDRConnection.send(new UPDT(timer.toNEWT()));
+
+            if (response == null) {
+                String mesg = LazyBones.getTranslation(
+                        "couldnt_change", "Couldn\'t change timer:")
+                        + "\n"
+                        + LazyBones.getTranslation("couldnt_connect",
+                                "Couldn\'t connect to VDR");
+                logger.log(mesg, Logger.CONNECTION, Logger.ERROR);                
+                return;
+            }
+
+            if (response instanceof R250) {
+                // since we dont have the ID of the new timer, we have to
+                // get the whole timer list again :-(
+                TimerManager.getInstance().synchronize();
+            } else {
+                String mesg =  LazyBones.getTranslation(
+                        "couldnt_change", "Couldn\'t change timer:")
+                        + " " + response.getMessage();
+                logger.log(mesg, Logger.OTHER, Logger.ERROR);
+            }
+        } else {
+            if (timer.getTitle() != null) {
+                int percentage = Utilities.percentageOfEquality(
+                        prog.getTitle(), timer.getTitle());
+                if (timer.getFile().indexOf("EPISODE") >= 0
+                        || timer.getFile().indexOf("TITLE") >= 0
+                        || timer.isRepeating()) {
+                    percentage = 100;
+                }
+                int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
+                if (percentage > threshold) {
+                    Response response = VDRConnection.send(new NEWT(timer));
+                    
+                    if (response == null) {
+                        String mesg = LazyBones.getTranslation("couldnt_create",
+                                "Couldn\'t create timer:")
+                                + "\n"
+                                + LazyBones.getTranslation("couldnt_connect",
+                                        "Couldn\'t connect to VDR");
+                        logger.log(mesg, Logger.CONNECTION, Logger.ERROR);                
+                        return;
+                    }
+                    
+                    if (response instanceof R250) {
+                        // since we dont have the ID of the new timer, we
+                        // have to get the whole timer list again :-(
+                        TimerManager.getInstance().synchronize();
+                    } else {
+                        logger.log(LazyBones.getTranslation("couldnt_create",
+                                "Couldn\'t create timer:")
+                                + " " + response.getMessage(), Logger.OTHER,
+                                Logger.ERROR);
+                    }
+                } else {
+                    logger.log("Looking in title mapping for timer "+timer, Logger.OTHER, Logger.DEBUG);
+                    // lookup in mapping history
+                    TimerManager tm = TimerManager.getInstance();
+                    String timerTitle = (String)tm.getTitleMapping().getVdrTitle(prog.getTitle());
+                    if(timer.getTitle().equals(timerTitle)) {
+                        Response response = VDRConnection.send(new NEWT(timer));
+                        if (response.getCode() == 250) {
+                            timerCreatedOK(prog, timer);
+                        } else {
+                            logger.log(LazyBones.getTranslation("couldnt_create",
+                                    "Couldn\'t create timer:")
+                                    + " " + response.getMessage(), Logger.OTHER,
+                                    Logger.ERROR);
+                        }
+                    } else { // no mapping found -> ask the user
+                        showTimerConfirmDialog(timer, prog);
+                    }
+                }
+            } else { // VDR has no EPG data
+                noEPGAvailable(prog, id);
+            }
+        }
+    }
+    
+    public void timerCreatedOK(Program prog, Timer timer) {
+        timer.addTvBrowserProgID(prog.getID());
+        replaceStoredTimer(timer);
+        
+        // since we dont have the ID of the new timer, we have
+        // to get the whole timer list again :-(
+        synchronize();
+    }
+    
+    /**
+     * If a Program can't be assigned to a VDR-Program, this method shows a
+     * dialog to select the right VDR-Program
+     * 
+     * @param prog
+     *            the Program selected in TV-Browser
+     * @param timerOptions
+     *            the timer from TimerOptionsDialog
+     */
+    private void showTimerConfirmDialog(Timer timerOptions, Program prog) {
+        // get all programs 2 hours before and after the given program
+        Calendar cal = GregorianCalendar.getInstance();
+        Date date = prog.getDate();
+        cal.set(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
+        cal.set(Calendar.MONTH, date.getMonth() - 1);
+        cal.set(Calendar.YEAR, date.getYear());
+        cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        cal.set(Calendar.MINUTE, prog.getMinutes());
+        cal.add(Calendar.MINUTE, prog.getLength() / 2);
+
+        devplugin.Channel chan = prog.getChannel();
+
+        TreeSet<Timer> programSet = new TreeSet<Timer>();
+        for (int i = 10; i <= 120; i += 10) {
+            // get the program before the given one
+            Calendar c = GregorianCalendar.getInstance();
+            c.setTimeInMillis(cal.getTimeInMillis());
+            c.add(Calendar.MINUTE, i * -1);
+            Timer t1 = ProgramManager.getInstance().getVDRProgramAt(c, chan);
+            if (t1 != null) {
+                programSet.add(t1);
+            }
+
+            // get the program after the given one
+            c = GregorianCalendar.getInstance();
+            c.setTimeInMillis(cal.getTimeInMillis());
+            c.add(Calendar.MINUTE, i);
+            Timer t2 = ProgramManager.getInstance().getVDRProgramAt(c, chan);
+            if (t2 != null) {
+                programSet.add(t2);
+            }
+        }
+
+        Program[] programs = new Program[programSet.size()];
+        int i = 0;
+        for (Iterator iter = programSet.iterator(); iter.hasNext();) {
+            Timer timer = (Timer) iter.next();
+            Calendar time = timer.getStartTime();
+            TimerProgram p = new TimerProgram(chan, new Date(time), time
+                    .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
+            p.setTitle(timer.getTitle());
+            p.setDescription("");
+            p.setTimer(timer);
+            programs[i++] = p;
+        }
+
+        // reverse the order of the programs
+        Program[] temp = new Program[programs.length];
+        for (int j = 0; j < programs.length; j++) {
+            temp[j] = programs[programs.length - 1 - j];
+        }
+        programs = temp;
+
+        // show dialog
+        new TimerSelectionDialog(programs, timerOptions, prog);
+    }
+    
     public void deleteTimer(Program prog) {
         Timer timer = TimerManager.getInstance().getTimer(prog.getID());
         DeleteTimerAction dta = new DeleteTimerAction(timer);
@@ -443,5 +791,59 @@ public class TimerManager extends Observable {
         
         //prog.unmark(this);
         TimerManager.getInstance().synchronize();
+    }
+    
+    public void editTimer(Timer timer) {
+        new TimerOptionsDialog(timer, null, true);
+    }
+    
+    public boolean lookUpTimer(Timer timer, Program candidate) {
+        logger.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+        ArrayList<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
+        if (progIDs != null) { // we have a mapping of this timer to a program
+            for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
+                String progID = (String) iter.next();
+
+                if(progID.equals("NO_PROGRAM")) {
+                    logger.log("Timer " + timer.toString()+" should never be assigned",Logger.OTHER, Logger.DEBUG);
+                    timer.setReason(Timer.NO_PROGRAM);
+                    return true;
+                } else {
+                    devplugin.Channel c = ChannelManager.getInstance().getChannel(timer);
+                    if (c != null) {
+                        Date date = new Date(timer.getStartTime());
+                        Iterator iterator = LazyBones.getPluginManager()
+                                .getChannelDayProgram(date, c);
+                        while (iterator.hasNext()) {
+                            Program p = (Program) iterator.next();
+                            if (p.getID().equals(progID)
+                                    && p.getDate().equals(date)) {
+                                p.mark(LazyBones.getInstance());
+                                timer.setTvBrowserProgIDs(progIDs);
+                                logger.log("Mapping found for: " + timer.toString(),
+                                        Logger.OTHER, Logger.DEBUG);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        } else  {
+            logger.log("No mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+            if(candidate != null) {
+                logger.log("Looking up old mappings", Logger.OTHER, Logger.DEBUG);
+                TimerManager tm = TimerManager.getInstance();
+                String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
+                if(candidate.getTitle().equals(progTitle)) {
+                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
+                    timer.addTvBrowserProgID(candidate.getID());
+                    logger.log("Old mapping found for: " + timer.toString(),
+                            Logger.OTHER, Logger.DEBUG);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

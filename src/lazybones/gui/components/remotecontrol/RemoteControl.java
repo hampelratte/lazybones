@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.1 2007-04-09 19:13:15 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.2 2007-05-05 20:32:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,12 +38,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.CHAN;
-
 import lazybones.LazyBones;
 import lazybones.Player;
 import lazybones.VDRConnection;
+
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.CHAN;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -58,21 +58,18 @@ public class RemoteControl extends JPanel implements ActionListener {
 
     private JButton watch = new JButton(LazyBones.getTranslation("Watch", "Watch"));
 
-    private LazyBones parent;
-
-    public RemoteControl(LazyBones parent) {
-        this.parent = parent;
+    public RemoteControl() {
         initGUI();
     }
 
     private void initGUI() {
         setLayout(new GridBagLayout());
 
-        numBlock = new NumberBlock(parent);
+        numBlock = new NumberBlock();
         add(numBlock, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                 new Insets(5, 5, 10, 5), 0, 0));
-        navBlock = new NavigationBlock(parent);
+        navBlock = new NavigationBlock();
         add(navBlock, new GridBagConstraints(0, 1, 2, 1, 0.1, 0.1,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
                 new Insets(10, 5, 5, 5), 0, 0));
@@ -82,7 +79,7 @@ public class RemoteControl extends JPanel implements ActionListener {
                 new Insets(5, 5, 10, 5), 0, 0));
 
         watch.addActionListener(this);
-        watch.setIcon(parent.getIcon("lazybones/play.png"));
+        watch.setIcon(LazyBones.getInstance().getIcon("lazybones/play.png"));
         add(watch, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                 new Insets(10, 5, 5, 5), 0, 0));

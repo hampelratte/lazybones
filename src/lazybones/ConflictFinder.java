@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.6 2007-03-17 15:08:30 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.7 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,11 +34,11 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-
 import lazybones.gui.TimelinePanel;
 import lazybones.utils.StartStopEvent;
 import lazybones.utils.Utilities;
+
+import org.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ConflictFinder implements Observer {
     private static ConflictFinder instance;    
@@ -156,7 +156,7 @@ public class ConflictFinder implements Observer {
     }
     
     private void increaseTransponderUse(Timer timer) {
-        Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+        Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
         if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
             int count = transponderUse.get(chan.getFrequency());
             count++;
@@ -167,7 +167,7 @@ public class ConflictFinder implements Observer {
     }
     
     private void decreaseTransponderUse(Timer timer) {
-        Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+        Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
         if(transponderUse.containsKey(chan.getFrequency())) {
             int count = transponderUse.get(chan.getFrequency());
             if(count == 1) {

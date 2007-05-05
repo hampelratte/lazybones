@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.7 2007-03-06 20:19:18 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.8 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,11 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 
 import lazybones.LazyBones;
 import lazybones.Timer;
@@ -64,15 +68,11 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
     private Program selectedProgram = null;
 
-    private LazyBones control;
-
     private JDialog dialog;
-
 
     private Timer timer;
 
-    public ProgramSelectionDialog(LazyBones control, Program[] programs, Timer timer) {
-        this.control = control;
+    public ProgramSelectionDialog(Program[] programs, Timer timer) {
         this.timer = timer;
         
         if (programs.length > 0) {
@@ -88,7 +88,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), true);
+        dialog = new JDialog(LazyBones.getInstance().getParent(), true);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_programselect", "Select Program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -159,7 +159,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
             for (int i = 0; i < indices.length; i++) {
                 if (indices[i] >= 0) {
                     selectedProgram = (Program) model.get(indices[i]);
-                    control.timerCreatedOK(selectedProgram, timer);
+                    TimerManager.getInstance().timerCreatedOK(selectedProgram, timer);
                     TimerManager.getInstance().getTitleMapping().put(selectedProgram.getTitle(), timer.getTitle());
                 }
             }

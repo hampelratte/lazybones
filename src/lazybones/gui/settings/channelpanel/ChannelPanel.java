@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.1 2007-04-09 19:20:15 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.2 2007-05-05 20:32:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,9 +45,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.ProgramManager;
-import lazybones.VDRChannelList;
 import lazybones.gui.settings.channelpanel.dnd.ListTransferHandler;
 import lazybones.gui.settings.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
@@ -101,7 +100,7 @@ public class ChannelPanel implements ActionListener {
             }
         };
         devplugin.Channel[] c = tvbrowser.core.ChannelList.getSubscribedChannels();
-        Hashtable channelMapping = ProgramManager.getChannelMapping();
+        Hashtable channelMapping = ChannelManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
             tableModel.addRow(row);
@@ -289,8 +288,8 @@ public class ChannelPanel implements ActionListener {
         try {
             DefaultListModel model = (DefaultListModel) list.getModel();
             model.clear();
-            VDRChannelList.getInstance().update();
-            List<Channel> vdrchans = VDRChannelList.getInstance().getFilteredChannels();
+            ChannelManager.getInstance().update();
+            List<Channel> vdrchans = ChannelManager.getInstance().getFilteredChannels();
             if (vdrchans != null) {
                 // add vdrchannels to channel list
                 for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
@@ -361,7 +360,7 @@ public class ChannelPanel implements ActionListener {
                 }
             }
         }
-        ProgramManager.setChannelMapping(channelMapping);
+        ChannelManager.setChannelMapping(channelMapping);
     }
     
     @SuppressWarnings("unchecked")

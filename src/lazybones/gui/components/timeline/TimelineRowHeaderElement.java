@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeaderElement.java,v 1.4 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: TimelineRowHeaderElement.java,v 1.5 2007-05-05 20:32:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,9 +39,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import lazybones.ProgramManager;
+import lazybones.ChannelManager;
 import lazybones.Timer;
-import lazybones.VDRChannelList;
 import tvbrowser.ui.programtable.ChannelLabel;
 import devplugin.Channel;
 
@@ -56,12 +55,12 @@ public class TimelineRowHeaderElement extends JPanel {
 
     private void initGUI() {
         setBorder(new TimelineRowHeaderElementBorder(TimelineRowHeaderElementBorder.TOP));
-        Channel tvbChannel = ProgramManager.getInstance().getChannel(timer);
+        Channel tvbChannel = ChannelManager.getInstance().getChannel(timer);
         if(tvbChannel != null) {
             ChannelLabel label = new ChannelLabel(tvbChannel);
             add(label);
         } else {
-            org.hampelratte.svdrp.responses.highlevel.Channel vdrChannel = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+            org.hampelratte.svdrp.responses.highlevel.Channel vdrChannel = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
             if(vdrChannel != null) {
                 JLabel l = new JLabel(vdrChannel.getName());
                 l.setFont(l.getFont().deriveFont(Font.BOLD));

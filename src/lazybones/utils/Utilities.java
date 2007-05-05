@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.2 2007-03-25 14:36:30 hampelratte Exp $
+/* $Id: Utilities.java,v 1.3 2007-05-05 20:32:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,6 +41,8 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 
 import lazybones.Timer;
+
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -223,5 +225,31 @@ public class Utilities {
     public static long getDurationInMinutes(Calendar startTime, Calendar endTime) {
         long durationMillis = endTime.getTimeInMillis() - startTime.getTimeInMillis();
         return durationMillis / 1000 / 60;
+    }
+    
+    /**
+     * Filters a list of EPGEntries by a provided VDR channel name and a time
+     * which has to be in between a EPGEntries start and end time.
+     * 
+     * @param epgList
+     *            list of EPGEntries retrieved from VDR
+     * @param vdrChannelName
+     *            VDR channel name which has to match a EPGEntry channel name
+     * @param middleTime
+     *            time of a program which has to be between start and end time
+     *            of a EPGEntry
+     * @return EPGEntry from the list which matches channel and time
+     */
+    public static EPGEntry filterEPGDate(List epgList, String vdrChannelName,
+            long middleTime) {
+        for (Iterator iter = epgList.iterator(); iter.hasNext();) {
+            EPGEntry element = (EPGEntry) iter.next();
+            if (element.getStartTime().getTimeInMillis() <= middleTime
+                    && middleTime <= element.getEndTime().getTimeInMillis()
+                    && vdrChannelName.equals(element.getChannelName())) {
+                return element;
+            }
+        }
+        return null;
     }
 }

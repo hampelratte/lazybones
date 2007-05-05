@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.4 2007-01-28 15:14:53 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.5 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,15 +53,13 @@ import lazybones.gui.components.timeline.Timeline;
 
 public class TimelinePanel extends JPanel implements ActionListener, Observer {
     
-    private LazyBones lazyBones;
     private JLabel date = new JLabel();
     private JButton nextDateButton;
     private JButton prevDateButton;
     private Timeline timeline;
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
     
-    public TimelinePanel(LazyBones lazyBones) {
-        this.lazyBones = lazyBones;
+    public TimelinePanel() {
         timeline = new Timeline();
         initGUI();
         TimerManager.getInstance().addObserver(this);
@@ -71,10 +69,10 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     private void initGUI() {
         setLayout(new BorderLayout());
         
-        nextDateButton = new JButton(lazyBones.getIcon("lazybones/go-next.png"));
+        nextDateButton = new JButton(LazyBones.getInstance().getIcon("lazybones/go-next.png"));
         nextDateButton.addActionListener(this);
         nextDateButton.setActionCommand("NEXT_DAY");
-        prevDateButton = new JButton(lazyBones.getIcon("lazybones/go-previous.png"));
+        prevDateButton = new JButton(LazyBones.getInstance().getIcon("lazybones/go-previous.png"));
         prevDateButton.addActionListener(this);
         prevDateButton.setActionCommand("PREVIOUS_DAY");
         

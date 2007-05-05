@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.2 2007-04-30 16:43:44 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.3 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,16 +29,24 @@
  */
 package lazybones.gui.utils;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.text.DateFormat;
 import java.util.Locale;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 
 import lazybones.LazyBones;
-import lazybones.ProgramManager;
 import lazybones.Timer;
-import lazybones.VDRChannelList;
+import lazybones.ChannelManager;
 import devplugin.Channel;
 
 public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
@@ -109,11 +117,11 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
             time.setText(tf.format(timer.getStartTime().getTime()));
             title.setText(timer.getDisplayTitle());
             
-            Channel chan = ProgramManager.getInstance().getChannel(timer);
+            Channel chan = ChannelManager.getInstance().getChannel(timer);
             if(chan != null) {
                 channel.setText(chan.getName());
             } else {
-                org.hampelratte.svdrp.responses.highlevel.Channel c = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+                org.hampelratte.svdrp.responses.highlevel.Channel c = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
                 if(c != null)
                     channel.setText(c.getName());
             }

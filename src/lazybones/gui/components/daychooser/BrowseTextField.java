@@ -1,4 +1,4 @@
-/* $Id: BrowseTextField.java,v 1.1 2007-04-09 19:02:47 hampelratte Exp $
+/* $Id: BrowseTextField.java,v 1.2 2007-05-05 20:32:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,7 +36,11 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 
 
 

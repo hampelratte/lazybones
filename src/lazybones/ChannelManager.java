@@ -1,4 +1,4 @@
-/* $Id: VDRChannelList.java,v 1.6 2007-03-25 18:24:10 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.1 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,8 +30,10 @@
 package lazybones;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
@@ -39,9 +41,11 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.util.ChannelParser;
 
 
-public class VDRChannelList {
+public class ChannelManager {
 
-    private static VDRChannelList instance;
+    private static ChannelManager instance;
+    
+    private static Hashtable channelMapping = new Hashtable();
 
     private List<Channel> channels = null;
     
@@ -54,9 +58,9 @@ public class VDRChannelList {
         }
     }
 
-    public static VDRChannelList getInstance() {
+    public static ChannelManager getInstance() {
         if (instance == null) {
-            instance = new VDRChannelList();
+            instance = new ChannelManager();
         }
         return instance;
     }
@@ -96,6 +100,37 @@ public class VDRChannelList {
             }
         }
         
+        return null;
+    }
+    
+    public static Hashtable getChannelMapping() {
+        return channelMapping;
+    }
+
+    public static void setChannelMapping(Hashtable channelMapping) {
+        ChannelManager.channelMapping = channelMapping;
+    }
+    
+    public devplugin.Channel getChannel(Timer timer) {
+        devplugin.Channel chan = null;
+        Enumeration en = ChannelManager.getChannelMapping().keys();
+        while (en.hasMoreElements()) {
+            String channelID = (String) en.nextElement();
+            Channel channel = (Channel) ChannelManager.getChannelMapping().get(channelID);
+            if (channel.getChannelNumber() == timer.getChannelNumber()) {
+                chan = getChannelById(channelID);
+            }
+        }
+        return chan;
+    }
+
+    public devplugin.Channel getChannelById(String id) {
+        devplugin.Channel[] channels = LazyBones.getPluginManager().getSubscribedChannels();
+        for (int i = 0; i < channels.length; i++) {
+            if (channels[i].getId().equals(id)) {
+                return channels[i];
+            }
+        }
         return null;
     }
 }

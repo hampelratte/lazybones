@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.13 2007-03-26 19:00:54 hampelratte Exp $
+/* $Id: Timer.java,v 1.14 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,9 +35,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-
 import lazybones.utils.Period;
+
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 public class Timer extends VDRTimer {
     
@@ -162,5 +162,18 @@ public class Timer extends VDRTimer {
 
     public void setUnbufferedStartTime(Calendar unbufferedStartTime) {
         this.unbufferedStartTime = unbufferedStartTime;
+    }
+    
+    /**
+     * 
+     * @return This timer without time buffers
+     */
+    public Timer getTimerWithoutBuffers() {
+        Timer timer = (Timer)this.clone();
+        int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+        timer.getStartTime().add(Calendar.MINUTE, buffer_before);
+        int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+        timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
+        return timer;
     }
 }

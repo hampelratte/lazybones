@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.14 2007-03-17 15:08:30 hampelratte Exp $
+/* $Id: Player.java,v 1.15 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,7 +49,7 @@ public class Player {
     private static Logger LOG = Logger.getLogger();
 
     public static void play(Program prog) {
-    	Object o = ProgramManager.getChannelMapping().get(prog.getChannel().getId());
+    	Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
         if (o != null) {
             Channel chan = (Channel) o;
             int id = chan.getChannelNumber();

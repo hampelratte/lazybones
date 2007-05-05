@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.7 2007-03-17 15:08:31 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.8 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,11 +42,12 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-
 import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerProgram;
+
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+
 import util.ui.ProgramList;
 import devplugin.Program;
 
@@ -77,8 +78,8 @@ public class TimerSelectionDialog implements ActionListener {
     
     private Timer timerOptions;
 
-    public TimerSelectionDialog(LazyBones control, Program[] programs, Timer timerOptions, Program prog) {
-        this.control = control;
+    public TimerSelectionDialog(Program[] programs, Timer timerOptions, Program prog) {
+        this.control = LazyBones.getInstance();
         this.programs = programs;
         this.timerOptions = timerOptions;
         this.originalProgram = prog;

@@ -1,4 +1,4 @@
-/* $Id: StartStopEvent.java,v 1.1 2007-01-28 15:05:10 hampelratte Exp $
+/* $Id: StartStopEvent.java,v 1.2 2007-05-05 20:32:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,7 +33,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 import lazybones.Timer;
-import lazybones.VDRChannelList;
+import lazybones.ChannelManager;
 
 public class StartStopEvent implements Comparable<StartStopEvent> {
     private Timer timer;
@@ -78,7 +78,7 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
         DateFormat df = DateFormat.getDateTimeInstance();
         Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();
         return (df.format(cal.getTime()) 
-                + " Transponder:" + VDRChannelList.getInstance().getChannelByNumber(
+                + " Transponder:" + ChannelManager.getInstance().getChannelByNumber(
                         timer.getChannelNumber()).getFrequency()+ " " 
                 + timer);
     }

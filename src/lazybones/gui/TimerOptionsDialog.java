@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.16 2007-04-09 19:23:41 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.17 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,17 +40,19 @@ import java.util.Calendar;
 
 import javax.swing.*;
 
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-
+import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Time;
 import lazybones.Timer;
-import lazybones.VDRChannelList;
+import lazybones.TimerManager;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
 import lazybones.gui.utils.SpinnerTimeModel;
+
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+
 import tvbrowser.core.ChannelList;
 import devplugin.Date;
 import devplugin.Plugin;
@@ -127,9 +129,9 @@ public class TimerOptionsDialog implements ActionListener,
     private int oldHour, oldMinute;
     
     
-    public TimerOptionsDialog(LazyBones control, Timer timer, Program prog, boolean update) {
+    public TimerOptionsDialog(Timer timer, Program prog, boolean update) {
         this.update = update;
-        this.control = control;
+        this.control = LazyBones.getInstance();
         this.timer = timer;
         this.prog = prog;
         dayChooser = new DayChooser(timer);
@@ -200,13 +202,12 @@ public class TimerOptionsDialog implements ActionListener,
         // example: start time is 00.00 h with time buffers we have 23.45
         // Calendar then decreases the start date, so that we don't have the right date, but
         // the date of the day before.
-        Timer tmp = (Timer)timer.clone();
-        control.removeTimerBuffers(tmp);
+        Timer tmp = timer.getTimerWithoutBuffers();
         Program prog = ProgramManager.getInstance().getProgram(tmp);
         if(prog != null) {
             channels.setSelectedItem(prog.getChannel());
         } else {
-            Channel chan = VDRChannelList.getInstance().getChannelByNumber(timer.getChannelNumber());
+            Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
             channels.addItem(chan);
             channels.setSelectedItem(chan);
         }
@@ -327,7 +328,7 @@ public class TimerOptionsDialog implements ActionListener,
             Object selected = channels.getSelectedItem();
             if(selected instanceof devplugin.Channel) {
                 devplugin.Channel c = (devplugin.Channel) selected;
-                vdrc = (Channel) ProgramManager.getChannelMapping().get(c.getId());
+                vdrc = (Channel) ChannelManager.getChannelMapping().get(c.getId());
             } else if( selected instanceof Channel) {
                 vdrc = (Channel) selected;
             }
@@ -346,7 +347,7 @@ public class TimerOptionsDialog implements ActionListener,
             timer.changeStateTo(VDRTimer.ACTIVE, cbActive.isSelected());
             timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
             dialog.dispose();
-            control.createTimerCallBack(timer, prog, update);
+            TimerManager.getInstance().createTimerCallBack(timer, prog, update);
         } else if (e.getSource() == cancel) {
             dialog.dispose();
         } else if (e.getSource() == cbVps) {

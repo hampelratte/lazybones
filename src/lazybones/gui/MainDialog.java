@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.8 2007-04-30 11:32:40 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.9 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,8 +48,6 @@ import lazybones.gui.components.remotecontrol.RemoteControl;
 
 public class MainDialog extends JDialog {
 
-    private LazyBones lazyBones;
-    
     private ScreenshotPanel screenshotPanel = new ScreenshotPanel();
     
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -59,9 +57,8 @@ public class MainDialog extends JDialog {
     private static final int INDEX_TIMELINE = 0;
     private static final int INDEX_RC = 3;
     
-    public MainDialog(Frame parent, String title, boolean modal, LazyBones lazyBones) {
+    public MainDialog(Frame parent, String title, boolean modal) {
         super(parent, title, modal);
-        this.lazyBones = lazyBones;
         initGUI();
     }
 
@@ -69,13 +66,13 @@ public class MainDialog extends JDialog {
         this.setSize(800, 450);
         JPanel remoteControl = new JPanel();
         remoteControl.setLayout(new GridBagLayout());
-        remoteControl.add(new RemoteControl(lazyBones), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        remoteControl.add(new RemoteControl(), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         remoteControl.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-        timelinePanel = new TimelinePanel(lazyBones);
+        timelinePanel = new TimelinePanel();
         
         // !! don't change the order without changing INDEX_TIMELINE and INDEX_RC !!  
         tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), timelinePanel);
-        tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel(lazyBones));
+        tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("recordings", "Recordings"), new RecordingManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
         

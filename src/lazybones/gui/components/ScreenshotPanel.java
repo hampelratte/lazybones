@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.1 2007-04-09 19:21:50 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.2 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,13 +40,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.GRAB;
-import org.hampelratte.svdrp.responses.R216;
-
 import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.VDRConnection;
+
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.GRAB;
+import org.hampelratte.svdrp.responses.R216;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>

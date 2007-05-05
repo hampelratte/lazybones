@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.5 2007-04-30 18:40:37 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.6 2007-05-05 20:32:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -60,10 +60,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
     private JButton buttonEdit = null;
     private JButton buttonRemove = null;
     
-    private LazyBones control;
-
-    public TimerManagerPanel(LazyBones control) {
-        this.control = control;
+    public TimerManagerPanel() {
         initGUI();
         TimerManager.getInstance().addObserver(this);
     }
@@ -148,12 +145,12 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
     
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == buttonNew) {
-            control.createTimer();
+            TimerManager.getInstance().createTimer();
         } else if(e.getSource() == buttonEdit) {
             if(timerList.getSelectedIndex() >= 0) {
                 Timer timer = (Timer)timerList.getSelectedValue();
                 try {
-                	control.editTimer(timer);
+                	TimerManager.getInstance().editTimer(timer);
                 } catch(Exception ex) {
                     Logger.getLogger().log(ex, Logger.OTHER, Logger.ERROR);
                     ex.printStackTrace();
