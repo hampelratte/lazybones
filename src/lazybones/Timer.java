@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.14 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: Timer.java,v 1.15 2007-05-13 11:17:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,14 +47,29 @@ public class Timer extends VDRTimer {
     public static final int NO_CHANNEL = 3;
     public static final int NO_PROGRAM = 4;
     
+    /**
+     * The point in time, when this program (not the timer) starts 
+     */
     private Calendar unbufferedStartTime = GregorianCalendar.getInstance();
 
+    /**
+     * The point in time, when this program (not the timer) ends 
+     */
     private Calendar unbufferedEndTime = GregorianCalendar.getInstance();
     
+    /**
+     * The reason, why this Timer couldn't be assigned
+     */
     private int reason = Timer.NO_REASON;
     
-    private ArrayList<String> tvBrowserProgIDs = new ArrayList<String>();
+    /**
+     * List of all TV-B programs assigned to this timer
+     */
+    private List<String> tvBrowserProgIDs = new ArrayList<String>();
     
+    /**
+     * Contains all time periods, where this timer conflicts with other timers
+     */
     private List<Period> conflictPeriods = new ArrayList<Period>();
     
     public Timer() {}
@@ -77,11 +92,15 @@ public class Timer extends VDRTimer {
         super.setTitle(timer.getTitle());
     }
     
-    public ArrayList<String> getTvBrowserProgIDs() {
+    /**
+     * Returns the IDs of all TV-Browser programs, which are assigned to this timer
+     * @return List of IDs of all TV-Browser programs, which are assigned to this timer
+     */
+    public List<String> getTvBrowserProgIDs() {
         return tvBrowserProgIDs;
     }
 
-    public void setTvBrowserProgIDs(ArrayList<String> tvBrowserProgIDs) {
+    public void setTvBrowserProgIDs(List<String> tvBrowserProgIDs) {
         this.tvBrowserProgIDs = tvBrowserProgIDs;
     }
     
@@ -102,14 +121,30 @@ public class Timer extends VDRTimer {
         return clone;
     }
 
+    /**
+     * @return The reason, why this timer couldn't be assigned
+     */
     public int getReason() {
         return reason;
     }
 
+    /**
+     * Set the reason why this timer couldn't be assigned
+     * @param reason the reason why this timer couldn't be assigned
+     * @see #NO_CHANNEL
+     * @see #NO_EPG
+     * @see #NO_PROGRAM
+     * @see #NO_REASON
+     * @see #NOT_FOUND
+     */
     public void setReason(int reason) {
         this.reason = reason;
     }
 
+    /**
+     * 
+     * @param id
+     */
     public void addTvBrowserProgID(String id) {
         tvBrowserProgIDs.add(id);
     }
