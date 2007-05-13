@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.10 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.11 2007-05-13 11:18:41 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -147,7 +147,7 @@ public class ProgramManager {
     }
     
     public JPopupMenu getContextMenuForTimer(Timer timer) {
-        ArrayList tvBrowserProgIds = timer.getTvBrowserProgIDs();
+        List tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
         if(tvBrowserProgIds.size() > 0) {
             Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), (String)tvBrowserProgIds.get(0));

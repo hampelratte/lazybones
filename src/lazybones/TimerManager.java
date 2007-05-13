@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.19 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.20 2007-05-13 11:17:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -178,7 +178,7 @@ public class TimerManager extends Observable {
     public Timer getTimer(String progID) {
         for (Iterator it = timers.iterator(); it.hasNext();) {
             Timer timer = (Timer) it.next();
-            ArrayList<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
+            List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
             for (Iterator iter = tvBrowserProdIDs.iterator(); iter.hasNext();) {
                 if (progID.equals((String) iter.next())) {
                     return timer;
@@ -244,12 +244,12 @@ public class TimerManager extends Observable {
      * @param timer
      * @return the ProgramID or null
      */
-    public ArrayList<String> hasBeenMappedBefore(Timer timer) {
+    public List<String> hasBeenMappedBefore(Timer timer) {
         for (Iterator it = storedTimers.iterator(); it.hasNext();) {
             Timer storedTimer = (Timer) it.next();
             if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
                 if(storedTimer.getReason() == Timer.NO_PROGRAM) {
-                    ArrayList<String> timers = new ArrayList<String>();
+                    List<String> timers = new ArrayList<String>();
                     timers.add("NO_PROGRAM");
                     return timers;
                 } else {
@@ -431,7 +431,7 @@ public class TimerManager extends Observable {
             return;
         }
 
-        ArrayList<String> progIDs = timer.getTvBrowserProgIDs();
+        List<String> progIDs = timer.getTvBrowserProgIDs();
         for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
             String id = (String) iter.next();
             Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), id);
@@ -523,7 +523,7 @@ public class TimerManager extends Observable {
             if (vdrEPG != null) {
                 Calendar calStart = vdrEPG.getStartTime();
                 timer.setUnbufferedStartTime((Calendar) calStart.clone());
-                // start the recording x min before the beggining of the program
+                // start the recording x min before the beginning of the program
                 calStart.add(Calendar.MINUTE, -buffer_before);
                 timer.setStartTime(calStart);
 
@@ -799,7 +799,7 @@ public class TimerManager extends Observable {
     
     public boolean lookUpTimer(Timer timer, Program candidate) {
         logger.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
-        ArrayList<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
+        List<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
         if (progIDs != null) { // we have a mapping of this timer to a program
             for (Iterator iter = progIDs.iterator(); iter.hasNext();) {
                 String progID = (String) iter.next();
