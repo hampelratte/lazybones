@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.73 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.74 2007-05-13 11:27:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -345,7 +345,6 @@ public class LazyBones extends Plugin implements Observer {
         while(it.hasNext()) {
             Timer timer = (Timer)it.next();
             if(timer.isAssigned()) {
-                Timer bufferLess = timer.getTimerWithoutBuffers(); // TODO warum wird das nicht benutzt
                 for (Iterator iter = timer.getTvBrowserProgIDs().iterator(); iter.hasNext();) {
                     String progID = (String)iter.next();
                     Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), progID);

@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.2 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.3 2007-05-13 11:26:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -109,7 +109,6 @@ public class ScreenshotPanel extends JLabel {
                     } else {
                         LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
                         setFont(new Font("SansSerif", Font.PLAIN, 24));
-                        // TODO bessere ausgabe je nach fehler
                         setText("  " + LazyBones.getTranslation("no_preview","Couldn't load screenshot."));
                         setIcon(null);
                         stopGrabbing();
