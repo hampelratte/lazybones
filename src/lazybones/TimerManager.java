@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.20 2007-05-13 11:17:58 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.21 2007-05-15 18:59:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,7 @@ import java.util.*;
 import javax.swing.JOptionPane;
 
 import lazybones.actions.DeleteTimerAction;
+import lazybones.actions.ModifyTimerAction;
 import lazybones.gui.TimerOptionsDialog;
 import lazybones.gui.TimerSelectionDialog;
 import lazybones.gui.utils.TitleMapping;
@@ -45,7 +46,6 @@ import org.hampelratte.svdrp.VDRVersion;
 import org.hampelratte.svdrp.commands.LSTE;
 import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.NEWT;
-import org.hampelratte.svdrp.commands.UPDT;
 import org.hampelratte.svdrp.responses.R250;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
@@ -97,6 +97,10 @@ public class TimerManager extends Observable {
     }
 
     public void addTimer(Timer timer, boolean calculateRepeatingTimers) {
+        addTimer(timer, calculateRepeatingTimers, true);
+    }
+    
+    private void addTimer(Timer timer, boolean calculateRepeatingTimers, boolean notifyObservers) {
         if(!timer.isRepeating() || !calculateRepeatingTimers) {
             timers.add(timer);
         } else {
@@ -126,8 +130,10 @@ public class TimerManager extends Observable {
             }
         }
         
-        setChanged();
-        notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_ADDED, timer));
+        if(notifyObservers) {
+            setChanged();
+            notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_ADDED, timer));
+        }
     }
 
     public void removeTimer(Timer timer) {
@@ -153,9 +159,9 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * @return an ArrayList of Timer objects
+     * @return a List of Timer objects
      */
-    public ArrayList<Timer> getTimers() {
+    public List<Timer> getTimers() {
         return timers;
     }
     
@@ -165,8 +171,11 @@ public class TimerManager extends Observable {
     public void setTimers(List vdrTimers, boolean calculateRepeatingTimers) {
         for (Iterator it = vdrTimers.iterator(); it.hasNext();) {
             VDRTimer element = (VDRTimer) it.next();
-            addTimer(new Timer(element), calculateRepeatingTimers);
+            addTimer(new Timer(element), calculateRepeatingTimers, false);
         }
+        
+        setChanged();
+        notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
     }
 
     /**
@@ -174,6 +183,7 @@ public class TimerManager extends Observable {
      * @param progID
      *            the programID of a devplugin.Program object
      * @return the timer for this program or null
+     * @see Program#getID()
      */
     public Timer getTimer(String progID) {
         for (Iterator it = timers.iterator(); it.hasNext();) {
@@ -298,7 +308,7 @@ public class TimerManager extends Observable {
      * @return the next day, on which a timer events starts or stops, after the given calendar
      */
     public Calendar getNextDayWithEvent(Calendar currentDay) {
-        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        List<Timer> timers = TimerManager.getInstance().getTimers();
         TreeSet<Calendar> events = new TreeSet<Calendar>();
         for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
             Timer timer = iter.next();
@@ -322,7 +332,7 @@ public class TimerManager extends Observable {
      * @return
      */
     public Calendar getPreviousDayWithEvent(Calendar currentDay) {
-        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        List<Timer> timers = TimerManager.getInstance().getTimers();
         TreeSet<Calendar> events = new TreeSet<Calendar>();
         for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
             Timer timer = iter.next();
@@ -546,7 +556,7 @@ public class TimerManager extends Observable {
             if(showOptionsDialog) {
                 new TimerOptionsDialog(timer, prog, false);
             } else {
-                createTimerCallBack(timer, prog, false);
+                createTimerCallBack(timer, null, prog, false);
             }
             
 
@@ -607,11 +617,18 @@ public class TimerManager extends Observable {
     
     /**
      * Called by TimerOptionsDialog, when the user confirms the dialog
-     * @param timer The new created / updated Timer
-     * @param prog The according Program
-     * @param update If the Timer is a new one or if the timer has been edited
+     * 
+     * @param timer
+     *            The new created / updated Timer
+     * @param oldTimer
+     *            A clone of the timer with the old settings. Can be null for
+     *            new timers.
+     * @param prog
+     *            The according Program
+     * @param update
+     *            If the Timer is a new one or if the timer has been edited
      */
-    public void createTimerCallBack(Timer timer, Program prog, boolean update) {
+    public void createTimerCallBack(Timer timer, Timer oldTimer, Program prog, boolean update) {
         int id = -1;
         if(prog != null) {
             Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
@@ -623,26 +640,13 @@ public class TimerManager extends Observable {
         }
         
         if (update) {
-            Response response = VDRConnection.send(new UPDT(timer.toNEWT()));
-
-            if (response == null) {
-                String mesg = LazyBones.getTranslation(
-                        "couldnt_change", "Couldn\'t change timer:")
-                        + "\n"
-                        + LazyBones.getTranslation("couldnt_connect",
-                                "Couldn\'t connect to VDR");
-                logger.log(mesg, Logger.CONNECTION, Logger.ERROR);                
-                return;
-            }
-
-            if (response instanceof R250) {
-                // since we dont have the ID of the new timer, we have to
-                // get the whole timer list again :-(
+            ModifyTimerAction mta = new ModifyTimerAction(timer, oldTimer);
+            if(mta.execute()) {
                 TimerManager.getInstance().synchronize();
             } else {
                 String mesg =  LazyBones.getTranslation(
                         "couldnt_change", "Couldn\'t change timer:")
-                        + " " + response.getMessage();
+                        + " " + mta.getResponse().getMessage();
                 logger.log(mesg, Logger.OTHER, Logger.ERROR);
             }
         } else {
@@ -794,7 +798,11 @@ public class TimerManager extends Observable {
     }
     
     public void editTimer(Timer timer) {
-        new TimerOptionsDialog(timer, null, true);
+        Program prog = null;
+        if(timer.getTvBrowserProgIDs().size() > 0) {
+            prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), timer.getTvBrowserProgIDs().get(0));
+        }
+        new TimerOptionsDialog(timer, prog, true);
     }
     
     public boolean lookUpTimer(Timer timer, Program candidate) {
