@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.1 2007-04-30 15:44:10 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.2 2007-05-15 19:57:54 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,7 @@ import java.util.Observable;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
+import org.hampelratte.svdrp.commands.PLAY;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.util.RecordingsParser;
 
@@ -115,5 +116,12 @@ public class RecordingManager extends Observable {
         
         setChanged();
         notifyObservers();
+    }
+
+    public void playOnVdr(Recording rec) {
+        Response res = VDRConnection.send(new PLAY(rec.getNumber()));
+        if(res.getCode() != 250) {
+            Logger.getLogger().log(res.getMessage(), Logger.OTHER, Logger.ERROR);
+        }
     }
 }
