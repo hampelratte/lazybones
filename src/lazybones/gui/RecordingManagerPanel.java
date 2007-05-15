@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.5 2007-04-30 15:45:38 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.6 2007-05-15 19:57:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -105,11 +105,16 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         menuInfo.addActionListener(this);
         menuInfo.setActionCommand("INFO");
         menuInfo.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-find", 16));
+        JMenuItem menuPlay = new JMenuItem(LazyBones.getTranslation("recording_play", "Play on VDR"));
+        menuPlay.addActionListener(this);
+        menuPlay.setActionCommand("PLAY");
+        menuPlay.setIcon(LazyBones.getInstance().getIcon("lazybones/play.png"));
         JMenuItem menuSync = new JMenuItem(LazyBones.getTranslation("resync", "Synchronize with VDR"));
         menuSync.addActionListener(this);
         menuSync.setActionCommand("SYNC");
         menuSync.setIcon(LazyBones.getInstance().getIcon("lazybones/reload.png"));
         popup.add(menuInfo);
+        popup.add(menuPlay);
         popup.add(menuDelete);
         popup.add(menuSync);
         
@@ -147,6 +152,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         } else if("SYNC".equals(e.getActionCommand())) {
             RecordingManager.getInstance().synchronize();
+        } else if("PLAY".equals(e.getActionCommand())) {
+            RecordingManager.getInstance().playOnVdr(rec);
         }
     }
 
