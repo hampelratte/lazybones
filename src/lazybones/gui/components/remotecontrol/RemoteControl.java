@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.2 2007-05-05 20:32:44 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.3 2007-05-15 20:37:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -79,7 +79,7 @@ public class RemoteControl extends JPanel implements ActionListener {
                 new Insets(5, 5, 10, 5), 0, 0));
 
         watch.addActionListener(this);
-        watch.setIcon(LazyBones.getInstance().getIcon("lazybones/play.png"));
+        watch.setIcon(LazyBones.getInstance().createImageIcon("action", "media-playback-start", 16));
         add(watch, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                 new Insets(10, 5, 5, 5), 0, 0));

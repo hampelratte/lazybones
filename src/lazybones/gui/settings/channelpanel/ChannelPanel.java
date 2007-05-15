@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.2 2007-05-05 20:32:46 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.3 2007-05-15 20:37:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -80,18 +80,16 @@ public class ChannelPanel implements ActionListener {
     
     private JSpinner maxChannelNumber = new JSpinner(new SpinnerNumberModel(0,0,10000,1));
 
-    private LazyBones lazyBones;
-
-    public ChannelPanel(LazyBones control) {
-        this.lazyBones = control;
+    public ChannelPanel() {
         initComponents();
     }
     
     private void initComponents() {
-        up.setIcon(lazyBones.getIcon("lazybones/go-up16.png"));
-        down.setIcon(lazyBones.getIcon("lazybones/go-down16.png"));
-        assign.setIcon(lazyBones.getIcon("lazybones/go-previous.png"));
-        remove.setIcon(lazyBones.getIcon("lazybones/go-next.png"));
+        up.setIcon(LazyBones.getInstance().createImageIcon("action", "go-up", 16));
+        down.setIcon(LazyBones.getInstance().createImageIcon("action", "go-down", 16));
+        assign.setIcon(LazyBones.getInstance().createImageIcon("action", "go-previous", 16));
+        remove.setIcon(LazyBones.getInstance().createImageIcon("action", "go-next", 16));
+        refresh.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
 
         Object[] headers = { "TV-Browser", "VDR" };
         tableModel = new DefaultTableModel(new Object[][] {}, headers) {

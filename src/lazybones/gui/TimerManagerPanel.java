@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.7 2007-05-15 19:00:04 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.8 2007-05-15 20:37:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -94,6 +94,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.gridx = 0;
         buttonNew = new JButton();
         buttonNew.setText(LazyBones.getTranslation("new_timer","New Timer"));
+        buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 16));
         buttonNew.addActionListener(this);
         this.add(buttonNew, gbc);
         
@@ -101,6 +102,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.gridx = 1;
         buttonEdit = new JButton();
         buttonEdit.setText(LazyBones.getTranslation("edit","Edit Timer"));
+        buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
         buttonEdit.addActionListener(this);
         this.add(buttonEdit, gbc);
         
@@ -108,6 +110,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.gridx = 2;
         buttonRemove = new JButton();
         buttonRemove.setText(LazyBones.getTranslation("dont_capture","Delete Timer"));
+        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
         buttonRemove.addActionListener(this);
         this.add(buttonRemove, gbc);
         

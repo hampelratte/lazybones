@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.5 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.6 2007-05-15 20:37:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -69,10 +69,10 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     private void initGUI() {
         setLayout(new BorderLayout());
         
-        nextDateButton = new JButton(LazyBones.getInstance().getIcon("lazybones/go-next.png"));
+        nextDateButton = new JButton(LazyBones.getInstance().createImageIcon("action", "go-next", 16));
         nextDateButton.addActionListener(this);
         nextDateButton.setActionCommand("NEXT_DAY");
-        prevDateButton = new JButton(LazyBones.getInstance().getIcon("lazybones/go-previous.png"));
+        prevDateButton = new JButton(LazyBones.getInstance().createImageIcon("action", "go-previous", 16));
         prevDateButton.addActionListener(this);
         prevDateButton.setActionCommand("PREVIOUS_DAY");
         

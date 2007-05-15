@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.2 2007-04-10 20:07:01 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.3 2007-05-15 20:37:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,7 +47,6 @@ import util.ui.ImageUtilities;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
 public class VDRSettingsPanel implements devplugin.SettingsTab {
-    private LazyBones control;
 
     private JTabbedPane tabbedPane;
 
@@ -61,11 +60,6 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 
     private ScreenshotSettingsPanel previewPanel;
 
-    public VDRSettingsPanel(LazyBones control) {
-        this.control = control;
-    }
-
-
     public JPanel createSettingsPanel() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
@@ -75,7 +69,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.addTab(LazyBones.getTranslation("general", "General"), generalPanel
 					.getPanel());
 
-            channelPanel = new ChannelPanel(control);
+            channelPanel = new ChannelPanel();
             tabbedPane.addTab(LazyBones.getTranslation("channels", "Channels"), channelPanel
 					.getPanel());
 

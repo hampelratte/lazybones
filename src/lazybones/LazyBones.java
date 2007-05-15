@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.74 2007-05-13 11:27:49 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.75 2007-05-15 20:37:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -149,7 +149,7 @@ public class LazyBones extends Plugin implements Observer {
 
     
     public devplugin.SettingsTab getSettingsTab() {
-        return new VDRSettingsPanel(this);
+        return new VDRSettingsPanel();
     }
     
 
@@ -406,7 +406,6 @@ public class LazyBones extends Plugin implements Observer {
         RecordingManager.getInstance().synchronize();
     }
     
-    // TODO standard icons von tvbrowser nehmen und über createImageIcon laden
     private class ContextMenuFactory {
         public ActionMenu createActionMenu(final Program program) {
             AbstractAction action = new AbstractAction() {
@@ -441,7 +440,7 @@ public class LazyBones extends Plugin implements Observer {
                     }
                 };
                 actions[1].putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
-                actions[1].putValue(Action.SMALL_ICON, createImageIcon("lazybones/cancel.png"));
+                actions[1].putValue(Action.SMALL_ICON, createImageIcon("actions", "edit-delete", 16));
 
                 actions[2] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
@@ -450,7 +449,7 @@ public class LazyBones extends Plugin implements Observer {
                     }
                 };
                 actions[2].putValue(Action.NAME, LazyBones.getTranslation("edit", "Edit Timer"));
-                actions[2].putValue(Action.SMALL_ICON, createImageIcon("lazybones/edit.png"));
+                actions[2].putValue(Action.SMALL_ICON, createImageIcon("actions", "document-edit", 16));
 
                 actions[3] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
@@ -458,7 +457,7 @@ public class LazyBones extends Plugin implements Observer {
                     }
                 };
                 actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
-                actions[3].putValue(Action.SMALL_ICON, createImageIcon("lazybones/reload.png"));
+                actions[3].putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
             } else {
                 actions = new Action[size];
 
@@ -476,7 +475,7 @@ public class LazyBones extends Plugin implements Observer {
                     }
                 };
                 actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
-                actions[2].putValue(Action.SMALL_ICON, createImageIcon("lazybones/reload.png"));
+                actions[2].putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
             }
 
             actions[0] = new AbstractAction() {
@@ -485,7 +484,7 @@ public class LazyBones extends Plugin implements Observer {
                 }
             };
             actions[0].putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
-            actions[0].putValue(Action.SMALL_ICON, createImageIcon("lazybones/play.png"));
+            actions[0].putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
 
             return new ActionMenu(action, actions);
         }
@@ -494,7 +493,7 @@ public class LazyBones extends Plugin implements Observer {
         public JPopupMenu createSimpleActionMenu(final Timer timer) {
             if(simpleMenu == null) {
                 simpleMenu = new JPopupMenu();
-                JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("lazybones/cancel.png"));
+                JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("actions", "edit-delete", 16));
                 delItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         TimerManager.getInstance().deleteTimer(timer);
@@ -502,7 +501,7 @@ public class LazyBones extends Plugin implements Observer {
                     
                 });
                 
-                JMenuItem editItem = new JMenuItem(LazyBones.getTranslation("edit", "Edit Timer"), createImageIcon("lazybones/edit.png"));
+                JMenuItem editItem = new JMenuItem(LazyBones.getTranslation("edit", "Edit Timer"), createImageIcon("actions", "document-edit", 16));
                 editItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         TimerManager.getInstance().editTimer(timer);
