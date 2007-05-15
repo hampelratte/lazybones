@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.6 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.7 2007-05-15 19:00:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,10 +35,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -133,7 +133,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
     
     private void getTimers() {
         model.removeAllElements();
-        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        List<Timer> timers = TimerManager.getInstance().getTimers();
         
         Collections.sort(timers, new TimerComparator());
         

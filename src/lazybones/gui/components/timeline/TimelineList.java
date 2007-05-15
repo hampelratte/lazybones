@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.6 2007-01-28 15:15:25 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.7 2007-05-15 19:03:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,12 +32,7 @@ package lazybones.gui.components.timeline;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 import javax.swing.JPanel;
 
@@ -188,7 +183,7 @@ public class TimelineList extends JPanel implements Observer {
         return false;
     }
     
-    public void showTimersForCurrentDate(ArrayList<Timer> timers) {
+    public void showTimersForCurrentDate(List<Timer> timers) {
         clear();
         for (Timer timer : timers) {
             if(runsOnCurrentDate(timer)) {
@@ -203,7 +198,7 @@ public class TimelineList extends JPanel implements Observer {
                 TimersChangedEvent tce = (TimersChangedEvent) arg;
                 switch(tce.getType()) {
                 case TimersChangedEvent.ALL:
-                    ArrayList<Timer> timers = tce.getTimers();
+                    List<Timer> timers = tce.getTimers();
                     clear();
                     for (Timer timer : timers) {
                         if(runsOnCurrentDate(timer)) {

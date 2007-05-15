@@ -1,4 +1,4 @@
-/* $Id: TimersChangedEvent.java,v 1.1 2006-12-29 23:34:13 hampelratte Exp $
+/* $Id: TimersChangedEvent.java,v 1.2 2007-05-15 18:59:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,7 @@
  */
 package lazybones;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class TimersChangedEvent {
     public static final int ALL = 0;
@@ -40,7 +40,7 @@ public class TimersChangedEvent {
 
     private int type = 0;
 
-    private ArrayList<Timer> timers = null;
+    private List<Timer> timers = null;
 
     private Timer timer = null;
     
@@ -58,7 +58,7 @@ public class TimersChangedEvent {
      * @param type
      * @param timers
      */
-    public TimersChangedEvent(int type, ArrayList<Timer> timers) {
+    public TimersChangedEvent(int type, List<Timer> timers) {
         super();
         this.type = type;
         this.timers = timers;
@@ -72,11 +72,11 @@ public class TimersChangedEvent {
         this.timer = timer;
     }
 
-    public ArrayList<Timer> getTimers() {
+    public List<Timer> getTimers() {
         return timers;
     }
 
-    public void setTimers(ArrayList<Timer> timers) {
+    public void setTimers(List<Timer> timers) {
         this.timers = timers;
     }
 

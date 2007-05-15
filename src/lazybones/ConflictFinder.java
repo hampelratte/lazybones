@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.7 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.8 2007-05-15 18:57:47 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -79,7 +79,7 @@ public class ConflictFinder implements Observer {
        
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
         Logger.getLogger().log("Number of cards: " + numberOfCards, Logger.OTHER, Logger.DEBUG);
-        ArrayList<Timer> timers = TimerManager.getInstance().getTimers();
+        List<Timer> timers = TimerManager.getInstance().getTimers();
         List<StartStopEvent> startStopEvents = Utilities.createStartStopEventList(timers); 
         
         // run over startStopEvents
