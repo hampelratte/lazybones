@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.15 2007-05-13 11:17:16 hampelratte Exp $
+/* $Id: Timer.java,v 1.16 2007-05-15 19:12:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,7 +32,6 @@ package lazybones;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import lazybones.utils.Period;
@@ -46,16 +45,6 @@ public class Timer extends VDRTimer {
     public static final int NOT_FOUND = 2;
     public static final int NO_CHANNEL = 3;
     public static final int NO_PROGRAM = 4;
-    
-    /**
-     * The point in time, when this program (not the timer) starts 
-     */
-    private Calendar unbufferedStartTime = GregorianCalendar.getInstance();
-
-    /**
-     * The point in time, when this program (not the timer) ends 
-     */
-    private Calendar unbufferedEndTime = GregorianCalendar.getInstance();
     
     /**
      * The reason, why this Timer couldn't be assigned
@@ -116,8 +105,6 @@ public class Timer extends VDRTimer {
         Timer clone = new Timer(vdrtimer);
         clone.setTvBrowserProgIDs(getTvBrowserProgIDs());
         clone.setReason(getReason());
-        clone.setUnbufferedEndTime(unbufferedEndTime);
-        clone.setUnbufferedStartTime(unbufferedStartTime);
         return clone;
     }
 
@@ -183,22 +170,6 @@ public class Timer extends VDRTimer {
         
     }
 
-    public Calendar getUnbufferedEndTime() {
-        return unbufferedEndTime;
-    }
-
-    public void setUnbufferedEndTime(Calendar unbufferedEndTime) {
-        this.unbufferedEndTime = unbufferedEndTime;
-    }
-
-    public Calendar getUnbufferedStartTime() {
-        return unbufferedStartTime;
-    }
-
-    public void setUnbufferedStartTime(Calendar unbufferedStartTime) {
-        this.unbufferedStartTime = unbufferedStartTime;
-    }
-    
     /**
      * 
      * @return This timer without time buffers

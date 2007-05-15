@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.21 2007-05-15 18:59:11 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.22 2007-05-15 19:12:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -532,13 +532,11 @@ public class TimerManager extends Observable {
 
             if (vdrEPG != null) {
                 Calendar calStart = vdrEPG.getStartTime();
-                timer.setUnbufferedStartTime((Calendar) calStart.clone());
                 // start the recording x min before the beginning of the program
                 calStart.add(Calendar.MINUTE, -buffer_before);
                 timer.setStartTime(calStart);
 
                 Calendar calEnd = vdrEPG.getEndTime();
-                timer.setUnbufferedEndTime((Calendar) calEnd.clone());
                 // stop the recording x min after the end of the program
                 calEnd.add(Calendar.MINUTE, buffer_after);
                 timer.setEndTime(calEnd);
@@ -601,9 +599,6 @@ public class TimerManager extends Observable {
 
             Calendar endTime = (Calendar) startTime.clone();
             endTime.add(Calendar.MINUTE, prog.getLength());
-
-            newTimer.setUnbufferedStartTime((Calendar) startTime.clone());
-            newTimer.setUnbufferedEndTime((Calendar) endTime.clone());
             
             // add buffers
             startTime.add(Calendar.MINUTE, -buffer_before);
