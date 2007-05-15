@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.11 2007-05-13 11:18:41 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.12 2007-05-15 19:12:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -107,7 +107,7 @@ public class ProgramManager {
         if (res != null && res.getCode() == 215) {
             List epg = EPGParser.parse(res.getMessage());
             if (epg.size() > 0) {
-                EPGEntry entry = (EPGEntry) epg.get(0);
+                EPGEntry entry = (EPGEntry) epg.get(0); // we can use the first element, because there will be only one item in the list
                 VDRTimer timer = new VDRTimer();
                 timer.setChannelNumber(channelNumber);
                 timer.setTitle(entry.getTitle());
