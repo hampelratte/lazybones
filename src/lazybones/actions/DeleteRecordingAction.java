@@ -1,4 +1,4 @@
-/* $Id: DeleteRecordingAction.java,v 1.3 2007-04-30 15:45:16 hampelratte Exp $
+/* $Id: DeleteRecordingAction.java,v 1.4 2007-05-15 19:33:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -90,6 +90,8 @@ public class DeleteRecordingAction implements VDRAction {
                     }
                 }
             }
+        } else {
+            return false;
         }
         
         // update recording list
