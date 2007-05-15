@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.6 2007-05-15 19:57:37 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.7 2007-05-15 20:10:47 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -100,7 +100,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         JMenuItem menuDelete = new JMenuItem(LazyBones.getTranslation("delete", "Delete"));
         menuDelete.addActionListener(this);
         menuDelete.setActionCommand("DELETE");
-        menuDelete.setIcon(LazyBones.getInstance().getIcon("lazybones/cancel.png"));
+        menuDelete.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-delete", 16));
         JMenuItem menuInfo = new JMenuItem(LazyBones.getTranslation("recording_info", "Show information"));
         menuInfo.addActionListener(this);
         menuInfo.setActionCommand("INFO");
@@ -108,11 +108,11 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         JMenuItem menuPlay = new JMenuItem(LazyBones.getTranslation("recording_play", "Play on VDR"));
         menuPlay.addActionListener(this);
         menuPlay.setActionCommand("PLAY");
-        menuPlay.setIcon(LazyBones.getInstance().getIcon("lazybones/play.png"));
+        menuPlay.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
         JMenuItem menuSync = new JMenuItem(LazyBones.getTranslation("resync", "Synchronize with VDR"));
         menuSync.addActionListener(this);
         menuSync.setActionCommand("SYNC");
-        menuSync.setIcon(LazyBones.getInstance().getIcon("lazybones/reload.png"));
+        menuSync.setIcon(LazyBones.getInstance().createImageIcon("actions", "view-refresh", 16));
         popup.add(menuInfo);
         popup.add(menuPlay);
         popup.add(menuDelete);
