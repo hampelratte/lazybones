@@ -1,4 +1,4 @@
-/* $Id: EPGInfoPanel.java,v 1.1 2007-04-30 15:43:15 hampelratte Exp $
+/* $Id: EPGInfoPanel.java,v 1.2 2007-05-22 16:40:54 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,9 +30,12 @@
 package lazybones.gui.components;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.DateFormat;
+import java.util.Locale;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,8 +44,6 @@ import javax.swing.JTextArea;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 
-// TODO show more details
-// TODO beautify
 public class EPGInfoPanel extends JPanel {
     
     private EPGEntry epg;
@@ -53,8 +54,6 @@ public class EPGInfoPanel extends JPanel {
     }
     
     private void initGUI() {
-        setBackground(Color.WHITE);
-        
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
@@ -62,10 +61,25 @@ public class EPGInfoPanel extends JPanel {
         
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(new JLabel(epg.getTitle()), gbc);
+        JLabel title = new JLabel(epg.getTitle());
+        title.setFont(title.getFont().deriveFont(Font.BOLD));
+        add(title, gbc);
+        
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
+        JLabel time = new JLabel(df.format(epg.getStartTime().getTime()));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        add(time, gbc);
         
         gbc.gridx = 0;
         gbc.gridy = 1;
+        String shortText = (epg.getShortText() != null && epg.getShortText().length() > 0) ? epg.getShortText() : "";
+        JLabel shortTextLabel = new JLabel(shortText);
+        add(shortTextLabel, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
