@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.7 2007-05-15 20:10:47 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.8 2007-05-27 19:05:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,7 @@ import javax.swing.*;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
+import lazybones.Player;
 import lazybones.RecordingManager;
 import lazybones.actions.DeleteRecordingAction;
 import lazybones.gui.components.EPGInfoPanel;
@@ -97,6 +98,59 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(0,10,10,10);
 
+        createContextMenu();
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        Recording rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
+        
+        if("DELETE".equals(e.getActionCommand())) {
+            DeleteRecordingAction dra = new DeleteRecordingAction(rec);
+            if(!dra.execute()) {
+                Logger.getLogger().log(dra.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+            } else {
+                updateRecordings();
+            }
+        } else if("INFO".equals(e.getActionCommand()) && selectedRow >= 0) {
+            createEPGInfoDialog(rec);
+        } else if("SYNC".equals(e.getActionCommand())) {
+            RecordingManager.getInstance().synchronize();
+        } else if("PLAY".equals(e.getActionCommand())) {
+            Player.play(rec);
+        } else if("PLAY_ON_VDR".equals(e.getActionCommand())) {
+            RecordingManager.getInstance().playOnVdr(rec);
+        }
+    }
+
+    private void createEPGInfoDialog(Recording rec) {
+        final JDialog dialog = new JDialog();
+        dialog.getContentPane().add(new EPGInfoPanel(rec.getEpgInfo()));
+        dialog.setSize(400,300);
+        dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());
+        dialog.setVisible(true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    }
+
+    public void update(Observable arg0, Object recordings) {
+        if(arg0 == RecordingManager.getInstance()) {
+            updateRecordings();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void updateRecordings() {
+        model.removeAllElements();
+        List recordings = RecordingManager.getInstance().getRecordings();
+        if(recordings != null && recordings.size() > 0) {
+            Collections.sort(recordings, new RecordingComparator());
+            for (Iterator iter = recordings.iterator(); iter.hasNext();) {
+                Recording rec = (Recording) iter.next();
+                model.addElement(rec);
+            }
+        }
+    }
+    
+    private void createContextMenu() {
         JMenuItem menuDelete = new JMenuItem(LazyBones.getTranslation("delete", "Delete"));
         menuDelete.addActionListener(this);
         menuDelete.setActionCommand("DELETE");
@@ -105,10 +159,18 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         menuInfo.addActionListener(this);
         menuInfo.setActionCommand("INFO");
         menuInfo.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-find", 16));
-        JMenuItem menuPlay = new JMenuItem(LazyBones.getTranslation("recording_play", "Play on VDR"));
-        menuPlay.addActionListener(this);
-        menuPlay.setActionCommand("PLAY");
+        JMenu menuPlay = new JMenu(LazyBones.getTranslation("playback", "Playback"));
         menuPlay.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
+        JMenuItem menuPlayLocal = new JMenuItem(LazyBones.getTranslation("playback.local", "Play"));
+        menuPlayLocal.addActionListener(this);
+        menuPlayLocal.setActionCommand("PLAY");
+        menuPlayLocal.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
+        JMenuItem menuPlayOnVdr = new JMenuItem(LazyBones.getTranslation("playback.vdr", "Play on VDR"));
+        menuPlayOnVdr.addActionListener(this);
+        menuPlayOnVdr.setActionCommand("PLAY_ON_VDR");
+        menuPlayOnVdr.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
+        menuPlay.add(menuPlayLocal);
+        menuPlay.add(menuPlayOnVdr);
         JMenuItem menuSync = new JMenuItem(LazyBones.getTranslation("resync", "Synchronize with VDR"));
         menuSync.addActionListener(this);
         menuSync.setActionCommand("SYNC");
@@ -132,48 +194,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             public void mouseExited(MouseEvent e) {}
             public void mouseReleased(MouseEvent e) {}
         });
-    }
-    
-    public void actionPerformed(ActionEvent e) {
-        Recording rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
-        
-        if("DELETE".equals(e.getActionCommand())) {
-            DeleteRecordingAction dra = new DeleteRecordingAction(rec);
-            if(!dra.execute()) {
-                Logger.getLogger().log(dra.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
-            } else {
-                updateRecordings();
-            }
-        } else if("INFO".equals(e.getActionCommand()) && selectedRow >= 0) {
-            JDialog dialog = new JDialog();
-            dialog.getContentPane().add(new EPGInfoPanel(rec.getEpgInfo()));
-            dialog.setSize(400,300);
-            dialog.setVisible(true);
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        } else if("SYNC".equals(e.getActionCommand())) {
-            RecordingManager.getInstance().synchronize();
-        } else if("PLAY".equals(e.getActionCommand())) {
-            RecordingManager.getInstance().playOnVdr(rec);
-        }
-    }
-
-    public void update(Observable arg0, Object recordings) {
-        if(arg0 == RecordingManager.getInstance()) {
-            updateRecordings();
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void updateRecordings() {
-        model.removeAllElements();
-        List recordings = RecordingManager.getInstance().getRecordings();
-        if(recordings != null && recordings.size() > 0) {
-            Collections.sort(recordings, new RecordingComparator());
-            for (Iterator iter = recordings.iterator(); iter.hasNext();) {
-                Recording rec = (Recording) iter.next();
-                model.addElement(rec);
-            }
-        }
     }
     
     private class RecordingComparator implements Comparator<Recording> {
