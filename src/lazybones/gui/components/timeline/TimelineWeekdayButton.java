@@ -1,4 +1,4 @@
-/* $Id: TimelineWeekdayButton.java,v 1.1 2007-05-27 20:45:50 hampelratte Exp $
+/* $Id: TimelineWeekdayButton.java,v 1.2 2007-05-27 20:49:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,9 +30,11 @@
 package lazybones.gui.components.timeline;
 
 import java.awt.Graphics;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -48,7 +50,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     
     private int timerCount = 0;
     
-    private String[] dayNames = {"So","Mo","Di","Mi","Do","Fr","Sa"};
+    private SimpleDateFormat sdf = new SimpleDateFormat("E", Locale.getDefault());
     
     public TimelineWeekdayButton(Calendar day) {
         setDay(day);
@@ -85,7 +87,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
 
     public void setDay(Calendar day) {
         this.day = day;
-        setText(dayNames[day.get(Calendar.DAY_OF_WEEK)-1]);
+        setText(sdf.format(day.getTime()));
     }
 
     public int getTimerCount() {
