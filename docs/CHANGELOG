@@ -1,10 +1,15 @@
 Lazy Bones 0.4
 ===============================================================================
 * Fixed bug in the timer state handling
-* Timers can now be deleted, if they are recording
+* Timers can now be deleted when they are recording
+* Timers are fully editable
 * Added a timer conflict detection
 * Added a timeline, which shows timers and conflicts
+* Timer overview and timeline show an icon if recording
 * Improved the channel configuration of the settings dialog
+* Channel list can be restricted by the channelnumber
 * Improved automatical assignment of channels in the settings dialog
 * Improved assignment of timers to TV-Browser programs
-* Channel list can be restricted by the channelnumber
+* Added a recording overview: Possibility to delete recordings and start playback on VDR
+* Screenshots are only taken, if the remote control is visible
+* Added function to play recordings via VDR and via player
