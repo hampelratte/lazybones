@@ -1,4 +1,4 @@
-/* $Id: TimelineWeekdayButton.java,v 1.2 2007-05-27 20:49:32 hampelratte Exp $
+/* $Id: TimelineWeekdayButton.java,v 1.3 2007-05-27 21:17:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,10 +53,8 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private SimpleDateFormat sdf = new SimpleDateFormat("E", Locale.getDefault());
     
     public TimelineWeekdayButton(Calendar day) {
-        setDay(day);
-        setEnabled(false);
         TimerManager.getInstance().addObserver(this);
-        updateIndicators();
+        setDay(day);
     }
     
     public void update(Observable o, Object arg) {
@@ -88,6 +86,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     public void setDay(Calendar day) {
         this.day = day;
         setText(sdf.format(day.getTime()));
+        updateIndicators();
     }
 
     public int getTimerCount() {
