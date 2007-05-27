@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.6 2007-05-15 20:37:25 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.7 2007-05-27 20:45:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,6 +50,8 @@ import javax.swing.JPanel;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.gui.components.timeline.Timeline;
+import lazybones.gui.components.timeline.TimelineWeekdayButton;
+import lazybones.utils.Utilities;
 
 public class TimelinePanel extends JPanel implements ActionListener, Observer {
     
@@ -58,6 +60,8 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     private JButton prevDateButton;
     private Timeline timeline;
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
+    
+    private TimelineWeekdayButton[] weekdayButtons = new TimelineWeekdayButton[7];
     
     public TimelinePanel() {
         timeline = new Timeline();
@@ -80,6 +84,16 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
         northPanel.add(date);
+        northPanel.add(new JLabel("     "));
+        Calendar today = Calendar.getInstance();
+        for (int i = 0; i < weekdayButtons.length; i++) {
+            Calendar day = (Calendar) today.clone();
+            day.add(Calendar.DAY_OF_MONTH, i);
+            weekdayButtons[i] = new TimelineWeekdayButton(day);
+            weekdayButtons[i].addActionListener(this);
+            northPanel.add(weekdayButtons[i]);
+        }
+        
         add(northPanel, BorderLayout.NORTH);
         
         date.setFont(new Font("SansSerif",Font.PLAIN, 18));
@@ -102,6 +116,9 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
             if(previousDay != null) {
                 setCalendar(previousDay);
             } 
+        } else { // one of the weekdayButtons has been hit
+            TimelineWeekdayButton button = (TimelineWeekdayButton) e.getSource();
+            setCalendar(button.getDay());
         }
         
         // enable disable next and prev buttons
@@ -117,6 +134,16 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         nextDateButton.setEnabled(enableNextButton);
         boolean enablePrevButton = TimerManager.getInstance().hasPreviousDayWithEvent(cal);
         prevDateButton.setEnabled(enablePrevButton);
+        
+        // weekday buttons
+        for (int i = 0; i < weekdayButtons.length; i++) {
+            TimelineWeekdayButton button = weekdayButtons[i];
+            if(Utilities.sameDay(cal, button.getDay())) {
+                button.setSelected(true);
+            } else {
+                button.setSelected(false);
+            }
+        }
     }
 
     public void update(Observable o, Object arg) {
