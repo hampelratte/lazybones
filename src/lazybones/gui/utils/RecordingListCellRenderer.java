@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.3 2007-04-10 19:44:25 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.4 2007-05-27 19:04:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -108,7 +108,9 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             
             date.setText(df.format(recording.getStartTime().getTime()));
             time.setText(tf.format(recording.getStartTime().getTime()));
-            title.setText(recording.getTitle());
+            title.setText(recording.getEpgInfo() != null ? 
+                    recording.getEpgInfo().getTitle() :
+                    recording.getTitle());
             
             if(recording.isNew()) {
                 newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
