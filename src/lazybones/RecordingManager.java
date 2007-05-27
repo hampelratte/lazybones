@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.2 2007-05-15 19:57:54 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.3 2007-05-27 19:20:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,11 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import lazybones.actions.ListRecordingsAction;
+
 import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.commands.PLAY;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
-import org.hampelratte.svdrp.util.RecordingsParser;
 
 /**
  * 
@@ -46,8 +46,6 @@ import org.hampelratte.svdrp.util.RecordingsParser;
  * Class to manage all recordings.
  */
 public class RecordingManager extends Observable {
-    
-    private transient static Logger logger = Logger.getLogger();
 
     private static RecordingManager instance;
 
@@ -100,18 +98,9 @@ public class RecordingManager extends Observable {
         removeAll();
         
         // fetch current recording list from vdr
-        Response res = VDRConnection.send(new LSTR());
-        if (res != null && res.getCode() == 250) {
-            logger.log("Recordings retrieved from VDR",Logger.OTHER, Logger.INFO);
-            String recordingsString = res.getMessage();
-            recordings = RecordingsParser.parse(recordingsString);
-        } else if (res != null && res.getCode() == 550) {
-            // no recordings, do nothing
-            logger.log("No recording on VDR",Logger.OTHER, Logger.INFO);
-        } else { /* something went wrong */
-            logger.log(LazyBones.getTranslation("error_retrieve_recordings",
-                "Couldn't retrieve recordings from VDR."), 
-                Logger.CONNECTION, Logger.ERROR);
+        ListRecordingsAction lstr = new ListRecordingsAction();
+        if(lstr.execute()) {
+            recordings = lstr.getRecordings();
         }
         
         setChanged();
