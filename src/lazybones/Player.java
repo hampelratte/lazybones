@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.15 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: Player.java,v 1.16 2007-05-27 19:20:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,7 @@ import java.io.InputStream;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.CHAN;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 import devplugin.Program;
 
@@ -46,7 +47,7 @@ import devplugin.Program;
 public class Player {
     private static PlayerThread playerThread;
     
-    private static Logger LOG = Logger.getLogger();
+    private static Logger logger = Logger.getLogger();
 
     public static void play(Program prog) {
     	Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
@@ -55,7 +56,7 @@ public class Player {
             int id = chan.getChannelNumber();
             Player.play(id);
         } else {
-            LOG.log("Couldn't start Player", Logger.OTHER, Logger.ERROR);
+            logger.log("Couldn't start Player", Logger.OTHER, Logger.ERROR);
         }
     }
 
@@ -73,7 +74,7 @@ public class Player {
                 if (res == null || res.getCode() != 250) {
                     String mesg = LazyBones.getTranslation("Error",
                     "Error") + ": " + res.getMessage();
-                    LOG.log(mesg, Logger.OTHER, Logger.ERROR);
+                    logger.log(mesg, Logger.OTHER, Logger.ERROR);
                     return;
                 }
             }
@@ -96,8 +97,33 @@ public class Player {
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
             String mesg =  LazyBones.getTranslation("Error", "Error")+ ": " + e1;
-            LOG.log(mesg, Logger.OTHER, Logger.ERROR);
+            logger.log(mesg, Logger.OTHER, Logger.ERROR);
         }
+    }
+    
+    public static void play(Recording rec) {
+        if (playerThread != null && playerThread.isRunning()) {
+            playerThread.stopThread();
+        }
+        
+        String parameters = LazyBones.getProperties().getProperty(
+        "player_params");
+        String[] arguments;
+        if (parameters.trim().length() > 0) {
+            String[] params = parameters.split(" ");
+            arguments = new String[params.length + 2];
+            System.arraycopy(params, 0, arguments, 1, params.length);
+        } else {
+            arguments = new String[2];
+        }
+        arguments[0] = LazyBones.getProperties().getProperty("player");
+        String host = LazyBones.getProperties().getProperty("host");
+        
+        String url = "http://" + host + ":3001/rec/" + rec.getNumber();
+        logger.log("Trying to play url " + url, Logger.OTHER, Logger.DEBUG);
+        arguments[arguments.length - 1] = url;
+        playerThread = new PlayerThread(arguments);
+
     }
 
     public static void stop() {
@@ -127,7 +153,7 @@ public class Player {
                 p.waitFor();
             } catch (Exception e) {
                 String mesg = LazyBones.getTranslation("couldnt_start", "Couldn't start player")+ ": " + e;
-                LOG.log(mesg, Logger.OTHER, Logger.ERROR);
+                logger.log(mesg, Logger.OTHER, Logger.ERROR);
             }
             running = false;
         }
@@ -155,7 +181,7 @@ public class Player {
             int length = -1;
             try {
                 while ((length = in.read(buffer)) > 0) {
-                    LOG.log("PLAYER: " + new String(buffer, 0, length), Logger.OTHER, Logger.DEBUG);
+                    logger.log("PLAYER: " + new String(buffer, 0, length), Logger.OTHER, Logger.DEBUG);
                 }
             } catch (Exception e) {
             }
