@@ -39,7 +39,7 @@
 		</javac>
 	</target>
 	
-	<target name="jar">
+	<target name="jar" depends="compile">
 		<mkdir dir="${classes.dir}/lazybones" />
 		<unjar src="${lib.dir}/${nacho}" dest="${classes.dir}"/>
 		<unjar src="${lib.dir}/${tableLayout}" dest="${classes.dir}"/>
