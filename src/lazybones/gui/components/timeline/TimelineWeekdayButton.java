@@ -1,4 +1,4 @@
-/* $Id: TimelineWeekdayButton.java,v 1.3 2007-05-27 21:17:13 hampelratte Exp $
+/* $Id: TimelineWeekdayButton.java,v 1.4 2007-06-04 16:14:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,7 @@ import java.util.Observer;
 
 import javax.swing.JToggleButton;
 
+import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerManager;
 import lazybones.utils.Utilities;
@@ -50,7 +51,8 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     
     private int timerCount = 0;
     
-    private SimpleDateFormat sdf = new SimpleDateFormat("E", Locale.getDefault());
+    private SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
+    private SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
     
     public TimelineWeekdayButton(Calendar day) {
         TimerManager.getInstance().addObserver(this);
@@ -63,18 +65,28 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
         }
     }
     
+    /**
+     * Updates the small dots on the button,
+     * the tooltip text and the enabled state
+     */
     private void updateIndicators() {
         setTimerCount(0);
         List<Timer> timers = TimerManager.getInstance().getTimers();
         for (Iterator iter = timers.iterator(); iter.hasNext();) {
             Timer timer = (Timer) iter.next();
-            if(timerRunsToday(timer)) {
+            if(timerRunsOnThisDay(timer)) {
                 timerCount++;
             }
         }
 
         // enable if there is a timer event today
         setEnabled(getTimerCount() > 0);
+        
+        // update tooltip text
+        setToolTipText(LazyBones.getTranslation("weekdayButton.tooltip", 
+                "{0} timers on {1}", 
+                Integer.toString(getTimerCount()), 
+                longFormat.format(day.getTime() )));
         
         repaint();
     }
@@ -85,7 +97,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
 
     public void setDay(Calendar day) {
         this.day = day;
-        setText(sdf.format(day.getTime()));
+        setText(dayFormat.format(day.getTime()));
         updateIndicators();
     }
 
@@ -97,7 +109,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
         this.timerCount = timerCount;
     }
     
-    private boolean timerRunsToday(Timer timer) {
+    private boolean timerRunsOnThisDay(Timer timer) {
         Calendar startTime = timer.getStartTime();
         Calendar endTime = timer.getEndTime();
         if(Utilities.sameDay(startTime, getDay()) || Utilities.sameDay(endTime, getDay())) {
