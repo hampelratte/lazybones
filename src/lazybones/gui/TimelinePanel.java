@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.7 2007-05-27 20:45:51 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.8 2007-06-04 16:39:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -84,6 +85,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
         northPanel.add(date);
+        date.setPreferredSize(new Dimension(280, 30));
         northPanel.add(new JLabel("     "));
         Calendar today = Calendar.getInstance();
         for (int i = 0; i < weekdayButtons.length; i++) {
