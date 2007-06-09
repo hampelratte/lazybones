@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.22 2007-05-15 19:12:32 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.23 2007-06-09 19:56:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -180,17 +180,22 @@ public class TimerManager extends Observable {
 
     /**
      * 
-     * @param progID
-     *            the programID of a devplugin.Program object
+     * @param prog
+     *            a devplugin.Program object
      * @return the timer for this program or null
-     * @see Program#getID()
+     * @see Program
      */
-    public Timer getTimer(String progID) {
+    public Timer getTimer(Program prog) {
+        String progID = prog.getID();
+        Calendar cal = prog.getDate().getCalendar();
         for (Iterator it = timers.iterator(); it.hasNext();) {
             Timer timer = (Timer) it.next();
             List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
             for (Iterator iter = tvBrowserProdIDs.iterator(); iter.hasNext();) {
-                if (progID.equals((String) iter.next())) {
+                // TODO observe the behaviour of timer deletion,
+                // maybe this doen't work in some cases e.g. progs after midnight or so
+                if (progID.equals((String) iter.next()) &&
+                        Utilities.sameDay(cal, timer.getStartTime())) {
                     return timer;
                 }
             }
@@ -779,7 +784,8 @@ public class TimerManager extends Observable {
     }
     
     public void deleteTimer(Program prog) {
-        Timer timer = TimerManager.getInstance().getTimer(prog.getID());
+        Timer timer = TimerManager.getInstance().getTimer(prog);
+        logger.log("Deleting timer " + timer, Logger.OTHER, Logger.DEBUG);
         DeleteTimerAction dta = new DeleteTimerAction(timer);
         if(!dta.execute()) {
             logger.log(LazyBones.getTranslation(

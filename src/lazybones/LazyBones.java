@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.76 2007-05-27 19:24:11 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.77 2007-06-09 19:59:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -444,7 +444,7 @@ public class LazyBones extends Plugin implements Observer {
 
                 actions[2] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        Timer timer = (Timer) TimerManager.getInstance().getTimer(program.getID());
+                        Timer timer = (Timer) TimerManager.getInstance().getTimer(program);
                         TimerManager.getInstance().editTimer(timer);
                     }
                 };
