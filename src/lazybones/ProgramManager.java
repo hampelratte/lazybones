@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.13 2007-07-06 13:01:14 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.14 2007-07-06 13:30:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -196,12 +196,12 @@ public class ProgramManager {
                 LazyBones.getProperties().getProperty("supressMatchDialog"))) {
             return;
         }
-        Iterator iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
+        Iterator<Timer> iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
         logger.log("Not assigned timers: "
                 + TimerManager.getInstance().getNotAssignedTimers().size(),
                 Logger.OTHER, Logger.DEBUG);
         while (iterator.hasNext()) {
-            Timer timer = (Timer) iterator.next();
+            Timer timer = iterator.next();
             switch(timer.getReason()) {
             case Timer.NOT_FOUND:
                 showProgramConfirmDialog(timer);
