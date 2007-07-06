@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.12 2007-05-15 19:12:06 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.13 2007-07-06 13:01:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -142,6 +142,12 @@ public class ProgramManager {
         return getProgramAt(timer.getStartTime(), time, chan);
     }
     
+    /**
+     * 
+     * @param time A Calendar object representing the day, the program is running at
+     * @param progID the progID of the program
+     * @return {@link devplugin.PluginManager#getProgram(Date, String)}
+     */
     public Program getProgram(Calendar time, String progID) {
         return LazyBones.getPluginManager().getProgram(new devplugin.Date(time), progID);
     }
@@ -264,7 +270,7 @@ public class ProgramManager {
 
                 // MAYBE zeittoleranz als option anbieten
                 // collect candidates
-                if (Math.abs(deltaStart) <= 15 && Math.abs(deltaEnd) <= 15) {
+                if (Math.abs(deltaStart) <= 20 && Math.abs(deltaEnd) <= 20) {
                     candidates.put(new Integer(Math.abs(deltaStart)), prog);
                 }
                 
@@ -345,13 +351,12 @@ public class ProgramManager {
 
             // calculate the precentage of common words
             int percentage = 0;
-            if(!timer.getPath().equals("")) {
-                int percentagePath = Utilities.percentageOfEquality(timer.getPath(), progMin.getTitle());
-                int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), progMin.getTitle());
-                percentage = Math.max(percentagePath, percentageTitle);
-            } else {
-                percentage = Utilities.percentageOfEquality(timer.getTitle(), progMin.getTitle());
-            }
+            int percentagePath = Utilities.percentageOfEquality(timer.getPath(), progMin.getTitle());
+            int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), progMin.getTitle());
+            int percentageBoth = Utilities.percentageOfEquality(timer.getPath() + timer.getTitle(), progMin.getTitle());
+            percentage = Math.max(percentagePath, percentageTitle);
+            percentage = Math.max(percentage, percentageBoth);
+
 
             // override the percentage
             if (timer.getFile().indexOf("EPISODE") >= 0
@@ -450,5 +455,16 @@ public class ProgramManager {
 
         // show dialog
         new ProgramSelectionDialog(programs, timer);
+    }
+    
+    public void handleTimerDoubleClick(Timer timer) {
+        List<String> progIDs = timer.getTvBrowserProgIDs();
+        if(progIDs.size() > 0) {
+            String firstProgID = progIDs.get(0);
+            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), firstProgID);
+            if(prog != null) {
+                LazyBones.getPluginManager().handleProgramDoubleClick(prog);
+            }
+        }
     }
 }
