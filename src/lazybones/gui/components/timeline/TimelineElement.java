@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.8 2007-05-05 20:32:46 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.9 2007-07-06 13:01:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -150,6 +150,9 @@ public class TimelineElement extends JComponent implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
+            ProgramManager.getInstance().handleTimerDoubleClick(getTimer());
+        }
     }
 
     public void mouseEntered(MouseEvent e) {
