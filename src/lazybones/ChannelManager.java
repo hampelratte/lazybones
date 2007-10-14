@@ -1,4 +1,4 @@
-/* $Id: ChannelManager.java,v 1.1 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.2 2007-10-14 18:57:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,10 +30,10 @@
 package lazybones;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
@@ -45,7 +45,7 @@ public class ChannelManager {
 
     private static ChannelManager instance;
     
-    private static Hashtable channelMapping = new Hashtable();
+    private static Map<String, Channel> channelMapping = new Hashtable<String, Channel>();
 
     private List<Channel> channels = null;
     
@@ -70,8 +70,7 @@ public class ChannelManager {
         int min = Integer.parseInt(LazyBones.getProperties().getProperty("minChannelNumber"));
         int max = Integer.parseInt(LazyBones.getProperties().getProperty("maxChannelNumber"));
 
-        for (Iterator iter = channels.iterator(); iter.hasNext();) {
-            Channel chan = (Channel) iter.next();
+        for (Channel chan : channels) {
             if(chan.getChannelNumber() >= min && (chan.getChannelNumber() <= max || max == 0 )) {
                 filteredChannels.add(chan);
             }
@@ -103,19 +102,17 @@ public class ChannelManager {
         return null;
     }
     
-    public static Hashtable getChannelMapping() {
+    public static Map<String, Channel> getChannelMapping() {
         return channelMapping;
     }
 
-    public static void setChannelMapping(Hashtable channelMapping) {
+    public static void setChannelMapping(Map<String, Channel> channelMapping) {
         ChannelManager.channelMapping = channelMapping;
     }
     
     public devplugin.Channel getChannel(Timer timer) {
         devplugin.Channel chan = null;
-        Enumeration en = ChannelManager.getChannelMapping().keys();
-        while (en.hasMoreElements()) {
-            String channelID = (String) en.nextElement();
+        for(String channelID : channelMapping.keySet()) {
             Channel channel = (Channel) ChannelManager.getChannelMapping().get(channelID);
             if (channel.getChannelNumber() == timer.getChannelNumber()) {
                 chan = getChannelById(channelID);

@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.8 2007-05-15 18:57:47 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.9 2007-10-14 18:57:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,7 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class ConflictFinder implements Observer {
     private static ConflictFinder instance;    
-    private HashSet<Set> conflicts = new HashSet<Set>();
+    private Set<ConflictingTimersSet<Timer>> conflicts = new HashSet<ConflictingTimersSet<Timer>>();
     private HashMap<Integer, Integer> transponderUse = new HashMap<Integer,Integer>();
     private HashSet<Timer> runningEvents = new HashSet<Timer>();
     
@@ -64,8 +64,7 @@ public class ConflictFinder implements Observer {
         runningEvents.clear();
         
         // reset timer conflict times
-        for (Iterator iter = TimerManager.getInstance().getTimers().iterator(); iter.hasNext();) {
-            Timer timer = (Timer) iter.next();
+        for (Timer timer : TimerManager.getInstance().getTimers()) {
             timer.getConflictPeriods().clear();
         }
     }
@@ -125,12 +124,10 @@ public class ConflictFinder implements Observer {
 
             // debug output
             StringBuffer logMsg = new StringBuffer();
-            Set conflicts = ConflictFinder.getInstance().getConflicts();
-            for (Iterator iter = conflicts.iterator(); iter.hasNext();) {
+            Set<ConflictingTimersSet<Timer>> conflicts = ConflictFinder.getInstance().getConflicts();
+            for (ConflictingTimersSet<Timer> set : conflicts) {
                 logMsg.append("Conflict found: ");
-                ConflictingTimersSet set = (ConflictingTimersSet) iter.next();
-                for (Iterator iterator = set.iterator(); iterator.hasNext();) {
-                    Timer timer = (Timer) iterator.next();
+                for (Timer timer : set) {
                     logMsg.append(timer.getTitle() + ", ");
                 }
                 logMsg.append(" Conflict start: " +  DateFormat.getDateTimeInstance().format(set.getConflictStartTime().getTime()));
@@ -140,7 +137,7 @@ public class ConflictFinder implements Observer {
             
             // set timeline date to the date of one conflict
             TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
-            ConflictingTimersSet set = (ConflictingTimersSet) conflicts.iterator().next();
+            ConflictingTimersSet<Timer> set = (ConflictingTimersSet<Timer>) conflicts.iterator().next();
             tp.setCalendar(set.getConflictStartTime());
         }
         
@@ -151,7 +148,7 @@ public class ConflictFinder implements Observer {
         return conflicts.size();
     }
     
-    public Set<Set> getConflicts() {
+    public Set<ConflictingTimersSet<Timer>> getConflicts() {
         return conflicts;
     }
     

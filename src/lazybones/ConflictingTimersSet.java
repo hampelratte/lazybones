@@ -1,4 +1,4 @@
-/* $Id: ConflictingTimersSet.java,v 1.2 2007-01-28 17:04:19 hampelratte Exp $
+/* $Id: ConflictingTimersSet.java,v 1.3 2007-10-14 18:57:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -65,7 +65,7 @@ public class ConflictingTimersSet<E> extends HashSet<E> {
     }
     
     private void addConflictTimeToTimers() {
-        for (Iterator iter = this.iterator(); iter.hasNext();) {
+        for (Iterator<E> iter = this.iterator(); iter.hasNext();) {
             Timer timer = (Timer) iter.next();
             Period p = new Period(conflictStartTime, conflictEndTime);
             timer.addConflictPeriod(p);
