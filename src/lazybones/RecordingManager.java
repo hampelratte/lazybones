@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.3 2007-05-27 19:20:23 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.4 2007-10-14 19:01:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,10 +34,14 @@ import java.util.List;
 import java.util.Observable;
 
 import lazybones.actions.ListRecordingsAction;
+import lazybones.actions.VDRAction;
 
 import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.commands.PLAY;
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
+import org.hampelratte.svdrp.util.EPGParser;
 
 /**
  * 
@@ -91,20 +95,48 @@ public class RecordingManager extends Observable {
     /**
      * Fetches the recording list from vdr
      */
-    public void synchronize() {
+    public synchronized void synchronize() {
         Logger.getLogger().log("Getting recordings from VDR", Logger.OTHER, Logger.DEBUG);
         
-        // clear recording list
-        removeAll();
-        
         // fetch current recording list from vdr
-        ListRecordingsAction lstr = new ListRecordingsAction();
-        if(lstr.execute()) {
-            recordings = lstr.getRecordings();
+        VDRCallback callback = new VDRCallback() {
+            public void receiveResponse(VDRAction cmd, Response response) {
+                ListRecordingsAction lstr = (ListRecordingsAction) cmd;
+                
+                // clear recording list
+                removeAll();
+                
+                if(lstr.isSuccess()) {
+                    recordings = lstr.getRecordings();
+                }
+                
+                setChanged();
+                notifyObservers();
+            }
+        };
+        ListRecordingsAction lstr = new ListRecordingsAction(callback);
+        lstr.enqueue();
+    }
+    
+    public void loadInfo(Recording rec) {
+        Response response = VDRConnection.send(new LSTR(rec.getNumber()));
+        if(response != null && response.getCode() == 215) {
+            // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
+            String[] lines = response.getMessage().split("\n");
+            StringBuffer mesg = new StringBuffer();
+            for (int i = 0; i < lines.length; i++) {
+                if(i == lines.length -1) {
+                    mesg.append("e\n");
+                }
+                mesg.append(lines[i]+"\n");
+            }
+            
+            // parse epg information
+            List<EPGEntry> epg = EPGParser.parse(mesg.toString());
+            if(epg.size() > 0) {
+                rec.setEpgInfo(epg.get(0));
+            }
         }
-        
-        setChanged();
-        notifyObservers();
     }
 
     public void playOnVdr(Recording rec) {

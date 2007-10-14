@@ -1,4 +1,4 @@
-/* $Id: ModifyTimerAction.java,v 1.1 2007-05-15 18:59:50 hampelratte Exp $
+/* $Id: ModifyTimerAction.java,v 1.2 2007-10-14 19:05:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,27 +35,25 @@ import lazybones.Timer;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.TimersOutOfSync;
 
-import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.MODT;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import org.hampelratte.svdrp.util.TimerParser;
 
-public class ModifyTimerAction implements VDRAction {
+public class ModifyTimerAction extends VDRAction {
 
     private Timer newTimer;
     private Timer oldTimer;
-    private Response response;
     
     public ModifyTimerAction(Timer newTimer, Timer oldTimer) {
         this.newTimer = newTimer;
         this.oldTimer = oldTimer;
     }
     
-    public boolean execute() {
+    boolean execute() {
         response = VDRConnection.send(new LSTT(Integer.toString(oldTimer.getID())));
         if(response != null && response.getCode() == 250) {
-            List list = TimerParser.parse(response.getMessage());
+            List<VDRTimer> list = TimerParser.parse(response.getMessage());
             if(list.size() <= 0) {
                 response = new TimersOutOfSync();
                 return false;
@@ -76,8 +74,8 @@ public class ModifyTimerAction implements VDRAction {
         return false;
     }
 
-    public Response getResponse() {
-        return response;
+    @Override
+    public String getDescription() {
+        return "Modify timer " + oldTimer;
     }
-
 }

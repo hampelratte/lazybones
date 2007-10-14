@@ -1,4 +1,4 @@
-/* $Id: DeleteRecordingAction.java,v 1.4 2007-05-15 19:33:38 hampelratte Exp $
+/* $Id: DeleteRecordingAction.java,v 1.5 2007-10-14 19:05:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,23 +35,28 @@ import lazybones.LazyBones;
 import lazybones.RecordingManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
+import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.DELR;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 
-
-public class DeleteRecordingAction implements VDRAction {
+public class DeleteRecordingAction extends VDRAction {
 
     private Recording recording;
-    private Response res;
     
     public DeleteRecordingAction(Recording recording) {
+        this(recording, null);
+    }
+    
+    public DeleteRecordingAction(Recording recording, VDRCallback callback) {
+        super(callback);
         this.recording = recording;
     }
     
-    public boolean execute() {
+    
+    boolean execute() {
         int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
                 LazyBones.getTranslation("recording_delete", "Do you really want to delete this recording?"), 
                 "", JOptionPane.YES_NO_OPTION);
@@ -60,12 +65,12 @@ public class DeleteRecordingAction implements VDRAction {
         }
         
         int recordingNumber = recording.getNumber();
-        res = VDRConnection.send(new DELR(recordingNumber));
-        if(res.getCode() == 250) {
+        response = VDRConnection.send(new DELR(recordingNumber));
+        if(response.getCode() == 250) {
             // update recording list
             RecordingManager.getInstance().synchronize();
             return true;
-        } else if(res.getCode() == 550 && res.getMessage().indexOf("in use by timer") >= 0) {
+        } else if(response.getCode() == 550 && response.getMessage().indexOf("in use by timer") >= 0) {
             // recording is still running, we have to delete the timer first
             result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
                     LazyBones.getTranslation("recording_running_delete", "Timer is still recording. Do you really want to delete this recording?"), 
@@ -74,24 +79,41 @@ public class DeleteRecordingAction implements VDRAction {
                 return true;
             } else {
                 // delete timer and recording
-                String msg = res.getMessage();
+                String msg = response.getMessage();
                 String numberString = msg.substring(msg.lastIndexOf(" "));
                 int timerNumber = Integer.parseInt( numberString.trim() );
                 Timer timer = TimerManager.getInstance().getTimer(timerNumber);
-                DeleteTimerAction dta = new DeleteTimerAction(timer, true);
-                if(!dta.execute()) {
-                    res = dta.getResponse();
-                    return false;
-                } else {
-                    // timer is deleted, now delete the recording
-                    res = VDRConnection.send(new DELR(recordingNumber));
-                    if(res.getCode() != 250) {
-                        return false;
+                
+                VDRCallback callback = new VDRCallback() {
+                    public void receiveResponse(VDRAction cmd, Response response) {
+                        /* The DeleteTimerAction finished, we can now check again,
+                         * if we can delete the recording */
+                        
+                        if(!cmd.isSuccess()) {
+                            response = cmd.getResponse();
+                            success = false;
+                            callback();
+                            return;
+                        } else {
+                            // timer is deleted, now delete the recording
+                            response = VDRConnection.send(new DELR(recording.getNumber()));
+                            if(response.getCode() != 250) {
+                                success = false;
+                                callback();
+                                return;
+                            }
+                        }
+                        
+                        success = true;
+                        callback();
                     }
-                }
+                };
+                DeleteTimerAction dta = new DeleteTimerAction(timer, true);
+                dta.setCallback(callback);
+                dta.enqueue();
             }
         } else {
-            return false;
+        	return false;
         }
         
         // update recording list
@@ -100,6 +122,11 @@ public class DeleteRecordingAction implements VDRAction {
     }
 
     public Response getResponse() {
-        return res;
+        return response;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Delete recording " + recording;
     }
 }

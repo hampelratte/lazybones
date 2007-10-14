@@ -1,4 +1,4 @@
-/* $Id: DeleteTimerAction.java,v 1.3 2007-04-30 13:36:50 hampelratte Exp $
+/* $Id: DeleteTimerAction.java,v 1.4 2007-10-14 19:05:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,7 +35,7 @@ import javax.swing.JOptionPane;
 
 import lazybones.LazyBones;
 import lazybones.Timer;
-import lazybones.TimerManager;
+import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.TimersOutOfSync;
 
@@ -47,13 +47,17 @@ import org.hampelratte.svdrp.responses.R250;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import org.hampelratte.svdrp.util.TimerParser;
 
-public class DeleteTimerAction implements VDRAction {
+public class DeleteTimerAction extends VDRAction {
 
     private Timer timer;
-    private Response response;
     private boolean forceDeletion = false;
     
     public DeleteTimerAction(Timer timer) {
+        this(timer, null);
+    }
+    
+    public DeleteTimerAction(Timer timer, VDRCallback callback) {
+        setCallback(callback);
         this.timer = timer;
     }
     
@@ -63,11 +67,11 @@ public class DeleteTimerAction implements VDRAction {
      * @param forceDeletion If set, the timer will be deleted without user confirmation
      */
     public DeleteTimerAction(Timer timer, boolean forceDeletion) {
-        this.timer = timer;
+        this(timer);
         this.forceDeletion = forceDeletion;
     }
     
-    public boolean execute() {
+    boolean execute() {
         // snychronize this timer with vdr and check if the timers on the vdr haven't changed
         response = VDRConnection.send(new LSTT(Integer.toString(timer.getID())));
         if( response == null || !(response instanceof R250) ) {
@@ -90,6 +94,7 @@ public class DeleteTimerAction implements VDRAction {
                         LazyBones.getTranslation("recording_timer_delete", "This timer is currently recording! Do you really want to delete it?"),
                         "", JOptionPane.YES_NO_OPTION);
                 if(result != JOptionPane.OK_OPTION) {
+                    // do nothing
                     return true;
                 }
             }
@@ -109,12 +114,15 @@ public class DeleteTimerAction implements VDRAction {
             return false;
         }
         
-        // timer has been deleted -> synchronize timer list
-        TimerManager.getInstance().synchronize();
         return true;
     }
 
     public Response getResponse() {
         return response;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Delete timer " + timer;
     }
 }

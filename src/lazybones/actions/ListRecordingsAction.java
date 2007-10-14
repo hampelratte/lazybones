@@ -1,4 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.1 2007-05-27 19:06:01 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.2 2007-10-14 19:05:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,46 +29,47 @@
  */
 package lazybones.actions;
 
-import java.util.Iterator;
 import java.util.List;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
+import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.ConnectionProblem;
 
 import org.hampelratte.svdrp.Connection;
-import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
-import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
-import org.hampelratte.svdrp.util.EPGParser;
 import org.hampelratte.svdrp.util.RecordingsParser;
 
-public class ListRecordingsAction implements VDRAction {
+public class ListRecordingsAction extends VDRAction {
 
     private Logger logger = Logger.getLogger();
     
-    private Response res;
-    
     private List<Recording> recordings;
     
-    public boolean execute() {
+    public ListRecordingsAction(VDRCallback callback) {
+        super(callback);
+    }
+    
+    boolean execute() {
         try {
             Connection connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout);
-            res = connection.send(new LSTR());
+            response = connection.send(new LSTR());
             
-            if (res != null && res.getCode() == 250) {
-                String recordingsString = res.getMessage();
+            if (response != null && response.getCode() == 250) {
+                String recordingsString = response.getMessage();
                 recordings = RecordingsParser.parse(recordingsString);
                 
                 // retrieve infos for all recordings
+                // this is to slow, instead we load the info on demand
+                /*
                 for (Iterator iter = recordings.iterator(); iter.hasNext();) {
                     Recording rec = (Recording) iter.next();
-                    res = connection.send(new LSTR(rec.getNumber()));
-                    if(res != null && res.getCode() == 215) {
+                    response = connection.send(new LSTR(rec.getNumber()));
+                    if(response != null && response.getCode() == 215) {
                         // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
-                        String[] lines = res.getMessage().split("\n");
+                        String[] lines = response.getMessage().split("\n");
                         StringBuffer mesg = new StringBuffer();
                         for (int i = 0; i < lines.length; i++) {
                             if(i == lines.length -1) {
@@ -84,7 +85,8 @@ public class ListRecordingsAction implements VDRAction {
                         }
                     }
                 }
-            } else if (res != null && res.getCode() == 550) {
+                */
+            } else if (response != null && response.getCode() == 550) {
                 // no recordings, do nothing
                 logger.log("No recording on VDR",Logger.OTHER, Logger.INFO);
             } else { /* something went wrong */
@@ -95,19 +97,19 @@ public class ListRecordingsAction implements VDRAction {
             
             connection.close();
         } catch (Exception e1) {
-            res = new ConnectionProblem();
-            logger.log(res.getMessage(), Logger.CONNECTION, Logger.ERROR);
+            response = new ConnectionProblem();
+            logger.log(response.getMessage(), Logger.CONNECTION, Logger.ERROR);
             return false;
         }   
         return true;
-    }
-
-    public Response getResponse() {
-        return res;
     }
 
     public List<Recording> getRecordings() {
         return recordings;
     }
 
+    @Override
+    public String getDescription() {
+        return "Update list of recordings";
+    }
 }

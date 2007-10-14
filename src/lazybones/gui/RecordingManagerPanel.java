@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.8 2007-05-27 19:05:36 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.9 2007-10-14 19:07:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,10 +48,13 @@ import lazybones.LazyBones;
 import lazybones.Logger;
 import lazybones.Player;
 import lazybones.RecordingManager;
+import lazybones.VDRCallback;
 import lazybones.actions.DeleteRecordingAction;
+import lazybones.actions.VDRAction;
 import lazybones.gui.components.EPGInfoPanel;
 import lazybones.gui.utils.RecordingListCellRenderer;
 
+import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 public class RecordingManagerPanel extends JPanel implements ActionListener, Observer {
@@ -105,12 +108,17 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         Recording rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
         
         if("DELETE".equals(e.getActionCommand())) {
-            DeleteRecordingAction dra = new DeleteRecordingAction(rec);
-            if(!dra.execute()) {
-                Logger.getLogger().log(dra.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
-            } else {
-                updateRecordings();
-            }
+            VDRCallback callback = new VDRCallback() {
+                public void receiveResponse(VDRAction cmd, Response response) {
+                    if(!cmd.isSuccess()) {
+                        Logger.getLogger().log(cmd.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+                    } else {
+                        updateRecordings();
+                    }
+                }
+            };
+            DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
+            dra.enqueue();
         } else if("INFO".equals(e.getActionCommand()) && selectedRow >= 0) {
             createEPGInfoDialog(rec);
         } else if("SYNC".equals(e.getActionCommand())) {
@@ -124,6 +132,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
 
     private void createEPGInfoDialog(Recording rec) {
         final JDialog dialog = new JDialog();
+        if(rec.getEpgInfo() == null) {
+            RecordingManager.getInstance().loadInfo(rec);
+        }
         dialog.getContentPane().add(new EPGInfoPanel(rec.getEpgInfo()));
         dialog.setSize(400,300);
         dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());

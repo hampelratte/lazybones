@@ -1,4 +1,4 @@
-/* $Id: VDRAction.java,v 1.2 2007-04-09 18:55:52 hampelratte Exp $
+/* $Id: VDRAction.java,v 1.3 2007-10-14 19:05:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,19 +29,107 @@
  */
 package lazybones.actions;
 
+import lazybones.VDRCallback;
+
 import org.hampelratte.svdrp.Response;
 
-public interface VDRAction {
+/**
+ * Represents a SVDRP command or a set of SVDRP commands, which are bundled
+ * together to execute a task.
+ * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ */
+public abstract class VDRAction {
+
+    protected boolean success;
+    
+    protected VDRCallback callback;
+    
+    protected Response response;
     
     /**
-     * Executes this VDRAction
-     * @return true, if the action has been succesfully executed 
+     * Default constructor
      */
-    public boolean execute();
+    public VDRAction() {}
+    
+    /**
+     * @param callback the {@link VDRCallback} to call, when this VDRAction has finished
+     */
+    public VDRAction(VDRCallback callback) {
+        this.callback = callback;
+    }
+    
+    /**
+     * <b>Don't call this method directly.</b>
+     * Use the {@link CommandQueue} instead.
+     * 
+     * Executes this VDRAction. Here you can execute several Commands
+     * to execute one task.
+     * 
+     * @return true, if the action was successfully executed
+     */
+    abstract boolean execute();
+   
+    // TODO i18n for all inheriting implementations
+    public abstract String getDescription();
     
     /**
      * Returns the response of VDR
      * @return the response of VDR
      */
-    public Response getResponse();
+    public Response getResponse() {
+        return response;
+    }
+
+    public VDRCallback getCallback() {
+        return callback;
+    }
+
+    /**
+     * If you want to get informed, when the execution of this
+     * VDRAction finished, you have to pass a callback
+     * @param callback the {@link VDRCallback} to call, when this VDRAction has finished
+     */
+    public void setCallback(VDRCallback callback) {
+        this.callback = callback;
+    }
+    
+    /**
+     * Calls the VDRCallback after the 
+     * execution of this action
+     */
+    protected void callback() {
+        if(callback != null) {
+            callback.receiveResponse(this, response);
+        }
+    }
+    
+    /**
+     * Returns, if this VDRAction was successfully executed
+     * @return if this VDRAction was successfully executed
+     */
+    public boolean isSuccess() {
+        return success;
+    }
+
+    /**
+     * @see VDRAction#isSuccess()
+     * @param success true, if the VDRAction was successfully executed
+     */
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+    
+    /**
+     * Adds this action to the global {@link CommandQueue}
+     */
+    public void enqueue() {
+        CommandQueue.getInstance().add(this);
+    }
+
+    @Override
+    public String toString() {
+        return getDescription();
+    }
+    
+    
 }
