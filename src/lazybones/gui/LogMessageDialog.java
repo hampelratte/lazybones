@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.8 2007-04-09 19:23:41 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.9 2007-10-14 19:06:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -101,7 +101,7 @@ public class LogMessageDialog extends JDialog {
     }
 
 
-    synchronized public static LogMessageDialog getInstance() {
+    public synchronized static LogMessageDialog getInstance() {
         if (instance == null) {
             instance = new LogMessageDialog();
         }
@@ -117,7 +117,7 @@ public class LogMessageDialog extends JDialog {
         super.setVisible(visible);
     }
     
-    public void addMessage(LogMessage message) {
+    public synchronized void addMessage(LogMessage message) {
         ((DefaultListModel)list.getModel()).addElement(message);
     }
     
@@ -126,8 +126,9 @@ public class LogMessageDialog extends JDialog {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean hasFocus) {
             LogMessage log = (LogMessage)value;
             setText(log.getMessage());
-            setIcon((Icon)icons.get(log.getLevel()));
+            setIcon(icons.get(log.getLevel()));
             setForeground(Color.BLACK);
+            
             return this;
         }
     }
