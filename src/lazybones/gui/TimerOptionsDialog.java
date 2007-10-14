@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.19 2007-05-15 19:03:05 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.20 2007-10-14 19:07:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -352,7 +352,7 @@ public class TimerOptionsDialog implements ActionListener,
             timer.changeStateTo(VDRTimer.ACTIVE, cbActive.isSelected());
             timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
             dialog.dispose();
-            TimerManager.getInstance().createTimerCallBack(timer, oldTimer, prog, update);
+            TimerManager.getInstance().createTimerCallBack(timer, oldTimer, prog, update, false);
         } else if (e.getSource() == cancel) {
             dialog.dispose();
         } else if (e.getSource() == cbVps) {

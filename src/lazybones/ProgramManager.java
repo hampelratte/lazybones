@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.14 2007-07-06 13:30:21 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.15 2007-10-14 18:59:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -73,10 +73,10 @@ public class ProgramManager {
      * und das Program nicht findet 
      */
     public Program getProgramAt(Calendar startTime, Calendar middleTime, devplugin.Channel chan) {
-        Iterator dayProgram = LazyBones.getPluginManager().getChannelDayProgram(
+        Iterator<Program> dayProgram = LazyBones.getPluginManager().getChannelDayProgram(
                 new Date(startTime), chan);
         while (dayProgram != null && dayProgram.hasNext()) {
-            Program prog = (Program) dayProgram.next();
+            Program prog = dayProgram.next();
             
             Calendar progStart = GregorianCalendar.getInstance();
             progStart.set(Calendar.YEAR, prog.getDate().getYear());
@@ -105,9 +105,9 @@ public class ProgramManager {
         LSTE cmd = new LSTE(channelNumber, time_t);
         Response res = VDRConnection.send(cmd);
         if (res != null && res.getCode() == 215) {
-            List epg = EPGParser.parse(res.getMessage());
+            List<EPGEntry> epg = EPGParser.parse(res.getMessage());
             if (epg.size() > 0) {
-                EPGEntry entry = (EPGEntry) epg.get(0); // we can use the first element, because there will be only one item in the list
+                EPGEntry entry = epg.get(0); // we can use the first element, because there will be only one item in the list
                 VDRTimer timer = new VDRTimer();
                 timer.setChannelNumber(channelNumber);
                 timer.setTitle(entry.getTitle());
@@ -153,10 +153,10 @@ public class ProgramManager {
     }
     
     public JPopupMenu getContextMenuForTimer(Timer timer) {
-        List tvBrowserProgIds = timer.getTvBrowserProgIDs();
+        List<String> tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
         if(tvBrowserProgIds.size() > 0) {
-            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), (String)tvBrowserProgIds.get(0));
+            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), tvBrowserProgIds.get(0));
             popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
         } else {
             popup = LazyBones.getInstance().getSimpleContextMenu(timer);
@@ -167,12 +167,9 @@ public class ProgramManager {
     /**
      * Called to mark all Programs
      */
-    public void markPrograms() {
-        Iterator iter = TimerManager.getInstance().getTimers().iterator();
-
+    public void  markPrograms() {
         // for every timer
-        while (iter.hasNext()) {
-            Timer timer = (Timer) iter.next();
+        for(Timer timer : TimerManager.getInstance().getTimers()) {
             devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
             if (chan == null) {
                 timer.setReason(Timer.NO_CHANNEL);
@@ -184,14 +181,13 @@ public class ProgramManager {
 
             markSingularTimer(timer, chan);
         }
-        handleNotAssignedTimers();
     }
     
     /**
      * Handles all timers, which couldn't be assigned automatically
      *
      */
-    private void handleNotAssignedTimers() {
+    public void handleNotAssignedTimers() {
         if (Boolean.TRUE.toString().equals(
                 LazyBones.getProperties().getProperty("supressMatchDialog"))) {
             return;
@@ -239,7 +235,7 @@ public class ProgramManager {
 
         Date date = new Date(year, month, day);
 
-        Iterator it = LazyBones.getPluginManager().getChannelDayProgram(date, chan);
+        Iterator<Program> it = LazyBones.getPluginManager().getChannelDayProgram(date, chan);
         if (it != null) {
             // contains programs, which could be the right program for the timer
             TreeMap<Integer, Program> candidates = new TreeMap<Integer, Program>();
@@ -250,7 +246,7 @@ public class ProgramManager {
             
             while (it.hasNext()) { // iterate over all programs of one day and
                                     // compare start and end time
-                Program prog = (Program) it.next();
+                Program prog = it.next();
                 int startTime = prog.getStartTime();
                 int endTime = startTime + prog.getLength();
 
@@ -299,8 +295,8 @@ public class ProgramManager {
                     // set the reason to no_reason
                     ArrayList<String> list = new ArrayList<String>();
                     String doppelpackTitle = null;
-                    for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
-                        String title = ((Program)iter.next()).getTitle();
+                    for (Program prog : doppelPack) {
+                        String title = prog.getTitle();
                         if(list.contains(title)) {
                             logger.log("Doppelpack found: " + title, Logger.OTHER, Logger.DEBUG);
                             timer.setReason(Timer.NO_REASON);
@@ -312,8 +308,7 @@ public class ProgramManager {
                     
                     // mark all doppelpack programs
                     if(doppelpackTitle != null) {
-                        for (Iterator iter = doppelPack.iterator(); iter.hasNext();) {
-                            Program prog = (Program) iter.next();
+                        for (Program prog : doppelPack) {
                             if(prog.getTitle().equals(doppelpackTitle)) {
                                 prog.mark(LazyBones.getInstance());
                                 timer.addTvBrowserProgID(prog.getID());
@@ -409,15 +404,7 @@ public class ProgramManager {
         Calendar start = GregorianCalendar.getInstance();
         start.setTimeInMillis(cal.getTimeInMillis());
 
-        Enumeration en = ChannelManager.getChannelMapping().keys();
-        devplugin.Channel chan = null;
-        while (en.hasMoreElements()) {
-            String channelID = (String) en.nextElement();
-            Channel channel = (Channel) ChannelManager.getChannelMapping().get(channelID);
-            if (channel.getChannelNumber() == timer.getChannelNumber()) {
-                chan = ChannelManager.getInstance().getChannelById(channelID);
-            }
-        }
+        devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
 
         // if we cant find the channel, stop
         if (chan == null)
@@ -447,8 +434,7 @@ public class ProgramManager {
 
         Program[] programs = new Program[programSet.size()];
         int i = 0;
-        for (Iterator iter = programSet.iterator(); iter.hasNext();) {
-            Program p = (Program) iter.next();
+        for (Program p : programSet) {
             programs[i++] = p;
         }
         Arrays.sort(programs, new ProgramComparator());
