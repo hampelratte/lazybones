@@ -1,4 +1,4 @@
-/* $Id: Logger.java,v 1.8 2007-04-09 19:23:40 hampelratte Exp $
+/* $Id: Logger.java,v 1.9 2007-10-14 18:58:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -87,6 +87,7 @@ public class Logger {
                             LogMessageDialog.getInstance().setVisible(true);
                         }       
                     };
+                    t.setName("Logger");
                     t.start();
                 }
             }
@@ -101,6 +102,7 @@ public class Logger {
                             LogMessageDialog.getInstance().setVisible(true);
                         }       
                     };
+                    t.setName("Logger");
                     t.start();
                 }
             }
@@ -114,6 +116,7 @@ public class Logger {
                         LogMessageDialog.getInstance().setVisible(true);
                     }       
                 };
+                t.setName("Logger");
                 t.start();
             }
             break;
