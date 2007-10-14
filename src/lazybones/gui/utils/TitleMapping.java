@@ -1,4 +1,4 @@
-/* $Id: TitleMapping.java,v 1.1 2007-04-09 19:23:40 hampelratte Exp $
+/* $Id: TitleMapping.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,6 +33,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -63,16 +64,15 @@ public class TitleMapping implements Serializable, TableModel {
     }
     
     private void fireTableChanged() {
-        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-            TableModelListener listener = (TableModelListener) iter.next();
+        for (TableModelListener listener : listeners) {
             listener.tableChanged(new TableModelEvent(this));
         }
     }
 
     public String getTvbTitle(String vdrTitle) {
         int count = 0;
-        for (Iterator iter = vdrTitles.iterator(); iter.hasNext(); count++) {
-            String element = (String) iter.next();
+        for (Iterator<String> iter = vdrTitles.iterator(); iter.hasNext(); count++) {
+            String element = iter.next();
             if (element.equals(vdrTitle)) {
                 return tvbTitles.get(count);
             }
@@ -82,8 +82,8 @@ public class TitleMapping implements Serializable, TableModel {
     
     public String getVdrTitle(String tvbTitle) {
         int count = 0;
-        for (Iterator iter = tvbTitles.iterator(); iter.hasNext(); count++) {
-            String element = (String) iter.next();
+        for (Iterator<String> iter = tvbTitles.iterator(); iter.hasNext(); count++) {
+            String element = iter.next();
             if (element.equals(tvbTitle)) {
                 return vdrTitles.get(count);
             }
@@ -140,7 +140,7 @@ public class TitleMapping implements Serializable, TableModel {
         }
     }
     
-    public HashMap getAsMap() {
+    public Map<String, String> getAsMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         for (int i = 0; i < tvbTitles.size(); i++) {
             map.put(tvbTitles.get(i), vdrTitles.get(i));
@@ -148,9 +148,9 @@ public class TitleMapping implements Serializable, TableModel {
         return map;
     }
     
-    public void setMappingFromMap(HashMap map) {
-        for (Iterator iter = map.keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
+    public void setMappingFromMap(Map<String, String> map) {
+        for (Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
+            String key = iter.next();
             String value = (String) map.get(key);
             tvbTitles.add(key);
             vdrTitles.add(value);

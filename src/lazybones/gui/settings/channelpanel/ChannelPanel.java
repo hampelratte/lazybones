@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.3 2007-05-15 20:37:25 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.4 2007-10-14 19:09:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,12 +35,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -98,7 +93,7 @@ public class ChannelPanel implements ActionListener {
             }
         };
         devplugin.Channel[] c = tvbrowser.core.ChannelList.getSubscribedChannels();
-        Hashtable channelMapping = ChannelManager.getChannelMapping();
+        Map<String, Channel> channelMapping = ChannelManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
             tableModel.addRow(row);
@@ -396,7 +391,7 @@ public class ChannelPanel implements ActionListener {
         }
     }
     
-    private class Container implements Comparable {
+    private class Container implements Comparable<Container> {
         private int percent;
         private int index;
         private Channel channel;
@@ -407,18 +402,14 @@ public class ChannelPanel implements ActionListener {
             this.channel = channel;
         }
 
-        public int compareTo(Object o) {
-            if(o instanceof Container) {
-                Container c = (Container)o;
-                if(c.getPercent() == percent) {
-                    return 0;
-                } else if(percent < c.getPercent()) {
-                    return -1;
-                } else {
-                    return 1;
-                }
+        public int compareTo(Container c) {
+            if(c.getPercent() == percent) {
+                return 0;
+            } else if(percent < c.getPercent()) {
+                return -1;
+            } else {
+                return 1;
             }
-            return -1;
         }
         
         public int getPercent() {

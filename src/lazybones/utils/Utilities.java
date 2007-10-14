@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.3 2007-05-05 20:32:46 hampelratte Exp $
+/* $Id: Utilities.java,v 1.4 2007-10-14 19:09:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,7 +34,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTable;
@@ -52,7 +51,8 @@ import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 public class Utilities {
 
     public static int percentageOfEquality(String s, String t) {
-        if (s == null || t == null) {
+        // check if strings are empty
+        if (s == null || t == null || s.length() == 0 || t.length() == 0) {
             return 0;
         }
         
@@ -60,6 +60,8 @@ public class Utilities {
         if(s.equals(t)) {
             return 100;
         }
+        
+        
         
         // check if one string is a substring of the other
         String shorter;
@@ -136,8 +138,8 @@ public class Utilities {
                 }
 
                 d[i][j] = min(d[i - 1][j] + 1, // insertion
-                        d[i][j - 1] + 1, // deletion
-                        d[i - 1][j - 1] + cost); // substitution
+                              d[i][j - 1] + 1, // deletion
+                              d[i - 1][j - 1] + cost); // substitution
             }
         }
         return d[n][m];
@@ -213,10 +215,11 @@ public class Utilities {
 
     public static List<StartStopEvent> createStartStopEventList(List<Timer> timers) {
         ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
-        for (Iterator<Timer> iter = timers.iterator(); iter.hasNext();) {
-            Timer timer = iter.next();
-            startStopEvents.add(new StartStopEvent(timer, true));
-            startStopEvents.add(new StartStopEvent(timer, false));
+        for (Timer timer : timers) {
+            if(timer.isActive()) {
+                startStopEvents.add(new StartStopEvent(timer, true));
+                startStopEvents.add(new StartStopEvent(timer, false));
+            }
         }
         Collections.sort(startStopEvents);
         return startStopEvents;
@@ -240,14 +243,13 @@ public class Utilities {
      *            of a EPGEntry
      * @return EPGEntry from the list which matches channel and time
      */
-    public static EPGEntry filterEPGDate(List epgList, String vdrChannelName,
+    public static EPGEntry filterEPGDate(List<EPGEntry> epgList, String vdrChannelName,
             long middleTime) {
-        for (Iterator iter = epgList.iterator(); iter.hasNext();) {
-            EPGEntry element = (EPGEntry) iter.next();
-            if (element.getStartTime().getTimeInMillis() <= middleTime
-                    && middleTime <= element.getEndTime().getTimeInMillis()
-                    && vdrChannelName.equals(element.getChannelName())) {
-                return element;
+        for (EPGEntry entry : epgList) {
+            if (entry.getStartTime().getTimeInMillis() <= middleTime
+                    && middleTime <= entry.getEndTime().getTimeInMillis()
+                    && vdrChannelName.equals(entry.getChannelName())) {
+                return entry;
             }
         }
         return null;

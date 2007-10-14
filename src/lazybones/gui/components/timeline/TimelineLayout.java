@@ -1,4 +1,4 @@
-/* $Id: TimelineLayout.java,v 1.3 2007-01-05 23:22:43 hampelratte Exp $
+/* $Id: TimelineLayout.java,v 1.4 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,7 +36,6 @@ import java.awt.LayoutManager2;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import lazybones.Timer;
@@ -148,8 +147,7 @@ public class TimelineLayout implements LayoutManager2 {
         Dimension d = new Dimension();
         d.width = parent.getWidth();
         d.height = 0;
-        for (Iterator iter = components.iterator(); iter.hasNext();) {
-            Component comp = (Component) iter.next();
+        for (Component comp : components) {
             if(comp.getWidth() > d.width) {
                 d.width = comp.getWidth();
             }
@@ -162,8 +160,7 @@ public class TimelineLayout implements LayoutManager2 {
         Dimension d = new Dimension();
         d.width = parent.getWidth();
         d.height = 0;
-        for (Iterator iter = components.iterator(); iter.hasNext();) {
-            Component comp = (Component) iter.next();
+        for (Component comp : components) {
             if(comp.getWidth() > d.width) {
                 d.width = comp.getWidth();
             }

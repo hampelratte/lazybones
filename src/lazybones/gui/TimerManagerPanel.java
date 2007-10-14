@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.9 2007-07-06 13:01:55 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.10 2007-10-14 19:07:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -141,8 +140,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         
         Collections.sort(timers, new TimerComparator());
         
-        for (Iterator iter = timers.iterator(); iter.hasNext();) {
-            Timer timer = (Timer) iter.next();
+        for (Timer timer : timers) {
             model.addElement(timer);
         }
     }

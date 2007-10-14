@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.9 2007-07-06 13:01:39 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.10 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.Locale;
 
 import javax.swing.BorderFactory;
@@ -137,8 +136,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         // paint conflicts
         g.setColor(CONFLICT_COLOR);
         if(timer.getConflictPeriods() != null && timer.getConflictPeriods().size() > 0) {
-            for (Iterator iter = timer.getConflictPeriods().iterator(); iter.hasNext();) {
-                Period period = (Period) iter.next();
+            for (Period period : timer.getConflictPeriods()) {
                 long durationMinutes = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getEndTime());
                 double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
                 long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), period.getStartTime());

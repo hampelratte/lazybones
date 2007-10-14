@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.1 2007-04-09 19:20:21 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,7 +30,7 @@
 package lazybones.gui.settings.channelpanel.dnd;
 
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -44,7 +44,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
     private int addCount = 0;  //Number of items added.
     
     private JList channelList;
-    private HashSet overwrittenChannels = new HashSet();
+    private Set<Channel> overwrittenChannels = new HashSet<Channel>();
     
     public TableTransferHandler(JList channelList) {
         this.channelList = channelList;
@@ -65,7 +65,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void importChannels(JComponent c, ChannelSet set) {
+    protected void importChannels(JComponent c, ChannelSet<Channel> set) {
         JTable target = (JTable)c;
         DefaultTableModel model = (DefaultTableModel)target.getModel();
         int index = target.getSelectedRow();
@@ -88,11 +88,10 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         
         addCount = set.size();
         overwrittenChannels.clear();
-        for (Iterator iter = set.iterator(); iter.hasNext();) {
-            Channel chan = (Channel) iter.next();
+        for (Channel chan : set) {
             Object o = model.getValueAt(index, 1);
             if(o != null) {
-                overwrittenChannels.add(o);
+                overwrittenChannels.add((Channel)o);
             }
             model.setValueAt(chan, index, 1);
             index++;
@@ -116,8 +115,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
             // else remove them 
             if (addCount > 0) {
                 int i = 0;
-                for (Iterator iter = overwrittenChannels.iterator(); iter.hasNext();) {
-                    Channel chan = (Channel) iter.next();
+                for (Channel chan : overwrittenChannels) {
                     model.setValueAt(chan, rows[i++], 1);
                 }
             } else {

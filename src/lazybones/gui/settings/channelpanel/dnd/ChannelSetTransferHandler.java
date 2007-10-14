@@ -8,10 +8,12 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+
 public abstract class ChannelSetTransferHandler extends TransferHandler {
     
-    protected abstract ChannelSet exportChannels(JComponent c);
-    protected abstract void importChannels(JComponent c, ChannelSet set);
+    protected abstract ChannelSet<Channel> exportChannels(JComponent c);
+    protected abstract void importChannels(JComponent c, ChannelSet<Channel> set);
     protected abstract void cleanup(JComponent c, boolean remove);
     
     protected Transferable createTransferable(JComponent c) {
@@ -22,10 +24,11 @@ public abstract class ChannelSetTransferHandler extends TransferHandler {
         return MOVE;
     }
     
+    @SuppressWarnings("unchecked")
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
             try {
-                ChannelSet set = (ChannelSet)t.getTransferData(ChannelSet.FLAVOR);
+                ChannelSet<Channel> set = (ChannelSet)t.getTransferData(ChannelSet.FLAVOR);
                 importChannels(c, set);
                 return true;
             } catch (UnsupportedFlavorException ufe) {

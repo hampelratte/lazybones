@@ -1,4 +1,4 @@
-/* $Id: ListTransferHandler.java,v 1.1 2007-04-09 19:20:21 hampelratte Exp $
+/* $Id: ListTransferHandler.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,6 @@
  */
 package lazybones.gui.settings.channelpanel.dnd;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.DefaultListModel;
@@ -45,24 +44,24 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
     private int addIndex = -1; //Location where items were added
     private int addCount = 0;  //Number of items added.
     
-    private Set overwrittenChannels;
+    private Set<Channel> overwrittenChannels;
     
     @SuppressWarnings("unchecked")
     @Override
-    protected ChannelSet<Channel> exportChannels(JComponent c) {
+    protected ChannelSet exportChannels(JComponent c) {
         ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
         JList list = (JList) c;
         indices = list.getSelectedIndices();
         Object[] values = list.getSelectedValues();
         for (int i = 0; i < values.length; i++) {
-            channelSet.add(values[i]);
+            channelSet.add((Channel)values[i]);
         }
         
         return channelSet;
     }
 
     @Override
-    protected void importChannels(JComponent c, ChannelSet set) {
+    protected void importChannels(JComponent c, ChannelSet<Channel> set) {
         JList target = (JList) c;
         DefaultListModel listModel = (DefaultListModel) target.getModel();
         int index = target.getSelectedIndex();
@@ -88,8 +87,7 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
         }
         addIndex = index;
         addCount = set.size();
-        for (Iterator iter = set.iterator(); iter.hasNext();) {
-            Channel chan = (Channel) iter.next();
+        for (Channel chan : set) {
             listModel.add(index++, chan);
         }
     }
@@ -115,8 +113,7 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
             
             // add channels to this list, which have been replaced in the table
             if(overwrittenChannels != null) {
-                for (Iterator iter = overwrittenChannels.iterator(); iter.hasNext();) {
-                    Channel chan = (Channel) iter.next();
+                for (Channel chan : overwrittenChannels) {
                     model.add(indices[0], chan);
                 }
                 overwrittenChannels = null;
@@ -127,7 +124,7 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
         addIndex = -1;
     }
 
-    public void setOverwrittenChannels(Set overwrittenChannels) {
+    public void setOverwrittenChannels(Set<Channel> overwrittenChannels) {
         this.overwrittenChannels = overwrittenChannels;
     }
 }

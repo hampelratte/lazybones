@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.24 2007-10-14 19:03:24 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.25 2007-10-14 19:11:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,6 @@
  */
 package lazybones;
 
-import java.text.DateFormat;
 import java.util.*;
 
 import javax.swing.JOptionPane;

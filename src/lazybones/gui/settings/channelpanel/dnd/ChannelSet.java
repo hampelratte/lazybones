@@ -1,4 +1,4 @@
-/* $Id: ChannelSet.java,v 1.1 2007-04-09 19:20:21 hampelratte Exp $
+/* $Id: ChannelSet.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,7 +35,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 
-public class ChannelSet<Channel> extends LinkedHashSet implements Transferable {
+public class ChannelSet<E> extends LinkedHashSet<E> implements Transferable {
 
     public static final DataFlavor FLAVOR = new DataFlavor(ChannelSet.class, "VDR Channels");
 

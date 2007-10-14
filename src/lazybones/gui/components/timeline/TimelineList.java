@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.7 2007-05-15 19:03:27 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.8 2007-10-14 19:09:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -108,8 +108,7 @@ public class TimelineList extends JPanel implements Observer {
             add(te);
         }
         
-        for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-            TimelineListener l = (TimelineListener) iter.next();
+        for (TimelineListener l : listeners) {
             l.timelineChanged(data);
         }
         
