@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.16 2007-05-27 19:20:57 hampelratte Exp $
+/* $Id: Player.java,v 1.17 2007-10-14 18:58:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -140,6 +140,7 @@ public class Player {
 
         PlayerThread(String[] playerParams) {
             this.playerParams = playerParams;
+            setName(getClass().getName());
             start();
         }
 
@@ -173,6 +174,7 @@ public class Player {
 
         PlayerOutputter(InputStream in) {
             this.in = in;
+            setName(getClass().getName());
             start();
         }
 
