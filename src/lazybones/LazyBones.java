@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.77 2007-06-09 19:59:07 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.78 2007-10-14 18:56:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -135,10 +135,13 @@ public class LazyBones extends Plugin implements Observer {
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
-        return new PluginInfo(name, description, author, new Version(0, 4, false, "CVS-2007-05-27"));
+        return new PluginInfo(getClass(), name, description, author, "AS IS", "http://vdr-wiki.de/wiki/index.php/Lazy_Bones");
+    }
+    
+    public static Version getVersion () {
+        return new Version(0,4,false,"cvs-2007-10-11");
     }
 
-    
     public MainDialog getMainDialog() {
         if(mainDialog == null) {
             mainDialog = new MainDialog(getParent(), LazyBones.getTranslation(
@@ -293,8 +296,8 @@ public class LazyBones extends Plugin implements Observer {
         logger.log("Updating channel list", Logger.OTHER, Logger.DEBUG);
         ChannelManager.getInstance().update();
         
-        // get all timers from vdr
-        TimerManager.getInstance().synchronize();
+        // synchronize timers and recordings
+        synchronize();
     }
     
     private void init() {
@@ -341,12 +344,9 @@ public class LazyBones extends Plugin implements Observer {
         node.removeAllActions();
         node.removeAllChildren();
         
-        Iterator it = TimerManager.getInstance().getTimers().iterator();
-        while(it.hasNext()) {
-            Timer timer = (Timer)it.next();
+        for(Timer timer : TimerManager.getInstance().getTimers()) {
             if(timer.isAssigned()) {
-                for (Iterator iter = timer.getTvBrowserProgIDs().iterator(); iter.hasNext();) {
-                    String progID = (String)iter.next();
+                for (String progID : timer.getTvBrowserProgIDs()) {
                     Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), progID);
                     if(prog != null) {
                         node.addProgram(prog);
@@ -397,6 +397,11 @@ public class LazyBones extends Plugin implements Observer {
         // mark all "timed" programs 
         ProgramManager.getInstance().markPrograms();
 
+        List<Timer> notAssigned = TimerManager.getInstance().getNotAssignedTimers();
+        if(notAssigned.size() > 0) {
+            ProgramManager.getInstance().handleNotAssignedTimers();
+        }
+        
         // update the plugin tree
         updateTree();
     }
@@ -463,7 +468,7 @@ public class LazyBones extends Plugin implements Observer {
 
                 actions[1] = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
-                        TimerManager.getInstance().createTimer(program);
+                        TimerManager.getInstance().createTimer(program, false);
                     }
                 };
                 actions[1].putValue(Action.NAME, LazyBones.getTranslation("capture", "Capture with VDR"));
@@ -517,4 +522,57 @@ public class LazyBones extends Plugin implements Observer {
         }
         
     }
+
+//################ to receive Programs from other plugins ######################
+    private final String TARGET_WATCH = "watch";
+    private final String TARGET_CAPTURE = "capture";
+    
+    @Override
+    public boolean canReceiveProgramsWithTarget() {
+        return true;
+    }
+
+    @Override
+    public ProgramReceiveTarget[] getProgramReceiveTargets() {
+        return new ProgramReceiveTarget[] {
+                 new ProgramReceiveTarget(this, LazyBones.getTranslation("capture", "Capture with VDR"), TARGET_CAPTURE),
+                 new ProgramReceiveTarget(this, LazyBones.getTranslation("watch", "Watch this channel"), TARGET_WATCH)
+        };
+    }
+
+    @Override
+    public boolean receivePrograms(Program[] programArr, ProgramReceiveTarget receiveTarget) {
+        logger.log("Program received for target \"" + receiveTarget.getTargetId()+"\"", Logger.OTHER, Logger.DEBUG);
+        if(TARGET_CAPTURE.equals(receiveTarget.getTargetId())) {
+            // store current property values
+            String threshold = props.getProperty("percentageThreshold");
+            String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
+            boolean logEpgErrors = Logger.logEPGErrors;
+            boolean logConnectionErrors = Logger.logConnectionErrors;
+            
+            // set properties to "automatic mode"
+            props.setProperty("percentageThreshold", "0");
+            props.setProperty("showTimerOptionsDialog", "false");
+            Logger.logEPGErrors = false;
+            Logger.logConnectionErrors = false;
+            
+            // create timers for all programs
+            for (int i = 0; i < programArr.length; i++) {
+                Program prog = programArr[i];
+                TimerManager.getInstance().createTimer(prog, true);
+            }
+            
+            // restore old properties
+            props.setProperty("percentageThreshold", threshold);
+            props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
+            Logger.logEPGErrors = logEpgErrors;
+            Logger.logConnectionErrors = logConnectionErrors;
+        } else if(TARGET_WATCH.equals(receiveTarget.getTargetId())) {
+            Player.play(programArr[0]);
+        }
+        
+        return true;
+    }
+    
+    
 }
