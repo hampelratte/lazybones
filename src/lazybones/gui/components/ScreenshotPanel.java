@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.3 2007-05-13 11:26:10 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.4 2007-11-13 20:06:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones.gui.components;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -153,7 +154,13 @@ public class ScreenshotPanel extends JLabel {
             Response res = VDRConnection.send(grab);
             if (res != null && res.getCode() == 216) {
                 R216 r216 = (R216)res;
-                return r216.getImage();
+                ImageIcon image = null; 
+                try {
+                    image = r216.getImage();
+                } catch (IOException e) {
+                    LOG.log("Couldn't grab screen: " + e.getMessage(), Logger.OTHER, Logger.ERROR);
+                }
+                return image;
             } else {
                 LOG.log(res, Logger.OTHER, Logger.DEBUG);
                 return null;
