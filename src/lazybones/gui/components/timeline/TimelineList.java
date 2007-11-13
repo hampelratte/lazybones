@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.8 2007-10-14 19:09:22 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.9 2007-11-13 20:50:55 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -65,6 +65,7 @@ public class TimelineList extends JPanel implements Observer {
                 }
             }
         };
+        repainter.setName("Lazy Bones Timeline repainter");
         repainter.start();
     }
 
