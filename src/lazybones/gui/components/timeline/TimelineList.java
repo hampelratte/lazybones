@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.9 2007-11-13 20:50:55 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.10 2008-04-22 14:24:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,7 +32,12 @@ package lazybones.gui.components.timeline;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JPanel;
 
