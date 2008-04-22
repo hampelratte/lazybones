@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.15 2007-04-30 15:44:38 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.16 2008-04-22 14:40:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -52,6 +52,8 @@ public class VDRConnection {
 
     public static int timeout = 500;
     
+    public static String charset;
+    
     
     /**
      * Sends a SVDRP command to VDR and returns a response object, which represents the vdr response
@@ -61,7 +63,7 @@ public class VDRConnection {
     public synchronized static Response send(final Command cmd) {
         Response res = null;
         try {
-            connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout);
+            connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, charset);
             res = connection.send(cmd);
             connection.close();
         } catch (Exception e1) {
@@ -83,7 +85,7 @@ public class VDRConnection {
      * public boolean isRunning() { return running; }
      * 
      * public void run() { running = true; for (int i = 0; i < timeout; i++) {
-     * pm.setProgress(i); pm.setNote( (timeout-i) + " Seconds übrig"); if
+     * pm.setProgress(i); pm.setNote( (timeout-i) + " Seconds ï¿½brig"); if
      * (pm.isCanceled()) { break; }
      * 
      * try { Connection connection = new Connection(VDRConnection.host,
