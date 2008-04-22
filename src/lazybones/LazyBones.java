@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.78 2007-10-14 18:56:46 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.79 2008-04-22 14:29:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -172,6 +172,12 @@ public class LazyBones extends Plugin implements Observer {
         String host = props.getProperty("host");
         host = host == null ? "localhost" : host;
         props.setProperty("host", host);
+        String charset = props.getProperty("charset");
+        charset = charset == null ? "ISO-8859-1" : charset;
+        props.setProperty("charset", charset);
+        String streamurl = props.getProperty("streamurl");
+        streamurl = streamurl == null ? "http://{host}:3000/{streamtype}/{channel}" : streamurl;
+        props.setProperty("streamurl", streamurl);
         String streamtype = props.getProperty("streamtype");
         streamtype = streamtype == null ? "TS" : streamtype;
         props.setProperty("streamtype", streamtype);
@@ -215,6 +221,9 @@ public class LazyBones extends Plugin implements Observer {
         String switchBefore = props.getProperty("switchBefore");
         switchBefore = switchBefore == null ? "false" : switchBefore;
         props.setProperty("switchBefore", switchBefore);
+        String recordingURL = props.getProperty("recording.url");
+        recordingURL = recordingURL == null ? "http://<host>:3001/rec/<recording_number>" : recordingURL;
+        props.setProperty("recording.url", recordingURL);
         
         String logConnectionErrors = props.getProperty("logConnectionErrors");
         logConnectionErrors = logConnectionErrors == null ? "true" : logConnectionErrors;
@@ -240,6 +249,7 @@ public class LazyBones extends Plugin implements Observer {
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
+        VDRConnection.charset = charset;
         
         init();
     }
@@ -367,15 +377,6 @@ public class LazyBones extends Plugin implements Observer {
     public boolean canUseProgramTree() {
         return true;
     }
-
-    /*
-     * public boolean canReceivePrograms() { return true; }
-     * 
-     * public void receivePrograms(Program[] progs) {
-     * if(VDRConnection.isAvailable()) { for (int i = 0; i < progs.length; i++) {
-     * createTimer(progs[i]); } } else { JOptionPane.showMessageDialog(null,
-     * "Couldn't connect to VDR"); } }
-     */
 
     public static String getTranslation(String key, String altText) {
         return mLocalizer.msg(key,altText);
