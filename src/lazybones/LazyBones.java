@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.79 2008-04-22 14:29:03 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.80 2008-04-22 14:41:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -176,7 +176,7 @@ public class LazyBones extends Plugin implements Observer {
         charset = charset == null ? "ISO-8859-1" : charset;
         props.setProperty("charset", charset);
         String streamurl = props.getProperty("streamurl");
-        streamurl = streamurl == null ? "http://{host}:3000/{streamtype}/{channel}" : streamurl;
+        streamurl = streamurl == null ? "http://<host>:3000/<streamtype>/<channel>" : streamurl;
         props.setProperty("streamurl", streamurl);
         String streamtype = props.getProperty("streamtype");
         streamtype = streamtype == null ? "TS" : streamtype;

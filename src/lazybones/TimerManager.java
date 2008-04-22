@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.25 2007-10-14 19:11:29 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.26 2008-04-22 14:42:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -142,8 +142,9 @@ public class TimerManager extends Observable {
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_REMOVED, timer));
     }
     
-    public void removeAll() {
+    private void removeAll() {
         timers.clear();
+
         setChanged();
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, timers));
     }
@@ -412,8 +413,7 @@ public class TimerManager extends Observable {
             setTimers(vdrtimers, false);
         }
         
-        // detect conflicts
-        ConflictFinder.getInstance().findConflicts();
+        // handle conflicts, if some have been detected
         ConflictFinder.getInstance().handleConflicts();
     }
     
@@ -646,7 +646,7 @@ public class TimerManager extends Observable {
      * @param automatic
      *            Supresses all user interaction
      */
-    // TODO eigentlich überflüssig, weil TimerOptionsDialog nicht mehr im eigenen Thread läuft
+    // TODO eigentlich Ã¼berflÃ¼ssig, weil TimerOptionsDialog nicht mehr im eigenen Thread lÃ¤uft
     public void createTimerCallBack(final Timer timer, Timer oldTimer, final Program prog, boolean update, boolean automatic) {
         int id = -1;
         if(prog != null) {
@@ -863,7 +863,7 @@ public class TimerManager extends Observable {
                 TimerManager tm = TimerManager.getInstance();
                 String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
                 if(candidate.getTitle().equals(progTitle)) {
-                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
+                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hï¿½rt sich nicht danach an
                     timer.addTvBrowserProgID(candidate.getID());
                     logger.log("Old mapping found for: " + timer.toString(),
                             Logger.OTHER, Logger.DEBUG);

@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.9 2007-10-14 19:07:53 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.10 2008-04-22 14:42:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,12 +37,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
@@ -70,7 +77,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     public RecordingManagerPanel() {
         initGUI();
         RecordingManager.getInstance().addObserver(this);
-        RecordingManager.getInstance().synchronize();
     }
 
     /**
@@ -113,7 +119,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
                     if(!cmd.isSuccess()) {
                         Logger.getLogger().log(cmd.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
                     } else {
-                        updateRecordings();
+                        RecordingManager.getInstance().synchronize();
                     }
                 }
             };
@@ -150,15 +156,17 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     
     @SuppressWarnings("unchecked")
     private void updateRecordings() {
-        model.removeAllElements();
-        List recordings = RecordingManager.getInstance().getRecordings();
+        // create a new model, because clear() made problems.
+        // sometimes the list was empty after an update
+        model = new DefaultListModel();
+        List<Recording> recordings = RecordingManager.getInstance().getRecordings();
         if(recordings != null && recordings.size() > 0) {
             Collections.sort(recordings, new RecordingComparator());
-            for (Iterator iter = recordings.iterator(); iter.hasNext();) {
-                Recording rec = (Recording) iter.next();
-                model.addElement(rec);
+            for (Recording recording : recordings) {
+                model.addElement(recording);
             }
         }
+        recordingList.setModel(model);
     }
     
     private void createContextMenu() {
