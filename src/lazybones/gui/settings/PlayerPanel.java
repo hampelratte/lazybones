@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.2 2008-04-22 14:23:57 hampelratte Exp $
+/* $Id: PlayerPanel.java,v 1.3 2008-04-22 14:40:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -64,6 +64,7 @@ public class PlayerPanel {
             "switch_before.tooltip", "This is useful, if you only have one DVB Tuner");
 
     private JPanel panel;
+    private JTextField urlRecordings;
     private JLabel lStreamtype;
     private JTextField url;
     private JLabel lURL;
@@ -90,7 +91,7 @@ public class PlayerPanel {
     	    panelLayout.columnWeights = new double[] {0.1};
     	    panelLayout.columnWidths = new int[] {7};
     	    panel.setLayout(panelLayout);
-            panel.setPreferredSize(new java.awt.Dimension(346, 163));
+            panel.setPreferredSize(new java.awt.Dimension(346, 183));
 	    	{
 	    		container = new JPanel();
 	    		panel.add(container, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
@@ -120,12 +121,12 @@ public class PlayerPanel {
 	    		}
 	    		{
 	    			streamType = new JComboBox();
-	    			container.add(streamType, new GridBagConstraints(1, 3, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+	    			container.add(streamType, new GridBagConstraints(1, 4, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
 	    		}
 	    		{
 	    			dummy = new JPanel();
 	    			GridBagLayout dummyLayout = new GridBagLayout();
-	    			container.add(dummy, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+	    			container.add(dummy, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 	    			dummyLayout.rowWeights = new double[] {0.1};
 	    			dummyLayout.rowHeights = new int[] {7};
 	    			dummyLayout.columnWeights = new double[] {0.1, 0.1};
@@ -142,7 +143,9 @@ public class PlayerPanel {
 	    		}
 	    		{
 	    			lUrlRecordings = new JLabel();
-	    			container.add(lUrlRecordings, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+	    			container.add(lUrlRecordings, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    lUrlRecordings.setText(LazyBones.getTranslation("url","URL") + " " +
+                            LazyBones.getTranslation("recordings","Recordings"));
 	    		}
 	    		{
 	    		    lURL = new JLabel();
@@ -155,14 +158,19 @@ public class PlayerPanel {
 	    		}
 	    		{
 	    		    lStreamtype = new JLabel();
-	    		    container.add(lStreamtype, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+	    		    container.add(lStreamtype, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
                     lStreamtype.setText(LazyBones.getTranslation("streamtype","Stream type"));
+	    		}
+	    		{
+	    		    urlRecordings = new JTextField();
+	    		    container.add(urlRecordings, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
 	    		}
 	    	}
     	}
         player.setText(LazyBones.getProperties().getProperty("player"));
         params.setText(LazyBones.getProperties().getProperty("player_params"));
         url.setText(LazyBones.getProperties().getProperty("streamurl"));
+        urlRecordings.setText(LazyBones.getProperties().getProperty("recording.url"));
         switchBefore.setSelected(new Boolean(LazyBones.getProperties()
                 .getProperty("switchBefore")).booleanValue());
         streamType.addItem("TS");
@@ -181,6 +189,7 @@ public class PlayerPanel {
         LazyBones.getProperties().setProperty("player", player.getText());
         LazyBones.getProperties().setProperty("player_params", params.getText());
         LazyBones.getProperties().setProperty("streamurl", url.getText());
+        LazyBones.getProperties().setProperty("recording.url", urlRecordings.getText());
         LazyBones.getProperties().setProperty("switchBefore",
                 new Boolean(switchBefore.isSelected()).toString());
         LazyBones.getProperties().setProperty("streamtype", streamType.getSelectedItem().toString());
