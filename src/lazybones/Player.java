@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.17 2007-10-14 18:58:28 hampelratte Exp $
+/* $Id: Player.java,v 1.18 2008-04-22 14:41:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -90,10 +90,14 @@ public class Player {
                 arguments = new String[2];
             }
             arguments[0] = LazyBones.getProperties().getProperty("player");
+            
             String host = LazyBones.getProperties().getProperty("host");
             String streamtype = LazyBones.getProperties().getProperty("streamtype");
-            arguments[arguments.length - 1] = "http://" + host + ":3000/" +
-                    streamtype + "/" + channel;
+            String url = LazyBones.getProperties().getProperty("streamurl");
+            url = url.replaceAll("<host>", host);
+            url = url.replaceAll("<streamtype>", streamtype);
+            url = url.replaceAll("<channel>", Integer.toString(channel));
+            arguments[arguments.length - 1] = url;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
             String mesg =  LazyBones.getTranslation("Error", "Error")+ ": " + e1;
@@ -118,8 +122,9 @@ public class Player {
         }
         arguments[0] = LazyBones.getProperties().getProperty("player");
         String host = LazyBones.getProperties().getProperty("host");
-        
-        String url = "http://" + host + ":3001/rec/" + rec.getNumber();
+        String url = LazyBones.getProperties().getProperty("recording.url");
+        url = url.replaceAll("<host>", host);
+        url = url.replaceAll("<recording_number>", Integer.toString(rec.getNumber()));
         logger.log("Trying to play url " + url, Logger.OTHER, Logger.DEBUG);
         arguments[arguments.length - 1] = url;
         playerThread = new PlayerThread(arguments);
