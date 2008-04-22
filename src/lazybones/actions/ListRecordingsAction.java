@@ -1,4 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.2 2007-10-14 19:05:51 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.3 2008-04-22 14:25:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -54,7 +54,7 @@ public class ListRecordingsAction extends VDRAction {
     
     boolean execute() {
         try {
-            Connection connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout);
+            Connection connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, VDRConnection.charset);
             response = connection.send(new LSTR());
             
             if (response != null && response.getCode() == 250) {
