@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.15 2007-10-14 18:59:11 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.16 2008-04-22 14:42:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -68,7 +68,7 @@ public class ProgramManager {
      * @return the Program or null
      * 
      * startTime ist notwendig, weil getChannelDayProgram benutzt wird.
-     * Bsp.: start 23:30 ende 01:00 middleTime würde dann schon am nächsten tag
+     * Bsp.: start 23:30 ende 01:00 middleTime wï¿½rde dann schon am nï¿½chsten tag
      * liegen (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt
      * und das Program nicht findet 
      */
@@ -96,7 +96,7 @@ public class ProgramManager {
         return null;
     }
     
-    // TODO schlechter name, weil Timer zurückgeliefert wird
+    // TODO schlechter name, weil Timer zurÃ¼ckgeliefert wird
     public Timer getVDRProgramAt(Calendar cal, devplugin.Channel chan) {
         long time_t = cal.getTimeInMillis() / 1000;
         Object o = ChannelManager.getChannelMapping().get(chan.getId());
