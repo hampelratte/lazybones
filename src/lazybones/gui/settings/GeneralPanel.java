@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.1 2007-04-09 19:20:20 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.2 2008-04-22 14:23:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,6 +45,8 @@ public class GeneralPanel {
 	private final String lPort = LazyBones.getTranslation("port", "Port");
 
 	private final String lTimeout = LazyBones.getTranslation("timeout", "Timeout");
+	
+	private final String lCharset = LazyBones.getTranslation("charset", "Charset");
 
 	private final String lExperts = LazyBones.getTranslation("experts", "Experts");
 
@@ -60,6 +62,8 @@ public class GeneralPanel {
     private JTextField port;
 
     private JTextField timeout;
+    
+    private JComboBox charset;
     
     private JLabel labPercentageOfEquality;
     private JSpinner percentageOfEquality;
@@ -131,12 +135,18 @@ public class GeneralPanel {
         showTimerOptionsDialog = new JCheckBox();
         showTimerOptionsDialog.setSelected(Boolean.TRUE.toString().equals(
                 LazyBones.getProperties().getProperty("showTimerOptionsDialog")));
+        
+        charset = new JComboBox();
+        ComboBoxModel model = new DefaultComboBoxModel(new Object[] {"ISO-8859-1", "ISO-8859-15", "UTF-8"});
+        charset.setModel(model);
+        String c = LazyBones.getProperties().getProperty("charset");
+        charset.setSelectedItem(c);
     }
 
     public JPanel getPanel() {
         final double P = TableLayout.PREFERRED;
         double[][] size = {{10, P, 10, P, 10},
-                           {10, P, 10, P, 10, P, 20, P, 10}};
+                           {10, P, 10, P, 10, P, 10, P, 20, P, 10}};
         TableLayout surround = new TableLayout(size);
 		JPanel panel = new JPanel(surround);
 
@@ -148,6 +158,9 @@ public class GeneralPanel {
 		
 		panel.add(new JLabel(lTimeout), "1,5,1,5");
 		panel.add(timeout,              "3,5,3,5");
+		
+		panel.add(new JLabel(lCharset), "1,7,1,7");
+        panel.add(charset,              "3,7,3,7");
 
         double[][] size2 = {{10, P, 10, P, 10},
                             {10, P, 10, P, 10, P, 10, P, 10, P, 10, P, 10, P, 10, P, 10}};
@@ -170,12 +183,11 @@ public class GeneralPanel {
         experts.add(new JLabel(lShowTimerOptionsDialog), "1,9,1,9");
         experts.add(showTimerOptionsDialog,              "3,9,3,9");
 
-        panel.add(experts, "1,7,3,7");
+        panel.add(experts, "1,9,3,9");
 		return panel;
 	}
 
     public void saveSettings() {
-        String h = host.getText();
         int p = 2001;
         int t = 500;
         try {
@@ -199,13 +211,17 @@ public class GeneralPanel {
             timeout.setText("500");
         }
 
+        String h = host.getText();
+        String c = charset.getSelectedItem().toString();
         VDRConnection.host = h;
         VDRConnection.port = p;
         VDRConnection.timeout = t;
+        VDRConnection.charset = c;
 
         LazyBones.getProperties().setProperty("host", h);
         LazyBones.getProperties().setProperty("port", Integer.toString(p));
         LazyBones.getProperties().setProperty("timeout", Integer.toString(t));
+        LazyBones.getProperties().setProperty("charset", c);
         LazyBones.getProperties().setProperty("percentageThreshold",
                 percentageOfEquality.getValue().toString());
         LazyBones.getProperties().setProperty("supressMatchDialog",
