@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.9 2007-10-14 19:06:15 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.10 2008-04-22 14:24:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,11 +34,19 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.HashMap;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 
 import lazybones.LazyBones;
 import lazybones.Logger;
@@ -78,28 +86,24 @@ public class LogMessageDialog extends JDialog {
         JButton okButton = new JButton(LazyBones.getTranslation("OK","OK"));
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                model.removeAllElements();
-                setVisible(false);
+                closeWindow();
             } 
         });
         getContentPane().add(okButton, BorderLayout.SOUTH);
         
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        addWindowListener(new WindowListener() {
-
-            public void windowClosed(WindowEvent arg0) {}
-            public void windowActivated(WindowEvent arg0) {}
+        addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent arg0) {
-                model.removeAllElements();
-                setVisible(false);
+                closeWindow();
             }
-            public void windowDeactivated(WindowEvent arg0) {}
-            public void windowDeiconified(WindowEvent arg0) {}
-            public void windowIconified(WindowEvent arg0) {}
-            public void windowOpened(WindowEvent arg0) {}
         });
     }
 
+    
+    private void closeWindow() {
+        model.removeAllElements();
+        setVisible(false);
+    }
 
     public synchronized static LogMessageDialog getInstance() {
         if (instance == null) {
