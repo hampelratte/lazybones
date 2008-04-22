@@ -25,9 +25,9 @@
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
 		
-		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" />
+		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true"/>
 		
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
 			<classpath>
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${classes.dir}" />
