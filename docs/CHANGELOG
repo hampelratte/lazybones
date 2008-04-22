@@ -16,3 +16,6 @@ Lazy Bones 0.4
 * Added function to play recordings via VDR and via player
 * Fixed bug in TimerManager.getTimer, which sometimes returned a wrong timer, 
   which resulted in a wrong timer being deleted
+* Added support for different charsets
+* Added config params for the streaming url 
+  and for the streaming url of recordings
