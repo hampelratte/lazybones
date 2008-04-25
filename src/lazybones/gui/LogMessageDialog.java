@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.11 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.12 2008-04-25 12:00:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -72,7 +72,7 @@ public class LogMessageDialog extends JDialog {
     
 
     private void initGUI() {
-        setTitle("Lazy Bones - " + LazyBones.getTranslation("Error", "Error"));
+        setTitle("Lazy Bones - " + Localizer.getLocalization(Localizer.I18N_ERROR));
         setSize(700, 400);
         getContentPane().setLayout(new BorderLayout(10,10));
         
@@ -134,11 +134,26 @@ public class LogMessageDialog extends JDialog {
     
     private class LogListCellRenderer extends JLabel implements ListCellRenderer {
 
+        private Color altColor = new Color(250, 250, 220);
+        
+        public LogListCellRenderer() {
+            setOpaque(true);
+        }
+
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean hasFocus) {
             LogRecord log = (LogRecord)value;
-            setText(log.getMessage());
+            StringBuilder sb = new StringBuilder("<html>");
+            sb.append(log.getSourceClassName());
+            sb.append('.');
+            sb.append(log.getSourceMethodName());
+            sb.append("<br>");
+            sb.append(log.getMessage().replaceAll("\n", "<br>"));
+            sb.append("</html>");
+            
+            setText(sb.toString());
             setIcon(icons.get(log.getLevel()));
             setForeground(Color.BLACK);
+            setBackground(index % 2 == 0 ? Color.WHITE : altColor);
             
             return this;
         }

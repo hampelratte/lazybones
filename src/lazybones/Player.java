@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.19 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: Player.java,v 1.20 2008-04-25 12:00:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,6 +38,7 @@ import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.ui.Localizer;
 import devplugin.Program;
 
 /**
@@ -74,8 +75,7 @@ public class Player {
                 Response res = VDRConnection.send(new CHAN(Integer
                         .toString(channel)));
                 if (res == null || res.getCode() != 250) {
-                    String mesg = LazyBones.getTranslation("Error",
-                    "Error") + ": " + res.getMessage();
+                    String mesg = Localizer.getLocalization(Localizer.I18N_ERROR) + ": " + res.getMessage();
                     logger.error(mesg);
                     return;
                 }
@@ -102,7 +102,7 @@ public class Player {
             arguments[arguments.length - 1] = url;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
-            String mesg =  LazyBones.getTranslation("Error", "Error")+ ": " + e1;
+            String mesg = Localizer.getLocalization(Localizer.I18N_ERROR)+ ": " + e1;
             logger.error(mesg);
         }
     }
