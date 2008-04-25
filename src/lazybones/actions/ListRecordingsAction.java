@@ -1,4 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.4 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.5 2008-04-25 15:09:54 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,7 @@ import lazybones.LazyBones;
 import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.ConnectionProblem;
+import lazybones.logging.LoggingConstants;
 
 import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.commands.LSTR;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 public class ListRecordingsAction extends VDRAction {
 
     private static transient Logger logger = LoggerFactory.getLogger(ListRecordingsAction.class);
+    private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
     
     private List<Recording> recordings;
     
@@ -91,16 +93,14 @@ public class ListRecordingsAction extends VDRAction {
                 // no recordings, do nothing
                 logger.info("No recording on VDR");
             } else { /* something went wrong */
-                // TODO Logger.CONNECTION suppress, if selected
-                logger.error(LazyBones.getTranslation("error_retrieve_recordings",
+                conLog.error(LazyBones.getTranslation("error_retrieve_recordings",
                     "Couldn't retrieve recordings from VDR."));
             }
             
             connection.close();
         } catch (Exception e1) {
             response = new ConnectionProblem();
-            // TODO Logger.CONNECTION suppress, if selected
-            logger.error(response.getMessage());
+            conLog.error(response.getMessage());
             return false;
         }   
         return true;

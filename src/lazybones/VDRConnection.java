@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.18 2008-04-25 13:35:05 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.19 2008-04-25 15:09:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones;
 
 import lazybones.actions.responses.ConnectionProblem;
+import lazybones.logging.LoggingConstants;
 
 import org.hampelratte.svdrp.Command;
 import org.hampelratte.svdrp.Connection;
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class VDRConnection {
     
-    private static transient Logger logger = LoggerFactory.getLogger(VDRConnection.class);
+    private static transient Logger logger = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
 
     private static Connection connection;
 
@@ -70,7 +71,6 @@ public class VDRConnection {
             connection.close();
         } catch (Exception e1) {
             res = new ConnectionProblem();
-            // TODO CONNECTION
             logger.error(res.getMessage(), e1);
         }
         return res;

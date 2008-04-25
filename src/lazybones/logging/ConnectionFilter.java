@@ -1,4 +1,4 @@
-/* $Id: ErrorPopupHandler.java,v 1.4 2008-04-25 15:09:42 hampelratte Exp $
+/* $Id: ConnectionFilter.java,v 1.1 2008-04-25 15:09:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,44 +29,19 @@
  */
 package lazybones.logging;
 
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Filter;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import javax.swing.SwingUtilities;
+import lazybones.LazyBones;
 
-import lazybones.gui.LogMessageDialog;
+public class ConnectionFilter implements Filter {
 
-public class ErrorPopupHandler extends ConsoleHandler {
-
-    private Filter filter;
-    
-    public ErrorPopupHandler() {
-        FilterChain chain = new FilterChain();
-        chain.addFilter(new ConnectionFilter());
-        chain.addFilter(new EpgFilter());
-        filter = chain;
-    }
-    
-    @Override
-    public void publish(final LogRecord record) {
-        super.publish(record);
-        
-        boolean loggable = true;
-        if(filter != null) {
-            loggable = filter.isLoggable(record);
+    public boolean isLoggable(LogRecord record) {
+        if(record.getLoggerName().equals(LoggingConstants.CONNECTION_LOGGER)) {
+            boolean logConnectionErrors = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("logConnectionErrors"));
+            return logConnectionErrors;
         }
         
-        if(loggable && record.getLevel().intValue() >= Level.SEVERE.intValue()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    LogMessageDialog.getInstance().addMessage(record);
-                    if(!LogMessageDialog.getInstance().isVisible()) {
-                        LogMessageDialog.getInstance().setVisible(true);
-                    }
-                }
-            });
-        }
+        return true;
     }
 }

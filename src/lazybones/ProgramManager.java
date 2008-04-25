@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.17 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.18 2008-04-25 15:09:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,6 +41,7 @@ import java.util.TreeMap;
 import javax.swing.JPopupMenu;
 
 import lazybones.gui.ProgramSelectionDialog;
+import lazybones.logging.LoggingConstants;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.Response;
@@ -57,6 +58,7 @@ import devplugin.Program;
 
 public class ProgramManager {
     private static transient Logger logger = LoggerFactory.getLogger(ProgramManager.class);
+    private static transient Logger epgLog = LoggerFactory.getLogger(LoggingConstants.EPG_LOGGER);
     
     private static ProgramManager instance;
     
@@ -213,13 +215,11 @@ public class ProgramManager {
             case Timer.NO_EPG:
                 logger.warn("Couldn't assign timer: ", timer);
                 String mesg = LazyBones.getTranslation("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
-             // TODO EPG incorporate in new log system
-                logger.error(mesg);
+                epgLog.error(mesg);
                 break;
             case Timer.NO_CHANNEL:
                 mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString());
-             // TODO EPG incorporate in new log system
-                logger.error(mesg);
+                epgLog.error(mesg);
                 break;
             case Timer.NO_PROGRAM:
                 // do nothing

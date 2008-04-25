@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.82 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.83 2008-04-25 15:09:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -250,14 +250,10 @@ public class LazyBones extends Plugin implements Observer {
         String logConnectionErrors = props.getProperty("logConnectionErrors");
         logConnectionErrors = logConnectionErrors == null ? "true" : logConnectionErrors;
         props.setProperty("logConnectionErrors", logConnectionErrors);
-        // TODO incorporate in new log system
-        //Logger.logConnectionErrors = new Boolean(logConnectionErrors).booleanValue();
         
         String logEPGErrors = props.getProperty("logEPGErrors");
         logEPGErrors = logEPGErrors == null ? "true" : logEPGErrors;
         props.setProperty("logEPGErrors", logEPGErrors);
-        // TODO incorporate in new log system
-        //Logger.logEPGErrors = new Boolean(logEPGErrors).booleanValue();
         
         String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
         showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
@@ -586,16 +582,14 @@ public class LazyBones extends Plugin implements Observer {
             String threshold = props.getProperty("percentageThreshold");
             String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
             
-            // TODO incorporate in new log system
-            //boolean logEpgErrors = Logger.logEPGErrors;
-            //boolean logConnectionErrors = Logger.logConnectionErrors;
+            String logEpgErrors = props.getProperty("logEPGErrors");
+            String logConnectionErrors = props.getProperty("logConnectionErrors");
             
             // set properties to "automatic mode"
             props.setProperty("percentageThreshold", "0");
             props.setProperty("showTimerOptionsDialog", "false");
-         // TODO incorporate in new log system
-//            Logger.logEPGErrors = false;
-//            Logger.logConnectionErrors = false;
+            props.setProperty("logEPGErrors", "false");
+            props.setProperty("logConnectionErrors", "false");
             
             // create timers for all programs
             for (int i = 0; i < programArr.length; i++) {
@@ -606,9 +600,8 @@ public class LazyBones extends Plugin implements Observer {
             // restore old properties
             props.setProperty("percentageThreshold", threshold);
             props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
-         // TODO incorporate in new log system
-//            Logger.logEPGErrors = logEpgErrors;
-//            Logger.logConnectionErrors = logConnectionErrors;
+            props.setProperty("logEPGErrors", logEpgErrors);
+            props.setProperty("logConnectionErrors", logConnectionErrors);
         } else if(TARGET_WATCH.equals(receiveTarget.getTargetId())) {
             Player.play(programArr[0]);
         }

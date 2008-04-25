@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.3 2008-04-25 11:27:06 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.4 2008-04-25 15:09:54 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -204,9 +204,7 @@ public class GeneralPanel {
         try {
             p = Integer.parseInt(port.getText());
         } catch (NumberFormatException nfe) {
-            String mesg = LazyBones.getTranslation(
-                   "invalidPort",
-                   "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>");
+            String mesg = LazyBones.getTranslation("invalidPort", "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>");
             logger.error(mesg);
             p = 2001;
             port.setText("2001");
@@ -214,9 +212,7 @@ public class GeneralPanel {
         try {
             t = Integer.parseInt(timeout.getText());
         } catch (NumberFormatException nfe) {
-            String mesg = LazyBones.getTranslation(
-                                            "invalidTimeout",
-                                            "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
+            String mesg = LazyBones.getTranslation("invalidTimeout", "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
             logger.error(mesg);
             t = 500;
             timeout.setText("500");
@@ -233,15 +229,10 @@ public class GeneralPanel {
         LazyBones.getProperties().setProperty("port", Integer.toString(p));
         LazyBones.getProperties().setProperty("timeout", Integer.toString(t));
         LazyBones.getProperties().setProperty("charset", c);
-        LazyBones.getProperties().setProperty("percentageThreshold",
-                percentageOfEquality.getValue().toString());
-        LazyBones.getProperties().setProperty("supressMatchDialog",
-				"" + supressMatchDialog.isSelected());
-        LazyBones.getProperties().setProperty("logConnectionErrors",
-                "" + logConnectionErrors.isSelected());
-        LazyBones.getProperties().setProperty("logEPGErrors",
-                "" + logEPGErrors.isSelected());
-        LazyBones.getProperties().setProperty("showTimerOptionsDialog",
-                "" + showTimerOptionsDialog.isSelected());
+        LazyBones.getProperties().setProperty("percentageThreshold", percentageOfEquality.getValue().toString());
+        LazyBones.getProperties().setProperty("supressMatchDialog", Boolean.toString(supressMatchDialog.isSelected()));
+        LazyBones.getProperties().setProperty("logConnectionErrors", Boolean.toString(logConnectionErrors.isSelected()));
+        LazyBones.getProperties().setProperty("logEPGErrors", Boolean.toString(logEPGErrors.isSelected()));
+        LazyBones.getProperties().setProperty("showTimerOptionsDialog", Boolean.toString(showTimerOptionsDialog.isSelected()));
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.27 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.28 2008-04-25 15:09:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,9 +45,11 @@ import lazybones.actions.CreateTimerAction;
 import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.VDRAction;
+import lazybones.actions.responses.ConnectionProblem;
 import lazybones.gui.TimerOptionsDialog;
 import lazybones.gui.TimerSelectionDialog;
 import lazybones.gui.utils.TitleMapping;
+import lazybones.logging.LoggingConstants;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.Connection;
@@ -75,6 +77,7 @@ import devplugin.Program;
 public class TimerManager extends Observable {
     
     private static transient Logger logger = LoggerFactory.getLogger(TimerManager.class);
+    private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
 
     private static TimerManager instance;
 
@@ -415,8 +418,7 @@ public class TimerManager extends Observable {
             logger.info("No timer defined on VDR");
         } else { /* something went wrong, we have no timers -> 
                   * load the stored ones */
-         // TODO CONNECTION incorporate in new log system
-            logger.error(LazyBones.getTranslation("using_stored_timers",
+            conLog.error(LazyBones.getTranslation("using_stored_timers",
                 "Couldn't retrieve timers from VDR, using stored ones."));
             
             List<Timer> vdrtimers = getStoredTimers();
@@ -583,9 +585,14 @@ public class TimerManager extends Observable {
         } else if(res != null && res.getCode() == 550 & "No schedule found\n".equals(res.getMessage())) {
             noEPGAvailable(prog, id, automatic);
         } else {
-            String msg = res != null ? res.getMessage() : "Reason unknown";
-            logger.error(LazyBones.getTranslation("couldnt_create",
+            if(res instanceof ConnectionProblem) {
+                conLog.error(LazyBones.getTranslation("couldnt_create",
+                "Couldn\'t create timer\n: ") + " " + res.getMessage());
+            } else {
+                String msg = res != null ? res.getMessage() : "Reason unknown";
+                logger.error(LazyBones.getTranslation("couldnt_create",
                     "Couldn\'t create timer\n: ") + " " + msg);
+            }
         }
     }
     
