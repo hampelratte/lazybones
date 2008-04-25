@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.17 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.18 2008-04-25 13:35:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -71,7 +71,7 @@ public class VDRConnection {
         } catch (Exception e1) {
             res = new ConnectionProblem();
             // TODO CONNECTION
-            logger.error(res.getMessage());
+            logger.error(res.getMessage(), e1);
         }
         return res;
     }
