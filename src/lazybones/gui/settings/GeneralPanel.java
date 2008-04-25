@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.4 2008-04-25 15:09:54 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.5 2008-04-25 16:54:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,12 +45,20 @@ import javax.swing.SpinnerNumberModel;
 import lazybones.LazyBones;
 import lazybones.VDRConnection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 public class GeneralPanel {
-    private static transient Logger logger = LoggerFactory.getLogger(GeneralPanel.class);
-    
 	private final String lHost = LazyBones.getTranslation("host", "Host");
 
 	private final String lPort = LazyBones.getTranslation("port", "Port");
@@ -70,10 +78,6 @@ public class GeneralPanel {
 
     private JTextField host;
 
-    private JTextField port;
-
-    private JTextField timeout;
-    
     private JComboBox charset;
     
     private JLabel labPercentageOfEquality;
@@ -81,6 +85,8 @@ public class GeneralPanel {
 
     private final String lSupressMatchDialog = LazyBones.getTranslation(
 			"supressMatchDialog", "Supress match dialog");
+    private JSpinner port;
+    private JSpinner timeout;
 
 	private final String ttSupressMatchDialog = LazyBones.getTranslation(
 			"supressMatchDialog.tooltip",
@@ -114,10 +120,12 @@ public class GeneralPanel {
     private void initComponents() {
         host = new JTextField(10);
         host.setText(LazyBones.getProperties().getProperty("host"));
-        port = new JTextField(10);
-        port.setText(LazyBones.getProperties().getProperty("port"));
-        timeout = new JTextField(10);
-        timeout.setText(LazyBones.getProperties().getProperty("timeout"));
+        int value = Integer.parseInt(LazyBones.getProperties().getProperty("port"));
+        port = new JSpinner(new SpinnerNumberModel(value, 1, 65535, 1));
+        port.setEditor(new JSpinner.NumberEditor(port, "#"));
+        value = Integer.parseInt(LazyBones.getProperties().getProperty("timeout"));
+        timeout = new JSpinner(new SpinnerNumberModel(value, 1, 30000, 1));
+        timeout.setEditor(new JSpinner.NumberEditor(timeout, "#"));
         
         int percentageThreshold = Integer.parseInt(LazyBones.getProperties().getProperty(
                 "percentageThreshold"));
@@ -165,11 +173,9 @@ public class GeneralPanel {
 		panel.add(host,              "3,1,3,1");
 		
 		panel.add(new JLabel(lPort), "1,3,1,3");
-		panel.add(port,              "3,3,3,3");
-		
+
 		panel.add(new JLabel(lTimeout), "1,5,1,5");
-		panel.add(timeout,              "3,5,3,5");
-		
+
 		panel.add(new JLabel(lCharset), "1,7,1,7");
         panel.add(charset,              "3,7,3,7");
 
@@ -195,28 +201,14 @@ public class GeneralPanel {
         experts.add(showTimerOptionsDialog,              "3,9,3,9");
 
         panel.add(experts, "1,9,3,9");
+        panel.add(port, "3, 3");
+        panel.add(timeout, "3, 5");
 		return panel;
 	}
 
     public void saveSettings() {
-        int p = 2001;
-        int t = 500;
-        try {
-            p = Integer.parseInt(port.getText());
-        } catch (NumberFormatException nfe) {
-            String mesg = LazyBones.getTranslation("invalidPort", "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>");
-            logger.error(mesg);
-            p = 2001;
-            port.setText("2001");
-        }
-        try {
-            t = Integer.parseInt(timeout.getText());
-        } catch (NumberFormatException nfe) {
-            String mesg = LazyBones.getTranslation("invalidTimeout", "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
-            logger.error(mesg);
-            t = 500;
-            timeout.setText("500");
-        }
+        int p = (Integer) port.getValue();
+        int t = (Integer) timeout.getValue();
 
         String h = host.getText();
         String c = charset.getSelectedItem().toString();
