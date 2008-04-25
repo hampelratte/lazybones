@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.14 2008-04-25 15:36:02 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.15 2008-04-25 16:35:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -119,6 +120,9 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
                 closeWindow();
             }
         });
+        
+        // requires java 1.6
+        setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
 
     
