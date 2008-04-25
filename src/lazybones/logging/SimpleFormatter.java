@@ -1,4 +1,4 @@
-/* $Id: SimpleFormatter.java,v 1.1 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: SimpleFormatter.java,v 1.2 2008-04-25 13:34:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,7 +44,7 @@ public class SimpleFormatter extends Formatter {
         DateFormat mTimeFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 
         String message = formatMessage(record);
-        sb.append(mTimeFormat.format(new java.util.Date(System.currentTimeMillis())));
+        sb.append(mTimeFormat.format(new java.util.Date(record.getMillis())));
         sb.append(" LAZYBONES ");
         sb.append(record.getLevel().getLocalizedName());
         sb.append(' ');
