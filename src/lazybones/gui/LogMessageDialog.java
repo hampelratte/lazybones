@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.13 2008-04-25 13:36:05 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.14 2008-04-25 15:36:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -87,7 +87,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
     private HashMap<Level,Icon> icons = new HashMap<Level,Icon>();
 
     private LogMessageDialog() {
-        super(LazyBones.getInstance().getParent(), true);
+        super(LazyBones.getInstance().getParent(), false);
         initGUI();
     }
     
@@ -125,6 +125,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
     private void closeWindow() {
         setVisible(false);
         model.removeAllElements();
+        taDetails.setText("Details...");
     }
 
     public synchronized static LogMessageDialog getInstance() {
@@ -217,7 +218,9 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
     private SimpleFormatter formatter = new SimpleFormatter();
     public void valueChanged(ListSelectionEvent e) {
         LogRecord log = (LogRecord) list.getSelectedValue();
-        taDetails.setText(formatter.format(log));
-        taDetails.setCaretPosition(0);
+        if(log != null) {
+            taDetails.setText(formatter.format(log));
+            taDetails.setCaretPosition(0);
+        }
     }
 }
