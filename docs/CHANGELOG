@@ -19,3 +19,6 @@ Lazy Bones 0.4
 * Added support for different charsets
 * Added config params for the streaming url 
   and for the streaming url of recordings
+* Ported logging to lsf4j.
+* LogMessageDialog is not modal anymore. Hoepfully this solves blocks between
+  dialog and the empty dialog problem.
