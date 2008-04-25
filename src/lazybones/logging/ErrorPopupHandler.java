@@ -1,4 +1,4 @@
-/* $Id: ErrorPopupHandler.java,v 1.2 2008-04-25 12:01:05 hampelratte Exp $
+/* $Id: ErrorPopupHandler.java,v 1.3 2008-04-25 13:35:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,6 +33,8 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import javax.swing.SwingUtilities;
+
 import lazybones.gui.LogMessageDialog;
 
 public class ErrorPopupHandler extends ConsoleHandler {
@@ -42,14 +44,14 @@ public class ErrorPopupHandler extends ConsoleHandler {
         super.publish(record);
         
         if(record.getLevel().intValue() >= Level.SEVERE.intValue()) {
-            Thread t = new Thread() {
-                @Override
+            SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     LogMessageDialog.getInstance().addMessage(record);
-                    LogMessageDialog.getInstance().setVisible(true);
+                    if(!LogMessageDialog.getInstance().isVisible()) {
+                        LogMessageDialog.getInstance().setVisible(true);
+                    }
                 }
-            };
-            t.start();
+            });
         }
     }
 }
