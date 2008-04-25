@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.10 2007-10-14 19:07:40 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.11 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,17 +41,27 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
 import lazybones.gui.utils.TimerListCellRenderer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TimerManagerPanel extends JPanel implements ActionListener, Observer {
 
+    private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
+    
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
     private JList timerList = new JList(model);
@@ -154,8 +164,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
                 try {
                 	TimerManager.getInstance().editTimer(timer);
                 } catch(Exception ex) {
-                    Logger.getLogger().log(ex, Logger.OTHER, Logger.ERROR);
-                    ex.printStackTrace();
+                    logger.error("An error occured", ex);
                 }
             }
         } else if(e.getSource() == buttonRemove) {

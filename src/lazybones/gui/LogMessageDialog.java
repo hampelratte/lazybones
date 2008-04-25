@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.10 2008-04-22 14:24:49 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.11 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,6 +37,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -49,17 +51,19 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
-import lazybones.Logger.LoggingLevel;
-import lazybones.gui.utils.LogMessage;
+import util.ui.Localizer;
+
+
 
 public class LogMessageDialog extends JDialog {
+    
+    // TODO add a threadsafe queue for saving the messages
     
     private static LogMessageDialog instance;
     
     public JList list;
     public DefaultListModel model;
-    private HashMap<LoggingLevel,Icon> icons = new HashMap<LoggingLevel,Icon>();
+    private HashMap<Level,Icon> icons = new HashMap<Level,Icon>();
 
     private LogMessageDialog() {
         super(LazyBones.getInstance().getParent(), true);
@@ -72,18 +76,21 @@ public class LogMessageDialog extends JDialog {
         setSize(700, 400);
         getContentPane().setLayout(new BorderLayout(10,10));
         
-        icons.put(Logger.ERROR, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
-        icons.put(Logger.FATAL, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
-        icons.put(Logger.DEBUG, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Logger.INFO, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Logger.WARN, UIManager.getDefaults().getIcon("OptionPane.warningIcon"));
+        icons.put(Level.SEVERE,  UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
+        icons.put(Level.WARNING, UIManager.getDefaults().getIcon("OptionPane.warningIcon"));
+        icons.put(Level.INFO,    UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.CONFIG,  UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.FINE,    UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.FINER,   UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.FINEST,  UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        
         
         list = new JList();
         model = new DefaultListModel();
         list.setModel(model);
         list.setCellRenderer(new LogListCellRenderer());
         getContentPane().add(new JScrollPane(list), BorderLayout.CENTER);
-        JButton okButton = new JButton(LazyBones.getTranslation("OK","OK"));
+        JButton okButton = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 closeWindow();
@@ -121,14 +128,14 @@ public class LogMessageDialog extends JDialog {
         super.setVisible(visible);
     }
     
-    public synchronized void addMessage(LogMessage message) {
+    public synchronized void addMessage(LogRecord message) {
         ((DefaultListModel)list.getModel()).addElement(message);
     }
     
     private class LogListCellRenderer extends JLabel implements ListCellRenderer {
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean hasFocus) {
-            LogMessage log = (LogMessage)value;
+            LogRecord log = (LogRecord)value;
             setText(log.getMessage());
             setIcon(icons.get(log.getLevel()));
             setForeground(Color.BLACK);

@@ -1,4 +1,4 @@
-/* $Id: CommandQueue.java,v 1.1 2007-10-14 19:04:44 hampelratte Exp $
+/* $Id: CommandQueue.java,v 1.2 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,14 +39,16 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements ListModel, Runnable {
 
     private static CommandQueue instance;
     
-    private Logger logger = Logger.getLogger(); 
+    private static transient Logger logger = LoggerFactory.getLogger(CommandQueue.class);
     
     private boolean running = false;
     
@@ -61,7 +63,7 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
 
     @Override
     public boolean add(VDRAction o) {
-        logger.log("Enqueued " + o, Logger.OTHER, Logger.DEBUG);
+        logger.debug("Enqueued {}", o.toString());
         return super.add(o);
     }
 

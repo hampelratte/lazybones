@@ -1,4 +1,4 @@
-/* $Id: StartStopEvent.java,v 1.3 2008-04-25 11:27:07 hampelratte Exp $
+/* $Id: SimpleFormatter.java,v 1.1 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,62 +27,44 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.utils;
+package lazybones.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
-import java.util.Calendar;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
-import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
-
-import lazybones.Timer;
-import lazybones.ChannelManager;
-
-public class StartStopEvent implements Comparable<StartStopEvent> {
-    private Timer timer;
-
-    private boolean startEvent = true;
-
-    /**
-     * @param timer
-     * @param startEvent
-     */
-    public StartStopEvent(Timer timer, boolean startEvent) {
-        super();
-        this.timer = timer;
-        this.startEvent = startEvent;
-    }
-
-    public boolean isStartEvent() {
-        return startEvent;
-    }
-
-    public void setStartEvent(boolean startEvent) {
-        this.startEvent = startEvent;
-    }
-
-    public Timer getTimer() {
-        return timer;
-    }
-
-    public void setTimer(Timer timer) {
-        this.timer = timer;
-    }
+public class SimpleFormatter extends Formatter {
     
-    public Calendar getEventTime() {
-        return isStartEvent() ? timer.getStartTime() : timer.getEndTime();
-    }
+    @Override
+    public String format(LogRecord record) {
+        StringBuffer sb = new StringBuffer();
 
-    public int compareTo(StartStopEvent o) {
-        return getEventTime().compareTo(o.getEventTime());
-    }
-    
-    public String toString() {
-        DateFormat df = DateFormat.getDateTimeInstance();
-        Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();
-        DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber()); 
-        return (df.format(cal.getTime()) 
-                + " Transponder: " 
-                + chan.getFrequency()+ " " 
-                + timer);
+        DateFormat mTimeFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+
+        String message = formatMessage(record);
+        sb.append(mTimeFormat.format(new java.util.Date(System.currentTimeMillis())));
+        sb.append(" LAZYBONES ");
+        sb.append(record.getLevel().getLocalizedName());
+        sb.append(' ');
+        sb.append(record.getSourceClassName());
+        sb.append('.');
+        sb.append(record.getSourceMethodName());
+        sb.append(": ");
+        sb.append(message);
+        sb.append("\n");
+        if (record.getThrown() != null) {
+            try {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                record.getThrown().printStackTrace(pw);
+                pw.close();
+                sb.append(sw.toString());
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
+        return sb.toString();
     }
 }

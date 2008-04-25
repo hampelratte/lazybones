@@ -1,4 +1,4 @@
-/* $Id: CreateTimerAction.java,v 1.1 2007-10-14 19:04:44 hampelratte Exp $
+/* $Id: CreateTimerAction.java,v 1.2 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,7 +30,6 @@
 package lazybones.actions;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.Timer;
 import lazybones.TimerManager;
 import lazybones.VDRConnection;
@@ -38,10 +37,12 @@ import lazybones.actions.responses.ConnectionProblem;
 
 import org.hampelratte.svdrp.commands.NEWT;
 import org.hampelratte.svdrp.responses.R250;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CreateTimerAction extends VDRAction {
 
-    private Logger logger = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(CreateTimerAction.class);
     
     private Timer timer;
     
@@ -63,10 +64,9 @@ public class CreateTimerAction extends VDRAction {
             TimerManager.getInstance().synchronize();
             return true;
         } else {
-            logger.log(LazyBones.getTranslation("couldnt_create",
+            logger.error(LazyBones.getTranslation("couldnt_create",
                     "Couldn\'t create timer:")
-                    + " " + response.getMessage(), Logger.OTHER,
-                    Logger.ERROR);
+                    + " " + response.getMessage());
             return false;
         }
     }

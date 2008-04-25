@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.2 2008-04-22 14:23:44 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.3 2008-04-25 11:27:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,14 +31,25 @@ package lazybones.gui.settings;
 
 import info.clearthought.layout.TableLayout;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.VDRConnection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GeneralPanel {
-    private Logger LOG = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(GeneralPanel.class);
     
 	private final String lHost = LazyBones.getTranslation("host", "Host");
 
@@ -196,7 +207,7 @@ public class GeneralPanel {
             String mesg = LazyBones.getTranslation(
                    "invalidPort",
                    "<html>You have entered a wrong value for the port.<br>Port 2001 will be used instead.</html>");
-            LOG.log(mesg, Logger.OTHER, Logger.ERROR);
+            logger.error(mesg);
             p = 2001;
             port.setText("2001");
         }
@@ -206,7 +217,7 @@ public class GeneralPanel {
             String mesg = LazyBones.getTranslation(
                                             "invalidTimeout",
                                             "<html>You have entered a wrong value for the timeout.<br>A timeout of 500 ms will be used instead.</html>");
-            LOG.log(mesg, Logger.OTHER, Logger.ERROR);
+            logger.error(mesg);
             t = 500;
             timeout.setText("500");
         }

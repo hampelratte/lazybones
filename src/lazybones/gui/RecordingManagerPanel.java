@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.10 2008-04-22 14:42:38 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.11 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -52,7 +52,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.Player;
 import lazybones.RecordingManager;
 import lazybones.VDRCallback;
@@ -63,9 +62,15 @@ import lazybones.gui.utils.RecordingListCellRenderer;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import util.ui.Localizer;
 
 public class RecordingManagerPanel extends JPanel implements ActionListener, Observer {
-
+    
+    private static transient Logger logger = LoggerFactory.getLogger(RecordingManagerPanel.class);
+    
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
     private JList recordingList = new JList(model);
@@ -117,7 +122,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             VDRCallback callback = new VDRCallback() {
                 public void receiveResponse(VDRAction cmd, Response response) {
                     if(!cmd.isSuccess()) {
-                        Logger.getLogger().log(cmd.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+                        logger.error(cmd.getResponse().getMessage());
                     } else {
                         RecordingManager.getInstance().synchronize();
                     }
@@ -170,7 +175,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     }
     
     private void createContextMenu() {
-        JMenuItem menuDelete = new JMenuItem(LazyBones.getTranslation("delete", "Delete"));
+        JMenuItem menuDelete = new JMenuItem(Localizer.getLocalization(Localizer.I18N_DELETE));
         menuDelete.addActionListener(this);
         menuDelete.setActionCommand("DELETE");
         menuDelete.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-delete", 16));

@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.9 2007-10-14 19:07:18 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.10 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,7 @@ import javax.swing.JScrollPane;
 import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerManager;
+import util.ui.Localizer;
 import util.ui.ProgramList;
 import devplugin.Program;
 
@@ -140,9 +141,9 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
 
         //list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        ok.setText(LazyBones.getTranslation("ok", "OK"));
+        ok.setText(Localizer.getLocalization(Localizer.I18N_OK));
         never.setText(LazyBones.getTranslation("never","Never assign"));
-        cancel.setText(LazyBones.getTranslation("cancel", "Cancel"));
+        cancel.setText(Localizer.getLocalization(Localizer.I18N_CANCEL));
 
         ok.addActionListener(this);
         never.addActionListener(this);

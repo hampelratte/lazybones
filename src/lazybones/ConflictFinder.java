@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.9 2007-10-14 18:57:17 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.10 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,7 +30,13 @@
 package lazybones;
 
 import java.text.DateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -38,9 +44,14 @@ import lazybones.gui.TimelinePanel;
 import lazybones.utils.StartStopEvent;
 import lazybones.utils.Utilities;
 
-import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConflictFinder implements Observer {
+    
+    private static transient Logger logger = LoggerFactory.getLogger(ConflictFinder.class);
+    
     private static ConflictFinder instance;    
     private Set<ConflictingTimersSet<Timer>> conflicts = new HashSet<ConflictingTimersSet<Timer>>();
     private HashMap<Integer, Integer> transponderUse = new HashMap<Integer,Integer>();
@@ -71,13 +82,13 @@ public class ConflictFinder implements Observer {
     
     @SuppressWarnings("unchecked")
     public void findConflicts() {
-        Logger.getLogger().log("Looking for conflicts", Logger.OTHER, Logger.DEBUG);
+        logger.debug("Looking for conflicts");
         
         // clear old data
         reset();
        
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
-        Logger.getLogger().log("Number of cards: " + numberOfCards, Logger.OTHER, Logger.DEBUG);
+        logger.debug("Number of cards: {}", numberOfCards);
         List<Timer> timers = TimerManager.getInstance().getTimers();
         List<StartStopEvent> startStopEvents = Utilities.createStartStopEventList(timers); 
         
@@ -111,14 +122,14 @@ public class ConflictFinder implements Observer {
     }
     
     public void handleConflicts() {
-        Logger.getLogger().log("Handling conflicts", Logger.OTHER, Logger.DEBUG);
+        logger.debug("Handling conflicts");
         // check, if there are timer conflicts
         if(getConflictCount() > 0) {
             String msg = LazyBones.getTranslation("conflict_found", 
                     LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!", 
                     Integer.toString(ConflictFinder.getInstance().getConflictCount()));
             JOptionPane.showMessageDialog(LazyBones.getInstance().getParent(), msg);
-            Logger.getLogger().log(msg, Logger.OTHER, Logger.INFO);
+            logger.info(msg);
             LazyBones.getInstance().getMainDialog().setVisible(true);
             LazyBones.getInstance().getMainDialog().showTimeline();
 
@@ -132,7 +143,7 @@ public class ConflictFinder implements Observer {
                 }
                 logMsg.append(" Conflict start: " +  DateFormat.getDateTimeInstance().format(set.getConflictStartTime().getTime()));
                 logMsg.append(" Conflict end: " +  DateFormat.getDateTimeInstance().format(set.getConflictEndTime().getTime()));
-                Logger.getLogger().log(logMsg.toString(), Logger.OTHER, Logger.DEBUG);
+                logger.debug(logMsg.toString());
             }
             
             // set timeline date to the date of one conflict
@@ -153,7 +164,7 @@ public class ConflictFinder implements Observer {
     }
     
     private void increaseTransponderUse(Timer timer) {
-        Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
         if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
             int count = transponderUse.get(chan.getFrequency());
             count++;
@@ -164,7 +175,7 @@ public class ConflictFinder implements Observer {
     }
     
     private void decreaseTransponderUse(Timer timer) {
-        Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
         if(transponderUse.containsKey(chan.getFrequency())) {
             int count = transponderUse.get(chan.getFrequency());
             if(count == 1) {

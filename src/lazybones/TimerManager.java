@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.26 2008-04-22 14:42:38 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.27 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,15 @@
  */
 package lazybones;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
 
@@ -52,6 +60,8 @@ import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import org.hampelratte.svdrp.util.EPGParser;
 import org.hampelratte.svdrp.util.TimerParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import devplugin.Date;
 import devplugin.Program;
@@ -64,7 +74,7 @@ import devplugin.Program;
  */
 public class TimerManager extends Observable {
     
-    private transient static Logger logger = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(TimerManager.class);
 
     private static TimerManager instance;
 
@@ -380,7 +390,7 @@ public class TimerManager extends Observable {
         // fetch current timer list from vdr
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
-            logger.log("Timers retrieved from VDR",Logger.OTHER, Logger.INFO);
+            logger.info("Timers retrieved from VDR");
             String timersString = res.getMessage();
             List<VDRTimer> vdrtimers = TimerParser.parse(timersString);
             List<Timer> timers = new ArrayList<Timer>();
@@ -402,12 +412,12 @@ public class TimerManager extends Observable {
             }
         } else if (res != null && res.getCode() == 550) {
             // no timers are defined, do nothing
-            logger.log("No timer defined on VDR",Logger.OTHER, Logger.INFO);
+            logger.info("No timer defined on VDR");
         } else { /* something went wrong, we have no timers -> 
                   * load the stored ones */
-            logger.log(LazyBones.getTranslation("using_stored_timers",
-                "Couldn't retrieve timers from VDR, using stored ones."), 
-                Logger.CONNECTION, Logger.ERROR);
+         // TODO CONNECTION incorporate in new log system
+            logger.error(LazyBones.getTranslation("using_stored_timers",
+                "Couldn't retrieve timers from VDR, using stored ones."));
             
             List<Timer> vdrtimers = getStoredTimers();
             setTimers(vdrtimers, false);
@@ -438,9 +448,9 @@ public class TimerManager extends Observable {
         VDRCallback callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
                 if(!cmd.isSuccess()) {
-                    logger.log(LazyBones.getTranslation(
+                    logger.error(LazyBones.getTranslation(
                             "couldnt_delete", "Couldn\'t delete timer:")
-                            + " " + cmd.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+                            + " " + cmd.getResponse().getMessage());
                     return;
                 }
                 
@@ -485,8 +495,7 @@ public class TimerManager extends Observable {
     public void createTimer(Program prog, boolean automatic) {
         if (prog.isExpired()) {
             if(!automatic) {
-                logger.log(LazyBones.getTranslation(
-                    "expired", "This program has expired"), Logger.OTHER, Logger.ERROR);
+                logger.error(LazyBones.getTranslation("expired", "This program has expired"));
             }
             return;
         }
@@ -503,8 +512,8 @@ public class TimerManager extends Observable {
 
         Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
-            logger.log(LazyBones.getTranslation("no_channel_defined",
-                    "No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
+            logger.error(LazyBones.getTranslation("no_channel_defined",
+                    "No channel defined", prog.toString()));
             return;
         }
         int id = ((Channel) o).getChannelNumber();
@@ -575,8 +584,8 @@ public class TimerManager extends Observable {
             noEPGAvailable(prog, id, automatic);
         } else {
             String msg = res != null ? res.getMessage() : "Reason unknown";
-            logger.log(LazyBones.getTranslation("couldnt_create",
-                    "Couldn\'t create timer\n: ") + " " + msg,Logger.OTHER, Logger.ERROR);
+            logger.error(LazyBones.getTranslation("couldnt_create",
+                    "Couldn\'t create timer\n: ") + " " + msg);
         }
     }
     
@@ -652,7 +661,7 @@ public class TimerManager extends Observable {
         if(prog != null) {
             Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
             if (o == null) {
-                logger.log(LazyBones.getTranslation("no_channel_defined","No channel defined", prog.toString()), Logger.OTHER, Logger.ERROR);
+                logger.error(LazyBones.getTranslation("no_channel_defined","No channel defined", prog.toString()));
                 return;
             }
             id = ((Channel) o).getChannelNumber();
@@ -667,7 +676,7 @@ public class TimerManager extends Observable {
                         String mesg =  LazyBones.getTranslation(
                                 "couldnt_change", "Couldn\'t change timer:")
                                 + " " + cmd.getResponse().getMessage();
-                        logger.log(mesg, Logger.OTHER, Logger.ERROR);
+                        logger.error(mesg);
                     }
                 }
             };
@@ -689,7 +698,7 @@ public class TimerManager extends Observable {
                     CreateTimerAction cta = new CreateTimerAction(timer);
                     cta.enqueue();
                 } else {
-                    logger.log("Looking in title mapping for timer "+timer, Logger.OTHER, Logger.DEBUG);
+                    logger.debug("Looking in title mapping for timer {}", timer);
                     // lookup in mapping history
                     TimerManager tm = TimerManager.getInstance();
                     String timerTitle = (String)tm.getTitleMapping().getVdrTitle(prog.getTitle());
@@ -799,14 +808,14 @@ public class TimerManager extends Observable {
     
     public void deleteTimer(Program prog) {
         Timer timer = TimerManager.getInstance().getTimer(prog);
-        logger.log("Deleting timer " + timer, Logger.OTHER, Logger.DEBUG);
+        logger.debug("Deleting timer {}", timer);
         VDRCallback callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
                 if(cmd instanceof DeleteTimerAction) {
                     if(!cmd.isSuccess()) {
-                        logger.log(LazyBones.getTranslation(
+                        logger.error(LazyBones.getTranslation(
                                 "couldnt_delete", "Couldn\'t delete timer:")
-                                + " " + cmd.getResponse().getMessage(), Logger.OTHER, Logger.ERROR);
+                                + " " + cmd.getResponse().getMessage());
                         return;
                     }
                     
@@ -828,12 +837,12 @@ public class TimerManager extends Observable {
     }
     
     public boolean lookUpTimer(Timer timer, Program candidate) {
-        logger.log("Looking in storedTimers for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+        logger.debug("Looking in storedTimers for: {}", timer.toString());
         List<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
         if (progIDs != null) { // we have a mapping of this timer to a program
             for (String progID : progIDs) {
                 if(progID.equals("NO_PROGRAM")) {
-                    logger.log("Timer " + timer.toString()+" should never be assigned",Logger.OTHER, Logger.DEBUG);
+                    logger.debug("Timer {} should never be assigned", timer.toString());
                     timer.setReason(Timer.NO_PROGRAM);
                     return true;
                 } else {
@@ -848,8 +857,7 @@ public class TimerManager extends Observable {
                                     && p.getDate().equals(date)) {
                                 p.mark(LazyBones.getInstance());
                                 timer.setTvBrowserProgIDs(progIDs);
-                                logger.log("Mapping found for: " + timer.toString(),
-                                        Logger.OTHER, Logger.DEBUG);
+                                logger.debug("Mapping found for: {}", timer.toString());
                                 return true;
                             }
                         }
@@ -857,16 +865,15 @@ public class TimerManager extends Observable {
                 }
             }
         } else  {
-            logger.log("No mapping found for: " + timer.toString(),Logger.OTHER, Logger.DEBUG);
+            logger.debug("No mapping found for: {}", timer.toString());
             if(candidate != null) {
-                logger.log("Looking up old mappings", Logger.OTHER, Logger.DEBUG);
+                logger.debug("Looking up old mappings");
                 TimerManager tm = TimerManager.getInstance();
                 String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
                 if(candidate.getTitle().equals(progTitle)) {
-                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup h�rt sich nicht danach an
+                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
                     timer.addTvBrowserProgID(candidate.getID());
-                    logger.log("Old mapping found for: " + timer.toString(),
-                            Logger.OTHER, Logger.DEBUG);
+                    logger.debug("Old mapping found for: {}", timer.toString());
                     return true;
                 }
             }

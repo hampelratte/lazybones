@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.16 2008-04-22 14:42:09 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.17 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,7 +29,14 @@
  */
 package lazybones;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
 
 import javax.swing.JPopupMenu;
 
@@ -42,12 +49,14 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import org.hampelratte.svdrp.util.EPGParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import devplugin.Date;
 import devplugin.Program;
 
 public class ProgramManager {
-    private static transient Logger logger = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(ProgramManager.class);
     
     private static ProgramManager instance;
     
@@ -68,7 +77,7 @@ public class ProgramManager {
      * @return the Program or null
      * 
      * startTime ist notwendig, weil getChannelDayProgram benutzt wird.
-     * Bsp.: start 23:30 ende 01:00 middleTime w�rde dann schon am n�chsten tag
+     * Bsp.: start 23:30 ende 01:00 middleTime würde dann schon am nächsten tag
      * liegen (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt
      * und das Program nicht findet 
      */
@@ -193,9 +202,8 @@ public class ProgramManager {
             return;
         }
         Iterator<Timer> iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
-        logger.log("Not assigned timers: "
-                + TimerManager.getInstance().getNotAssignedTimers().size(),
-                Logger.OTHER, Logger.DEBUG);
+        logger.debug("Not assigned timers: {}",
+                + TimerManager.getInstance().getNotAssignedTimers().size());
         while (iterator.hasNext()) {
             Timer timer = iterator.next();
             switch(timer.getReason()) {
@@ -203,20 +211,21 @@ public class ProgramManager {
                 showProgramConfirmDialog(timer);
                 break;
             case Timer.NO_EPG:
-                logger.log("Couldn't assign timer: " + timer, Logger.EPG, Logger.WARN);
+                logger.warn("Couldn't assign timer: ", timer);
                 String mesg = LazyBones.getTranslation("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
-                logger.log(mesg, Logger.EPG, Logger.ERROR);
+             // TODO EPG incorporate in new log system
+                logger.error(mesg);
                 break;
             case Timer.NO_CHANNEL:
-                mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString()); 
-                logger.log(mesg, Logger.EPG, Logger.ERROR);
+                mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString());
+             // TODO EPG incorporate in new log system
+                logger.error(mesg);
                 break;
             case Timer.NO_PROGRAM:
                 // do nothing
                 break;
             default:
-                logger.log("Not assigned timer: " + timer.toString(), Logger.OTHER,
-                        Logger.DEBUG);
+                logger.debug("Not assigned timer: {}", timer);
             }
         }
     }
@@ -298,7 +307,7 @@ public class ProgramManager {
                     for (Program prog : doppelPack) {
                         String title = prog.getTitle();
                         if(list.contains(title)) {
-                            logger.log("Doppelpack found: " + title, Logger.OTHER, Logger.DEBUG);
+                            logger.debug("Doppelpack found: {}", title);
                             timer.setReason(Timer.NO_REASON);
                             doppelpackTitle = title;
                         } else {
@@ -323,9 +332,8 @@ public class ProgramManager {
                         // lookup old mappings
                         boolean found = TimerManager.getInstance().lookUpTimer(timer, null);
                         if (!found) { // we have no mapping
-                            logger.log("Couldn't find a program with that title: "
-                                    + timer.getTitle(), Logger.OTHER, Logger.WARN);
-                            logger.log("Couldn't assign timer: " + timer, Logger.OTHER, Logger.WARN);
+                            logger.warn("Couldn't find a program with that title: ", timer.getTitle());
+                            logger.warn("Couldn't assign timer: ", timer);
                             timer.setReason(Timer.NOT_FOUND);
                         } else {
                             timer.setReason(Timer.NO_REASON);
@@ -360,7 +368,7 @@ public class ProgramManager {
                 percentage = 100;
             }
             
-            logger.log("Percentage:"+percentage + " " + timer.toString(), Logger.OTHER, Logger.DEBUG);
+            logger.debug("Percentage: {} {}", percentage, timer.toString());
 
             int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
             // if the percentage of common words is
@@ -378,9 +386,8 @@ public class ProgramManager {
             } else {
                 boolean found = TimerManager.getInstance().lookUpTimer(timer, progMin);
                 if (!found) { // we have no mapping
-                    logger.log("Couldn't find a program with that title: "
-                            + timer.getTitle(), Logger.OTHER, Logger.WARN);
-                    logger.log("Couldn't assign timer: " + timer, Logger.OTHER, Logger.WARN);
+                    logger.warn("Couldn't find a program with that title: ", timer.getTitle());
+                    logger.warn("Couldn't assign timer: ", timer);
                     timer.setReason(Timer.NOT_FOUND);
                 }
             }

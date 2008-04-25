@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.20 2007-10-14 19:07:18 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.21 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,18 +40,36 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Calendar;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
-import lazybones.*;
+import lazybones.ChannelManager;
+import lazybones.LazyBones;
+import lazybones.ProgramManager;
+import lazybones.Time;
 import lazybones.Timer;
+import lazybones.TimerManager;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
 import lazybones.gui.utils.SpinnerTimeModel;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tvbrowser.core.ChannelList;
+import util.ui.Localizer;
 import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
@@ -61,9 +79,11 @@ import devplugin.Program;
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
-public class TimerOptionsDialog implements ActionListener,
-        ItemListener {
-    private JLabel lChannels = new JLabel(LazyBones.getTranslation("channel", "Channel"));
+public class TimerOptionsDialog implements ActionListener, ItemListener {
+    
+    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsDialog.class);
+    
+    private JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
     private JComboBox channels = new JComboBox();
 
@@ -82,7 +102,7 @@ public class TimerOptionsDialog implements ActionListener,
     private JSpinner spinnerEndtime = new JSpinner();
 
     private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority",
-            "Priorität"));
+            "Priority"));
 
     private JSpinner priority = new JSpinner();
 
@@ -314,8 +334,8 @@ public class TimerOptionsDialog implements ActionListener,
         gbc.gridy = 12;
         panel.add(ok, gbc);
 
-        ok.setText(LazyBones.getTranslation("ok", "OK"));
-        cancel.setText(LazyBones.getTranslation("cancel", "Cancel"));
+        ok.setText(Localizer.getLocalization(Localizer.I18N_OK));
+        cancel.setText(Localizer.getLocalization(Localizer.I18N_CANCEL));
 
         ok.addActionListener(this);
         cancel.addActionListener(this);
@@ -365,7 +385,7 @@ public class TimerOptionsDialog implements ActionListener,
                     // VPS needs the unbuffered start time
                     int hour = prog.getHours();
                     int minute = prog.getMinutes();
-                    Logger.getLogger().log("Setting start time to start time of the TVB-program", Logger.OTHER, Logger.DEBUG);
+                    logger.debug("Setting start time to start time of the TVB-program");
                     spinnerStarttime.getModel().setValue(new Time(hour, minute));
                     spinnerStarttime.setBorder(BorderFactory.createLineBorder(Color.RED));
                     spinnerStarttime.repaint();

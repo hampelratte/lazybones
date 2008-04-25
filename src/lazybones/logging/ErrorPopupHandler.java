@@ -1,4 +1,4 @@
-/* $Id: LogMessage.java,v 1.1 2007-04-09 19:23:40 hampelratte Exp $
+/* $Id: ErrorPopupHandler.java,v 1.1 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,32 +27,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.utils;
+package lazybones.logging;
 
-import lazybones.Logger.LoggingLevel;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.LogRecord;
 
-public class LogMessage {
-    private LoggingLevel level;
-    private String message;
+public class ErrorPopupHandler extends ConsoleHandler {
 
-    public LogMessage(String message, LoggingLevel level) {
-        this.message = message;
-        this.level = level;
-    }
-
-    public LoggingLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(LoggingLevel level) {
-        this.level = level;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    @Override
+    public void publish(LogRecord record) {
+        // TODO publish errors on MEssageDialog
+        super.publish(record);
     }
 }

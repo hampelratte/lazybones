@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.4 2007-11-13 20:06:37 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.5 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,12 +42,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.VDRConnection;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.GRAB;
 import org.hampelratte.svdrp.responses.R216;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -55,7 +56,7 @@ import org.hampelratte.svdrp.responses.R216;
  */
 public class ScreenshotPanel extends JLabel {
 
-    private static final Logger LOG = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(ScreenshotPanel.class);
 
     private ImageIcon image;
 
@@ -108,21 +109,20 @@ public class ScreenshotPanel extends JLabel {
                         setIcon(image);
                         setText("");
                     } else {
-                        LOG.log("Grabbed image is null", Logger.OTHER, Logger.WARN);
+                        logger.warn("Grabbed image is null");
                         setFont(new Font("SansSerif", Font.PLAIN, 24));
                         setText("  " + LazyBones.getTranslation("no_preview","Couldn't load screenshot."));
                         setIcon(null);
                         stopGrabbing();
                     }
                 } catch (InterruptedException e) {
-                    LOG.log("Problem with grabber thread:", Logger.OTHER, Logger.ERROR);
-                    e.printStackTrace();
+                    logger.error("Problem with grabber thread:", e);
                 } 
             }
         }
         
         private ImageIcon getHTTPImage() {
-            LOG.log("Grabbing image over HTTP", Logger.OTHER, Logger.DEBUG);
+            logger.debug("Grabbing image over HTTP");
             grab.setFilename(LazyBones.getProperties()
                     .getProperty("preview.path"));
             ImageIcon preview = null;
@@ -143,13 +143,13 @@ public class ScreenshotPanel extends JLabel {
                     preview = new ImageIcon(bos.toByteArray());
                 }
             } catch (Exception e) {
-                LOG.log("Couldn't grab image: " + e, Logger.OTHER, Logger.DEBUG);
+                logger.debug("Couldn't grab image", e);
             }
             return preview;
         }
         
         private ImageIcon getSVDRPImage() {
-            LOG.log("Grabbing image over SVDRP", Logger.OTHER, Logger.DEBUG);
+            logger.debug("Grabbing image over SVDRP");
             grab.setFilename("-");
             Response res = VDRConnection.send(grab);
             if (res != null && res.getCode() == 216) {
@@ -158,11 +158,11 @@ public class ScreenshotPanel extends JLabel {
                 try {
                     image = r216.getImage();
                 } catch (IOException e) {
-                    LOG.log("Couldn't grab screen: " + e.getMessage(), Logger.OTHER, Logger.ERROR);
+                    logger.error("Couldn't grab screen", e);
                 }
                 return image;
             } else {
-                LOG.log(res, Logger.OTHER, Logger.DEBUG);
+                logger.debug(res.toString());
                 return null;
             }
         }

@@ -1,4 +1,4 @@
-/* $Id: NavigationBlock.java,v 1.3 2007-05-15 20:37:24 hampelratte Exp $
+/* $Id: NavigationBlock.java,v 1.4 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import util.ui.Localizer;
+
 import lazybones.Controller;
 import lazybones.LazyBones;
 
@@ -49,7 +51,7 @@ import lazybones.LazyBones;
 public class NavigationBlock extends JPanel {
     JButton bMenu = new JButton(LazyBones.getTranslation("Menu", "Menu"));
 
-    JButton bBack = new JButton(LazyBones.getTranslation("Back", "Back"));
+    JButton bBack = new JButton(Localizer.getLocalization(Localizer.I18N_BACK));
 
     JButton bUp = new JButton();
 
@@ -59,7 +61,7 @@ public class NavigationBlock extends JPanel {
 
     JButton bRight = new JButton();
 
-    JButton bOk = new JButton(LazyBones.getTranslation("OK", "OK"));
+    JButton bOk = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
     
     public NavigationBlock() {
         initGUI();

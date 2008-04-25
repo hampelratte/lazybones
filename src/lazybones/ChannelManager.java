@@ -1,4 +1,4 @@
-/* $Id: ChannelManager.java,v 1.2 2007-10-14 18:57:17 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.3 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -38,11 +39,16 @@ import java.util.Map;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
 import org.hampelratte.svdrp.util.ChannelParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ChannelManager {
 
+    private static transient Logger logger = LoggerFactory.getLogger(ChannelManager.class);
+    
     private static ChannelManager instance;
     
     private static Map<String, Channel> channelMapping = new Hashtable<String, Channel>();
@@ -54,7 +60,19 @@ public class ChannelManager {
     public void update() {
         Response res = VDRConnection.send(new LSTC());
         if (res != null && res.getCode() == 250) {
-            channels = ChannelParser.parse(res.getMessage());
+            try {
+                channels = ChannelParser.parse(res.getMessage(), true);
+                
+                // remove all non DVB channels
+                for (Iterator<Channel> iter = channels.iterator(); iter.hasNext();) {
+                    Channel channel = iter.next();
+                    if( !(channel instanceof DVBChannel) ) {
+                        iter.remove();
+                    }
+                }
+            } catch (ParseException e) {
+                logger.error("Couldn't update channel list", e);
+            }
         }
     }
 

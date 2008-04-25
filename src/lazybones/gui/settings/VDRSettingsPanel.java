@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.3 2007-05-15 20:37:24 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.4 2008-04-25 11:27:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,7 @@ import javax.swing.JTabbedPane;
 import lazybones.LazyBones;
 import lazybones.gui.settings.channelpanel.ChannelPanel;
 import util.ui.ImageUtilities;
+import util.ui.Localizer;
 
 /**
  * The root container for the settings tabs
@@ -70,7 +71,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 					.getPanel());
 
             channelPanel = new ChannelPanel();
-            tabbedPane.addTab(LazyBones.getTranslation("channels", "Channels"), channelPanel
+            tabbedPane.addTab(Localizer.getLocalization(Localizer.I18N_CHANNELS), channelPanel
 					.getPanel());
 
             playerPanel = new PlayerPanel();

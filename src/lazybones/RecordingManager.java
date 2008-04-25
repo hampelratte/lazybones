@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.4 2007-10-14 19:01:52 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.5 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,6 +42,8 @@ import org.hampelratte.svdrp.commands.PLAY;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.util.EPGParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -51,6 +53,8 @@ import org.hampelratte.svdrp.util.EPGParser;
  */
 public class RecordingManager extends Observable {
 
+    private static transient Logger logger = LoggerFactory.getLogger(RecordingManager.class);
+    
     private static RecordingManager instance;
 
     /**
@@ -96,7 +100,7 @@ public class RecordingManager extends Observable {
      * Fetches the recording list from vdr
      */
     public synchronized void synchronize() {
-        Logger.getLogger().log("Getting recordings from VDR", Logger.OTHER, Logger.DEBUG);
+        logger.debug("Getting recordings from VDR");
         
         // fetch current recording list from vdr
         VDRCallback callback = new VDRCallback() {
@@ -142,7 +146,7 @@ public class RecordingManager extends Observable {
     public void playOnVdr(Recording rec) {
         Response res = VDRConnection.send(new PLAY(rec.getNumber()));
         if(res.getCode() != 250) {
-            Logger.getLogger().log(res.getMessage(), Logger.OTHER, Logger.ERROR);
+            logger.error(res.getMessage());
         }
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.18 2008-04-22 14:41:26 hampelratte Exp $
+/* $Id: Player.java,v 1.19 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,8 @@ import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.CHAN;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import devplugin.Program;
 
@@ -47,7 +49,7 @@ import devplugin.Program;
 public class Player {
     private static PlayerThread playerThread;
     
-    private static Logger logger = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(Player.class);
 
     public static void play(Program prog) {
     	Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
@@ -56,7 +58,7 @@ public class Player {
             int id = chan.getChannelNumber();
             Player.play(id);
         } else {
-            logger.log("Couldn't start Player", Logger.OTHER, Logger.ERROR);
+            logger.error("Couldn't start Player. No mapped channel found");
         }
     }
 
@@ -74,7 +76,7 @@ public class Player {
                 if (res == null || res.getCode() != 250) {
                     String mesg = LazyBones.getTranslation("Error",
                     "Error") + ": " + res.getMessage();
-                    logger.log(mesg, Logger.OTHER, Logger.ERROR);
+                    logger.error(mesg);
                     return;
                 }
             }
@@ -101,7 +103,7 @@ public class Player {
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
             String mesg =  LazyBones.getTranslation("Error", "Error")+ ": " + e1;
-            logger.log(mesg, Logger.OTHER, Logger.ERROR);
+            logger.error(mesg);
         }
     }
     
@@ -125,7 +127,7 @@ public class Player {
         String url = LazyBones.getProperties().getProperty("recording.url");
         url = url.replaceAll("<host>", host);
         url = url.replaceAll("<recording_number>", Integer.toString(rec.getNumber()));
-        logger.log("Trying to play url " + url, Logger.OTHER, Logger.DEBUG);
+        logger.debug("Trying to play url {}", url);
         arguments[arguments.length - 1] = url;
         playerThread = new PlayerThread(arguments);
 
@@ -158,8 +160,8 @@ public class Player {
                 new PlayerOutputter(p.getErrorStream());
                 p.waitFor();
             } catch (Exception e) {
-                String mesg = LazyBones.getTranslation("couldnt_start", "Couldn't start player")+ ": " + e;
-                logger.log(mesg, Logger.OTHER, Logger.ERROR);
+                String mesg = LazyBones.getTranslation("couldnt_start", "Couldn't start player");
+                logger.error(mesg, e);
             }
             running = false;
         }
@@ -188,7 +190,7 @@ public class Player {
             int length = -1;
             try {
                 while ((length = in.read(buffer)) > 0) {
-                    logger.log("PLAYER: " + new String(buffer, 0, length), Logger.OTHER, Logger.DEBUG);
+                    logger.debug("PLAYER: {}", new String(buffer, 0, length));
                 }
             } catch (Exception e) {
             }

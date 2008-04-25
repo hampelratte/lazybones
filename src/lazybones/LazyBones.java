@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.81 2008-04-22 14:49:51 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.82 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,7 +32,18 @@ package lazybones;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Properties;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -42,13 +53,25 @@ import javax.swing.JPopupMenu;
 
 import lazybones.gui.MainDialog;
 import lazybones.gui.settings.VDRSettingsPanel;
+import lazybones.logging.ErrorPopupHandler;
+import lazybones.logging.SimpleFormatter;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.NEWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
-import devplugin.*;
+import devplugin.ActionMenu;
+import devplugin.ButtonAction;
+import devplugin.Marker;
+import devplugin.Plugin;
+import devplugin.PluginInfo;
+import devplugin.PluginTreeNode;
+import devplugin.Program;
+import devplugin.ProgramReceiveTarget;
+import devplugin.Version;
 
 /**
  * A VDRRemoteControl Plugin
@@ -58,8 +81,8 @@ import devplugin.*;
  */
 public class LazyBones extends Plugin implements Observer {
 
-    public static final Logger logger = Logger.getLogger();
-
+    private static transient Logger logger = LoggerFactory.getLogger(LazyBones.class);
+    
     /** Translator */
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer
             .getLocalizerFor(LazyBones.class);
@@ -116,13 +139,12 @@ public class LazyBones extends Plugin implements Observer {
         if (response.getCode() == 250) {
             TimerManager.getInstance().timerCreatedOK(selectedProgram, t);
         } else {
-            logger.log(LazyBones.getTranslation("couldnt_create",
+            logger.error(LazyBones.getTranslation("couldnt_create",
                     "Couldn\'t create timer:")
-                    + " " + response.getMessage(),
-                    Logger.OTHER, Logger.ERROR);
+                    + " " + response.getMessage());
         }
         
-        logger.log("Storing " + originalProgram.getTitle() + "-"+t.getTitle()+ " in tvb2vdr", Logger.OTHER, Logger.DEBUG);
+        logger.debug("Storing {}-{} in tvb2vdr", originalProgram.getTitle(), t.getTitle());
         TimerManager.getInstance().getTitleMapping().put(originalProgram.getTitle(), t.getTitle());
     }
 
@@ -228,12 +250,14 @@ public class LazyBones extends Plugin implements Observer {
         String logConnectionErrors = props.getProperty("logConnectionErrors");
         logConnectionErrors = logConnectionErrors == null ? "true" : logConnectionErrors;
         props.setProperty("logConnectionErrors", logConnectionErrors);
-        Logger.logConnectionErrors = new Boolean(logConnectionErrors).booleanValue();
+        // TODO incorporate in new log system
+        //Logger.logConnectionErrors = new Boolean(logConnectionErrors).booleanValue();
         
         String logEPGErrors = props.getProperty("logEPGErrors");
         logEPGErrors = logEPGErrors == null ? "true" : logEPGErrors;
         props.setProperty("logEPGErrors", logEPGErrors);
-        Logger.logEPGErrors = new Boolean(logEPGErrors).booleanValue();
+        // TODO incorporate in new log system
+        //Logger.logEPGErrors = new Boolean(logEPGErrors).booleanValue();
         
         String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
         showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
@@ -263,7 +287,7 @@ public class LazyBones extends Plugin implements Observer {
             HashMap titleMapping = (HashMap) xstream.fromXML(props.getProperty("titleMapping"));
             TimerManager.getInstance().setTitleMappingValues(titleMapping);
         } catch (Exception e) {
-            logger.log("Couldn't load title mapping: " + e, Logger.OTHER, Logger.WARN);
+            logger.warn("Couldn't load title mapping", e);
         }
         
         // load channel mapping
@@ -271,7 +295,7 @@ public class LazyBones extends Plugin implements Observer {
             Hashtable channelMapping = (Hashtable) xstream.fromXML(props.getProperty("channelMapping"));
             ChannelManager.setChannelMapping(channelMapping);
         } catch (Exception e) {
-            logger.log("Couldn't load channel mapping: " + e, Logger.OTHER, Logger.WARN);
+            logger.warn("Couldn't load channel mapping", e);
         }
         
         // load timers
@@ -279,7 +303,7 @@ public class LazyBones extends Plugin implements Observer {
             ArrayList timers = (ArrayList) xstream.fromXML(props.getProperty("timers"));
             TimerManager.getInstance().setStoredTimers(timers);
         } catch (Exception e) {
-            logger.log("Couldn't load timers: " + e, Logger.OTHER, Logger.WARN);
+            logger.warn("Couldn't load timers", e);
         }
         
         // load channel list
@@ -287,7 +311,7 @@ public class LazyBones extends Plugin implements Observer {
             List channelList = (List) xstream.fromXML(props.getProperty("channelList")); 
             ChannelManager.getInstance().setChannels(channelList);
         } catch (Exception e) {
-            logger.log("Couldn't load channel list: " + e, Logger.OTHER, Logger.WARN);
+            logger.warn("Couldn't load channel list", e);
         }
         
         // remove outdated timers
@@ -303,7 +327,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public void handleTvBrowserStartFinished() {
         // upload channel list from vdr
-        logger.log("Updating channel list", Logger.OTHER, Logger.DEBUG);
+        logger.debug("Updating channel list");
         ChannelManager.getInstance().update();
         
         // synchronize timers and recordings
@@ -315,6 +339,19 @@ public class LazyBones extends Plugin implements Observer {
         
         // observe the timer list
         TimerManager.getInstance().addObserver(this);
+        
+        // initialize logging
+        initLogging();
+    }
+    
+    private void initLogging() {
+        Handler eph = new ErrorPopupHandler();
+        eph.setLevel(Level.FINEST);
+        
+        java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
+        lazyLogger.setUseParentHandlers(false);
+        lazyLogger.addHandler(eph);
+        eph.setFormatter(new SimpleFormatter());
     }
 
     public Properties storeSettings() {
@@ -543,19 +580,22 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public boolean receivePrograms(Program[] programArr, ProgramReceiveTarget receiveTarget) {
-        logger.log("Program received for target \"" + receiveTarget.getTargetId()+"\"", Logger.OTHER, Logger.DEBUG);
+        logger.debug("Program received for target [{}]", receiveTarget.getTargetId());
         if(TARGET_CAPTURE.equals(receiveTarget.getTargetId())) {
             // store current property values
             String threshold = props.getProperty("percentageThreshold");
             String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
-            boolean logEpgErrors = Logger.logEPGErrors;
-            boolean logConnectionErrors = Logger.logConnectionErrors;
+            
+            // TODO incorporate in new log system
+            //boolean logEpgErrors = Logger.logEPGErrors;
+            //boolean logConnectionErrors = Logger.logConnectionErrors;
             
             // set properties to "automatic mode"
             props.setProperty("percentageThreshold", "0");
             props.setProperty("showTimerOptionsDialog", "false");
-            Logger.logEPGErrors = false;
-            Logger.logConnectionErrors = false;
+         // TODO incorporate in new log system
+//            Logger.logEPGErrors = false;
+//            Logger.logConnectionErrors = false;
             
             // create timers for all programs
             for (int i = 0; i < programArr.length; i++) {
@@ -566,8 +606,9 @@ public class LazyBones extends Plugin implements Observer {
             // restore old properties
             props.setProperty("percentageThreshold", threshold);
             props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
-            Logger.logEPGErrors = logEpgErrors;
-            Logger.logConnectionErrors = logConnectionErrors;
+         // TODO incorporate in new log system
+//            Logger.logEPGErrors = logEpgErrors;
+//            Logger.logConnectionErrors = logConnectionErrors;
         } else if(TARGET_WATCH.equals(receiveTarget.getTargetId())) {
             Player.play(programArr[0]);
         }

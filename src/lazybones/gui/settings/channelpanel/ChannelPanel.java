@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.4 2007-10-14 19:09:23 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.5 2008-04-25 11:27:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,9 +35,23 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.ChannelManager;
@@ -47,6 +61,8 @@ import lazybones.gui.settings.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+
+import util.ui.Localizer;
 
 public class ChannelPanel implements ActionListener {
     private DefaultTableModel tableModel;
@@ -154,7 +170,7 @@ public class ChannelPanel implements ActionListener {
         
         // channel interval spinner 
         JPanel channelInterval = new JPanel();
-        channelInterval.add(new JLabel(LazyBones.getTranslation("channels", "Channels")));
+        channelInterval.add(new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNELS)));
         channelInterval.add(minChannelNumber);
         channelInterval.add(new JLabel("-"));
         channelInterval.add(maxChannelNumber);

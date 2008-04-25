@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.8 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.9 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,6 +48,7 @@ import lazybones.TimerProgram;
 
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
+import util.ui.Localizer;
 import util.ui.ProgramList;
 import devplugin.Program;
 
@@ -126,8 +127,8 @@ public class TimerSelectionDialog implements ActionListener {
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        ok.setText(LazyBones.getTranslation("ok", "OK"));
-        cancel.setText(LazyBones.getTranslation("cancel", "Cancel"));
+        ok.setText(Localizer.getLocalization(Localizer.I18N_OK));
+        cancel.setText(Localizer.getLocalization(Localizer.I18N_CANCEL));
 
         ok.addActionListener(this);
         cancel.addActionListener(this);

@@ -1,4 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.3 2008-04-22 14:25:48 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.4 2008-04-25 11:27:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,7 +32,6 @@ package lazybones.actions;
 import java.util.List;
 
 import lazybones.LazyBones;
-import lazybones.Logger;
 import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.ConnectionProblem;
@@ -41,10 +40,12 @@ import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.util.RecordingsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListRecordingsAction extends VDRAction {
 
-    private Logger logger = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(ListRecordingsAction.class);
     
     private List<Recording> recordings;
     
@@ -88,17 +89,18 @@ public class ListRecordingsAction extends VDRAction {
                 */
             } else if (response != null && response.getCode() == 550) {
                 // no recordings, do nothing
-                logger.log("No recording on VDR",Logger.OTHER, Logger.INFO);
+                logger.info("No recording on VDR");
             } else { /* something went wrong */
-                logger.log(LazyBones.getTranslation("error_retrieve_recordings",
-                    "Couldn't retrieve recordings from VDR."), 
-                    Logger.CONNECTION, Logger.ERROR);
+                // TODO Logger.CONNECTION suppress, if selected
+                logger.error(LazyBones.getTranslation("error_retrieve_recordings",
+                    "Couldn't retrieve recordings from VDR."));
             }
             
             connection.close();
         } catch (Exception e1) {
             response = new ConnectionProblem();
-            logger.log(response.getMessage(), Logger.CONNECTION, Logger.ERROR);
+            // TODO Logger.CONNECTION suppress, if selected
+            logger.error(response.getMessage());
             return false;
         }   
         return true;

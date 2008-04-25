@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.16 2008-04-22 14:40:22 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.17 2008-04-25 11:27:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,8 @@ import lazybones.actions.responses.ConnectionProblem;
 import org.hampelratte.svdrp.Command;
 import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,7 +44,7 @@ import org.hampelratte.svdrp.Response;
  */
 public class VDRConnection {
     
-    private static Logger logger = Logger.getLogger();
+    private static transient Logger logger = LoggerFactory.getLogger(VDRConnection.class);
 
     private static Connection connection;
 
@@ -68,7 +70,8 @@ public class VDRConnection {
             connection.close();
         } catch (Exception e1) {
             res = new ConnectionProblem();
-            logger.log(res.getMessage(), Logger.CONNECTION, Logger.ERROR);
+            // TODO CONNECTION
+            logger.error(res.getMessage());
         }
         return res;
     }
@@ -85,7 +88,7 @@ public class VDRConnection {
      * public boolean isRunning() { return running; }
      * 
      * public void run() { running = true; for (int i = 0; i < timeout; i++) {
-     * pm.setProgress(i); pm.setNote( (timeout-i) + " Seconds �brig"); if
+     * pm.setProgress(i); pm.setNote( (timeout-i) + " Seconds übrig"); if
      * (pm.isCanceled()) { break; }
      * 
      * try { Connection connection = new Connection(VDRConnection.host,
