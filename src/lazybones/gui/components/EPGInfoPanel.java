@@ -1,4 +1,4 @@
-/* $Id: EPGInfoPanel.java,v 1.2 2007-05-22 16:40:54 hampelratte Exp $
+/* $Id: EPGInfoPanel.java,v 1.3 2008-05-06 17:32:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,19 +38,41 @@ import java.text.DateFormat;
 import java.util.Locale;
 
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import lazybones.RecordingManager;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
+import org.hampelratte.svdrp.responses.highlevel.Recording;
 
-public class EPGInfoPanel extends JPanel {
+public class EPGInfoPanel extends JPanel implements ListSelectionListener {
     
     private EPGEntry epg;
+    
+    private JLabel title = new JLabel();
+    private JLabel time = new JLabel();
+    private DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
+    private JLabel shortTextLabel = new JLabel();
+    private JTextArea desc = new JTextArea();
+    
+    public EPGInfoPanel() {
+        initGUI();
+    }
     
     public EPGInfoPanel(EPGEntry epg) {
         this.epg = epg;
         initGUI();
+        loadData();
+    }
+    
+    public void setEpg(EPGEntry epg) {
+        this.epg = epg;
+        loadData();
     }
     
     private void initGUI() {
@@ -61,34 +83,51 @@ public class EPGInfoPanel extends JPanel {
         
         gbc.gridx = 0;
         gbc.gridy = 0;
-        JLabel title = new JLabel(epg.getTitle());
         title.setFont(title.getFont().deriveFont(Font.BOLD));
         add(title, gbc);
         
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
-        JLabel time = new JLabel(df.format(epg.getStartTime().getTime()));
-        gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         add(time, gbc);
         
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        String shortText = (epg.getShortText() != null && epg.getShortText().length() > 0) ? epg.getShortText() : "";
-        JLabel shortTextLabel = new JLabel(shortText);
+        gbc.gridy = 2;
         add(shortTextLabel, gbc);
         
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        JTextArea desc = new JTextArea();
-        desc.setText(epg.getDescription());
         desc.setWrapStyleWord(true);
         desc.setLineWrap(true);
         desc.setEditable(false);
         desc.setBackground(Color.WHITE);
         add(new JScrollPane(desc), gbc);
+    }
+    
+    private void loadData() {
+        title.setText(epg.getTitle());
+        time.setText(df.format(epg.getStartTime().getTime()));
+        String shortText = (epg.getShortText() != null && epg.getShortText().length() > 0) ? epg.getShortText() : "";
+        shortTextLabel.setText(shortText);
+        desc.setText(epg.getDescription());
+    }
+
+    public void valueChanged(ListSelectionEvent e) {
+        JList list = (JList) e.getSource();
+        Recording rec = (Recording) list.getSelectedValue();
+        if(rec == null) {
+            title.setText(null);
+            time.setText(null);
+            shortTextLabel.setText(null);
+            desc.setText(null);
+        } else {
+            if(rec.getEpgInfo() == null) {
+                RecordingManager.getInstance().loadInfo(rec);
+            }
+            setEpg(rec.getEpgInfo());
+        }
     }
 }

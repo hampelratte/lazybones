@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.11 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.12 2008-05-06 17:32:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JList;
@@ -75,6 +77,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     private DefaultListModel model = new DefaultListModel();
     private JList recordingList = new JList(model);
     private int selectedRow = -1;
+    private EPGInfoPanel epgInfoPanel = new EPGInfoPanel();
     
 
     private JPopupMenu popup = new JPopupMenu();
@@ -96,7 +99,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 3;
         gbc.insets = new java.awt.Insets(10,10,10,10);
         gbc.gridx = 0;
         recordingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -105,12 +107,15 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         this.add(scrollPane, gbc);
         
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.1;
-        gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(0,10,10,10);
+        //gbc.fill = java.awt.GridBagConstraints.VERTICAL;
+        gbc.gridx = 1;
+        gbc.weightx = .1;
+        recordingList.addListSelectionListener(epgInfoPanel);
+        epgInfoPanel.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
+        epgInfoPanel.setPreferredSize(new Dimension(300,300));
+        epgInfoPanel.setMinimumSize(new Dimension(300,300));
+        epgInfoPanel.setMaximumSize(new Dimension(300,300));
+        this.add(epgInfoPanel, gbc);
 
         createContextMenu();
     }
