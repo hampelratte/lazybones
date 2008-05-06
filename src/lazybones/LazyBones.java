@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.84 2008-04-25 16:11:04 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.85 2008-05-06 16:42:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -341,6 +341,13 @@ public class LazyBones extends Plugin implements Observer {
     }
     
     private void initLogging() {
+//        java.util.logging.Logger logger = java.util.logging.Logger.getLogger("");
+//        logger.setLevel(Level.ALL);
+//        Handler[] handlers = logger.getHandlers();
+//        for (int i = 0; i < handlers.length; i++) {
+//            handlers[i].setLevel(Level.ALL);
+//        }
+        
         Handler eph = new ErrorPopupHandler();
         eph.setLevel(Level.FINEST);
         

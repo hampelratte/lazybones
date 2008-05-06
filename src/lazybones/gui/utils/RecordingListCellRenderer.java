@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.4 2007-05-27 19:04:48 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.5 2008-05-06 16:42:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.util.Locale;
 
@@ -52,6 +53,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
     
     private JLabel date = new JLabel();
     private JLabel newRec = new JLabel();
+    private JLabel cutRec = new JLabel();
     private JLabel time = new JLabel();
     private JLabel title = new JLabel();
     
@@ -67,6 +69,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         time.setForeground(Color.BLACK);
         title.setForeground(Color.BLACK);
         newRec.setForeground(Color.BLACK);
+        cutRec.setForeground(Color.BLACK);
         date.setForeground(Color.BLACK);
         
         Font bold = time.getFont().deriveFont(Font.BOLD);
@@ -85,12 +88,16 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         gbc.gridx = 1;
         gbc.gridy = 0;
         add(newRec, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        add(cutRec, gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(time, gbc);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
         add(title, gbc);
     }
 
@@ -110,7 +117,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             time.setText(tf.format(recording.getStartTime().getTime()));
             title.setText(recording.getEpgInfo() != null ? 
                     recording.getEpgInfo().getTitle() :
-                    recording.getTitle());
+                    recording.getDisplayTitle());
             
             if(recording.isNew()) {
                 newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
@@ -118,9 +125,26 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
                 newRec.setIcon(null);
             }
             
+            if(recording.isCut()) {
+                cutRec.setIcon(LazyBones.getInstance().getIcon("lazybones/edit-cut.png"));
+            } else {
+                cutRec.setIcon(null);
+            }
+            
             return this;
         } else {
             return new JLabel(value.toString());
+        }
+    }
+    
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if(newRec.getBounds().contains(event.getPoint())) {
+            return LazyBones.getTranslation("new_recording", "New recording");
+        } else if(cutRec.getBounds().contains(event.getPoint())) {
+            return LazyBones.getTranslation("cut_recording", "Cut recording");
+        } else {
+            return super.getToolTipText(event);
         }
     }
 }
