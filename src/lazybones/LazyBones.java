@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.85 2008-05-06 16:42:21 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.86 2008-05-18 19:18:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,6 +53,7 @@ import javax.swing.JPopupMenu;
 
 import lazybones.gui.MainDialog;
 import lazybones.gui.settings.VDRSettingsPanel;
+import lazybones.logging.DebugConsoleHandler;
 import lazybones.logging.ErrorPopupHandler;
 import lazybones.logging.SimpleFormatter;
 
@@ -350,10 +351,13 @@ public class LazyBones extends Plugin implements Observer {
         
         Handler eph = new ErrorPopupHandler();
         eph.setLevel(Level.FINEST);
+        Handler dch = new DebugConsoleHandler();
+        dch.setLevel(Level.FINEST);
         
         java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
-        lazyLogger.setUseParentHandlers(false);
+        lazyLogger.setUseParentHandlers(true);
         lazyLogger.addHandler(eph);
+        lazyLogger.addHandler(dch);
         eph.setFormatter(new SimpleFormatter());
     }
 
@@ -361,7 +365,7 @@ public class LazyBones extends Plugin implements Observer {
         storeData();        
         return props;
     }
-
+    
     private void storeData() {
         XStream xstream = new XStream();
         props.setProperty( "channelMapping", xstream.toXML(ChannelManager.getChannelMapping()) );
