@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.11 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.12 2008-05-18 19:19:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -48,17 +50,21 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
+import lazybones.gui.components.timeroptions.TimerOptionsPanel;
+import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.utils.TimerListCellRenderer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimerManagerPanel extends JPanel implements ActionListener, Observer {
+public class TimerManagerPanel extends JPanel implements ActionListener, Observer, ListSelectionListener {
 
     private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
     
@@ -68,6 +74,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
     private JButton buttonNew = null;
     private JButton buttonEdit = null;
     private JButton buttonRemove = null;
+    private TimerOptionsPanel top = new TimerOptionsPanel(Mode.VIEW);
     
     public TimerManagerPanel() {
         initGUI();
@@ -86,19 +93,27 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 2;
         gbc.insets = new java.awt.Insets(10,10,10,10);
         gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         timerList.setCellRenderer(new TimerListCellRenderer());
+        timerList.addListSelectionListener(this);
         scrollPane = new JScrollPane(timerList);
         this.add(scrollPane, gbc);
+        
+        gbc.gridwidth = 1;
+        gbc.gridx = 2;
+        top.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
+        top.setPreferredSize(new Dimension(300,300));
+        top.setMinimumSize(new Dimension(300,300));
+        top.setMaximumSize(new Dimension(300,300));
+        this.add(top, gbc);
         
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(0,10,10,10);
         gbc.gridx = 0;
         buttonNew = new JButton();
@@ -185,5 +200,10 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         public int compare(Timer t1, Timer t2) {
             return t1.getStartTime().compareTo(t2.getStartTime());
         }
+    }
+
+    public void valueChanged(ListSelectionEvent e) {
+        Timer timer = (Timer) timerList.getSelectedValue();
+        top.setTimer(timer);
     }
 }
