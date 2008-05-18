@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.22 2008-04-25 15:12:14 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.1 2008-05-18 19:20:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.components.timeroptions;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -41,10 +41,8 @@ import java.awt.event.ItemListener;
 import java.util.Calendar;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -58,9 +56,9 @@ import lazybones.LazyBones;
 import lazybones.ProgramManager;
 import lazybones.Time;
 import lazybones.Timer;
-import lazybones.TimerManager;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
+import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.utils.SpinnerTimeModel;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -74,14 +72,8 @@ import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
 
-/**
- * Shown, if a timer should be edited.
- * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
- */
-public class TimerOptionsDialog implements ActionListener, ItemListener {
-    
-    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsDialog.class);
+public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener {
+    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
     
     private JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
@@ -101,8 +93,7 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
 
     private JSpinner spinnerEndtime = new JSpinner();
 
-    private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority",
-            "Priority"));
+    private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority", "Priority"));
 
     private JSpinner priority = new JSpinner();
 
@@ -119,17 +110,17 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
     private JComboBox comboDesc = new JComboBox();
 
     private JTextArea description = new JTextArea();
-
-    private JButton ok = new JButton();
-
-    private JButton cancel = new JButton();
-
-    private LazyBones control;
-
-    private JDialog dialog;
-
-    private JPanel panel = new JPanel();
-
+    
+    private JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
+    
+    private JCheckBox cbActive = new JCheckBox();
+    
+    private JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
+    
+    private JLabel lVpsTimeHint = new JLabel(LazyBones.getTranslation("vpsTimeHint", "Starttime has been changed for VPS"));
+    
+    private JCheckBox cbVps = new JCheckBox();
+    
     /**
      * The actual timer
      */
@@ -142,34 +133,24 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
     
     private Program prog;
     
-    private JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
+    private Mode mode;
     
-    private JCheckBox cbActive = new JCheckBox();
+    public TimerOptionsPanel(Timer timer, Program prog, Mode mode) {
+        this.mode = mode;
+        
+        initGUI();
+        
+        setTimer(timer);
+        setProgram(prog);
+    }
     
-    private JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
-    
-    private JLabel lVpsTimeHint = new JLabel(LazyBones.getTranslation("vpsTimeHint", "Starttime has been changed for VPS"));
-    
-    private JCheckBox cbVps = new JCheckBox();
-
-    private boolean update = false;
-    
-    public TimerOptionsDialog(Timer timer, Program prog, boolean update) {
-        this.update = update;
-        this.control = LazyBones.getInstance();
-        this.timer = timer;
-        this.prog = prog;
-        dayChooser = new DayChooser(timer);
-        day = new BrowseTextField(dayChooser);
-        oldTimer = (Timer) timer.clone();
+    public TimerOptionsPanel(Mode mode) {
+        this.mode = mode;
         initGUI();
     }
 
     private void initGUI() {
-        dialog = new JDialog(control.getParent(), true);
-        dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
-        panel.setLayout(new GridBagLayout());
-        dialog.getContentPane().add(panel);
+        setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.gridwidth = 1;
@@ -182,71 +163,57 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(lActive, gbc);
+        add(lActive, gbc);
         
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(lVps, gbc);
+        add(lVps, gbc);
         
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(lTitle, gbc);
+        add(lTitle, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        panel.add(lChannels, gbc);
+        add(lChannels, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        panel.add(lDay, gbc);
+        add(lDay, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 5;
-        panel.add(lVpsTimeHint, gbc);
+        add(lVpsTimeHint, gbc);
         lVpsTimeHint.setForeground(Color.RED);
         lVpsTimeHint.setVisible(false);
         
         gbc.gridx = 0;
         gbc.gridy = 6;
-        panel.add(lStarttime, gbc);
+        add(lStarttime, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 7;
-        panel.add(lEndtime, gbc);
+        add(lEndtime, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 8;
-        panel.add(lPriority, gbc);
+        add(lPriority, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 9;
-        panel.add(lLifetime, gbc);
+        add(lLifetime, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
-        panel.add(channels, gbc);
+        add(channels, gbc);
         devplugin.Channel[] c = ChannelList.getSubscribedChannels();
         for (int i = 0; i < c.length; i++) {
             channels.addItem(c[i]);
         }
         
-        // we have to remove the buffers again, to get the right start date
-        // example: start time is 00.00 h with time buffers we have 23.45
-        // Calendar then decreases the start date, so that we don't have the right date, but
-        // the date of the day before.
-        Timer tmp = timer.getTimerWithoutBuffers();
-        Program prog = ProgramManager.getInstance().getProgram(tmp);
-        if(prog != null) {
-            channels.setSelectedItem(prog.getChannel());
-        } else {
-            Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-            channels.addItem(chan);
-            channels.setSelectedItem(chan);
-        }
-
         gbc.gridx = 0;
         gbc.gridy = 10;
-        panel.add(lDescription, gbc);
+        add(lDescription, gbc);
         
         gbc.gridx = 0;
         gbc.gridy = 11;
@@ -255,127 +222,126 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
         description.setRows(10);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
-        if ("".equals(timer.getDescription())
-                && prog != null && !"".equals(prog.getDescription())) {
-            description.setText(prog.getDescription());
-            description.append("\n\n" + prog.getChannel().getCopyrightNotice());
-        } else {
-            description.setText(timer.getDescription());
-        }
-        panel.add(new JScrollPane(description), gbc);
+        add(new JScrollPane(description), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 12;
-        gbc.gridwidth = 1;
         gbc.weighty = 0.1;
-        panel.add(cancel, gbc);
-
         gbc.weightx = 1.0;
-
         gbc.gridx = 1;
         gbc.gridy = 0;
-        panel.add(cbActive, gbc);
-        cbActive.setSelected(timer.isActive());
+        add(cbActive, gbc);
         
         gbc.gridx = 1;
         gbc.gridy = 1;
-        panel.add(cbVps, gbc);
-        cbVps.setSelected(timer.hasState(VDRTimer.VPS));
+        add(cbVps, gbc);
         cbVps.addActionListener(this);
         
         gbc.gridx = 1;
         gbc.gridy = 2;
-        panel.add(title, gbc);
-        title.setText(timer.getFile());
+        add(title, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 4;
-        panel.add(day, gbc);
-        day.setText(timer.getDayString());
+        dayChooser = new DayChooser();
+        day = new BrowseTextField(dayChooser);
         day.setEditable(false);
+        add(day, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 6;
-        panel.add(spinnerStarttime, gbc);
+        add(spinnerStarttime, gbc);
         SpinnerTimeModel model = new SpinnerTimeModel();
-        int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);
-        int minute = timer.getStartTime().get(Calendar.MINUTE);
-        model.setValue(new Time(hour, minute));
         spinnerStarttime.setModel(model);
 
         gbc.gridx = 1;
         gbc.gridy = 7;
-        panel.add(spinnerEndtime, gbc);
+        add(spinnerEndtime, gbc);
         model = new SpinnerTimeModel();
-        hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
-        minute = timer.getEndTime().get(Calendar.MINUTE);
-        model.setValue(new Time(hour, minute));
         spinnerEndtime.setModel(model);
 
         gbc.gridx = 1;
         gbc.gridy = 8;
-        panel.add(priority, gbc);
-        priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
+        add(priority, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 9;
-        panel.add(lifetime, gbc);
-        lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
+        add(lifetime, gbc);
         
         gbc.gridx = 1;
         gbc.gridy = 10;
-        panel.add(comboDesc, gbc);
+        add(comboDesc, gbc);
         comboDesc.addItem("VDR");
         comboDesc.addItem("TV-Browser");
         comboDesc.addItemListener(this);
         //comboDesc.setEnabled(!update);
-
-        gbc.gridx = 1;
-        gbc.gridy = 12;
-        panel.add(ok, gbc);
-
-        ok.setText(Localizer.getLocalization(Localizer.I18N_OK));
-        cancel.setText(Localizer.getLocalization(Localizer.I18N_CANCEL));
-
-        ok.addActionListener(this);
-        cancel.addActionListener(this);
-
-        dialog.setSize(400, 500);
-        dialog.setLocation(50, 50);
-        dialog.setVisible(true);
-        dialog.pack();
+        
+        if(mode == Mode.VIEW) { // set components to readonly
+            cbActive.setEnabled(false);
+            cbVps.setEnabled(false);
+            title.setEnabled(false);
+            channels.setEnabled(false);
+            day.setEnabled(false);
+            spinnerStarttime.setEnabled(false);
+            spinnerEndtime.setEnabled(false);
+            lifetime.setEnabled(false);
+            priority.setEnabled(false);
+            comboDesc.setEnabled(false);
+            description.setEnabled(false);
+        }
     }
 
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == ok) {
-            timer.setFile(title.getText());
-            Channel vdrc = null;
-            Object selected = channels.getSelectedItem();
-            if(selected instanceof devplugin.Channel) {
-                devplugin.Channel c = (devplugin.Channel) selected;
-                vdrc = (Channel) ChannelManager.getChannelMapping().get(c.getId());
-            } else if( selected instanceof Channel) {
-                vdrc = (Channel) selected;
+    public void setTimer(Timer timer) {
+        if(timer != null) {
+            this.timer = timer;
+            this.oldTimer = (Timer) timer.clone();
+            
+            // we have to remove the buffers again, to get the right start date
+            // example: start time is 00.00 h with time buffers we have 23.45
+            // Calendar then decreases the start date, so that we don't have the right date, but
+            // the date of the day before.
+            Timer tmp = timer.getTimerWithoutBuffers();
+            Program prog = ProgramManager.getInstance().getProgram(tmp);
+            if(prog != null) {
+                channels.setSelectedItem(prog.getChannel());
+            } else {
+                Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+                channels.addItem(chan);
+                channels.setSelectedItem(chan);
             }
-            timer.setChannelNumber(vdrc.getChannelNumber());
-            Calendar start = timer.getStartTime();
-            start.set(Calendar.HOUR_OF_DAY, ((Time) spinnerStarttime.getValue()).getHour());
-            start.set(Calendar.MINUTE, ((Time) spinnerStarttime.getValue()).getMinute());
-            timer.setStartTime(start);
-            Calendar end = timer.getEndTime();
-            end.set(Calendar.HOUR_OF_DAY, ((Time) spinnerEndtime.getValue()).getHour());
-            end.set(Calendar.MINUTE, ((Time) spinnerEndtime.getValue()).getMinute());
-            timer.setEndTime(end);
-            timer.setPriority(((Integer) priority.getValue()).intValue());
-            timer.setLifetime(((Integer) lifetime.getValue()).intValue());
-            timer.setDescription(description.getText());
-            timer.changeStateTo(VDRTimer.ACTIVE, cbActive.isSelected());
-            timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
-            dialog.dispose();
-            TimerManager.getInstance().callbackCreateTimer(timer, oldTimer, prog, update, false);
-        } else if (e.getSource() == cancel) {
-            dialog.dispose();
-        } else if (e.getSource() == cbVps) {
+            
+            if ("".equals(timer.getDescription())
+                    && prog != null && !"".equals(prog.getDescription())) {
+                description.setText(prog.getDescription());
+                description.append("\n\n" + prog.getChannel().getCopyrightNotice());
+            } else {
+                description.setText(timer.getDescription());
+            }
+            
+            cbActive.setSelected(timer.isActive());
+            cbVps.setSelected(timer.hasState(VDRTimer.VPS));
+            title.setText(timer.getFile());
+            day.setText(timer.getDayString());
+            
+            int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);
+            int minute = timer.getStartTime().get(Calendar.MINUTE);
+            spinnerStarttime.getModel().setValue(new Time(hour, minute));
+            
+            hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
+            minute = timer.getEndTime().get(Calendar.MINUTE);
+            spinnerEndtime.getModel().setValue(new Time(hour, minute));
+            
+            priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
+            lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
+            
+            dayChooser.setTimer(timer);
+        }
+    }
+    
+    public void setProgram(Program prog) {
+        this.prog = prog;
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == cbVps) {
             /* to set the right vps time we use start time of the tvb program
              * the start time of the vdr epg should be rather used, but it's to complicated
              * for this simple case 
@@ -401,7 +367,34 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
             }
         }
     }
-
+    
+    public Timer getTimer() {
+        timer.setFile(title.getText());
+        Channel vdrc = null;
+        Object selected = channels.getSelectedItem();
+        if(selected instanceof devplugin.Channel) {
+            devplugin.Channel c = (devplugin.Channel) selected;
+            vdrc = (Channel) ChannelManager.getChannelMapping().get(c.getId());
+        } else if( selected instanceof Channel) {
+            vdrc = (Channel) selected;
+        }
+        timer.setChannelNumber(vdrc.getChannelNumber());
+        Calendar start = timer.getStartTime();
+        start.set(Calendar.HOUR_OF_DAY, ((Time) spinnerStarttime.getValue()).getHour());
+        start.set(Calendar.MINUTE, ((Time) spinnerStarttime.getValue()).getMinute());
+        timer.setStartTime(start);
+        Calendar end = timer.getEndTime();
+        end.set(Calendar.HOUR_OF_DAY, ((Time) spinnerEndtime.getValue()).getHour());
+        end.set(Calendar.MINUTE, ((Time) spinnerEndtime.getValue()).getMinute());
+        timer.setEndTime(end);
+        timer.setPriority(((Integer) priority.getValue()).intValue());
+        timer.setLifetime(((Integer) lifetime.getValue()).intValue());
+        timer.setDescription(description.getText());
+        timer.changeStateTo(VDRTimer.ACTIVE, cbActive.isSelected());
+        timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
+        return timer;
+    }
+    
     public void itemStateChanged(ItemEvent e) {
         if(e.getStateChange() == ItemEvent.SELECTED) {
             String item = (String)e.getItem();
@@ -412,11 +405,11 @@ public class TimerOptionsDialog implements ActionListener, ItemListener {
                 tmpCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
                 tmpCal.set(Calendar.MINUTE, prog.getMinutes());
                 tmpCal.add(Calendar.MINUTE, prog.getLength()/2); // take the middle of the playtime to be sure, that the right program is chosen
-                dialog.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                getParent().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 VDRTimer tmp = ProgramManager.getInstance().getVDRProgramAt(tmpCal, prog.getChannel());
                 String desc = tmp == null ? "" : tmp.getDescription();
                 description.setText(desc);
-                dialog.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             } else {
                 Date date = new Date(timer.getStartTime());
                 Program prog = Plugin.getPluginManager().getProgram(date,
