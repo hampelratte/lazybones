@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.2 2007-05-05 20:32:46 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.3 2008-05-18 19:21:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -75,10 +75,17 @@ public class DayChooser extends BrowsePanel implements ActionListener,
 
     private DatePanel cal = CalendarFactory.createDatePanel();
 
-    public DayChooser(VDRTimer timer) {
-        this.timer = timer;
-
+    public DayChooser() {
         initGUI();
+    }
+    
+    public DayChooser(VDRTimer timer) {
+        setTimer(timer);
+        initGUI();
+    }
+    
+    public void setTimer(VDRTimer timer) {
+        this.timer = timer;
     }
 
     private void initGUI() {
