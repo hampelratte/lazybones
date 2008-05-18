@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.6 2008-05-18 19:20:37 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.7 2008-05-18 19:31:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui.settings;
 import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -68,6 +69,7 @@ public class GeneralPanel extends JPanel {
     private JLabel lHost;
     private JTextField host;
     private JSpinner port;
+    private JPanel mainPanel;
     private JButton bShowLog;
     private JCheckBox showTimerOptions;
     private JLabel lShowTimerOptions;
@@ -93,12 +95,24 @@ public class GeneralPanel extends JPanel {
     private void initGUI() {
         try {
             {
-                GridBagLayout thisLayout = new GridBagLayout();
+                FlowLayout thisLayout = new FlowLayout();
+                thisLayout.setAlignment(FlowLayout.LEFT);
                 this.setLayout(thisLayout);
                 this.setPreferredSize(new java.awt.Dimension(517, 343));
                 {
+                    mainPanel = new JPanel();
+                    GridBagLayout mainPanelLayout = new GridBagLayout();
+                    mainPanelLayout.columnWidths = new int[] {7, 7};
+                    mainPanelLayout.rowHeights = new int[] {7, 7, 7, 7};
+                    mainPanelLayout.columnWeights = new double[] {0.1, 0.1};
+                    mainPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1};
+                    this.add(mainPanel);
+                    mainPanel.setLayout(mainPanelLayout);
+                }
+                {
                     lHost = new JLabel();
                     lHost.setText(LazyBones.getTranslation("host", "Host"));
+                    mainPanel.add(lHost, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
                 }
                 {
                     expertsPanel = new JPanel();
@@ -180,27 +194,27 @@ public class GeneralPanel extends JPanel {
                 {
                     ComboBoxModel charsetModel = new DefaultComboBoxModel(new Object[] {"ISO-8859-1", "ISO-8859-15", "UTF-8"});
                     charset = new JComboBox();
-                    this.add(charset, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(charset, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
                     charset.setModel(charsetModel);
                     String c = LazyBones.getProperties().getProperty("charset");
                     charset.setSelectedItem(c);
                 }
                 {
                     lCharset = new JLabel();
-                    this.add(lCharset, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lCharset, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
                     lCharset.setText(LazyBones.getTranslation("charset", "Charset"));
                 }
                 {
                     int value = Integer.parseInt(LazyBones.getProperties().getProperty("timeout"));
                     SpinnerNumberModel timeoutModel = new SpinnerNumberModel(value, 1, 30000, 1);
                     timeout = new JSpinner();
-                    this.add(timeout, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(timeout, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
                     timeout.setModel(timeoutModel);
                     timeout.setEditor(new JSpinner.NumberEditor(timeout, "#"));
                 }
                 {
                     lTimeout = new JLabel();
-                    this.add(lTimeout, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lTimeout, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
                     lTimeout.setText("Timeout");
                 }
                 {
@@ -211,23 +225,18 @@ public class GeneralPanel extends JPanel {
                     int value = Integer.parseInt(LazyBones.getProperties().getProperty("port"));
                     SpinnerNumberModel portModel = new SpinnerNumberModel(value, 1, 65535, 1);
                     port = new JSpinner();
-                    this.add(port, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(port, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
                     port.setModel(portModel);
                     port.setEditor(new JSpinner.NumberEditor(port, "#"));
                 }
                 {
                     lPort = new JLabel();
-                    this.add(lPort, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                    this.add(host, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-                    this.add(lHost, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                    this.add(expertsPanel, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lPort, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(host, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(expertsPanel, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
                     expertsPanel.setSize(10, 10);
                     lPort.setText(LazyBones.getTranslation("port", "Port"));
                 }
-                thisLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1};
-                thisLayout.rowHeights = new int[] {7, 7, 7, 7, 7};
-                thisLayout.columnWeights = new double[] {0.1, 0.1};
-                thisLayout.columnWidths = new int[] {7, 7};
             }
         } catch(Exception e) {
             e.printStackTrace();
