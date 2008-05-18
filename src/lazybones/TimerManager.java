@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.29 2008-04-25 15:11:59 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.30 2008-05-18 19:21:30 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,8 +46,8 @@ import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.VDRAction;
 import lazybones.actions.responses.ConnectionProblem;
-import lazybones.gui.TimerOptionsDialog;
 import lazybones.gui.TimerSelectionDialog;
+import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.utils.TitleMapping;
 import lazybones.logging.LoggingConstants;
 import lazybones.utils.Utilities;
@@ -576,7 +576,7 @@ public class TimerManager extends Observable {
                     LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
             
             if(showOptionsDialog) {
-                new TimerOptionsDialog(timer, prog, false);
+                new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.NEW);
             } else {
                 callbackCreateTimer(timer, null, prog, false, automatic);
             }
@@ -642,7 +642,7 @@ public class TimerManager extends Observable {
             if(automatic) {
                 callbackCreateTimer(newTimer, null, prog, false, automatic);
             } else {
-                new TimerOptionsDialog(newTimer, prog, false);
+                new TimerOptionsDialog(newTimer, prog, TimerOptionsDialog.Mode.NEW);
             }
         }
     }
@@ -840,7 +840,7 @@ public class TimerManager extends Observable {
         if(timer.getTvBrowserProgIDs().size() > 0) {
             prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), timer.getTvBrowserProgIDs().get(0));
         }
-        new TimerOptionsDialog(timer, prog, true);
+        new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
     }
     
     public boolean lookUpTimer(Timer timer, Program candidate) {
