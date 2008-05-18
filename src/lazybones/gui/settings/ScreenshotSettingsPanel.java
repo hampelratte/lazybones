@@ -1,4 +1,4 @@
-/* $Id: ScreenshotSettingsPanel.java,v 1.1 2007-04-09 19:20:20 hampelratte Exp $
+/* $Id: ScreenshotSettingsPanel.java,v 1.2 2008-05-18 19:20:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,8 +29,6 @@
  */
 package lazybones.gui.settings;
 
-import info.clearthought.layout.TableLayout;
-
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,10 +36,30 @@ import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import lazybones.LazyBones;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 public class ScreenshotSettingsPanel implements ItemListener {
     private String lMethod = LazyBones.getTranslation("method", "Method");
     
@@ -93,23 +111,23 @@ public class ScreenshotSettingsPanel implements ItemListener {
         note = new JScrollPane(description,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        
-        final double P = TableLayout.PREFERRED;
-        double[][] size = {{0, P, TableLayout.FILL, 0}, //cols
-                           {0, P, P, P}}; // rows
-        TableLayout layout = new TableLayout(size);
-        layout.setHGap(10);
-        layout.setVGap(10);
-        httpPanel.setLayout(layout);
-                
-        httpPanel.add(lURL,         "1,1,1,1");
-        httpPanel.add(url,          "2,1,2,1");
-        httpPanel.add(lPicturePath, "1,2,1,2");
-        httpPanel.add(picturePath,  "2,2,2,2");
-        httpPanel.add(note,         "1,3,2,3");
-        
+
+        GridBagLayout httpPanelLayout = new GridBagLayout();
+        httpPanel.setLayout(httpPanelLayout);
+        httpPanel.add(lURL, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        httpPanel.add(url, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+        httpPanel.add(lPicturePath, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        httpPanel.add(picturePath, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+        httpPanel.add(note, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+
+        httpPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1};
+        httpPanelLayout.rowHeights = new int[] {7, 7, 7};
+        httpPanelLayout.columnWeights = new double[] {0.1, 0.1};
+        httpPanelLayout.columnWidths = new int[] {7, 7};
         cardsContainer.add(httpPanel, "HTTP");
-        cardsContainer.add(new JPanel(), "SVDRP");
+        {
+            cardsContainer.add(new JPanel(), "SVDRP");
+        }
         
         method.addItem("HTTP");
         method.addItem("SVDRP");
@@ -126,6 +144,7 @@ public class ScreenshotSettingsPanel implements ItemListener {
 
     public JPanel getPanel() {
 		JPanel panel = new JPanel(new GridBagLayout());
+        panel.setPreferredSize(new java.awt.Dimension(473, 264));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -144,7 +163,7 @@ public class ScreenshotSettingsPanel implements ItemListener {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        panel.add(cardsContainer, gbc);
+        panel.add(cardsContainer, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
         return panel;
     }
 
