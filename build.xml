@@ -16,7 +16,6 @@
 	<property name="doc.dir" value="${res.dir}/docs"/>
 	<property name="jar.file" value="${tvbrowser.runtime.dir}/plugins/LazyBones.jar"/>
 	<property name="nacho" value="nachocalendar-0.22.jar" />
-	<property name="tableLayout" value="TableLayout.jar" />
 	<property name="xstream" value="xstream-1.2.1.jar" />
 	<property name="xpp3" value="xpp3_min-1.1.3.4.O.jar" />
 	<property name="lsf4japi" value="slf4j-api-1.5.0.jar" />
@@ -34,7 +33,6 @@
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${classes.dir}" />
 				<pathelement location="${lib.dir}/${nacho}" />
-				<pathelement location="${lib.dir}/${tableLayout}" />
 				<pathelement location="${lib.dir}/${xstream}" />
 				<pathelement location="${lib.dir}/${xpp3}" />
 			</classpath>
@@ -44,7 +42,6 @@
 	<target name="jar" depends="compile">
 		<mkdir dir="${classes.dir}/lazybones" />
 		<unjar src="${lib.dir}/${nacho}" dest="${classes.dir}"/>
-		<unjar src="${lib.dir}/${tableLayout}" dest="${classes.dir}"/>
 		<unjar src="${lib.dir}/${xstream}" dest="${classes.dir}"/>
 		<unjar src="${lib.dir}/${xpp3}" dest="${classes.dir}"/>
 		<unjar src="${lib.dir}/${lsf4japi}" dest="${classes.dir}"/>
