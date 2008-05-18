@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.9 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.10 2008-05-18 19:19:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -63,7 +63,7 @@ public class MainDialog extends JDialog {
     }
 
     private void initGUI() {
-        this.setSize(800, 450);
+        this.setSize(800, 650);
         JPanel remoteControl = new JPanel();
         remoteControl.setLayout(new GridBagLayout());
         remoteControl.add(new RemoteControl(), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
