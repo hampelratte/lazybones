@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.88 2008-05-19 17:24:04 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.89 2008-05-19 20:17:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -97,6 +97,8 @@ public class LazyBones extends Plugin implements Observer {
     private ContextMenuFactory cmf = new ContextMenuFactory();
     
     private static LazyBones instance;
+    
+    public static final String TIMER_MENU_KEY = "TIMER_MENU_KEY";
     
     public static LazyBones getInstance() {
         return instance;
@@ -459,6 +461,10 @@ public class LazyBones extends Plugin implements Observer {
         return mLocalizer.msg(key,altText, arg1, arg2);
     }
     
+    public static String getTranslation(String key, String altText, String arg1, String arg2, String arg3) {
+        return mLocalizer.msg(key,altText, arg1, arg2, arg3);
+    }
+    
     public JPopupMenu getSimpleContextMenu(Timer timer) {
         return cmf.createSimpleActionMenu(timer);
     }
@@ -500,11 +506,13 @@ public class LazyBones extends Plugin implements Observer {
                 }
             }
 
-            int size = 4;
+            boolean notAssignedTimersExist = TimerManager.getInstance().getNotAssignedTimers().size() > 0;
             
-//            if(marked) {
-//                size++;
-//            } 
+            int size = 3;
+            
+            if(marked || notAssignedTimersExist) {
+                size++;
+            }
             
             ActionMenu[] actions = null;
             if (marked) {
@@ -558,23 +566,28 @@ public class LazyBones extends Plugin implements Observer {
                 action2.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
                 actions[2] = new ActionMenu(action2);
                 
-                AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
-                action3.putValue(Action.NAME, LazyBones.getTranslation("assign", "Assign"));
-                action3.putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
-
-                Action[] timers = new Action[TimerManager.getInstance().getNotAssignedTimers().size()];
-                ActionMenu menu = new ActionMenu(action3, timers);
-                List<Timer> timerList = TimerManager.getInstance().getNotAssignedTimers();
-                for (int i = 0; i < timers.length; i++) {
-                    timers[i] = new AbstractAction() {
-                        public void actionPerformed(ActionEvent e) {
-                            logger.error("Juhu");
-                        }
-                    };
-                    timers[i].putValue(Action.NAME, timerList.get(i).getTitle());
-                    timers[i].putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
+                if(notAssignedTimersExist) {
+                    AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
+                    action3.putValue(Action.NAME, LazyBones.getTranslation("assign", "Assign"));
+                    action3.putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
+                    action3.putValue(Plugin.DISABLED_ON_TASK_MENU, true);
+    
+                    Action[] timers = new Action[TimerManager.getInstance().getNotAssignedTimers().size()];
+                    List<Timer> timerList = TimerManager.getInstance().getNotAssignedTimers();
+                    for (int i = 0; i < timers.length; i++) {
+                        final Timer timer = timerList.get(i); 
+                        timers[i] = new AbstractAction() {
+                            public void actionPerformed(ActionEvent e) {
+                                ProgramManager.getInstance().assignTimerToProgram(program, timer);
+                                TimerManager.getInstance().timerCreatedOK(program, timer);
+                            }
+                        };
+                        timers[i].putValue(Action.NAME, timerList.get(i).getDisplayTitle());
+                        timers[i].putValue(LazyBones.TIMER_MENU_KEY, timerList.get(i));
+                        timers[i].putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
+                    }
+                    actions[3] = new ActionMenu(action3, timers);
                 }
-                actions[3] = menu;
             }
 
             AbstractAction action0 = new AbstractAction() {
