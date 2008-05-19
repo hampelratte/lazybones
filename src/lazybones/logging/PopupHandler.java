@@ -1,4 +1,4 @@
-/* $Id: ErrorPopupHandler.java,v 1.6 2008-05-19 11:53:09 hampelratte Exp $
+/* $Id: PopupHandler.java,v 1.1 2008-05-19 17:21:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,11 +36,13 @@ import java.util.logging.LogRecord;
 
 import lazybones.gui.LogMessageDialog;
 
-public class ErrorPopupHandler extends Handler {
+public class PopupHandler extends Handler {
 
+    public static final String KEYWORD = "PopupLogger";
+    
     private Filter filter;
     
-    public ErrorPopupHandler() {
+    public PopupHandler() {
         FilterChain chain = new FilterChain();
         chain.addFilter(new ConnectionFilter());
         chain.addFilter(new EpgFilter());
@@ -54,7 +56,7 @@ public class ErrorPopupHandler extends Handler {
             loggable = filter.isLoggable(record);
         }
         
-        if(loggable && record.getLevel().intValue() >= Level.SEVERE.intValue()) {
+        if(loggable && record.getLevel().intValue() >= Level.SEVERE.intValue() || KEYWORD.equals(record.getLoggerName())) {
             LogMessageDialog.getInstance().addMessage(record);
             if(!LogMessageDialog.getInstance().isVisible()) {
                 LogMessageDialog.getInstance().setVisible(true);
