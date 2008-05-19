@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.3 2007-05-05 20:32:45 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.4 2008-05-19 13:20:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -104,8 +104,16 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         if(isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
+            time.setForeground(UIManager.getColor("List.selectionForeground"));
+            title.setForeground(UIManager.getColor("List.selectionForeground"));
+            channel.setForeground(UIManager.getColor("List.selectionForeground"));
+            date.setForeground(UIManager.getColor("List.selectionForeground"));
         } else {
             setBackground(index % 2 == 0 ? background : altBackground);
+            time.setForeground(UIManager.getColor("List.foreground"));
+            title.setForeground(UIManager.getColor("List.foreground"));
+            channel.setForeground(UIManager.getColor("List.foreground"));
+            date.setForeground(UIManager.getColor("List.foreground"));
         }
         
         if(value instanceof Timer) {

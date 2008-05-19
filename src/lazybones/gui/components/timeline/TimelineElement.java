@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.10 2007-10-14 19:09:22 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.11 2008-05-19 13:20:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -57,6 +57,7 @@ public class TimelineElement extends JComponent implements MouseListener {
     private Calendar currentDate;
     
     public final static Color COLOR = UIManager.getColor("TextField.selectionBackground");
+    public final static Color TEXT_COLOR = UIManager.getColor("TextField.selectionForeground");
     public final static Color CONFLICT_COLOR = new Color(255,0,0,90);
     
     public TimelineElement(Timer timer, Calendar currentDate) {
@@ -120,7 +121,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         g.fillRect(0, 0, getWidth(), getHeight());
         
         // paint text
-        g.setColor(UIManager.getColor("Label.foreground"));
+        g.setColor(TEXT_COLOR);
         g.setFont(new Font("SansSerif", Font.PLAIN, 9));
         g.drawString(timer.getDisplayTitle(), 5, 12);
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());

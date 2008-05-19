@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.6 2008-05-19 12:54:13 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.7 2008-05-19 13:20:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -104,8 +104,14 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         if(isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
+            date.setForeground(UIManager.getColor("List.selectionForeground"));
+            time.setForeground(UIManager.getColor("List.selectionForeground"));
+            title.setForeground(UIManager.getColor("List.selectionForeground"));
         } else {
             setBackground(index % 2 == 0 ? background : altBackground);
+            date.setForeground(UIManager.getColor("List.foreground"));
+            time.setForeground(UIManager.getColor("List.foreground"));
+            title.setForeground(UIManager.getColor("List.foreground"));
         }
         
         if(value instanceof Recording) {
