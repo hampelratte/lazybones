@@ -22,3 +22,6 @@ Lazy Bones 0.4
 * Ported logging to lsf4j.
 * Dialogs have a special modal exclusion mode to avoid blocking windows
 * Improved Look and Feel integration of custom components
+* Removed ProgramSelectionDialog. Not assigned timers can now be assigned with
+  the context menu
+* Added a DebugConsole under Settings->General, which shows the Lazy Bones log.
