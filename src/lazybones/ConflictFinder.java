@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.10 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.11 2008-05-19 17:22:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,9 +38,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-
 import lazybones.gui.TimelinePanel;
+import lazybones.logging.PopupHandler;
 import lazybones.utils.StartStopEvent;
 import lazybones.utils.Utilities;
 
@@ -50,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 public class ConflictFinder implements Observer {
     
+    private static transient Logger popuplog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
     private static transient Logger logger = LoggerFactory.getLogger(ConflictFinder.class);
     
     private static ConflictFinder instance;    
@@ -128,8 +128,7 @@ public class ConflictFinder implements Observer {
             String msg = LazyBones.getTranslation("conflict_found", 
                     LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!", 
                     Integer.toString(ConflictFinder.getInstance().getConflictCount()));
-            JOptionPane.showMessageDialog(LazyBones.getInstance().getParent(), msg);
-            logger.info(msg);
+            
             LazyBones.getInstance().getMainDialog().setVisible(true);
             LazyBones.getInstance().getMainDialog().showTimeline();
 
@@ -150,6 +149,8 @@ public class ConflictFinder implements Observer {
             TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
             ConflictingTimersSet<Timer> set = (ConflictingTimersSet<Timer>) conflicts.iterator().next();
             tp.setCalendar(set.getConflictStartTime());
+            
+            popuplog.info(msg);
         }
         
         LazyBones.getInstance().getMainDialog().getTimelinePanel().repaint();

@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.18 2008-04-25 15:09:53 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.19 2008-05-19 17:23:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -40,8 +41,8 @@ import java.util.TreeMap;
 
 import javax.swing.JPopupMenu;
 
-import lazybones.gui.ProgramSelectionDialog;
 import lazybones.logging.LoggingConstants;
+import lazybones.logging.PopupHandler;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.Response;
@@ -59,6 +60,7 @@ import devplugin.Program;
 public class ProgramManager {
     private static transient Logger logger = LoggerFactory.getLogger(ProgramManager.class);
     private static transient Logger epgLog = LoggerFactory.getLogger(LoggingConstants.EPG_LOGGER);
+    private static transient Logger popupLog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
     
     private static ProgramManager instance;
     
@@ -446,8 +448,21 @@ public class ProgramManager {
         }
         Arrays.sort(programs, new ProgramComparator());
 
-        // show dialog
-        new ProgramSelectionDialog(programs, timer);
+        //  show message
+        java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        String dateString = sdf.format(date);
+        String title = timer.getPath() + timer.getTitle();
+        String msg = LazyBones.getTranslation("message_programselect",
+                "I couldn\'t find a program, which matches the"
+                        + " timer <b>{0}</b> at <b>{1}</b>VDR.\nPlease select the right"
+                        + " program in the given list and press OK.",
+                title, dateString);
+        popupLog.warn(msg);
+        
+        
+//        // show dialog
+//        new ProgramSelectionDialog(programs, timer);
     }
     
     public void handleTimerDoubleClick(Timer timer) {
