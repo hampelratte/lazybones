@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.19 2008-05-19 17:23:13 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.20 2008-05-19 20:17:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,10 +31,8 @@ package lazybones;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -212,7 +210,14 @@ public class ProgramManager {
             Timer timer = iterator.next();
             switch(timer.getReason()) {
             case Timer.NOT_FOUND:
-                showProgramConfirmDialog(timer);
+                //  show message
+                java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+                String dateString = sdf.format(date);
+                String title = timer.getPath() + timer.getTitle();
+                Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+                String msg = LazyBones.getTranslation("message_programselect", "I couldn\'t find a program, which matches the vdr timer\n<b>{0}</b> at <b>{1}</b> on <b>{2}</b>.\n" + "You may assign this timer to a program in the context menu.", title, dateString, chan.getName());
+                popupLog.warn(msg);
                 break;
             case Timer.NO_EPG:
                 logger.warn("Couldn't assign timer: ", timer);
@@ -377,14 +382,7 @@ public class ProgramManager {
             // higher than the config value percentageThreshold, mark this
             // program
             if (percentage >= threshold) {
-                progMin.mark(LazyBones.getInstance());
-                timer.addTvBrowserProgID(progMin.getID());
-                if (timer.isRepeating()) {
-                    Date d = progMin.getDate();
-                    timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
-                    timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
-                    timer.getStartTime().set(Calendar.YEAR, d.getYear());
-                }
+                assignTimerToProgram(progMin, timer);
             } else {
                 boolean found = TimerManager.getInstance().lookUpTimer(timer, progMin);
                 if (!found) { // we have no mapping
@@ -400,69 +398,15 @@ public class ProgramManager {
         }
     }
     
-    /**
-     * If a timer can't be assigned to a Program, this method shows a dialog to
-     * select the right Program
-     * 
-     * @param timer
-     *            the timer received from the VDR
-     */
-    private void showProgramConfirmDialog(Timer timer) {
-        Calendar cal = timer.getStartTime();
-
-        Calendar start = GregorianCalendar.getInstance();
-        start.setTimeInMillis(cal.getTimeInMillis());
-
-        devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
-
-        // if we cant find the channel, stop
-        if (chan == null)
-            return;
-
-        // get all programs 3 hours before and after the given program
-        HashSet<Program> programSet = new HashSet<Program>();
-        for (int i = 0; i <= 180; i++) { 
-            // get the program before the given one
-            Calendar c = GregorianCalendar.getInstance();
-            c.setTimeInMillis(start.getTimeInMillis());
-            c.add(Calendar.MINUTE, i * -1);
-            Program p1 = ProgramManager.getInstance().getProgramAt(c, c, chan);
-            if (p1 != null) {
-                programSet.add(p1);
-            }
-
-            // get the program after the given one
-            c = GregorianCalendar.getInstance();
-            c.setTimeInMillis(start.getTimeInMillis());
-            c.add(Calendar.MINUTE, i);
-            Program p2 = ProgramManager.getInstance().getProgramAt(c, c, chan);
-            if (p2 != null) {
-                programSet.add(p2);
-            }
+    public void assignTimerToProgram(Program prog, Timer timer) {
+        prog.mark(LazyBones.getInstance());
+        timer.addTvBrowserProgID(prog.getID());
+        if (timer.isRepeating()) {
+            Date d = prog.getDate();
+            timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
+            timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
+            timer.getStartTime().set(Calendar.YEAR, d.getYear());
         }
-
-        Program[] programs = new Program[programSet.size()];
-        int i = 0;
-        for (Program p : programSet) {
-            programs[i++] = p;
-        }
-        Arrays.sort(programs, new ProgramComparator());
-
-        //  show message
-        java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-        String dateString = sdf.format(date);
-        String title = timer.getPath() + timer.getTitle();
-        String msg = LazyBones.getTranslation("message_programselect",
-                "I couldn\'t find a program, which matches the"
-                        + " timer <b>{0}</b> at <b>{1}</b>VDR.\nPlease select the right"
-                        + " program in the given list and press OK.",
-                title, dateString);
-        popupLog.warn(msg);
-        
-        
-//        // show dialog
-//        new ProgramSelectionDialog(programs, timer);
     }
     
     public void handleTimerDoubleClick(Timer timer) {
