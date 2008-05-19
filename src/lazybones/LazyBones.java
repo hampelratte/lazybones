@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.87 2008-05-19 11:53:09 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.88 2008-05-19 17:24:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,6 +43,7 @@ import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
+import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
@@ -54,7 +56,7 @@ import javax.swing.JPopupMenu;
 import lazybones.gui.MainDialog;
 import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
-import lazybones.logging.ErrorPopupHandler;
+import lazybones.logging.PopupHandler;
 import lazybones.logging.SimpleFormatter;
 
 import org.hampelratte.svdrp.Response;
@@ -348,16 +350,40 @@ public class LazyBones extends Plugin implements Observer {
 //        for (int i = 0; i < handlers.length; i++) {
 //            handlers[i].setLevel(Level.ALL);
 //        }
-        
-        Handler eph = new ErrorPopupHandler();
+
+        // create our special logging components
+        SimpleFormatter formatter = new SimpleFormatter();
+        Handler eph = new PopupHandler();
         eph.setLevel(Level.FINEST);
         Handler dch = new DebugConsoleHandler();
         dch.setLevel(Level.FINEST);
         
+        // add our special handlers to all lazybones.* messages
         java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
         lazyLogger.addHandler(eph);
         lazyLogger.addHandler(dch);
-        eph.setFormatter(new SimpleFormatter());
+        eph.setFormatter(formatter);
+        
+        // add our special handlers to the popuplogger
+        java.util.logging.Logger popupLogger = java.util.logging.Logger.getLogger(PopupHandler.KEYWORD);
+        popupLogger.setLevel(Level.ALL);
+        popupLogger.addHandler(eph);
+        popupLogger.addHandler(dch);
+
+        // create a custom file handler only for lazy bones
+        Handler fh = null;
+        String settingsDir = getPluginManager().getTvBrowserSettings().getTvBrowserUserHome();
+        try {
+             fh = new FileHandler(settingsDir + File.separator + "lazybones.log");
+             fh.setFormatter(formatter);
+        } catch (Exception e) {
+            logger.warn("Couldn't add file handler for Lazy Bones", e);
+        } 
+        
+        if(fh != null) {
+            lazyLogger.addHandler(fh);
+            popupLogger.addHandler(fh);
+        }
     }
 
     public Properties storeSettings() {
@@ -474,66 +500,91 @@ public class LazyBones extends Plugin implements Observer {
                 }
             }
 
-            int size = 3;
-            if(marked) {
-                size++;
-            }
+            int size = 4;
             
-            Action[] actions = null;
+//            if(marked) {
+//                size++;
+//            } 
+            
+            ActionMenu[] actions = null;
             if (marked) {
-                actions = new Action[size];
+                actions = new ActionMenu[size];
 
-                actions[1] = new AbstractAction() {
+                AbstractAction action1 = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         TimerManager.getInstance().deleteTimer(program);
                     }
                 };
-                actions[1].putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
-                actions[1].putValue(Action.SMALL_ICON, createImageIcon("actions", "edit-delete", 16));
+                action1.putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
+                action1.putValue(Action.SMALL_ICON, createImageIcon("actions", "edit-delete", 16));
+                actions[1] = new ActionMenu(action1);
 
-                actions[2] = new AbstractAction() {
+                AbstractAction action2 = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         Timer timer = (Timer) TimerManager.getInstance().getTimer(program);
                         TimerManager.getInstance().editTimer(timer);
                     }
                 };
-                actions[2].putValue(Action.NAME, LazyBones.getTranslation("edit", "Edit Timer"));
-                actions[2].putValue(Action.SMALL_ICON, createImageIcon("actions", "document-edit", 16));
+                action2.putValue(Action.NAME, LazyBones.getTranslation("edit", "Edit Timer"));
+                action2.putValue(Action.SMALL_ICON, createImageIcon("actions", "document-edit", 16));
+                actions[2] = new ActionMenu(action2);
 
-                actions[3] = new AbstractAction() {
+                AbstractAction action3 = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         LazyBones.getInstance().synchronize();
                     }
                 };
-                actions[3].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
-                actions[3].putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
+                action3.putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
+                action3.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
+                actions[3] = new ActionMenu(action3);
             } else {
-                actions = new Action[size];
+                actions = new ActionMenu[size];
 
-                actions[1] = new AbstractAction() {
+                AbstractAction action1 = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         TimerManager.getInstance().createTimer(program, false);
                     }
                 };
-                actions[1].putValue(Action.NAME, LazyBones.getTranslation("capture", "Capture with VDR"));
-                actions[1].putValue(Action.SMALL_ICON, createImageIcon("lazybones/capture.png"));
+                action1.putValue(Action.NAME, LazyBones.getTranslation("capture", "Capture with VDR"));
+                action1.putValue(Action.SMALL_ICON, createImageIcon("lazybones/capture.png"));
+                actions[1] = new ActionMenu(action1);
 
-                actions[2] = new AbstractAction() {
+                AbstractAction action2 = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
                         LazyBones.getInstance().synchronize();
                     }
                 };
-                actions[2].putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
-                actions[2].putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
+                action2.putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
+                action2.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
+                actions[2] = new ActionMenu(action2);
+                
+                AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
+                action3.putValue(Action.NAME, LazyBones.getTranslation("assign", "Assign"));
+                action3.putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
+
+                Action[] timers = new Action[TimerManager.getInstance().getNotAssignedTimers().size()];
+                ActionMenu menu = new ActionMenu(action3, timers);
+                List<Timer> timerList = TimerManager.getInstance().getNotAssignedTimers();
+                for (int i = 0; i < timers.length; i++) {
+                    timers[i] = new AbstractAction() {
+                        public void actionPerformed(ActionEvent e) {
+                            logger.error("Juhu");
+                        }
+                    };
+                    timers[i].putValue(Action.NAME, timerList.get(i).getTitle());
+                    timers[i].putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
+                }
+                actions[3] = menu;
             }
 
-            actions[0] = new AbstractAction() {
+            AbstractAction action0 = new AbstractAction() {
                 public void actionPerformed(ActionEvent evt) {
                     Player.play(program);
                 }
             };
-            actions[0].putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
-            actions[0].putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
+            action0.putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
+            action0.putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
+            actions[0] = new ActionMenu(action0);
 
             return new ActionMenu(action, actions);
         }
