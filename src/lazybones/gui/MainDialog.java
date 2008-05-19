@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.10 2008-05-18 19:19:11 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.11 2008-05-19 12:00:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui;
 
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -93,6 +94,8 @@ public class MainDialog extends JDialog {
                 }
             }
         });
+        
+        setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
     
     public void setVisible(boolean visible) {

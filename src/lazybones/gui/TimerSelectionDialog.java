@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.9 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.10 2008-05-19 12:00:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui;
 
+import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -91,6 +92,7 @@ public class TimerSelectionDialog implements ActionListener {
         dialog = new JDialog(control.getParent(), true);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_vdrselect", "Select VDR-program"));
         dialog.getContentPane().setLayout(new GridBagLayout());
+        dialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.gridx = 0;

@@ -1,4 +1,4 @@
-/* $Id: ProgramSelectionDialog.java,v 1.10 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: ProgramSelectionDialog.java,v 1.11 2008-05-19 12:00:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones.gui;
 
+import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -79,6 +80,7 @@ public class ProgramSelectionDialog extends Thread implements ActionListener {
         if (programs.length > 0) {
             initGUI();
             dialog.setSize(600, 400);
+            dialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
             model.removeAllElements();
             for (int i = 0; i < programs.length; i++) {
                 model.addElement(programs[i]);
