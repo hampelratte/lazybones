@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.15 2008-04-25 16:35:59 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.16 2008-05-19 17:23:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -93,7 +93,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
     }
     
     private void initGUI() {
-        setTitle("Lazy Bones - " + Localizer.getLocalization(Localizer.I18N_ERROR));
+        setTitle("Lazy Bones - " + LazyBones.getTranslation("msg", "Message"));
         setSize(700, 400);
         getContentPane().setLayout(new BorderLayout(10,10));
         
