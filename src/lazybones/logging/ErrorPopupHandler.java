@@ -1,4 +1,4 @@
-/* $Id: ErrorPopupHandler.java,v 1.5 2008-04-25 15:36:03 hampelratte Exp $
+/* $Id: ErrorPopupHandler.java,v 1.6 2008-05-19 11:53:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,14 +29,14 @@
  */
 package lazybones.logging;
 
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Filter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import lazybones.gui.LogMessageDialog;
 
-public class ErrorPopupHandler extends ConsoleHandler {
+public class ErrorPopupHandler extends Handler {
 
     private Filter filter;
     
@@ -49,8 +49,6 @@ public class ErrorPopupHandler extends ConsoleHandler {
     
     @Override
     public void publish(final LogRecord record) {
-        super.publish(record);
-        
         boolean loggable = true;
         if(filter != null) {
             loggable = filter.isLoggable(record);
@@ -63,4 +61,10 @@ public class ErrorPopupHandler extends ConsoleHandler {
             }
         }
     }
+
+    @Override
+    public void close() throws SecurityException {}
+
+    @Override
+    public void flush() {}
 }

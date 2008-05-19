@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.86 2008-05-18 19:18:36 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.87 2008-05-19 11:53:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -355,7 +355,6 @@ public class LazyBones extends Plugin implements Observer {
         dch.setLevel(Level.FINEST);
         
         java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
-        lazyLogger.setUseParentHandlers(true);
         lazyLogger.addHandler(eph);
         lazyLogger.addHandler(dch);
         eph.setFormatter(new SimpleFormatter());
