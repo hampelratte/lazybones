@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.5 2008-05-06 16:42:21 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.6 2008-05-19 12:54:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -121,14 +121,18 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             
             if(recording.isNew()) {
                 newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
+                newRec.setVisible(true);
             } else {
                 newRec.setIcon(null);
+                newRec.setVisible(false);
             }
             
             if(recording.isCut()) {
                 cutRec.setIcon(LazyBones.getInstance().getIcon("lazybones/edit-cut.png"));
+                cutRec.setVisible(true);
             } else {
                 cutRec.setIcon(null);
+                cutRec.setVisible(false);
             }
             
             return this;
@@ -139,9 +143,9 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
     
     @Override
     public String getToolTipText(MouseEvent event) {
-        if(newRec.getBounds().contains(event.getPoint())) {
+        if(newRec.getBounds().contains(event.getPoint()) && newRec.isVisible()) {
             return LazyBones.getTranslation("new_recording", "New recording");
-        } else if(cutRec.getBounds().contains(event.getPoint())) {
+        } else if(cutRec.getBounds().contains(event.getPoint()) && cutRec.isVisible()) {
             return LazyBones.getTranslation("cut_recording", "Cut recording");
         } else {
             return super.getToolTipText(event);
