@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.30 2008-05-18 19:21:30 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.31 2008-05-19 20:35:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -731,7 +731,7 @@ public class TimerManager extends Observable {
         }
     }
     
-    public void timerCreatedOK(Program prog, Timer timer) {
+    public void assignProgramToTimer(Program prog, Timer timer) {
         timer.addTvBrowserProgID(prog.getID());
         replaceStoredTimer(timer);
         getTitleMapping().put(prog.getTitle(), timer.getTitle());

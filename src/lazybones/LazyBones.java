@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.90 2008-05-19 20:23:35 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.91 2008-05-19 20:35:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -142,7 +142,7 @@ public class LazyBones extends Plugin implements Observer {
         t.getEndTime().add(Calendar.MINUTE, buffer_after);
         Response response = VDRConnection.send(new NEWT(t));
         if (response.getCode() == 250) {
-            TimerManager.getInstance().timerCreatedOK(selectedProgram, t);
+            TimerManager.getInstance().assignProgramToTimer(selectedProgram, t);
         } else {
             logger.error(LazyBones.getTranslation("couldnt_create",
                     "Couldn\'t create timer:")
@@ -579,7 +579,7 @@ public class LazyBones extends Plugin implements Observer {
                         timers[i] = new AbstractAction() {
                             public void actionPerformed(ActionEvent e) {
                                 ProgramManager.getInstance().assignTimerToProgram(program, timer);
-                                TimerManager.getInstance().timerCreatedOK(program, timer);
+                                TimerManager.getInstance().assignProgramToTimer(program, timer);
                             }
                         };
                         timers[i].putValue(Action.NAME, timerList.get(i).getDisplayTitle());
