@@ -32,9 +32,9 @@
 			<classpath>
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${classes.dir}" />
-				<pathelement location="${lib.dir}/${nacho}" />
-				<pathelement location="${lib.dir}/${xstream}" />
-				<pathelement location="${lib.dir}/${xpp3}" />
+				<fileset dir="${lib.dir}">
+				    <include name="*.jar"/>
+			    </fileset>
 			</classpath>
 		</javac>
 	</target>
