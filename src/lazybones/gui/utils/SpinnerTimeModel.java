@@ -1,4 +1,4 @@
-/* $Id: SpinnerTimeModel.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
+/* $Id: SpinnerTimeModel.java,v 1.3 2008-07-05 12:02:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,19 +29,13 @@
  */
 package lazybones.gui.utils;
 
-import java.util.Vector;
-
-import javax.swing.SpinnerModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.AbstractSpinnerModel;
 
 import lazybones.Time;
 
-public class SpinnerTimeModel implements SpinnerModel {
+public class SpinnerTimeModel extends AbstractSpinnerModel {
 
     private Time time = new Time();
-
-    private Vector<ChangeListener> changeListener = new Vector<ChangeListener>();
 
     public Object getNextValue() {
         time.increase();
@@ -63,20 +57,6 @@ public class SpinnerTimeModel implements SpinnerModel {
         if (o instanceof Time) {
             time = (Time) o;
             fireStateChanged();
-        }
-    }
-
-    public void addChangeListener(ChangeListener arg0) {
-        changeListener.add(arg0);
-    }
-
-    public void removeChangeListener(ChangeListener arg0) {
-        changeListener.remove(arg0);
-    }
-
-    private void fireStateChanged() {
-        for(ChangeListener cl : changeListener) {
-            cl.stateChanged(new ChangeEvent(this));
         }
     }
 }
