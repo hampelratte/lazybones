@@ -1,4 +1,4 @@
-/* $Id: SpinnerTimeModel.java,v 1.3 2008-07-05 12:02:18 hampelratte Exp $
+/* $Id: SpinnerTimeModel.java,v 1.4 2008-07-05 12:14:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,13 +39,11 @@ public class SpinnerTimeModel extends AbstractSpinnerModel {
 
     public Object getNextValue() {
         time.increase();
-        fireStateChanged();
         return time;
     }
 
     public Object getPreviousValue() {
         time.decrease();
-        fireStateChanged();
         return time;
     }
 
