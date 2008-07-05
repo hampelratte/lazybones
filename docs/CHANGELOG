@@ -25,3 +25,4 @@ Lazy Bones 0.4
 * Removed ProgramSelectionDialog. Not assigned timers can now be assigned with
   the context menu
 * Added a DebugConsole under Settings->General, which shows the Lazy Bones log.
+* Fixed bug in SpinnerTimeModel (reported by docmax)
