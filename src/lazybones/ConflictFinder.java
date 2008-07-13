@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.11 2008-05-19 17:22:33 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.12 2008-07-13 16:19:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -166,6 +166,14 @@ public class ConflictFinder implements Observer {
     
     private void increaseTransponderUse(Timer timer) {
         DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if(chan == null) {
+            logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
+                    "Couldn\'t find a channel for one timer.\n" + 
+            		"The timer conflict check will not work properly."));
+            logger.trace("Timer: {}", timer);
+            return;
+        }
+        
         if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
             int count = transponderUse.get(chan.getFrequency());
             count++;
