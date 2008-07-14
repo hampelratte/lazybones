@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.LogRecord;
 
+// TODO check, if can use the MemoryHandler for this
 public class LoggingArchive {
     public static final int LOG_HISTORY = 1000;
     
