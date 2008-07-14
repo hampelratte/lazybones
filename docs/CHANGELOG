@@ -26,3 +26,5 @@ Lazy Bones 0.4
   the context menu
 * Added a DebugConsole under Settings->General, which shows the Lazy Bones log.
 * Fixed bug in SpinnerTimeModel (reported by docmax)
+* Added support for DVB-S2 parameters in channels.conf 
+  (reported by reelmichael)

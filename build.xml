@@ -25,20 +25,26 @@
 
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
-		
-		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true"/>
-		
+
+		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
 			<classpath>
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${classes.dir}" />
 				<fileset dir="${lib.dir}">
-				    <include name="*.jar"/>
-			    </fileset>
+					<include name="*.jar"/>
+				</fileset>
 			</classpath>
 		</javac>
 	</target>
-	
+
 	<target name="jar" depends="compile">
 		<mkdir dir="${classes.dir}/lazybones" />
 		<unjar src="${lib.dir}/${nacho}" dest="${classes.dir}"/>
@@ -50,10 +56,10 @@
 			<fileset dir="${res.dir}/images" includes="*.png"/>
 			<fileset dir="${res.dir}/images" includes="*.gif"/>
 			<fileset dir="${res.dir}/language" includes="**/*.properties"/>
-        </copy>
+		</copy>
 		<copy todir="${classes.dir}">
 			<fileset dir="${license.dir}" includes="**/*.*"/>
-        </copy>
+		</copy>
 		<jar destfile="${jar.file}" basedir="${classes.dir}">
 		</jar>
 	</target>
@@ -64,37 +70,37 @@
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 		</java>
 	</target>
-	
+
 	<target name="run-vdr-local" depends="compile,jar">
-			<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
-				<jvmarg value="-Duser.home=/home/henni/.tvbrowser-vdr-local"/>
-				<!--<jvmarg value="-Dawt.toolkit=sun.awt.motif.MToolkit"/>-->
-				<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
-			</java>
+		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
+			<jvmarg value="-Duser.home=/home/henni/.tvbrowser-vdr-local"/>
+			<!--<jvmarg value="-Dawt.toolkit=sun.awt.motif.MToolkit"/>-->
+			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
+		</java>
 	</target>
-	
+
 	<target name="clean">
 		<delete dir="${build.dir}"/>
 	</target>
 
 	<target name="dist" depends="jar" description="Make distribution zip">
-	        <property name="dist-tmp.dir" value="${build.dir}/dist-tmp"/>        
-	        <mkdir dir="${dist-tmp.dir}"/>
-	        
-	        <delete>
-	            <fileset dir="${build.dir}" includes="*.zip"/>
-	        </delete>
-	        
-	        <copy file="${jar.file}" todir="${dist-tmp.dir}/LazyBones-${version}/"/>
-	        <copy todir="${dist-tmp.dir}/LazyBones-${version}">
-	            <fileset dir="${doc.dir}">
-	            </fileset>
-	        </copy>
-	        
-	        <zip destfile="${build.dir}/LazyBones-${version}.zip" 
+		<property name="dist-tmp.dir" value="${build.dir}/dist-tmp"/>
+		<mkdir dir="${dist-tmp.dir}"/>
+
+		<delete>
+			<fileset dir="${build.dir}" includes="*.zip"/>
+		</delete>
+
+		<copy file="${jar.file}" todir="${dist-tmp.dir}/LazyBones-${version}/"/>
+		<copy todir="${dist-tmp.dir}/LazyBones-${version}">
+			<fileset dir="${doc.dir}">
+			</fileset>
+		</copy>
+
+		<zip destfile="${build.dir}/LazyBones-${version}.zip" 
 	             basedir="${dist-tmp.dir}"/>
 
-	        <delete dir="${dist-tmp.dir}"/>
-	    </target>
-	
+		<delete dir="${dist-tmp.dir}"/>
+	</target>
+
 </project>
