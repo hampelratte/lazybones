@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.5 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.6 2008-07-23 15:53:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -89,7 +89,6 @@ public class ScreenshotPanel extends JLabel {
         
         PreviewGrabber() {
             grab = new GRAB();
-            grab.setFormat("jpeg");
             grab.setQuality("80");
         }
 
@@ -150,7 +149,7 @@ public class ScreenshotPanel extends JLabel {
         
         private ImageIcon getSVDRPImage() {
             logger.debug("Grabbing image over SVDRP");
-            grab.setFilename("-");
+            grab.setFilename(".jpeg");
             Response res = VDRConnection.send(grab);
             if (res != null && res.getCode() == 216) {
                 R216 r216 = (R216)res;
