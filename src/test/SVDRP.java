@@ -1,4 +1,4 @@
-/* $Id: SVDRP.java,v 1.1 2008-07-23 15:27:18 hampelratte Exp $
+/* $Id: SVDRP.java,v 1.2 2008-07-23 15:39:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 
 import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.GRAB;
 import org.hampelratte.svdrp.commands.PLUG;
 
 public class SVDRP {
@@ -44,6 +45,13 @@ public class SVDRP {
              conn = new Connection("localhost", 2001);
              Connection.DEBUG = true;
              Response res = conn.send(new PLUG("epgsearch", false, false, "lsts", ""));
+             System.out.println(res + ": " + res.getCode() + " " + res.getMessage());
+             
+             GRAB grab = new GRAB();
+             grab.setFilename("-");
+             grab.setFormat("jpeg");
+             grab.setQuality("80");
+             res = conn.send(grab);
              System.out.println(res + ": " + res.getCode() + " " + res.getMessage());
         } catch (UnknownHostException e) {
             e.printStackTrace();
