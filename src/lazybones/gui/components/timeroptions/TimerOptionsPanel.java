@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.1 2008-05-18 19:20:23 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.2 2008-07-30 10:39:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -271,6 +271,9 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         add(comboDesc, gbc);
         comboDesc.addItem("VDR");
         comboDesc.addItem("TV-Browser");
+        if(mode == Mode.UPDATE) {
+            comboDesc.addItem("Timer");
+        }
         comboDesc.addItemListener(this);
         //comboDesc.setEnabled(!update);
         
@@ -308,12 +311,20 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 channels.setSelectedItem(chan);
             }
             
-            if ("".equals(timer.getDescription())
+            boolean useTvbDescription = Boolean.parseBoolean(LazyBones.getProperties().getProperty("descSourceTvb"));
+            if ( ("".equals(timer.getDescription()) || useTvbDescription) 
                     && prog != null && !"".equals(prog.getDescription())) {
                 description.setText(prog.getDescription());
                 description.append("\n\n" + prog.getChannel().getCopyrightNotice());
+                comboDesc.setSelectedIndex(1);
             } else {
                 description.setText(timer.getDescription());
+                comboDesc.setSelectedIndex(0);
+            }
+            
+            if(mode == Mode.UPDATE) {
+                description.setText(oldTimer.getDescription());
+                comboDesc.setSelectedIndex(2);
             }
             
             cbActive.setSelected(timer.isActive());
@@ -410,12 +421,14 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 String desc = tmp == null ? "" : tmp.getDescription();
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            } else {
+            } else if ("TV-Browser".equals(item)){
                 Date date = new Date(timer.getStartTime());
                 Program prog = Plugin.getPluginManager().getProgram(date,
                         timer.getTvBrowserProgIDs().get(0));
                 description.setText(prog.getDescription());
                 description.append("\n\n" + prog.getChannel().getCopyrightNotice());
+            } else if ("Timer".equals(item)){
+                description.setText(oldTimer.getDescription());
             }
         }
     }

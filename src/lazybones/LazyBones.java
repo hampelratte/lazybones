@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.93 2008-07-16 19:43:32 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.94 2008-07-30 10:37:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -53,6 +53,7 @@ import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import lazybones.captureplugin.driver.LazyBonesDevice;
 import lazybones.gui.MainDialog;
 import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
@@ -183,7 +184,6 @@ public class LazyBones extends Plugin implements Observer {
         return new VDRSettingsPanel();
     }
     
-
     public void onDeactivation() {
         try {
             Player.stop();
@@ -264,6 +264,10 @@ public class LazyBones extends Plugin implements Observer {
         String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
         showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
         props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
+        
+        String descSourceTvb = props.getProperty("descSourceTvb");
+        descSourceTvb = descSourceTvb == null ? "false" : descSourceTvb;
+        props.setProperty("descSourceTvb", descSourceTvb);
         
         String minChannelNumber = props.getProperty("minChannelNumber");
         minChannelNumber = minChannelNumber == null ? "0" : minChannelNumber;
@@ -679,10 +683,11 @@ public class LazyBones extends Plugin implements Observer {
             props.setProperty("logConnectionErrors", logConnectionErrors);
         } else if(TARGET_WATCH.equals(receiveTarget.getTargetId())) {
             Player.play(programArr[0]);
+        } else if (LazyBonesDevice.TARGET_CAPTURE_PLUGIN_ADD.equals(receiveTarget.getTargetId())) {
+            TimerManager.getInstance().createTimer(programArr[0], false);
+        } else if (LazyBonesDevice.TARGET_CAPTURE_PLUGIN_REMOVE.equals(receiveTarget.getTargetId())) {
+            TimerManager.getInstance().deleteTimer(programArr[0]);
         }
-        
         return true;
     }
-    
-    
 }

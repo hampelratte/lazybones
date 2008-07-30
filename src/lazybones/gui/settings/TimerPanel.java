@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.1 2007-04-09 19:20:20 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.3 2008-07-30 10:38:00 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,8 +42,21 @@ import javax.swing.*;
 import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
-import lazybones.gui.TitleMapping;
+import lazybones.gui.utils.TitleMapping;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 public class TimerPanel implements MouseListener, ActionListener {
     private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");
 
@@ -82,6 +95,10 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JButton addRow;
 
     private JButton delRow;
+    
+    private JLabel lDescSource;
+    
+    private JCheckBox cbDescSource;
 
     private JPopupMenu mappingPopup = new JPopupMenu();
 
@@ -95,6 +112,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
         int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
         int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
+        boolean descSourceTvb = Boolean.parseBoolean(LazyBones.getProperties().getProperty("descSourceTvb"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
         before.setToolTipText(ttBefore);
@@ -143,6 +161,10 @@ public class TimerPanel implements MouseListener, ActionListener {
         delRow = new JButton(LazyBones.getTranslation("del_rows", "Delete selected rows"));
         delRow.setActionCommand("DEL");
         delRow.addActionListener(this);
+        
+        lDescSource = new JLabel(LazyBones.getTranslation("desc_source", "Use description from TV-Browser"));
+        cbDescSource = new JCheckBox();
+        cbDescSource.setSelected(descSourceTvb);
     }
 
     public JPanel getPanel() {
@@ -173,11 +195,21 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.insets = new Insets(15, 15, 30, 5);
+        gbc.insets = new Insets(15, 15, 5, 5);
+        panel.add(lDescSource, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(15, 5, 5, 5);
+        panel.add(cbDescSource, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(5, 15, 30, 5);
         panel.add(lNumberOfCards, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.insets = new Insets(15, 5, 30, 5);
         panel.add(numberOfCards, gbc);
 
@@ -204,12 +236,12 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         // mapping
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(labMappings, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridwidth = 4;
         gbc.gridheight = 2;
         gbc.fill = GridBagConstraints.BOTH;
@@ -220,7 +252,7 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         // buttons
         gbc.gridx = 4;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         gbc.insets = new Insets(0, 5, 5, 15);
@@ -231,7 +263,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(addRow, gbc);
 
         gbc.gridx = 4;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.insets = new Insets(5, 5, 5, 15);
         panel.add(delRow, gbc);
 
@@ -244,6 +276,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         LazyBones.getProperties().setProperty("timer.prio", prio.getValue().toString());
         LazyBones.getProperties().setProperty("timer.lifetime", lifetime.getValue().toString());
         LazyBones.getProperties().setProperty("numberOfCards", numberOfCards.getValue().toString());
+        LazyBones.getProperties().setProperty("descSourceTvb", Boolean.toString(cbDescSource.isSelected()));
         
         ConflictFinder.getInstance().findConflicts();
         ConflictFinder.getInstance().handleConflicts();
