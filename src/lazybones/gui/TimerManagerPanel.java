@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.12 2008-05-18 19:19:34 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.13 2008-07-30 12:52:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -140,6 +140,16 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         
         timerList.addMouseListener(new MouseListener() {
             public void mousePressed(MouseEvent e) {
+                mayTriggerPopup(e);
+            }
+            public void mouseClicked(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {
+                mayTriggerPopup(e);
+            }
+            
+            private void mayTriggerPopup(MouseEvent e) {
                 int index = timerList.locationToIndex(e.getPoint());
                 Timer timer = (Timer) timerList.getModel().getElementAt(index);
                 if(e.isPopupTrigger()) {
@@ -150,10 +160,6 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
                     ProgramManager.getInstance().handleTimerDoubleClick(timer);
                 }
             }
-            public void mouseClicked(MouseEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
-            public void mouseReleased(MouseEvent e) {}
         });
         
         getTimers();

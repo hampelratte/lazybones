@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.12 2008-05-06 17:32:30 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.13 2008-07-30 12:52:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -211,6 +211,16 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         
         recordingList.addMouseListener(new MouseListener() {
             public void mousePressed(MouseEvent e) {
+                mayTriggerPopup(e);
+            }
+            public void mouseClicked(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {
+                mayTriggerPopup(e);
+            }
+            
+            private void mayTriggerPopup(MouseEvent e) {
                 if(e.isPopupTrigger()) {
                     selectedRow = recordingList.locationToIndex(e.getPoint());
                     recordingList.setSelectedIndex(selectedRow);
@@ -218,10 +228,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
                     popup.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
-            public void mouseClicked(MouseEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
-            public void mouseReleased(MouseEvent e) {}
         });
     }
     

@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.11 2008-05-19 13:20:26 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.12 2008-07-30 12:52:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -149,6 +149,7 @@ public class TimelineElement extends JComponent implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
+        System.err.println(e);
         if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
             ProgramManager.getInstance().handleTimerDoubleClick(getTimer());
         }
@@ -163,16 +164,24 @@ public class TimelineElement extends JComponent implements MouseListener {
     }
 
     public void mousePressed(MouseEvent e) {
+        mayTriggerPopup(e);
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        mayTriggerPopup(e);
+    }
+    
+    /**
+     * Checks, if the mouse event is a popup trigger for this OS and shows the
+     * popup menu in case it is a trigger
+     * 
+     * @param e MouseEvent to check
+     */
+    private void mayTriggerPopup(MouseEvent e) {
         if(e.isPopupTrigger()) {
             JPopupMenu popup = ProgramManager.getInstance().getContextMenuForTimer(timer);
             popup.setLocation(e.getPoint());
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
-
-    public void mouseReleased(MouseEvent e) {
-        
-    }
-    
-    
 }
