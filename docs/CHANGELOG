@@ -1,3 +1,9 @@
+Lazy Bones 0.4.1
+===============================================================================
+* Added default option for the timer description. You can select between VDR,
+  TV-Browser and longest description. The timer options dialog then will use
+  the appropriate description. (suggested by ChrisBox)
+
 Lazy Bones 0.4
 ===============================================================================
 * Fixed bug in the timer state handling
