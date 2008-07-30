@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.4 2007-10-14 19:09:23 hampelratte Exp $
+/* $Id: Utilities.java,v 1.5 2008-07-30 17:48:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -225,6 +225,12 @@ public class Utilities {
         return startStopEvents;
     }
     
+    /**
+     * Returns the difference of two calendars in minutes
+     * @param startTime
+     * @param endTime
+     * @return difference of two calendars in minutes
+     */
     public static long getDurationInMinutes(Calendar startTime, Calendar endTime) {
         long durationMillis = endTime.getTimeInMillis() - startTime.getTimeInMillis();
         return durationMillis / 1000 / 60;
