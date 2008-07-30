@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.3 2008-07-30 11:53:11 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.4 2008-07-30 12:52:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -275,7 +275,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         add(comboDesc, gbc);
         comboDesc.addItem("VDR");
         comboDesc.addItem("TV-Browser");
-        if(mode == Mode.UPDATE) {
+        if(mode == Mode.UPDATE || mode == Mode.VIEW) {
             comboDesc.addItem("Timer");
         }
         comboDesc.addItemListener(this);
@@ -344,7 +344,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 break;
             }
             
-            if(mode == Mode.UPDATE) {
+            if(mode == Mode.UPDATE || mode == Mode.VIEW) {
                 description.setText(oldTimer.getDescription());
                 comboDesc.setSelectedIndex(2);
             }
