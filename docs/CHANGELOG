@@ -6,6 +6,9 @@ Lazy Bones 0.4.1
 * Fixed popup menu trigger for windows in different dialogs. The popup menu
   should work now for every timer and recording in every overview and list.
   (reported by ChrisBox)
+* Fixed bug in the paiting routine of the conflict painting.
+* Extended the week-day buttons on tht timeline panel to indicate conflicting
+  timers.
 
 Lazy Bones 0.4
 ===============================================================================

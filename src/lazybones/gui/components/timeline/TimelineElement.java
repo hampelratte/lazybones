@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.13 2008-07-30 16:42:02 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.14 2008-07-30 17:47:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -142,11 +142,11 @@ public class TimelineElement extends JComponent implements MouseListener {
                 double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
                 long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), period.getStartTime());
                 int x = 0;
-                if(period.getStartTime().get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
+                if(Utilities.sameDay(period.getStartTime(), currentDate)) {
                     x = (int)(pixelsPerMinute * startMinute);
                 }
                 int width = 0;
-                if(period.getEndTime().get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
+                if(Utilities.sameDay(period.getEndTime(), currentDate)) {
                     width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(period.getStartTime(), period.getEndTime()));
                 }
                 g.fillRect(x, 0, width, getHeight()-1);
