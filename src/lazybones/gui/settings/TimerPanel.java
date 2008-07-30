@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.3 2008-07-30 10:38:00 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.4 2008-07-30 11:53:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -98,7 +98,7 @@ public class TimerPanel implements MouseListener, ActionListener {
     
     private JLabel lDescSource;
     
-    private JCheckBox cbDescSource;
+    private JComboBox cbDescSource;
 
     private JPopupMenu mappingPopup = new JPopupMenu();
 
@@ -112,7 +112,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
         int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
         int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
-        boolean descSourceTvb = Boolean.parseBoolean(LazyBones.getProperties().getProperty("descSourceTvb"));
+        int descSourceTvb = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
         before = new JSpinner();
         before.setValue(new Integer(int_before));
         before.setToolTipText(ttBefore);
@@ -163,8 +163,11 @@ public class TimerPanel implements MouseListener, ActionListener {
         delRow.addActionListener(this);
         
         lDescSource = new JLabel(LazyBones.getTranslation("desc_source", "Use description from TV-Browser"));
-        cbDescSource = new JCheckBox();
-        cbDescSource.setSelected(descSourceTvb);
+        cbDescSource = new JComboBox();
+        cbDescSource.addItem("VDR");
+        cbDescSource.addItem("TV-Browser");
+        cbDescSource.addItem(LazyBones.getTranslation("timer_desc_longest", "longest description"));
+        cbDescSource.setSelectedIndex(descSourceTvb);
     }
 
     public JPanel getPanel() {
@@ -276,7 +279,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         LazyBones.getProperties().setProperty("timer.prio", prio.getValue().toString());
         LazyBones.getProperties().setProperty("timer.lifetime", lifetime.getValue().toString());
         LazyBones.getProperties().setProperty("numberOfCards", numberOfCards.getValue().toString());
-        LazyBones.getProperties().setProperty("descSourceTvb", Boolean.toString(cbDescSource.isSelected()));
+        LazyBones.getProperties().setProperty("descSourceTvb", Integer.toString(cbDescSource.getSelectedIndex()));
         
         ConflictFinder.getInstance().findConflicts();
         ConflictFinder.getInstance().handleConflicts();

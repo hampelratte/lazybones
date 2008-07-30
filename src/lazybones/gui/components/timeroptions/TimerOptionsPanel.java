@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.2 2008-07-30 10:39:48 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.3 2008-07-30 11:53:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -74,6 +74,10 @@ import devplugin.Program;
 
 public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
+    
+    public static final int DESC_VDR = 0;
+    public static final int DESC_TVB = 1;
+    public static final int DESC_LONGEST = 2;
     
     private JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
@@ -311,15 +315,33 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 channels.setSelectedItem(chan);
             }
             
-            boolean useTvbDescription = Boolean.parseBoolean(LazyBones.getProperties().getProperty("descSourceTvb"));
-            if ( ("".equals(timer.getDescription()) || useTvbDescription) 
-                    && prog != null && !"".equals(prog.getDescription())) {
-                description.setText(prog.getDescription());
-                description.append("\n\n" + prog.getChannel().getCopyrightNotice());
-                comboDesc.setSelectedIndex(1);
-            } else {
-                description.setText(timer.getDescription());
-                comboDesc.setSelectedIndex(0);
+            // set the description
+            String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
+            String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
+            int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
+            
+            switch (useTvbDescription) {
+            case DESC_VDR:
+                description.setText(descVdr);
+                comboDesc.setSelectedIndex(DESC_VDR);
+                break;
+            case DESC_TVB:
+                description.setText(descTvb);
+                comboDesc.setSelectedIndex(DESC_TVB);
+                break;
+            case DESC_LONGEST:
+                if(descVdr.length() < descTvb.length()) {
+                    description.setText(descTvb);
+                    comboDesc.setSelectedIndex(DESC_TVB);
+                } else {
+                    description.setText(descVdr);
+                    comboDesc.setSelectedIndex(DESC_VDR);
+                }
+                break;
+            default:
+                description.setText(descVdr);
+                comboDesc.setSelectedIndex(DESC_VDR);
+                break;
             }
             
             if(mode == Mode.UPDATE) {
@@ -327,9 +349,15 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 comboDesc.setSelectedIndex(2);
             }
             
+            // set timer is active switch
             cbActive.setSelected(timer.isActive());
+            
+            // set timer uses VPS switch
             cbVps.setSelected(timer.hasState(VDRTimer.VPS));
+            
+            // set timer title
             title.setText(timer.getFile());
+
             day.setText(timer.getDayString());
             
             int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);

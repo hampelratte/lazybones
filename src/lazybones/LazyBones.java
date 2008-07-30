@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.94 2008-07-30 10:37:25 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.95 2008-07-30 11:53:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -266,7 +266,7 @@ public class LazyBones extends Plugin implements Observer {
         props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
         
         String descSourceTvb = props.getProperty("descSourceTvb");
-        descSourceTvb = descSourceTvb == null ? "false" : descSourceTvb;
+        descSourceTvb = descSourceTvb == null ? "0" : descSourceTvb;
         props.setProperty("descSourceTvb", descSourceTvb);
         
         String minChannelNumber = props.getProperty("minChannelNumber");
