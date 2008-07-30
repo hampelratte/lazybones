@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.31 2008-05-19 20:35:16 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.32 2008-07-30 10:41:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -576,9 +576,12 @@ public class TimerManager extends Observable {
                     LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
             
             if(showOptionsDialog) {
-                new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.NEW);
+                TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.NEW);
+                if(tod.isAccepted()) {
+                    commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), false, false);
+                }
             } else {
-                callbackCreateTimer(timer, null, prog, false, automatic);
+                commitTimer(timer, null, prog, false, automatic);
             }
             
 
@@ -640,15 +643,18 @@ public class TimerManager extends Observable {
             newTimer.setEndTime(endTime);
 
             if(automatic) {
-                callbackCreateTimer(newTimer, null, prog, false, automatic);
+                commitTimer(newTimer, null, prog, false, true);
             } else {
-                new TimerOptionsDialog(newTimer, prog, TimerOptionsDialog.Mode.NEW);
+                TimerOptionsDialog tod = new TimerOptionsDialog(newTimer, prog, TimerOptionsDialog.Mode.NEW);
+                if(tod.isAccepted()) {
+                    commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), false, false);
+                }
             }
         }
     }
     
     /**
-     * Called by TimerOptionsDialog, when the user confirms the dialog
+     * Commits a new or changed timer to VDR
      * 
      * @param timer
      *            The new created / updated Timer
@@ -662,8 +668,7 @@ public class TimerManager extends Observable {
      * @param automatic
      *            Supresses all user interaction
      */
-    // TODO eigentlich überflüssig, weil TimerOptionsDialog nicht mehr im eigenen Thread läuft
-    public void callbackCreateTimer(final Timer timer, Timer oldTimer, final Program prog, boolean update, boolean automatic) {
+    private void commitTimer(final Timer timer, Timer oldTimer, final Program prog, boolean update, boolean automatic) {
         int id = -1;
         if(prog != null) {
             Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
@@ -840,7 +845,10 @@ public class TimerManager extends Observable {
         if(timer.getTvBrowserProgIDs().size() > 0) {
             prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), timer.getTvBrowserProgIDs().get(0));
         }
-        new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
+        TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
+        if(tod.isAccepted()) {
+            commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), true, false);
+        }
     }
     
     public boolean lookUpTimer(Timer timer, Program candidate) {
