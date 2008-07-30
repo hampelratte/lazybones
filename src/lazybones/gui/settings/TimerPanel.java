@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.4 2008-07-30 11:53:11 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.5 2008-07-30 12:02:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -214,7 +214,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(15, 5, 30, 5);
-        panel.add(numberOfCards, gbc);
+        panel.add(numberOfCards, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 30, 5), 0, 0));
 
         // right column of spinners
         gbc.gridx = 2;
