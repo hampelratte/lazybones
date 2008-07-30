@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.12 2008-07-30 12:52:58 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.13 2008-07-30 16:42:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -141,15 +141,20 @@ public class TimelineElement extends JComponent implements MouseListener {
                 long durationMinutes = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getEndTime());
                 double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
                 long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), period.getStartTime());
-                int x = (int)(pixelsPerMinute * startMinute);
-                int width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(period.getStartTime(), period.getEndTime()));
+                int x = 0;
+                if(period.getStartTime().get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
+                    x = (int)(pixelsPerMinute * startMinute);
+                }
+                int width = 0;
+                if(period.getEndTime().get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
+                    width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(period.getStartTime(), period.getEndTime()));
+                }
                 g.fillRect(x, 0, width, getHeight()-1);
             }
         }
     }
 
     public void mouseClicked(MouseEvent e) {
-        System.err.println(e);
         if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
             ProgramManager.getInstance().handleTimerDoubleClick(getTimer());
         }
