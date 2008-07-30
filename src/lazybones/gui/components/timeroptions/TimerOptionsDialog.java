@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.2 2008-05-19 12:00:49 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.3 2008-07-30 10:39:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,6 @@ import javax.swing.JPanel;
 
 import lazybones.LazyBones;
 import lazybones.Timer;
-import lazybones.TimerManager;
 import util.ui.Localizer;
 import devplugin.Program;
 
@@ -61,8 +60,6 @@ public class TimerOptionsDialog implements ActionListener {
 
     private JDialog dialog;
 
-    private Mode mode = Mode.NEW;
-    
     private TimerOptionsPanel top;
     
     private JPanel panel;
@@ -77,7 +74,9 @@ public class TimerOptionsDialog implements ActionListener {
      */
     private Timer oldTimer;
     
-    private Program prog;
+    private Program program;
+    
+    private boolean accepted = false;
     
     public enum Mode {
         NEW,
@@ -86,13 +85,12 @@ public class TimerOptionsDialog implements ActionListener {
     }
     
     public TimerOptionsDialog(Timer timer, Program prog, Mode mode) {
-        this.mode = mode;
         this.control = LazyBones.getInstance();
         top = new TimerOptionsPanel(timer, prog, mode);
         
         this.timer = timer;
         this.oldTimer = (Timer) timer.clone();
-        this.prog = prog;
+        this.program = prog;
         
         initGUI();
     }
@@ -142,12 +140,41 @@ public class TimerOptionsDialog implements ActionListener {
         if (e.getSource() == ok) {
             timer = top.getTimer();
             dialog.dispose();
-            boolean update = mode == Mode.UPDATE;
-            TimerManager.getInstance().callbackCreateTimer(timer, oldTimer, prog, update, false);
+            accepted = true;
         } else if (e.getSource() == cancel) {
             dialog.dispose();
         } 
     }
 
-    
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public Timer getOldTimer() {
+        return oldTimer;
+    }
+
+    public void setOldTimer(Timer oldTimer) {
+        this.oldTimer = oldTimer;
+    }
+
+    public Program getProgram() {
+        return program;
+    }
+
+    public void setProgram(Program program) {
+        this.program = program;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
 }
