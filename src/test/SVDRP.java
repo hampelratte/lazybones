@@ -1,4 +1,4 @@
-/* $Id: SVDRP.java,v 1.2 2008-07-23 15:39:50 hampelratte Exp $
+/* $Id: SVDRP.java,v 1.3 2008-07-31 20:37:08 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,8 +48,7 @@ public class SVDRP {
              System.out.println(res + ": " + res.getCode() + " " + res.getMessage());
              
              GRAB grab = new GRAB();
-             grab.setFilename("-");
-             grab.setFormat("jpeg");
+             grab.setFilename(".jpg");
              grab.setQuality("80");
              res = conn.send(grab);
              System.out.println(res + ": " + res.getCode() + " " + res.getMessage());

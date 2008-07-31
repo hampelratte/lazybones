@@ -9,6 +9,11 @@ Lazy Bones 0.4.1
 * Fixed bug in the paiting routine of the conflict painting.
 * Extended the week-day buttons on tht timeline panel to indicate conflicting
   timers.
+* Plugin tree was not updated, when a timer was assigned to a program manuaaly 
+  with the context menu
+* Fixed bug, which prevented Lazy Bones to mark the last available program
+  in the TVB EPG data. (The last program of the last day for which data is 
+  available)
 
 Lazy Bones 0.4
 ===============================================================================
