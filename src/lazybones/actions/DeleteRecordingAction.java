@@ -1,4 +1,4 @@
-/* $Id: DeleteRecordingAction.java,v 1.5 2007-10-14 19:05:51 hampelratte Exp $
+/* $Id: DeleteRecordingAction.java,v 1.6 2008-07-31 21:35:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -105,6 +105,7 @@ public class DeleteRecordingAction extends VDRAction {
                         }
                         
                         success = true;
+                        TimerManager.getInstance().synchronize();
                         callback();
                     }
                 };
