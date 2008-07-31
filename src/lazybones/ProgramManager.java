@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.20 2008-05-19 20:17:09 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.21 2008-07-31 20:39:48 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -281,8 +281,12 @@ public class ProgramManager {
                 int deltaEnd = endTime - timerend;
 
                 // MAYBE zeittoleranz als option anbieten
-                // collect candidates
-                if (Math.abs(deltaStart) <= 20 && Math.abs(deltaEnd) <= 20) {
+                // collect candidates, start and end time must not differ more than 20 minutes
+                if (Math.abs(deltaStart) <= 20 && (Math.abs(deltaEnd) <= 20 
+                        || prog.getLength() == -1)) /* special case prog.getLength() == -1, if the program is the last
+                                                     * program available in the EPG data. In this case, TVB can't calculate 
+                                                     * the length, because there is no subsequent program.*/
+                {
                     candidates.put(new Integer(Math.abs(deltaStart)), prog);
                 }
                 
