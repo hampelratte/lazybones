@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.32 2008-07-30 10:41:20 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.33 2008-07-31 21:37:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -149,6 +149,15 @@ public class TimerManager extends Observable {
         }
     }
 
+    /**
+     * Removes this timer from the internal list.
+     * This will result in a disappearence of this timer
+     * in any GUI element.
+     * 
+     * <string>Note!</strong>This method will not delete the timer on the VDR.
+     * To achieve that, use {@link #deleteTimer(Timer)}
+     * @param timer
+     */
     public void removeTimer(Timer timer) {
         timers.remove(timer);
         setChanged();
@@ -193,10 +202,9 @@ public class TimerManager extends Observable {
         Calendar cal = prog.getDate().getCalendar();
         for (Timer timer : timers) {
             List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
+            Timer bufferless = timer.getTimerWithoutBuffers(); 
             for (String curProgID : tvBrowserProdIDs) {
-                // maybe this doen't work in some cases e.g. progs after midnight or so
-                if (progID.equals(curProgID) &&
-                        Utilities.sameDay(cal, timer.getStartTime())) {
+                if ( progID.equals(curProgID) && Utilities.sameDay(cal, bufferless.getStartTime()) ) {
                     return timer;
                 }
             }
@@ -446,6 +454,11 @@ public class TimerManager extends Observable {
         }
     }
     
+    
+    /**
+     * Deletes a timer on the VDR
+     * @param timer timer to delete
+     */
     public void deleteTimer(final Timer timer) {
         VDRCallback callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
