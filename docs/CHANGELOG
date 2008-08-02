@@ -15,6 +15,7 @@ Lazy Bones 0.4.1
   in the TVB EPG data. (The last program of the last day for which data is 
   available)
 * Fixed bug in TimerManager.getTimer(Program prog)
+* Enabled font anti aliasing for custom components of the timeline panel
 
 Lazy Bones 0.4
 ===============================================================================
