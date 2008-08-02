@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.4 2008-07-30 12:52:27 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.5 2008-08-02 22:17:13 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -320,34 +320,35 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
             int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
             
-            switch (useTvbDescription) {
-            case DESC_VDR:
-                description.setText(descVdr);
-                comboDesc.setSelectedIndex(DESC_VDR);
-                break;
-            case DESC_TVB:
-                description.setText(descTvb);
-                comboDesc.setSelectedIndex(DESC_TVB);
-                break;
-            case DESC_LONGEST:
-                if(descVdr.length() < descTvb.length()) {
-                    description.setText(descTvb);
-                    comboDesc.setSelectedIndex(DESC_TVB);
-                } else {
-                    description.setText(descVdr);
-                    comboDesc.setSelectedIndex(DESC_VDR);
-                }
-                break;
-            default:
-                description.setText(descVdr);
-                comboDesc.setSelectedIndex(DESC_VDR);
-                break;
-            }
-            
             if(mode == Mode.UPDATE || mode == Mode.VIEW) {
                 description.setText(oldTimer.getDescription());
                 comboDesc.setSelectedIndex(2);
+            } else {
+                switch (useTvbDescription) {
+                case DESC_VDR:
+                    description.setText(descVdr);
+                    comboDesc.setSelectedIndex(DESC_VDR);
+                    break;
+                case DESC_TVB:
+                    description.setText(descTvb);
+                    comboDesc.setSelectedIndex(DESC_TVB);
+                    break;
+                case DESC_LONGEST:
+                    if(descVdr.length() < descTvb.length()) {
+                        description.setText(descTvb);
+                        comboDesc.setSelectedIndex(DESC_TVB);
+                    } else {
+                        description.setText(descVdr);
+                        comboDesc.setSelectedIndex(DESC_VDR);
+                    }
+                    break;
+                default:
+                    description.setText(descVdr);
+                    comboDesc.setSelectedIndex(DESC_VDR);
+                    break;
+                }
             }
+            
             
             // set timer is active switch
             cbActive.setSelected(timer.isActive());
