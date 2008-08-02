@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.14 2008-07-30 17:47:29 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.15 2008-08-02 16:57:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -138,17 +138,36 @@ public class TimelineElement extends JComponent implements MouseListener {
         g.setColor(CONFLICT_COLOR);
         if(timer.getConflictPeriods() != null && timer.getConflictPeriods().size() > 0) {
             for (Period period : timer.getConflictPeriods()) {
-                long durationMinutes = Utilities.getDurationInMinutes(timer.getStartTime(), timer.getEndTime());
+                Calendar conflictStart = (Calendar) period.getStartTime().clone();
+                Calendar conflictEnd = (Calendar) period.getEndTime().clone();
+                Calendar timerStart = (Calendar) timer.getStartTime().clone();
+                Calendar timerEnd = (Calendar) timer.getEndTime().clone();
+                if(!Utilities.sameDay(conflictStart, currentDate)) {
+                    conflictStart.set(Calendar.HOUR_OF_DAY, 0);
+                    conflictStart.set(Calendar.MINUTE, 0);
+                    conflictStart.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                if(!Utilities.sameDay(conflictEnd, currentDate)) {
+                    conflictEnd.set(Calendar.HOUR_OF_DAY, 23);
+                    conflictEnd.set(Calendar.MINUTE, 59);
+                    conflictEnd.add(Calendar.DAY_OF_MONTH, -1);
+                }
+                if(!Utilities.sameDay(timerStart, currentDate)) {
+                    timerStart.set(Calendar.HOUR_OF_DAY, 0);
+                    timerStart.set(Calendar.MINUTE, 0);
+                    timerStart.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                if(!Utilities.sameDay(timerEnd, currentDate)) {
+                    timerEnd.set(Calendar.HOUR_OF_DAY, 23);
+                    timerEnd.set(Calendar.MINUTE, 59);
+                    timerEnd.add(Calendar.DAY_OF_MONTH, -1);
+                }
+                
+                long durationMinutes = Utilities.getDurationInMinutes(timerStart, timerEnd);
                 double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
-                long startMinute = Utilities.getDurationInMinutes(timer.getStartTime(), period.getStartTime());
-                int x = 0;
-                if(Utilities.sameDay(period.getStartTime(), currentDate)) {
-                    x = (int)(pixelsPerMinute * startMinute);
-                }
-                int width = 0;
-                if(Utilities.sameDay(period.getEndTime(), currentDate)) {
-                    width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(period.getStartTime(), period.getEndTime()));
-                }
+                long startMinute = Utilities.getDurationInMinutes(timerStart, conflictStart);
+                int x = (int)Math.ceil(pixelsPerMinute * startMinute);
+                int width = (int)(pixelsPerMinute * Utilities.getDurationInMinutes(conflictStart, conflictEnd));
                 g.fillRect(x, 0, width, getHeight()-1);
             }
         }
