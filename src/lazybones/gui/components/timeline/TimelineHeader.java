@@ -1,4 +1,4 @@
-/* $Id: TimelineHeader.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelineHeader.java,v 1.2 2008-08-02 19:17:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -49,6 +51,14 @@ public class TimelineHeader extends JComponent {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        
+        // enable font anti aliasing
+        Graphics2D g2d = (Graphics2D) g;
+        // storing original anitalising flag
+        Object state = g2d.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+        if (state != RenderingHints.VALUE_TEXT_ANTIALIAS_ON) {
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
         
         int w = getWidth();
         int h = getHeight();

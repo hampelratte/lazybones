@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.15 2008-08-02 16:57:15 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.16 2008-08-02 19:17:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -33,6 +33,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
@@ -115,6 +117,14 @@ public class TimelineElement extends JComponent implements MouseListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        
+        // enable font anti aliasing
+        Graphics2D g2d = (Graphics2D) g;
+        // storing original anitalising flag
+        Object state = g2d.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+        if (state != RenderingHints.VALUE_TEXT_ANTIALIAS_ON) {
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
         
         // paint background
         g.setColor(COLOR);
