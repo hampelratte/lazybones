@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.16 2007-05-15 19:12:32 hampelratte Exp $
+/* $Id: Timer.java,v 1.17 2008-08-19 13:55:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -68,16 +68,16 @@ public class Timer extends VDRTimer {
         super.setState(timer.getState());
         super.setChannelNumber(timer.getChannelNumber());
         super.setDescription(timer.getDescription());
-        super.setEndTime(timer.getEndTime());
+        super.getEndTime().setTimeInMillis(timer.getEndTime().getTimeInMillis());
         super.setFile(timer.getFile());
-        super.setFirstTime(timer.getFirstTime());
+        super.getFirstTime().setTimeInMillis(timer.getFirstTime().getTimeInMillis());
         super.setHasFirstTime(timer.hasFirstTime());
         super.setChannelNumber(timer.getChannelNumber());
         super.setLifetime(timer.getLifetime());
         super.setPath(timer.getPath());
         super.setPriority(timer.getPriority());
         super.setRepeatingDays(timer.getRepeatingDays());
-        super.setStartTime(timer.getStartTime());
+        super.getStartTime().setTimeInMillis(timer.getStartTime().getTimeInMillis());
         super.setTitle(timer.getTitle());
     }
     
