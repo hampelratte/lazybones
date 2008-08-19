@@ -37,6 +37,7 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
 			<classpath>
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
+				<pathelement location="${tvbrowser.runtime.dir}/plugins/CapturePlugin.jar" />
 				<pathelement location="${classes.dir}" />
 				<fileset dir="${lib.dir}">
 					<include name="*.jar"/>
@@ -68,6 +69,7 @@
 		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
 			<!--<jvmarg value="-Dawt.toolkit=sun.awt.motif.MToolkit"/>-->
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
+			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
 		</java>
 	</target>
 
@@ -76,6 +78,7 @@
 			<jvmarg value="-Duser.home=/home/henni/.tvbrowser-vdr-local"/>
 			<!--<jvmarg value="-Dawt.toolkit=sun.awt.motif.MToolkit"/>-->
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
+			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
 		</java>
 	</target>
 
