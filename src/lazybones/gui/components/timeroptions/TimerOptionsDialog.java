@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.3 2008-07-30 10:39:31 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.4 2008-09-09 11:18:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -115,6 +115,7 @@ public class TimerOptionsDialog implements ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 0;
         panel.add(top, gbc);
+        dialog.addWindowListener(top);
 
         gbc.weighty = 0.1;
         gbc.gridwidth = 1;

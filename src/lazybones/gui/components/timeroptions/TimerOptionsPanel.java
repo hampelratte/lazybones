@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.5 2008-08-02 22:17:13 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.6 2008-09-09 11:18:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,6 +38,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Calendar;
 
 import javax.swing.BorderFactory;
@@ -72,7 +74,7 @@ import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
 
-public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener {
+public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener, WindowListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
     
     public static final int DESC_VDR = 0;
@@ -293,7 +295,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             priority.setEnabled(false);
             comboDesc.setEnabled(false);
             description.setEnabled(false);
-        }
+        } 
     }
 
     public void setTimer(Timer timer) {
@@ -460,5 +462,15 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 description.setText(oldTimer.getDescription());
             }
         }
+    }
+    
+    public void windowActivated(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {}
+    public void windowClosing(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {
+        title.requestFocus();
     }
 }
