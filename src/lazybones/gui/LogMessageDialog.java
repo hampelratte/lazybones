@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.16 2008-05-19 17:23:37 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.17 2008-09-09 11:39:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -59,6 +59,8 @@ import javax.swing.event.ListSelectionListener;
 import lazybones.LazyBones;
 import lazybones.logging.SimpleFormatter;
 import util.ui.Localizer;
+import util.ui.UiUtilities;
+import util.ui.WindowClosingIf;
 
 
 
@@ -75,7 +77,7 @@ import util.ui.Localizer;
 * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
-public class LogMessageDialog extends JDialog implements ListSelectionListener {
+public class LogMessageDialog extends JDialog implements ListSelectionListener, WindowClosingIf {
     
     private static LogMessageDialog instance;
     
@@ -90,6 +92,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
     private LogMessageDialog() {
         super(LazyBones.getInstance().getParent(), false);
         initGUI();
+        UiUtilities.registerForClosing(this);
     }
     
     private void initGUI() {
@@ -108,7 +111,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
         JButton okButton = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                closeWindow();
+                close();
             } 
         });
         getContentPane().add(okButton, BorderLayout.SOUTH);
@@ -117,7 +120,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent arg0) {
-                closeWindow();
+                close();
             }
         });
         
@@ -126,7 +129,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener {
     }
 
     
-    private void closeWindow() {
+    public void close() {
         setVisible(false);
         model.removeAllElements();
         taDetails.setText("Details...");

@@ -30,6 +30,9 @@ import lazybones.logging.SimpleFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.ui.UiUtilities;
+import util.ui.WindowClosingIf;
+
 
 /**
 * This code was edited or generated using CloudGarden's Jigloo
@@ -43,7 +46,7 @@ import org.slf4j.LoggerFactory;
 * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
-public class DebugConsole extends JFrame implements LogObserver {
+public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf {
 	
 	private static transient Logger logger = LoggerFactory.getLogger(DebugConsole.class);
 	
@@ -67,6 +70,7 @@ public class DebugConsole extends JFrame implements LogObserver {
         LoggingArchive.addObserver(this);
         initStyles();
         initGUI();
+        UiUtilities.registerForClosing(this);
         showCurrentLog();
     }
 
@@ -157,5 +161,9 @@ public class DebugConsole extends JFrame implements LogObserver {
                 setVisible(false);
             }
         });
+    }
+
+    public void close() {
+        setVisible(false);
     }
 }

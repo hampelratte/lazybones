@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.4 2008-09-09 11:18:03 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.5 2008-09-09 11:39:12 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,10 +39,13 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 
 import lazybones.LazyBones;
 import lazybones.Timer;
 import util.ui.Localizer;
+import util.ui.UiUtilities;
+import util.ui.WindowClosingIf;
 import devplugin.Program;
 
 /**
@@ -50,7 +53,7 @@ import devplugin.Program;
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
-public class TimerOptionsDialog implements ActionListener {
+public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
     
     private JButton ok = new JButton();
 
@@ -100,6 +103,9 @@ public class TimerOptionsDialog implements ActionListener {
         dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
         dialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         panel = new JPanel(new GridBagLayout());
+        
+        // register escape listener
+        UiUtilities.registerForClosing(this);
         
         dialog.getContentPane().add(panel);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -177,5 +183,13 @@ public class TimerOptionsDialog implements ActionListener {
 
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public void close() {
+        dialog.dispose();
+    }
+
+    public JRootPane getRootPane() {
+        return dialog.getRootPane();
     }
 }

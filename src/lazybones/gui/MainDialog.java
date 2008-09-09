@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.11 2008-05-19 12:00:48 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.12 2008-09-09 11:39:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,11 +43,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import util.ui.UiUtilities;
+import util.ui.WindowClosingIf;
+
 import lazybones.LazyBones;
 import lazybones.gui.components.ScreenshotPanel;
 import lazybones.gui.components.remotecontrol.RemoteControl;
 
-public class MainDialog extends JDialog {
+public class MainDialog extends JDialog implements WindowClosingIf {
 
     private ScreenshotPanel screenshotPanel = new ScreenshotPanel();
     
@@ -61,6 +64,7 @@ public class MainDialog extends JDialog {
     public MainDialog(Frame parent, String title, boolean modal) {
         super(parent, title, modal);
         initGUI();
+        UiUtilities.registerForClosing(this);
     }
 
     private void initGUI() {
@@ -113,5 +117,9 @@ public class MainDialog extends JDialog {
 
     public TimelinePanel getTimelinePanel() {
         return timelinePanel;
+    }
+
+    public void close() {
+        setVisible(false);
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.10 2008-05-19 12:00:48 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.11 2008-09-09 11:39:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
@@ -51,6 +52,8 @@ import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
 import util.ui.Localizer;
 import util.ui.ProgramList;
+import util.ui.UiUtilities;
+import util.ui.WindowClosingIf;
 import devplugin.Program;
 
 /**
@@ -59,7 +62,7 @@ import devplugin.Program;
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  */
-public class TimerSelectionDialog implements ActionListener {
+public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
@@ -86,6 +89,7 @@ public class TimerSelectionDialog implements ActionListener {
         this.timerOptions = timerOptions;
         this.originalProgram = prog;
         initGUI();
+        UiUtilities.registerForClosing(this);
     }
 
     private void initGUI() {
@@ -164,5 +168,13 @@ public class TimerSelectionDialog implements ActionListener {
             }
         } 
         dialog.dispose();
+    }
+
+    public void close() {
+        dialog.dispose();
+    }
+
+    public JRootPane getRootPane() {
+        return dialog.getRootPane();
     }
 }

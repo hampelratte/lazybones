@@ -1,4 +1,4 @@
-/* $Id: Server.java,v 1.1 2008-07-23 15:27:17 hampelratte Exp $
+/* $Id: Server.java,v 1.2 2008-09-09 11:39:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -109,22 +109,24 @@ public class Server {
     }
 
     private void printTimerList() {
-        ps.println("250-1 1:29:2008-07-13:2010:2205:99:99:Born to be Wild - Saumäßig unterwegs:<epgsearch><eventid>13695</eventid><update>0</update><bstart>5</bstart><bstop>10</bstop></epgsearch>\n" + 
-        		"250-2 1:7:2008-07-14:2009:2123:50:50:Moonlight:Mick und Beth erlebten einen gemeinsamen, intimen Moment in der Wüste - jetzt versuchen sie alles, um sich aus dem Weg zu gehen, nicht zuletzt deswegen, weil die Reporterin liiert ist. Mick ist derweil mit einem neuen Fall beschäftigt und hat alle Hände voll zu tun. Der Detektiv ist auf der Suche nach einem Vampirteenager, dessen Beute meist junge Frauen eines Escort-Services sind, die er zuvor im Internet ausfindig macht.\n" + 
-        		"250 3 1:7:2008-07-15:0750:0833:50:50:Two and a Half Men:Alan leidet unter Schlafstörungen. Als er versucht, durch Joggen müde zu werden, wird er auch noch fälschlicherweise für einen Bankräuber gehalten und verhaftet. Bei einer Therapeutin findet er schließlich heraus, dass Charlie der Auslöser seiner Probleme ist. Der gräbt indes die Mutter von Jakes Freundin an, was dem gar nicht passt. Jake glaubt nämlich, dass die Sache kein gutes Ende für ihn nehmen wird. Charlie trifft sich heimlich mit der attraktiven Mutter. ");
-        
+//        ps.println("250-1 1:29:2008-07-13:2010:2205:99:99:Born to be Wild - Saumäßig unterwegs:<epgsearch><eventid>13695</eventid><update>0</update><bstart>5</bstart><bstop>10</bstop></epgsearch>\n" + 
+//        		"250-2 1:7:2008-07-14:2009:2123:50:50:Moonlight:Mick und Beth erlebten einen gemeinsamen, intimen Moment in der Wüste - jetzt versuchen sie alles, um sich aus dem Weg zu gehen, nicht zuletzt deswegen, weil die Reporterin liiert ist. Mick ist derweil mit einem neuen Fall beschäftigt und hat alle Hände voll zu tun. Der Detektiv ist auf der Suche nach einem Vampirteenager, dessen Beute meist junge Frauen eines Escort-Services sind, die er zuvor im Internet ausfindig macht.\n" + 
+//        		"250 3 1:7:2008-07-15:0750:0833:50:50:Two and a Half Men:Alan leidet unter Schlafstörungen. Als er versucht, durch Joggen müde zu werden, wird er auch noch fälschlicherweise für einen Bankräuber gehalten und verhaftet. Bei einer Therapeutin findet er schließlich heraus, dass Charlie der Auslöser seiner Probleme ist. Der gräbt indes die Mutter von Jakes Freundin an, was dem gar nicht passt. Jake glaubt nämlich, dass die Sache kein gutes Ende für ihn nehmen wird. Charlie trifft sich heimlich mit der attraktiven Mutter. ");
+        ps.println("250-1 1:3:2008-08-19:2155:2240:50:50:Fahr mal hin:Sie ist mit Sicherheit die s&#65533;&#65533;este Stra&#65533;e der Welt. Die neue \"Route du Chocolat\". Sie f&#65533;hrt vom els&#65533;ssischen Retzwiller bis nach Bad Bergzabern in der S&#65533;dpfalz. An insgesamt 40 Rastpl&#65533;tzen, also Konditoreien und Chocolaterien, k&#65533;nnen Reisende in Sachen Schokolade schwelgen. Edle Schokoladen und Rumtr&#65533;ffel naschen, Pfefferpralinen kosten und den Chocolatiers bei der Zubereitung &#65533;ber die Schulter schauen. Die Idee zur \"Route du Chocolat\" hatten els&#65533;ssische Patissiers und Chocolatiers. Schlie&#65533;lich stammen 40 Prozent aller in Frankreich hergestellten Schokoladenprodukte aus dem Elsass. Seit dem Kinofilm \"Chocolat\" ist die Schokolade neu entdeckt worden. Weg vom billigen Massenprodukt mit den Standardsorten wie Vollmilch oder Trauben-Nuss. Heute denken sich Schokoladenhersteller immer neue, manchmal sogar kuriose Sorten aus. Besonders im Trend ist derzeit Schokolade mit Pfeffer oder Chiligeschmack. Der Phantasie der Chocolatiers sind keine Grenzen gesetzt. Die Zuschauer erfahren in der Sendung wie die Schokolade nach Frankreich kam, lernen dass es Schokolade lange Zeit nur zum Trinken gab und nehmen teil an einer Verkostung von Wein und Schokolade. Sie erleben in der Schule der Chocolatiers eine Abschlusspr&#65533;fung und im Luxushotel \"Le Clos de D&#65533;lices\" eine Massage mit fl&#65533;ssiger Schokolade.||(c) by DasErste/TV-Browser\n" + 
+        		"250-2 1:6:MTWTF--:0556:0614:50:50:MUSIK BOXX:Habt ihr Lust auf Singen und Tanzen? Dann ist die MUSIK BOXX genau das Richtige f&#65533;r euch. In der MUSIK BOXX zeigen wir von Montag bis Freitag die neuesten und besten Musik Clips von euren Lieblingsliedermachern, wie Volker Rosin, Rumpelstil, Jenny Thoms, Gr&#65533;nschnabel, Hexe Knickebein, Daniel Kallauch, Rolf Zuckowski und vielen mehr. Die Auswahl ist riesengro&#65533;!!! In der MUSIK BOXX gibt es Lieder &#65533;ber Tiere, Freundschaft, Geister, Indianer aber auch tolle Bewegungs-Lieder. Schaut mal rein, bestimmt ist auch euer Lieblingslied dabei!\n" + 
+        		"250 3 1:9:2008-08-19:1140:1240:50:50:Unkraut:* Frankenwald: Naturjuwel im Dornr&#65533;schenschlaf|* Rarit&#65533;ten: Bayerns letzte Urw&#65533;lder|* Visionen: Bioenergie f&#65533;r ein ganzes Dorf|* Invasion: Tschechische Borkenk&#65533;fer im Bayerischen Wald|* Luft&#65533;berwachung: Auf der Suche nach Waldbr&#65533;nden ");
     }
 
     private void printChannelList() {
         ps.println("250-1 Das Erste;ARD:11836:hC34:S19.2E:27500:101:102=deu,103=2ch;106=dd:104:0:28106:1:1101:0\n" + 
         		"250-2 ZDF;ZDFvision:11954:hC34:S19.2E:27500:110:120=deu,121=2ch;125=dd:130:0:28006:1:1079:0\n" + 
-        		"250-3 SAT.1;ProSiebenSat.1:12544:hC56:S19.2E:22000:255:256=deu;259=deu:32:0:17500:1:1107:0\n" + 
+        		"250-3 SWR Fernsehen BW;ARD:11836:hC34:S19.2E:27500:801:802=deu:804:0:28113:1:1101:0\n" +  
         		"250-4 RTL Television,RTL;RTL World:12188:hC34:S19.2E:27500:163:104=deu;106=deu:105:0:12003:1:1089:0\n" + 
         		"250-5 RTL2;RTL World:12188:hC34:S19.2E:27500:166:128=deu:68:0:12020:1:1089:0\n" + 
-        		"250-6 VOX;RTL World:12188:hC34:S19.2E:27500:167:136=deu:71:0:12060:1:1089:0\n" + 
+        		"250-6 KiKa;ZDFvision:11954:hC34:S19.2E:27500:310:320=deu:330:0:28008:1:1079:0\n" + 
         		"250-7 ProSieben;ProSiebenSat.1:12544:hC56:S19.2E:22000:511:512=deu;515=deu:33:0:17501:1:1107:0\n" + 
         		"250-8 kabel eins;ProSiebenSat.1:12544:hC56:S19.2E:22000:767:768=deu:34:0:17502:1:1107:0\n" + 
-        		"250-9 DAS VIERTE,D VIERTE;BetaDigital:12460:hC34:S19.2E:27500:2047:2048=deu:36:0:1793:133:5:0\n" + 
+        		"250-9 Bayerisches FS Süd;ARD:11836:hC34:S19.2E:27500:201:202=deu,203=2ch;206=dd:204:0:28107:1:1101:0\n" +
         		"250-10 TELE 5;BetaDigital:12480:vC34:S19.2E:27500:1535:1536=deu:38:0:51:133:33:0\n" + 
         		"250-11 Super RTL,S RTL;RTL World:12188:hC34:S19.2E:27500:165:120=deu:65:0:12040:1:1089:0\n" + 
         		"250-12 3sat;ZDFvision:11954:hC34:S19.2E:27500:210:220=deu,221=2ch;225=dd:230:0:28007:1:1079:0\n" + 
@@ -133,7 +135,7 @@ public class Server {
         		"250-15 Radio Bremen TV-alt;ARD:12266:hC34:S19.2E:27500:1201:1202=deu:1204:0:28485:1:1093:0\n" + 
         		"250-16 rbb Berlin;ARD:12110:hC34:S19.2E:27500:601:602=deu:604:0:28206:1:1073:0\n" + 
         		"250-17 SR Fernsehen;ARD:12266:hC34:S19.2E:27500:1301:1302=deu:1304:0:28486:1:1093:0\n" + 
-        		"250-18 SWR Fernsehen BW;ARD:11836:hC34:S19.2E:27500:801:802=deu:804:0:28113:1:1101:0\n" + 
+        		"250-18 SAT.1;ProSiebenSat.1:12544:hC56:S19.2E:22000:255:256=deu;259=deu:32:0:17500:1:1107:0\n" +
         		"250-19 WDR Köln;ARD:11836:hC34:S19.2E:27500:601:602=deu:604:0:28111:1:1101:0\n" + 
         		"250-20 EinsExtra;ARD:10743:hC56:S19.2E:22000:101:102=deu:0:0:28721:1:1051:0\n" + 
         		"250-21 EinsFestival;ARD:10743:hC56:S19.2E:22000:201:202=deu:204:0:28722:1:1051:0\n" + 
@@ -180,11 +182,11 @@ public class Server {
         		"250-62 dhd24.tv;Media Broadcast:12633:hC56:S19.2E:22000:53:54=deu:55:0:12604:1:1113:0\n" + 
         		"250-63 JAMBA! TV,JAMBA!;BetaDigital:12460:hC34:S19.2E:27500:2303:2304=deu:0:0:1794:133:5:0\n" + 
         		"250-64 Gebrauchtwagen TV;BetaDigital:12246:vC34:S19.2E:27500:2799:2800=deu:38:0:10124:1:1092:0\n" + 
-        		"250-65 Bayerisches FS Süd;ARD:11836:hC34:S19.2E:27500:201:202=deu,203=2ch;206=dd:204:0:28107:1:1101:0\n" + 
+        		"250-65 DAS VIERTE,D VIERTE;BetaDigital:12460:hC34:S19.2E:27500:2047:2048=deu:36:0:1793:133:5:0\n" +
         		"250-66 BR-alpha*;ARD:11836:hC34:S19.2E:27500:701:702=deu:704:0:28112:1:1101:0\n" + 
         		"250-67 hr-fernsehen;ARD:11836:hC34:S19.2E:27500:301:302=deu:304:0:28108:1:1101:0\n" + 
         		"250-68 MDR Sachsen;ARD:12110:hC34:S19.2E:27500:2901:2902=deu,2903=2ch:2904:0:28228:1:1073:0\n" + 
-        		"250-69 KiKa;ZDFvision:11954:hC34:S19.2E:27500:310:320=deu:330:0:28008:1:1079:0\n" + 
+        		"250-69 VOX;RTL World:12188:hC34:S19.2E:27500:167:136=deu:71:0:12060:1:1089:0\n" +
         		"250-70 n-tv;RTL World:12188:hC34:S19.2E:27500:169:73=deu:80:0:12090:1:1089:0\n" + 
         		"250-71 N24;ProSiebenSat.1:12544:hC56:S19.2E:22000:1023:1024=deu:35:0:17503:1:1107:0\n" + 
         		"250-72 Bloomberg TV Germany;Bloomberg:12551:vC56:S19.2E:22000:162:99=deu:0:0:12160:1:1108:0\n" + 
