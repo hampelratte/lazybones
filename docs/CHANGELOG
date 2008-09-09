@@ -16,6 +16,9 @@ Lazy Bones 0.4.1
   available)
 * Fixed bug in TimerManager.getTimer(Program prog)
 * Enabled font anti aliasing for custom components of the timeline panel
+* TimerOptionsDialog sets the focus to the title field when opened 
+  (suggested by ChrisBox)
+* All dialogs can be closed with the escape key (suggested by ChrisBox)
 
 Lazy Bones 0.4
 ===============================================================================
