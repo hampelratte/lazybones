@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.98 2008-08-19 13:55:03 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.99 2008-09-15 20:12:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -231,6 +231,10 @@ public class LazyBones extends Plugin implements Observer {
         props.setProperty("timer.after", timer_after);
         props.setProperty("timer.prio", timer_prio);
         props.setProperty("timer.lifetime", timer_lifetime);
+        
+        String vpsDefault = props.getProperty("vps.default");
+        vpsDefault = vpsDefault == null ? "false" : vpsDefault;
+        props.setProperty("vps.default", vpsDefault);
         
         String numberOfCards = props.getProperty("numberOfCards");
         numberOfCards = numberOfCards == null ? "1" : numberOfCards;

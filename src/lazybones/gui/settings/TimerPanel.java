@@ -1,4 +1,4 @@
-/* $Id: TimerPanel.java,v 1.5 2008-07-30 12:02:13 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.6 2008-09-15 20:12:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -95,7 +95,9 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JButton addRow;
 
     private JButton delRow;
-    
+    private JCheckBox cbVPS;
+    private JLabel lVPS = new JLabel(LazyBones.getTranslation("vpsDefault", "VPS by default"));
+
     private JLabel lDescSource;
     
     private JComboBox cbDescSource;
@@ -113,6 +115,8 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
         int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
         int descSourceTvb = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
+        boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+        
         before = new JSpinner();
         before.setValue(new Integer(int_before));
         before.setToolTipText(ttBefore);
@@ -168,10 +172,20 @@ public class TimerPanel implements MouseListener, ActionListener {
         cbDescSource.addItem("TV-Browser");
         cbDescSource.addItem(LazyBones.getTranslation("timer_desc_longest", "longest description"));
         cbDescSource.setSelectedIndex(descSourceTvb);
+        
+        cbVPS = new JCheckBox();
+        cbVPS.setSelected(vpsDefault);
     }
 
     public JPanel getPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
+        GridBagLayout panelLayout = new GridBagLayout();
+        panelLayout.columnWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1};
+        panelLayout.columnWidths = new int[] {7, 7, 7, 7, 7};
+        panelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1};
+        panelLayout.rowHeights = new int[] {7, 7, 7, 20, 7, 7, 29, 7};
+        panel.setLayout(panelLayout);
+        panel.setPreferredSize(new java.awt.Dimension(1021, 672));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
 
@@ -209,12 +223,12 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(5, 15, 30, 5);
-        panel.add(lNumberOfCards, gbc);
+        panel.add(lNumberOfCards, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 30, 5), 0, 0));
 
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.insets = new Insets(15, 5, 30, 5);
-        panel.add(numberOfCards, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 30, 5), 0, 0));
+        panel.add(numberOfCards, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 30, 5), 0, 0));
 
         // right column of spinners
         gbc.gridx = 2;
@@ -241,7 +255,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.insets = new Insets(5, 15, 5, 5);
-        panel.add(labMappings, gbc);
+        panel.add(labMappings, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 5, 5), 0, 0));
 
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -251,7 +265,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.insets = new Insets(0, 15, 15, 5);
-        panel.add(mappingPane, gbc);
+        panel.add(mappingPane, new GridBagConstraints(0, 6, 4, 2, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 15, 15, 5), 0, 0));
 
         // buttons
         gbc.gridx = 4;
@@ -263,12 +277,14 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(addRow, gbc);
+        panel.add(addRow, new GridBagConstraints(4, 6, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
 
         gbc.gridx = 4;
         gbc.gridy = 6;
         gbc.insets = new Insets(5, 5, 5, 15);
-        panel.add(delRow, gbc);
+        panel.add(delRow, new GridBagConstraints(4, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
+        panel.add(lVPS, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 5, 5), 0, 0));
+        panel.add(cbVPS, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 
         return panel;
     }
@@ -280,6 +296,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         LazyBones.getProperties().setProperty("timer.lifetime", lifetime.getValue().toString());
         LazyBones.getProperties().setProperty("numberOfCards", numberOfCards.getValue().toString());
         LazyBones.getProperties().setProperty("descSourceTvb", Integer.toString(cbDescSource.getSelectedIndex()));
+        LazyBones.getProperties().setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
         
         ConflictFinder.getInstance().findConflicts();
         ConflictFinder.getInstance().handleConflicts();

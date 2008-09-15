@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.6 2008-09-09 11:18:03 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.7 2008-09-15 20:12:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -146,8 +146,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         
         initGUI();
         
-        setTimer(timer);
         setProgram(prog);
+        setTimer(timer);
     }
     
     public TimerOptionsPanel(Mode mode) {
@@ -355,9 +355,6 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             // set timer is active switch
             cbActive.setSelected(timer.isActive());
             
-            // set timer uses VPS switch
-            cbVps.setSelected(timer.hasState(VDRTimer.VPS));
-            
             // set timer title
             title.setText(timer.getFile());
 
@@ -375,6 +372,15 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
             
             dayChooser.setTimer(timer);
+            
+            // set timer uses VPS switch
+            if(mode == Mode.NEW) {
+                boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+                cbVps.setSelected(vpsDefault);
+                setVps(vpsDefault);
+            } else {
+                cbVps.setSelected(timer.hasState(VDRTimer.VPS));
+            }
         }
     }
     
@@ -384,28 +390,34 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == cbVps) {
-            /* to set the right vps time we use start time of the tvb program
-             * the start time of the vdr epg should be rather used, but it's to complicated
-             * for this simple case 
-             */
-            if(cbVps.isSelected()) {
-                if(prog != null) {
-                    // VPS needs the unbuffered start time
-                    int hour = prog.getHours();
-                    int minute = prog.getMinutes();
-                    logger.debug("Setting start time to start time of the TVB-program");
-                    spinnerStarttime.getModel().setValue(new Time(hour, minute));
-                    spinnerStarttime.setBorder(BorderFactory.createLineBorder(Color.RED));
-                    spinnerStarttime.repaint();
-                    lVpsTimeHint.setVisible(true);
-                }
+            setVps(cbVps.isSelected());
+            lVpsTimeHint.setVisible(true);
+            spinnerStarttime.setBorder(BorderFactory.createLineBorder(Color.RED));
+            spinnerStarttime.repaint();
+        }
+    }
+    
+    private void setVps(boolean activated) {
+        /* to set the right vps time we use start time of the tvb program
+         * the start time of the vdr epg should be rather used, but it's to complicated
+         * for this simple case 
+         */
+        if(activated) {
+            if(prog != null) {
+                // VPS needs the unbuffered start time
+                int hour = prog.getHours();
+                int minute = prog.getMinutes();
+                logger.debug("Setting start time to start time of the TVB-program");
+                spinnerStarttime.getModel().setValue(new Time(hour, minute));
             } else {
-                if(oldTimer != null) {
-                    // set the timer to the previous startTime
-                    int hour = oldTimer.getStartTime().get(Calendar.HOUR_OF_DAY);
-                    int minute = oldTimer.getStartTime().get(Calendar.MINUTE);
-                    spinnerStarttime.getModel().setValue(new Time(hour, minute));
-                }
+                
+            }
+        } else {
+            if(oldTimer != null) {
+                // set the timer to the previous startTime
+                int hour = oldTimer.getStartTime().get(Calendar.HOUR_OF_DAY);
+                int minute = oldTimer.getStartTime().get(Calendar.MINUTE);
+                spinnerStarttime.getModel().setValue(new Time(hour, minute));
             }
         }
     }
