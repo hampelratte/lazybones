@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.21 2008-07-31 20:39:48 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.22 2008-10-04 21:48:12 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -249,113 +249,112 @@ public class ProgramManager {
         int month = bufferLessTimer.getStartTime().get(Calendar.MONTH) + 1;
         int year = bufferLessTimer.getStartTime().get(Calendar.YEAR);
 
+        // get the day program of the day, the previous day and the next day
         Date date = new Date(year, month, day);
-
-        Iterator<Program> it = LazyBones.getPluginManager().getChannelDayProgram(date, chan);
+        List<Program> threeDayProgram = getThreeDayProgram(date, chan); 
+        Iterator<Program> it = threeDayProgram.iterator(); 
         if (it != null) {
             // contains programs, which could be the right program for the timer
             TreeMap<Integer, Program> candidates = new TreeMap<Integer, Program>();
             
             // contains programs, which start and stop between the start and the stop time
             // of the timer and could be part of a Doppelpack
-            ArrayList<Program> doppelPack = new ArrayList<Program>();
+            List<Program> doppelPack = new ArrayList<Program>();
+
+            // get timer start and end as unix time stamp
+            Calendar timerStartCal = bufferLessTimer.getStartTime();
+            Calendar timerEndCal = bufferLessTimer.getEndTime();
             
-            while (it.hasNext()) { // iterate over all programs of one day and
-                                    // compare start and end time
+            // iterate over all programs and
+            // compare start and end time
+            while (it.hasNext()) { 
                 Program prog = it.next();
-                int startTime = prog.getStartTime();
-                int endTime = startTime + prog.getLength();
-
-                Calendar timerStartCal = bufferLessTimer.getStartTime();
-                int hour = timerStartCal.get(Calendar.HOUR_OF_DAY);
-                int minute = timerStartCal.get(Calendar.MINUTE);
-                int timerstart = hour * 60 + minute;
-
-                Calendar timerEndCal = bufferLessTimer.getEndTime();
-                hour = timerEndCal.get(Calendar.HOUR_OF_DAY);
-                minute = timerEndCal.get(Calendar.MINUTE);
-                int timerend = hour * 60 + minute;
-                timerend = timerend < timerstart ? timerend + 1440 : timerend;
-
-                int deltaStart = startTime - timerstart;
-                int deltaEnd = endTime - timerend;
+                
+                // get prog start and end as unix time stamp
+                Calendar progStartCal = prog.getDate().getCalendar();
+                progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+                progStartCal.set(Calendar.MINUTE, prog.getMinutes());
+                progStartCal.set(Calendar.SECOND, 0);
+                Calendar progEndCal = (Calendar) progStartCal.clone();
+                progEndCal.add(Calendar.MINUTE, prog.getLength());
+                
+                // convert differences to minutes
+                int deltaStartMin = (int)Utilities.getDiffInMinutes(progStartCal, timerStartCal);
+                int deltaEndMin = (int)Utilities.getDiffInMinutes(progEndCal, timerEndCal);
 
                 // MAYBE zeittoleranz als option anbieten
-                // collect candidates, start and end time must not differ more than 20 minutes
-                if (Math.abs(deltaStart) <= 20 && (Math.abs(deltaEnd) <= 20 
-                        || prog.getLength() == -1)) /* special case prog.getLength() == -1, if the program is the last
+                // collect candidates, start and end time must not differ more than x minutes
+                int tolerance = 20;
+                if (deltaStartMin <= tolerance && deltaEndMin <= tolerance 
+                        || prog.getLength() == -1) /* special case prog.getLength() == -1, if the program is the last
                                                      * program available in the EPG data. In this case, TVB can't calculate 
                                                      * the length, because there is no subsequent program.*/
                 {
-                    candidates.put(new Integer(Math.abs(deltaStart)), prog);
+                    candidates.put(new Integer(deltaStartMin), prog);
                 }
                 
                 // collect doppelpack candidates
                 // use timer with buffers
-                timerStartCal = timer.getStartTime();
-                hour = timerStartCal.get(Calendar.HOUR_OF_DAY);
-                minute = timerStartCal.get(Calendar.MINUTE);
-                timerstart = hour * 60 + minute;
-                timerEndCal = timer.getEndTime();
-                hour = timerEndCal.get(Calendar.HOUR_OF_DAY);
-                minute = timerEndCal.get(Calendar.MINUTE);
-                timerend = hour * 60 + minute;
-                timerend = timerend < timerstart ? timerend + 1440 : timerend;
-                if(startTime >= timerstart && endTime <= timerend) {
+                if(progStartCal.after(timer.getStartTime()) && progEndCal.before(timer.getEndTime())) {
                     doppelPack.add(prog);
                 }
             }
 
-            if (candidates.size() == 0) {
-                if (doppelPack.size() > 1) {
-                    timer.setReason(Timer.NOT_FOUND); // if no doppelpack is found, this timer
-                    // is a timer with weird start and end times
-                    // then we have to show a ProgramConfirmDialog, so we set
-                    // the reason to not found and if a doppelpack is detected we
-                    // set the reason to no_reason
-                    ArrayList<String> list = new ArrayList<String>();
-                    String doppelpackTitle = null;
-                    for (Program prog : doppelPack) {
-                        String title = prog.getTitle();
-                        if(list.contains(title)) {
-                            logger.debug("Doppelpack found: {}", title);
-                            timer.setReason(Timer.NO_REASON);
-                            doppelpackTitle = title;
-                        } else {
-                            list.add(title);
-                        }
-                    }
-                    
-                    // mark all doppelpack programs
-                    if(doppelpackTitle != null) {
-                        for (Program prog : doppelPack) {
-                            if(prog.getTitle().equals(doppelpackTitle)) {
-                                prog.mark(LazyBones.getInstance());
-                                timer.addTvBrowserProgID(prog.getID());
-                            }
-                        }
-
-                    }
-                    
-                    // this timer is no doppelpack, but the times are weird
-                    // we now look if the user has made a mapping before
-                    if(timer.getReason() == Timer.NOT_FOUND) {
-                        // lookup old mappings
-                        boolean found = TimerManager.getInstance().lookUpTimer(timer, null);
-                        if (!found) { // we have no mapping
-                            logger.warn("Couldn't find a program with that title: ", timer.getTitle());
-                            logger.warn("Couldn't assign timer: ", timer);
-                            timer.setReason(Timer.NOT_FOUND);
-                        } else {
-                            timer.setReason(Timer.NO_REASON);
-                        }
-                    }
-                } else {
-                    boolean found = TimerManager.getInstance().lookUpTimer(timer, null);
-                    if (!found) {
-                        timer.setReason(Timer.NOT_FOUND);
+            if (doppelPack.size() > 1) {
+                timer.setReason(Timer.NOT_FOUND); // if no doppelpack is found, this timer
+                // is a timer with weird start and end times
+                // then we have to show a ProgramConfirmDialog, so we set
+                // the reason to not found and if a doppelpack is detected we
+                // set the reason to no_reason
+                ArrayList<String> list = new ArrayList<String>();
+                String doppelpackTitle = null;
+                for (Program prog : doppelPack) {
+                    String title = prog.getTitle();
+                    if(list.contains(title)) {
+                        logger.debug("Doppelpack found: {}", title);
+                        timer.setReason(Timer.NO_REASON);
+                        doppelpackTitle = title;
+                    } else {
+                        list.add(title);
                     }
                 }
+                
+                // mark all doppelpack programs
+                if(doppelpackTitle != null) {
+                    for (Program prog : doppelPack) {
+                        if(prog.getTitle().equals(doppelpackTitle)) {
+                            prog.mark(LazyBones.getInstance());
+                            timer.addTvBrowserProgID(prog.getID());
+                        }
+                    }
+
+                }
+                
+                // this timer is no doppelpack, but the times are weird
+                // we now look if the user has made a mapping before
+                if(timer.getReason() == Timer.NOT_FOUND) {
+                    // lookup old mappings
+                    boolean found = TimerManager.getInstance().lookUpTimer(timer, null);
+                    if (!found) { // we have no mapping
+                        logger.warn("Couldn't find a program with that title: ", timer.getTitle());
+                        logger.warn("Couldn't assign timer: ", timer);
+                        timer.setReason(Timer.NOT_FOUND);
+                    } else {
+                        timer.setReason(Timer.NO_REASON);
+                    }
+                }
+                
+                return;
+            }
+            
+            // no candidate and no doppelpack found
+            // look for the timer in stored timers
+            if (candidates.size() == 0 && doppelPack.size() == 0) {
+                boolean found = TimerManager.getInstance().lookUpTimer(timer, null);
+                if (!found) {
+                    timer.setReason(Timer.NOT_FOUND);
+                }
+                
                 return;
             }
             
@@ -371,14 +370,6 @@ public class ProgramManager {
             percentage = Math.max(percentagePath, percentageTitle);
             percentage = Math.max(percentage, percentageBoth);
 
-
-            // override the percentage
-            if (timer.getFile().indexOf("EPISODE") >= 0
-                    || timer.getFile().indexOf("TITLE") >= 0
-                    || timer.isRepeating()) {
-                percentage = 100;
-            }
-            
             logger.debug("Percentage: {} {}", percentage, timer.toString());
 
             int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
@@ -422,5 +413,32 @@ public class ProgramManager {
                 LazyBones.getPluginManager().handleProgramDoubleClick(prog);
             }
         }
+    }
+    
+    /**
+     * Returns the day program of a day + the previous day's program + the next day's program
+     * @param date
+     * @param chan
+     * @return
+     */
+    private List<Program> getThreeDayProgram(Date date, devplugin.Channel chan) {
+        List<Program> list = new ArrayList<Program>();
+
+        Iterator<Program> it = LazyBones.getPluginManager().getChannelDayProgram(date, chan);
+        while (it != null && it.hasNext()) {
+            list.add(it.next());
+        }
+
+        it = LazyBones.getPluginManager().getChannelDayProgram(date.addDays(1), chan);
+        while (it != null && it.hasNext()) {
+            list.add(it.next());
+        }
+
+        it = LazyBones.getPluginManager().getChannelDayProgram(date.addDays(-1), chan);
+        while (it != null && it.hasNext()) {
+            list.add(it.next());
+        }
+
+        return list;
     }
 }
