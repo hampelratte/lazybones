@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.7 2008-05-19 13:20:25 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.8 2008-10-04 18:37:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -115,17 +115,25 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         }
         
         if(value instanceof Recording) {
-            Recording recording = (Recording)value;
+            Recording rec = (Recording)value;
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
             DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
             
-            date.setText(df.format(recording.getStartTime().getTime()));
-            time.setText(tf.format(recording.getStartTime().getTime()));
-            title.setText(recording.getEpgInfo() != null ? 
-                    recording.getEpgInfo().getTitle() :
-                    recording.getDisplayTitle());
+            date.setText(df.format(rec.getStartTime().getTime()));
+            time.setText(tf.format(rec.getStartTime().getTime()));
             
-            if(recording.isNew()) {
+            String recTitle = rec.getDisplayTitle(); 
+            if(rec.getEpgInfo() != null) {
+                StringBuilder sb = new StringBuilder(rec.getEpgInfo().getTitle());
+                if(rec.getEpgInfo().getShortText().length() > 0) {
+                    sb.append(" - ");
+                    sb.append(rec.getEpgInfo().getShortText());
+                }
+                recTitle = sb.toString();
+            }
+            title.setText(recTitle);
+            
+            if(rec.isNew()) {
                 newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
                 newRec.setVisible(true);
             } else {
@@ -133,7 +141,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
                 newRec.setVisible(false);
             }
             
-            if(recording.isCut()) {
+            if(rec.isCut()) {
                 cutRec.setIcon(LazyBones.getInstance().getIcon("lazybones/edit-cut.png"));
                 cutRec.setVisible(true);
             } else {
