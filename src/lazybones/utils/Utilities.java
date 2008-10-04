@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.5 2008-07-30 17:48:14 hampelratte Exp $
+/* $Id: Utilities.java,v 1.6 2008-10-04 21:47:02 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JTable;
 import javax.swing.JViewport;
@@ -231,9 +232,9 @@ public class Utilities {
      * @param endTime
      * @return difference of two calendars in minutes
      */
-    public static long getDurationInMinutes(Calendar startTime, Calendar endTime) {
-        long durationMillis = endTime.getTimeInMillis() - startTime.getTimeInMillis();
-        return durationMillis / 1000 / 60;
+    public static long getDiffInMinutes(Calendar startTime, Calendar endTime) {
+        long diffMillis = Math.abs(endTime.getTimeInMillis() - startTime.getTimeInMillis());
+        return TimeUnit.MILLISECONDS.toMinutes(diffMillis);
     }
     
     /**
