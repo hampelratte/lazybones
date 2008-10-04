@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.5 2008-04-25 11:27:06 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.6 2008-10-04 18:37:08 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -372,7 +372,6 @@ public class ChannelPanel implements ActionListener {
         ChannelManager.setChannelMapping(channelMapping);
     }
     
-    @SuppressWarnings("unchecked")
     public void tryToAssignChannels() {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             ArrayList<Container> list = new ArrayList<Container>();

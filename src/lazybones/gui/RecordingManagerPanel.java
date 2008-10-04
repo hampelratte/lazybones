@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.13 2008-07-30 12:52:58 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.14 2008-10-04 18:36:31 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -164,7 +164,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         }
     }
     
-    @SuppressWarnings("unchecked")
     private void updateRecordings() {
         // create a new model, because clear() made problems.
         // sometimes the list was empty after an update

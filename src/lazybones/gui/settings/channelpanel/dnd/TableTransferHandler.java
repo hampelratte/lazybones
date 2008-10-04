@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.3 2008-10-04 18:37:08 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -63,7 +63,6 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         return channelSet;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void importChannels(JComponent c, ChannelSet<Channel> set) {
         JTable target = (JTable)c;

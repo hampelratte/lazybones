@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.13 2008-07-13 18:35:58 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.14 2008-10-04 18:36:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -80,7 +80,6 @@ public class ConflictFinder implements Observer {
         }
     }
     
-    @SuppressWarnings("unchecked")
     public void findConflicts() {
         logger.debug("Looking for conflicts");
         
