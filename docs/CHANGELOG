@@ -2,6 +2,7 @@ Lazy Bones 0.4.3
 ===============================================================================
 * Short description is displayed for recordings, if available
 * Improved timer time calculations -> better timer to TVB-program assignment
+* Hopefully fixed the problem of the empty error dialog
 
 Lazy Bones 0.4.2
 ===============================================================================
