@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.17 2008-09-09 11:39:11 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.18 2008-10-17 19:18:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -131,7 +131,8 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
     
     public void close() {
         setVisible(false);
-        model.removeAllElements();
+        model = new DefaultListModel();
+        list.setModel(model);
         taDetails.setText("Details...");
     }
 
