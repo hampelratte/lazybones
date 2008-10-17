@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.13 2008-07-30 12:52:58 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.14 2008-10-17 21:24:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -54,12 +54,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import lazybones.LazyBones;
-import lazybones.ProgramManager;
 import lazybones.Timer;
 import lazybones.TimerManager;
 import lazybones.gui.components.timeroptions.TimerOptionsPanel;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.utils.TimerListCellRenderer;
+import lazybones.programmanager.ProgramManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

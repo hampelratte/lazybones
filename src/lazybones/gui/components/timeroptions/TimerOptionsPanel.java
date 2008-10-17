@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.7 2008-09-15 20:12:28 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.8 2008-10-17 21:24:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -55,13 +55,13 @@ import javax.swing.SpinnerNumberModel;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.ProgramManager;
 import lazybones.Time;
 import lazybones.Timer;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.utils.SpinnerTimeModel;
+import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;

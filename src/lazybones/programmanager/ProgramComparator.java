@@ -1,4 +1,4 @@
-/* $Id: ProgramComparator.java,v 1.4 2006-09-07 13:53:42 hampelratte Exp $
+/* $Id: ProgramComparator.java,v 1.1 2008-10-17 21:24:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.programmanager;
 
 import java.util.Calendar;
 import java.util.Comparator;

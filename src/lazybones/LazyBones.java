@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.101 2008-10-04 21:55:28 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.102 2008-10-17 21:24:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -59,6 +59,7 @@ import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
 import lazybones.logging.PopupHandler;
 import lazybones.logging.SimpleFormatter;
+import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.NEWT;

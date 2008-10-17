@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.22 2008-10-04 21:48:12 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.1 2008-10-17 21:24:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.programmanager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,8 +39,15 @@ import java.util.TreeMap;
 
 import javax.swing.JPopupMenu;
 
+import lazybones.ChannelManager;
+import lazybones.LazyBones;
+import lazybones.Timer;
+import lazybones.TimerManager;
+import lazybones.VDRConnection;
 import lazybones.logging.LoggingConstants;
 import lazybones.logging.PopupHandler;
+import lazybones.programmanager.evaluation.Evaluator;
+import lazybones.programmanager.evaluation.Result;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.Response;
@@ -61,6 +68,8 @@ public class ProgramManager {
     private static transient Logger popupLog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
     
     private static ProgramManager instance;
+    
+    private Evaluator evaluator = new Evaluator();
     
     private ProgramManager() {
     }
@@ -270,7 +279,7 @@ public class ProgramManager {
             while (it.hasNext()) { 
                 Program prog = it.next();
                 
-                // get prog start and end as unix time stamp
+                // get prog start and end
                 Calendar progStartCal = prog.getDate().getCalendar();
                 progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
                 progStartCal.set(Calendar.MINUTE, prog.getMinutes());
@@ -284,7 +293,7 @@ public class ProgramManager {
 
                 // MAYBE zeittoleranz als option anbieten
                 // collect candidates, start and end time must not differ more than x minutes
-                int tolerance = 20;
+                int tolerance = 90;
                 if (deltaStartMin <= tolerance && deltaEndMin <= tolerance 
                         || prog.getLength() == -1) /* special case prog.getLength() == -1, if the program is the last
                                                      * program available in the EPG data. In this case, TVB can't calculate 
@@ -301,11 +310,7 @@ public class ProgramManager {
             }
 
             if (doppelPack.size() > 1) {
-                timer.setReason(Timer.NOT_FOUND); // if no doppelpack is found, this timer
-                // is a timer with weird start and end times
-                // then we have to show a ProgramConfirmDialog, so we set
-                // the reason to not found and if a doppelpack is detected we
-                // set the reason to no_reason
+                timer.setReason(Timer.NOT_FOUND); 
                 ArrayList<String> list = new ArrayList<String>();
                 String doppelpackTitle = null;
                 for (Program prog : doppelPack) {
@@ -327,24 +332,15 @@ public class ProgramManager {
                             timer.addTvBrowserProgID(prog.getID());
                         }
                     }
-
+                    return;
                 }
                 
-                // this timer is no doppelpack, but the times are weird
-                // we now look if the user has made a mapping before
-                if(timer.getReason() == Timer.NOT_FOUND) {
-                    // lookup old mappings
-                    boolean found = TimerManager.getInstance().lookUpTimer(timer, null);
-                    if (!found) { // we have no mapping
-                        logger.warn("Couldn't find a program with that title: ", timer.getTitle());
-                        logger.warn("Couldn't assign timer: ", timer);
-                        timer.setReason(Timer.NOT_FOUND);
-                    } else {
-                        timer.setReason(Timer.NO_REASON);
-                    }
-                }
-                
-                return;
+                // no doppelpack is found, this timer
+                // is a timer with weird start and end times,
+                // but we now add it to candidates, because, if
+                // it is not automatically assigned, we will do
+                // a lookup in stored timers as last resort
+                candidates.put(new Integer(0), doppelPack.get(0));
             }
             
             // no candidate and no doppelpack found
@@ -358,28 +354,20 @@ public class ProgramManager {
                 return;
             }
             
-            // get the best fitting candidate. this is the first key, because
-            // TreeMap is sorted
-            Program progMin = (Program) candidates.get(candidates.firstKey());
-
-            // calculate the precentage of common words
-            int percentage = 0;
-            int percentagePath = Utilities.percentageOfEquality(timer.getPath(), progMin.getTitle());
-            int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), progMin.getTitle());
-            int percentageBoth = Utilities.percentageOfEquality(timer.getPath() + timer.getTitle(), progMin.getTitle());
-            percentage = Math.max(percentagePath, percentageTitle);
-            percentage = Math.max(percentage, percentageBoth);
-
-            logger.debug("Percentage: {} {}", percentage, timer.toString());
+            // we have some candidates and can now valuate the programs, with
+            // several criteria
+            Result bestMatching = evaluator.evaluate(candidates.values(), timer);
+            logger.info("Best matching program for timer {} is {} with a percentage of {}", new Object[] {timer.getTitle(), bestMatching.getProgram().getTitle(), bestMatching.getPercentage()});
 
             int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
-            // if the percentage of common words is
-            // higher than the config value percentageThreshold, mark this
-            // program
-            if (percentage >= threshold) {
-                assignTimerToProgram(progMin, timer);
+            // if the percentage of common words is higher than the config value
+            // percentageThreshold, mark this program
+            if (bestMatching.getPercentage() >= threshold) {
+                assignTimerToProgram(bestMatching.getProgram(), timer);
             } else {
-                boolean found = TimerManager.getInstance().lookUpTimer(timer, progMin);
+                // no candidate and no doppelpack found
+                // look for the timer in stored timers
+                boolean found = TimerManager.getInstance().lookUpTimer(timer, bestMatching.getProgram());
                 if (!found) { // we have no mapping
                     logger.warn("Couldn't find a program with that title: ", timer.getTitle());
                     logger.warn("Couldn't assign timer: ", timer);

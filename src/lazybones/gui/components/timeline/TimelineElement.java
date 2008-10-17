@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.17 2008-10-04 21:47:15 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.18 2008-10-17 21:24:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,8 +48,8 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 
 import lazybones.ChannelManager;
-import lazybones.ProgramManager;
 import lazybones.Timer;
+import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Period;
 import lazybones.utils.Utilities;
 import devplugin.Channel;

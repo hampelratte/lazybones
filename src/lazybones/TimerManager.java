@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.33 2008-07-31 21:37:04 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.34 2008-10-17 21:24:56 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,6 +50,7 @@ import lazybones.gui.TimerSelectionDialog;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.utils.TitleMapping;
 import lazybones.logging.LoggingConstants;
+import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.Connection;
