@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.34 2008-10-17 21:24:56 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.35 2008-10-21 19:41:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -880,7 +880,7 @@ public class TimerManager extends Observable {
                         Date date = new Date(timer.getStartTime());
                         Iterator<Program> iterator = LazyBones.getPluginManager()
                                 .getChannelDayProgram(date, c);
-                        while (iterator.hasNext()) {
+                        while (iterator != null && iterator.hasNext()) {
                             Program p = iterator.next();
                             if (p.getID().equals(progID)
                                     && p.getDate().equals(date)) {
