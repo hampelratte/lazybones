@@ -1,4 +1,4 @@
-/* $Id: Evaluator.java,v 1.2 2008-10-21 19:42:57 hampelratte Exp $
+/* $Id: Evaluator.java,v 1.3 2008-10-21 19:47:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -70,7 +70,7 @@ public class Evaluator {
             int factors = 0;
             int total = 0;
             for (Criterion criterion : criteria) {
-                int percentage = criterion.evaluate(program, timer);
+                int percentage = Math.max(0, criterion.evaluate(program, timer));
                 total += percentage * criterion.getBoost();
                 factors += criterion.getBoost();
             }
