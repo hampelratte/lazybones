@@ -1,4 +1,4 @@
-/* $Id: TitleCriterion.java,v 1.2 2008-10-21 19:42:57 hampelratte Exp $
+/* $Id: StarttimeCriterion.java,v 1.1 2008-10-21 19:42:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,28 +29,43 @@
  */
 package lazybones.programmanager.evaluation;
 
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+
 import lazybones.Timer;
-import lazybones.utils.Utilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import devplugin.Program;
 
-public class TitleCriterion extends AbstractCriterion {
+/**
+ * Compares the start time of a {@link Program} and {@link Timer} and returns
+ * the percentage of equality
+ * 
+ * @author <a href="hampelratte@users.berlios.de">hampelratte@users.berlios.de</a>
+ */
+public class StarttimeCriterion extends AbstractCriterion {
 
-    private static transient Logger logger = LoggerFactory.getLogger(TitleCriterion.class);
+    private static transient Logger logger = LoggerFactory.getLogger(StarttimeCriterion.class);
     
     public int evaluate(Program prog, Timer timer) {
-        // calculate the precentage of common words
-        int percentage = 0;
-        int percentagePath = Utilities.percentageOfEquality(timer.getPath(), prog.getTitle());
-        int percentageTitle = Utilities.percentageOfEquality(timer.getTitle(), prog.getTitle());
-        int percentageBoth = Utilities.percentageOfEquality(timer.getPath() + timer.getTitle(), prog.getTitle());
-        percentage = Math.max(percentagePath, percentageTitle);
-        percentage = Math.max(percentage, percentageBoth);
-
-        logger.trace("TitleCriterion for timer {} and prog {}: {}", new Object[] {timer.getTitle(), prog.getTitle(), percentage});
+        // program start time
+        Calendar progStartCal = prog.getDate().getCalendar();
+        progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        progStartCal.set(Calendar.MINUTE, prog.getMinutes());
+        progStartCal.set(Calendar.SECOND, 0);
+        long progInMillis = progStartCal.getTimeInMillis();
+        
+        // timer start time
+        Timer bufferless = timer.getTimerWithoutBuffers();
+        long timerInMillis = bufferless.getStartTime().getTimeInMillis();
+        
+        int diffInMin = (int) TimeUnit.MILLISECONDS.toMinutes((Math.abs(progInMillis - timerInMillis)));
+        
+        // return 100% - the difference in minutes
+        int percentage = 100 - diffInMin;
+        logger.trace("StarttimeCriterion for timer {} and prog {}: {}", new Object[] {timer.getTitle(), prog.getTitle(), percentage});
         return percentage;
     }
 

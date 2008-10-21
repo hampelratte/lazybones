@@ -1,4 +1,4 @@
-/* $Id: Evaluator.java,v 1.1 2008-10-17 21:24:56 hampelratte Exp $
+/* $Id: Evaluator.java,v 1.2 2008-10-21 19:42:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,9 +36,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import lazybones.Timer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import devplugin.Program;
 
 public class Evaluator {
+    
+    private static transient Logger logger = LoggerFactory.getLogger(Evaluator.class);
     
     private List<Criterion> criteria = new ArrayList<Criterion>();
     
@@ -46,11 +52,8 @@ public class Evaluator {
     
     public Evaluator() {
         criteria.add(new TitleCriterion());
-        /* at the moment there is only the TitleCriterion
-         * ideas for more criterions are:
-         * - the length of the program
-         * - start and end time
-         */
+        criteria.add(new DurationCriterion());
+        criteria.add(new StarttimeCriterion());
     }
     
     /**
@@ -68,11 +71,12 @@ public class Evaluator {
             int total = 0;
             for (Criterion criterion : criteria) {
                 int percentage = criterion.evaluate(program, timer);
+                total += percentage * criterion.getBoost();
                 factors += criterion.getBoost();
-                total += percentage * factors;
             }
             
             int percentage = total / factors;
+            logger.trace("Total percentage for timer {} and prog {}: {}", new Object[] {timer.getTitle(), program.getTitle(), percentage});
             results.add(new Result(program, percentage));
         }
         
