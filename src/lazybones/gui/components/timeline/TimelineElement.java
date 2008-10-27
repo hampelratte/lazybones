@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.18 2008-10-17 21:24:57 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.19 2008-10-27 16:55:58 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -58,15 +58,17 @@ public class TimelineElement extends JComponent implements MouseListener {
     private Timer timer;
     private Calendar currentDate;
     
-    public final static Color COLOR = UIManager.getColor("TextField.selectionBackground");
+    public final static Color COLOR_ACTIVE = UIManager.getColor("TextField.selectionBackground");
+    public final static Color COLOR_INACTIVE = Color.LIGHT_GRAY;
     public final static Color TEXT_COLOR = UIManager.getColor("TextField.selectionForeground");
+    public final static Color TEXT_COLOR_INACTIVE = Color.GRAY;
     public final static Color CONFLICT_COLOR = new Color(255,0,0,90);
     
     public TimelineElement(Timer timer, Calendar currentDate) {
         this.timer = timer;
         this.currentDate = currentDate;
-        //setBorder(BorderFactory.createLineBorder(COLOR.darker()));
-        setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR, COLOR.darker()));
+        //setBorder(BorderFactory.createLineBorder(COLOR_ACTIVE.darker()));
+        setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_ACTIVE, COLOR_ACTIVE.darker()));
         this.addMouseListener(this);
         
         // set tooltip
@@ -127,11 +129,11 @@ public class TimelineElement extends JComponent implements MouseListener {
         }
         
         // paint background
-        g.setColor(COLOR);
+        g.setColor(timer.isActive() ? COLOR_ACTIVE : COLOR_INACTIVE);
         g.fillRect(0, 0, getWidth(), getHeight());
         
         // paint text
-        g.setColor(TEXT_COLOR);
+        g.setColor(timer.isActive() ? TEXT_COLOR: TEXT_COLOR_INACTIVE);
         g.setFont(new Font("SansSerif", Font.PLAIN, 9));
         g.drawString(timer.getDisplayTitle(), 5, 12);
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
