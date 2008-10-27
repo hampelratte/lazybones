@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.4 2008-05-19 13:20:25 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.5 2008-10-27 17:01:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -59,6 +59,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
+    private Color inactive = Color.LIGHT_GRAY;
     
     public TimerListCellRenderer() {
         initGUI();
@@ -118,6 +119,14 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         
         if(value instanceof Timer) {
             Timer timer = (Timer)value;
+            
+            if(!timer.isActive()) {
+                time.setForeground(inactive);
+                title.setForeground(inactive);
+                channel.setForeground(inactive);
+                date.setForeground(inactive);
+            }
+            
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
             DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
             
