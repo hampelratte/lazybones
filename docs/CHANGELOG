@@ -1,3 +1,8 @@
+Lazy Bones 0.5.1
+===============================================================================
+* Timeline and timer overview render inactive timers with a grey color
+* Fixed bug in the new evaluator mechanism
+
 Lazy Bones 0.5
 ===============================================================================
 * Short description is displayed for recordings, if available
