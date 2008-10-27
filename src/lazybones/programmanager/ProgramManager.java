@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.2 2008-10-21 19:42:35 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.3 2008-10-27 17:02:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -322,8 +322,13 @@ public class ProgramManager {
         // no doppelpacks, we can now valuate the programs with
         // several criteria
         Result bestMatching = evaluator.evaluate(threeDayProgram, timer);
-        logger.debug("Best matching program for timer {} is {} with a percentage of {}", new Object[] {timer.getTitle(), bestMatching.getProgram().getTitle(), bestMatching.getPercentage()});
+        if(bestMatching == null) {
+            logger.warn("Couldn't assign timer: ", timer);
+            timer.setReason(Timer.NOT_FOUND);
+            return;
+        } 
 
+        logger.debug("Best matching program for timer {} is {} with a percentage of {}", new Object[] { timer.getTitle(), bestMatching.getProgram().getTitle(), bestMatching.getPercentage() });
         int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
         // if the percentage of equality is higher than the config value
         // percentageThreshold, mark this program
