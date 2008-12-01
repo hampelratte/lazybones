@@ -1,3 +1,8 @@
+Lazy Bones 0.5.2
+===============================================================================
+* Fixed bug, which set the start time for periodic timers to the wrong day,
+  which caused the timeline to draw a 24h timer
+
 Lazy Bones 0.5.1
 ===============================================================================
 * Timeline and timer overview render inactive timers with a grey color
