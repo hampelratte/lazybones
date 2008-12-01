@@ -6,11 +6,11 @@ import java.util.logging.LogRecord;
 
 // TODO check, if can use the MemoryHandler for this
 public class LoggingArchive {
-    public static final int LOG_HISTORY = 1000;
+    public static final int LOG_HISTORY = 10000;
     
     private static Vector<LogObserver> observers = new Vector<LogObserver>();
 
-    private static CircularList<LogRecord> list = new CircularList<LogRecord>(1000);
+    private static CircularList<LogRecord> list = new CircularList<LogRecord>(LOG_HISTORY);
 
     public static void log(LogRecord record) {
         list.add(record);
