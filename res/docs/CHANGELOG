@@ -1,0 +1,68 @@
+Lazy Bones 0.5.1
+===============================================================================
+* Timeline and timer overview render inactive timers with a grey color
+* Fixed bug in the new evaluator mechanism
+
+Lazy Bones 0.5
+===============================================================================
+* Short description is displayed for recordings, if available
+* Introduced new criteria mechanism to assign timers to programs. Should work
+  much better than the old way.
+* Hopefully fixed the problem of the empty error dialog
+
+Lazy Bones 0.4.2
+===============================================================================
+* Added default option for VPS
+
+Lazy Bones 0.4.1
+===============================================================================
+* Added default option for the timer description. You can select between VDR,
+  TV-Browser and longest description. The timer options dialog then will use
+  the appropriate description. (suggested by ChrisBox)
+* Fixed popup menu trigger for windows in different dialogs. The popup menu
+  should work now for every timer and recording in every overview and list.
+  (reported by ChrisBox)
+* Fixed bug in the paiting routine of the conflict painting.
+* Extended the week-day buttons on the timeline panel to indicate conflicting
+  timers.
+* Plugin tree was not updated, when a timer was assigned to a program manuaaly 
+  with the context menu
+* Fixed bug, which prevented Lazy Bones to mark the last available program
+  in the TVB EPG data. (The last program of the last day for which data is 
+  available)
+* Fixed bug in TimerManager.getTimer(Program prog)
+* Enabled font anti aliasing for custom components of the timeline panel
+* TimerOptionsDialog sets the focus to the title field when opened 
+  (suggested by ChrisBox)
+* All dialogs can be closed with the escape key (suggested by ChrisBox)
+
+Lazy Bones 0.4
+===============================================================================
+* Fixed bug in the timer state handling
+* Timers can now be deleted when they are recording
+* Timers are fully editable
+* Added a timer conflict detection
+* Added a timeline, which shows timers and conflicts
+* Timer overview and timeline show an icon if recording
+* Improved the channel configuration of the settings dialog
+* Channel list can be restricted by the channelnumber
+* Improved automatical assignment of channels in the settings dialog
+* Improved assignment of timers to TV-Browser programs
+* Added a recording overview: Possibility to delete recordings and start 
+  playback on VDR
+* Screenshots are only taken, if the remote control is visible
+* Added function to play recordings via VDR and via player
+* Fixed bug in TimerManager.getTimer, which sometimes returned a wrong timer, 
+  which resulted in a wrong timer being deleted
+* Added support for different charsets
+* Added config params for the streaming url 
+  and for the streaming url of recordings
+* Ported logging to lsf4j.
+* Dialogs have a special modal exclusion mode to avoid blocking windows
+* Improved Look and Feel integration of custom components
+* Removed ProgramSelectionDialog. Not assigned timers can now be assigned with
+  the context menu
+* Added a DebugConsole under Settings->General, which shows the Lazy Bones log.
+* Fixed bug in SpinnerTimeModel (reported by docmax)
+* Added support for DVB-S2 parameters in channels.conf 
+  (reported by reelmichael)
