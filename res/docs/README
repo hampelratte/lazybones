@@ -15,9 +15,8 @@ http://wiki.tvbrowser.org/index.php/LazyBones
 
 License
 ================================================================================
-This software uses NachoCalendar (http://nachocalendar.sourceforge.net/), which
-is published under the GNU Lesser General Public License 
-(http://www.gnu.org/copyleft/lesser.html).
+This software uses NachoCalendar, XStream, XPP3 and SLF4J. You can find the 
+licenses of these libraries in the license folder.
 
 The software itself is published under a BSD license. Read the LICENSE file for
 details.
