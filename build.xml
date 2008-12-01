@@ -99,6 +99,10 @@
 			<fileset dir="${doc.dir}">
 			</fileset>
 		</copy>
+		<copy todir="${dist-tmp.dir}/LazyBones-${version}/license">
+            <fileset dir="${license.dir}">
+            </fileset>
+        </copy>
 
 		<zip destfile="${build.dir}/LazyBones-${version}.zip" 
 	             basedir="${dist-tmp.dir}"/>
