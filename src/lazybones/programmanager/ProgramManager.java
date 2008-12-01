@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.3 2008-10-27 17:02:18 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.4 2008-12-01 15:08:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -349,12 +349,12 @@ public class ProgramManager {
     public void assignTimerToProgram(Program prog, Timer timer) {
         prog.mark(LazyBones.getInstance());
         timer.addTvBrowserProgID(prog.getID());
-        if (timer.isRepeating()) {
-            Date d = prog.getDate();
-            timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
-            timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
-            timer.getStartTime().set(Calendar.YEAR, d.getYear());
-        }
+//        if (timer.isRepeating()) {
+//            Date d = prog.getDate();
+//            timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
+//            timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
+//            timer.getStartTime().set(Calendar.YEAR, d.getYear());
+//        }
     }
     
     public void handleTimerDoubleClick(Timer timer) {
