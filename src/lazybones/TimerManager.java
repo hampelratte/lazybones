@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.36 2009-02-04 14:15:53 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.37 2009-02-04 14:16:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -70,10 +70,8 @@ import devplugin.Date;
 import devplugin.Program;
 
 /**
- * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
- * 
  * Class to manage all timers.
+ * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  */
 public class TimerManager extends Observable {
     

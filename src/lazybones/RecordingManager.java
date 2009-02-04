@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.5 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.6 2009-02-04 14:17:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,10 +46,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Class to manage all recordings.
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
- * 
- * Class to manage all recordings.
  */
 public class RecordingManager extends Observable {
 

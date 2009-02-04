@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.105 2008-12-01 15:09:49 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.106 2009-02-04 14:18:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -79,7 +79,7 @@ import devplugin.ProgramReceiveTarget;
 import devplugin.Version;
 
 /**
- * A VDRRemoteControl Plugin
+ * A remote control plugin for VDR
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
