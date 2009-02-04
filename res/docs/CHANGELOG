@@ -1,3 +1,8 @@
+Lazy Bones 0.5.3
+===============================================================================
+* Include timer path information in title comparison, if a timer path is set
+  (e.g. program~episode, path provided by larsv)
+
 Lazy Bones 0.5.2
 ===============================================================================
 * Fixed bug, which set the start time for periodic timers to the wrong day,
