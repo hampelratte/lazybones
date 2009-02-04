@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.35 2008-10-21 19:41:35 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.36 2009-02-04 14:15:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -711,8 +711,12 @@ public class TimerManager extends Observable {
             mta.enqueue();
         } else {
             if (timer.getTitle() != null) {
-                int percentage = Utilities.percentageOfEquality(
-                        prog.getTitle(), timer.getTitle());
+                int percentage;
+                if (timer.getPath() != null && timer.getPath() != "") {
+                    percentage = Utilities.percentageOfEquality(prog.getTitle(), timer.getPath() + timer.getTitle());
+                } else {
+                    percentage = Utilities.percentageOfEquality(prog.getTitle(), timer.getTitle());
+                }
                 if (timer.getFile().indexOf("EPISODE") >= 0
                         || timer.getFile().indexOf("TITLE") >= 0
                         || timer.isRepeating()
