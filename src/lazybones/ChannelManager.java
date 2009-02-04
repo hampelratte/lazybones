@@ -1,4 +1,4 @@
-/* $Id: ChannelManager.java,v 1.3 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.4 2009-02-04 19:45:14 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
@@ -137,6 +138,17 @@ public class ChannelManager {
             }
         }
         return chan;
+    }
+    
+    public devplugin.Channel getChannel(Channel chan) {
+        devplugin.Channel tvbchan = null;
+        for(Entry<String, Channel> entry : channelMapping.entrySet()) {
+            Channel ctemp = entry.getValue();
+            if(ctemp.getChannelNumber() == chan.getChannelNumber()) {
+                tvbchan = getChannelById(entry.getKey());
+            }
+        }
+        return tvbchan;
     }
 
     public devplugin.Channel getChannelById(String id) {
