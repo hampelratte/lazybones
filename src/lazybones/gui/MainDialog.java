@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.12 2008-09-09 11:39:11 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.13 2009-02-04 19:46:05 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -80,6 +80,10 @@ public class MainDialog extends JDialog implements WindowClosingIf {
         tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("recordings", "Recordings"), new RecordingManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
+        
+        if(Boolean.parseBoolean(LazyBones.getProperties().getProperty("upload.enabled"))) {
+            tabbedPane.add("Data upload", new DataUploadPanel());
+        }
         
         this.add(tabbedPane);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
