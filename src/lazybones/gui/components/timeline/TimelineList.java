@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.10 2008-04-22 14:24:14 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.11 2009-02-04 14:50:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,8 +46,8 @@ import lazybones.TimerManager;
 import lazybones.TimersChangedEvent;
 
 public class TimelineList extends JPanel implements Observer {
-    private ArrayList<Timer> data = new ArrayList<Timer>();
-    private ArrayList<TimelineListener> listeners = new ArrayList<TimelineListener>();
+    private List<Timer> data = new ArrayList<Timer>();
+    private List<TimelineListener> listeners = new ArrayList<TimelineListener>();
     private Calendar calendar = new GregorianCalendar();
     private int rowHeight = 40;
     private int padding = 0;

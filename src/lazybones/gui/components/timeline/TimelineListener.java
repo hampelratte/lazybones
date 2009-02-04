@@ -1,4 +1,4 @@
-/* $Id: TimelineListener.java,v 1.1 2006-12-29 23:34:14 hampelratte Exp $
+/* $Id: TimelineListener.java,v 1.2 2009-02-04 14:50:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,10 +29,10 @@
  */
 package lazybones.gui.components.timeline;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import lazybones.Timer;
 
 public interface TimelineListener {
-    public void timelineChanged(ArrayList<Timer> timers);
+    public void timelineChanged(List<Timer> timers);
 }

@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeader.java,v 1.2 2007-01-05 23:10:43 hampelratte Exp $
+/* $Id: TimelineRowHeader.java,v 1.3 2009-02-04 14:50:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones.gui.components.timeline;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -39,7 +40,7 @@ import lazybones.Timer;
 
 public class TimelineRowHeader extends JPanel implements TimelineListener {
 
-    private ArrayList<Integer> channels = new ArrayList<Integer>();
+    private List<Integer> channels = new ArrayList<Integer>();
     private int rowHeight = 40;
     private int padding = 0;
     
@@ -58,7 +59,7 @@ public class TimelineRowHeader extends JPanel implements TimelineListener {
         }
     }
     
-    public void timelineChanged(ArrayList<Timer> timers) {
+    public void timelineChanged(List<Timer> timers) {
         this.removeAll();
         channels.clear();
         for (Timer timer : timers) {
