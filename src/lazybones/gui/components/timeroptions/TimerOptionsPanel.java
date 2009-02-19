@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.8 2008-10-17 21:24:56 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.9 2009-02-19 18:26:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -465,7 +465,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             } else if ("TV-Browser".equals(item)){
-                Date date = new Date(timer.getStartTime());
+                Date date = new Date(timer.getTimerWithoutBuffers().getStartTime());
                 Program prog = Plugin.getPluginManager().getProgram(date,
                         timer.getTvBrowserProgIDs().get(0));
                 description.setText(prog.getDescription());
