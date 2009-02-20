@@ -1,4 +1,4 @@
-/* $Id: Time.java,v 1.2 2005-08-22 15:07:46 hampelratte Exp $
+/* $Id: Time.java,v 1.3 2009-02-20 16:22:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -84,5 +84,9 @@ public class Time {
 
     public void setMinute(int minute) {
         this.minute = minute;
+    }
+    
+    public Time clone() {
+        return new Time(hour, minute);
     }
 }
