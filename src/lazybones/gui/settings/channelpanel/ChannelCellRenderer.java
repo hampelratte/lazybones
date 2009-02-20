@@ -1,4 +1,4 @@
-/* $Id: ChannelCellRenderer.java,v 1.1 2007-04-09 19:20:15 hampelratte Exp $
+/* $Id: ChannelCellRenderer.java,v 1.2 2009-02-20 16:23:03 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,7 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 
-import tvbrowser.ui.programtable.ChannelLabel;
+import util.ui.ChannelLabel;
 
 public class ChannelCellRenderer extends DefaultTableCellRenderer {
 
