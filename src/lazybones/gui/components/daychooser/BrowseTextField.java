@@ -1,4 +1,4 @@
-/* $Id: BrowseTextField.java,v 1.2 2007-05-05 20:32:46 hampelratte Exp $
+/* $Id: BrowseTextField.java,v 1.3 2009-02-20 16:46:38 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -96,6 +96,10 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
 
     public void setText(String text) {
         textfield.setText(text);
+    }
+    
+    public String getText() {
+        return textfield.getText();
     }
 
     public void propertyChange(PropertyChangeEvent pce) {
