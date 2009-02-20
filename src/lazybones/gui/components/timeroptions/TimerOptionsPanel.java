@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.9 2009-02-19 18:26:22 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.10 2009-02-20 16:30:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -52,6 +52,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
@@ -74,7 +76,7 @@ import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
 
-public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener, WindowListener {
+public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener, WindowListener, ChangeListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
     
     public static final int DESC_VDR = 0;
@@ -140,6 +142,9 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private Program prog;
     
     private Mode mode;
+    
+    private Time oldStartTime;
+    private Time oldEndTime;
     
     public TimerOptionsPanel(Timer timer, Program prog, Mode mode) {
         this.mode = mode;
@@ -257,13 +262,15 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         add(spinnerStarttime, gbc);
         SpinnerTimeModel model = new SpinnerTimeModel();
         spinnerStarttime.setModel(model);
+        spinnerStarttime.addChangeListener(this);
 
         gbc.gridx = 1;
         gbc.gridy = 7;
         add(spinnerEndtime, gbc);
         model = new SpinnerTimeModel();
         spinnerEndtime.setModel(model);
-
+        spinnerEndtime.addChangeListener(this);
+        
         gbc.gridx = 1;
         gbc.gridy = 8;
         add(priority, gbc);
@@ -362,11 +369,13 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             
             int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);
             int minute = timer.getStartTime().get(Calendar.MINUTE);
-            spinnerStarttime.getModel().setValue(new Time(hour, minute));
+            oldStartTime = new Time(hour, minute);
+            spinnerStarttime.getModel().setValue(oldStartTime);
             
             hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
             minute = timer.getEndTime().get(Calendar.MINUTE);
-            spinnerEndtime.getModel().setValue(new Time(hour, minute));
+            oldEndTime = new Time(hour, minute);
+            spinnerEndtime.getModel().setValue(oldEndTime);
             
             priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
             lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
@@ -410,7 +419,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 logger.debug("Setting start time to start time of the TVB-program");
                 spinnerStarttime.getModel().setValue(new Time(hour, minute));
             } else {
-                
+                logger.warn("No programm found to determine the VPS time");
             }
         } else {
             if(oldTimer != null) {
@@ -484,5 +493,34 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     public void windowIconified(WindowEvent e) {}
     public void windowOpened(WindowEvent e) {
         title.requestFocus();
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if(e.getSource() == spinnerStarttime) {
+            Time time = (Time) spinnerStarttime.getValue();
+            if(oldStartTime.getHour() == 23 && oldStartTime.getMinute() == 59 &&
+                    time.getHour() == 0 && time.getMinute() == 0) {
+                timer.getStartTime().add(Calendar.DAY_OF_MONTH, 1);
+                day.setText(Integer.toString(timer.getStartTime().get(Calendar.DAY_OF_MONTH)));
+            } else if(oldStartTime.getHour() == 0 && oldStartTime.getMinute() == 0 &&
+                    time.getHour() == 23 && time.getMinute() == 59) {
+                timer.getStartTime().add(Calendar.DAY_OF_MONTH, -1);
+                day.setText(Integer.toString(timer.getStartTime().get(Calendar.DAY_OF_MONTH)));
+            }
+            oldStartTime = time.clone();
+        } else if(e.getSource() == spinnerEndtime) {
+            Time time = (Time) spinnerEndtime.getValue();
+            if(oldEndTime.getHour() == 23 && oldEndTime.getMinute() == 59 &&
+                    time.getHour() == 0 && time.getMinute() == 0) {
+                timer.getEndTime().add(Calendar.DAY_OF_MONTH, 1);
+                day.setText(Integer.toString(timer.getEndTime().get(Calendar.DAY_OF_MONTH)));
+            } else if(oldEndTime.getHour() == 0 && oldEndTime.getMinute() == 0 &&
+                    time.getHour() == 23 && time.getMinute() == 59) {
+                timer.getEndTime().add(Calendar.DAY_OF_MONTH, -1);
+                day.setText(Integer.toString(timer.getEndTime().get(Calendar.DAY_OF_MONTH)));
+            }
+            oldEndTime = time.clone();
+        }
     }
 }
