@@ -2,6 +2,12 @@ Lazy Bones 0.5.3
 ===============================================================================
 * Include timer path information in title comparison, if a timer path is set
   (e.g. program~episode, path provided by larsv)
+* Fixed some NPEs, which occured with timers around 00:00
+* Improved TimerOptionsDialog: If the start or end time of the timer crosses
+  00:00 the day of the timer will also be adjusted
+* Improved TimerOptionsDialog: If a timer starts on one day, but the vps timer 
+  starts on the next day, the day of the timer will be also changed, if vps is 
+  selected
 
 Lazy Bones 0.5.2
 ===============================================================================
