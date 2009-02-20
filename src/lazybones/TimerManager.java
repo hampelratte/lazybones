@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.37 2009-02-04 14:16:36 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.38 2009-02-20 16:32:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -201,10 +201,12 @@ public class TimerManager extends Observable {
         Calendar cal = prog.getDate().getCalendar();
         for (Timer timer : timers) {
             List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
-            Timer bufferless = timer.getTimerWithoutBuffers(); 
+            Timer bufferless = timer.getTimerWithoutBuffers();
             for (String curProgID : tvBrowserProdIDs) {
-                if ( progID.equals(curProgID) && Utilities.sameDay(cal, bufferless.getStartTime()) ) {
-                    return timer;
+                if (progID.equals(curProgID)) {
+                    if (tvBrowserProdIDs.size() == 1 || Utilities.sameDay(cal, bufferless.getStartTime())) {
+                        return timer;
+                    }
                 }
             }
         }
@@ -834,7 +836,7 @@ public class TimerManager extends Observable {
         LazyBones.getInstance().synchronize();
     }
     
-    public void deleteTimer(Program prog) {
+    public void deleteTimer(final Program prog) {
         Timer timer = TimerManager.getInstance().getTimer(prog);
         logger.debug("Deleting timer {}", timer);
         VDRCallback callback = new VDRCallback() {
@@ -847,7 +849,7 @@ public class TimerManager extends Observable {
                         return;
                     }
                     
-                    //prog.unmark(this);
+                    prog.unmark(LazyBones.getInstance());
                     TimerManager.getInstance().synchronize();
                 }
             }
