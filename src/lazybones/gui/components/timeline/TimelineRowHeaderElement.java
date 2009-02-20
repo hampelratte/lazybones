@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeaderElement.java,v 1.5 2007-05-05 20:32:46 hampelratte Exp $
+/* $Id: TimelineRowHeaderElement.java,v 1.6 2009-02-20 16:30:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,7 +41,7 @@ import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
 import lazybones.Timer;
-import tvbrowser.ui.programtable.ChannelLabel;
+import util.ui.ChannelLabel;
 import devplugin.Channel;
 
 public class TimelineRowHeaderElement extends JPanel {
