@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.38 2009-02-20 16:32:35 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.39 2009-02-21 12:14:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -861,7 +861,8 @@ public class TimerManager extends Observable {
     public void editTimer(Timer timer) {
         Program prog = null;
         if(timer.getTvBrowserProgIDs().size() > 0) {
-            prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), timer.getTvBrowserProgIDs().get(0));
+            Calendar starttime = timer.getTimerWithoutBuffers().getStartTime();
+            prog = ProgramManager.getInstance().getProgram(starttime, timer.getTvBrowserProgIDs().get(0));
         }
         TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
         if(tod.isAccepted()) {
