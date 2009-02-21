@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.11 2009-02-20 16:47:35 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.12 2009-02-21 12:15:21 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -419,6 +419,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 logger.debug("Setting start time to start time of the TVB-program");
                 spinnerStarttime.getModel().setValue(new Time(hour, minute));
                 day.setText(Integer.toString(prog.getDate().getDayOfMonth()));
+                timer.getStartTime().set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
             } else {
                 logger.warn("No programm found to determine the VPS time");
             }
@@ -429,6 +430,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 int minute = oldTimer.getStartTime().get(Calendar.MINUTE);
                 spinnerStarttime.getModel().setValue(new Time(hour, minute));
                 day.setText(Integer.toString(oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH)));
+                timer.getStartTime().set(Calendar.DAY_OF_MONTH, oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH));
             }
         }
     }
@@ -504,12 +506,12 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             if(oldStartTime.getHour() == 23 && oldStartTime.getMinute() == 59 &&
                     time.getHour() == 0 && time.getMinute() == 0) {
                 int d = Integer.parseInt(day.getText());
-                timer.getStartTime().set(Calendar.DAY_OF_MONTH, d++);
+                timer.getStartTime().set(Calendar.DAY_OF_MONTH, ++d);
                 day.setText(Integer.toString(d));
             } else if(oldStartTime.getHour() == 0 && oldStartTime.getMinute() == 0 &&
                     time.getHour() == 23 && time.getMinute() == 59) {
                 int d = Integer.parseInt(day.getText());
-                timer.getStartTime().set(Calendar.DAY_OF_MONTH, d--);
+                timer.getStartTime().set(Calendar.DAY_OF_MONTH, --d);
                 day.setText(Integer.toString(d));
             }
             oldStartTime = time.clone();
@@ -518,12 +520,12 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             if(oldEndTime.getHour() == 23 && oldEndTime.getMinute() == 59 &&
                     time.getHour() == 0 && time.getMinute() == 0) {
                 int d = Integer.parseInt(day.getText());
-                timer.getEndTime().set(Calendar.DAY_OF_MONTH, d++);
+                timer.getEndTime().set(Calendar.DAY_OF_MONTH, ++d);
                 day.setText(Integer.toString(d));
             } else if(oldEndTime.getHour() == 0 && oldEndTime.getMinute() == 0 &&
                     time.getHour() == 23 && time.getMinute() == 59) {
                 int d = Integer.parseInt(day.getText());
-                timer.getEndTime().set(Calendar.DAY_OF_MONTH, d--);
+                timer.getEndTime().set(Calendar.DAY_OF_MONTH, --d);
                 day.setText(Integer.toString(d));
             }
             oldEndTime = time.clone();
