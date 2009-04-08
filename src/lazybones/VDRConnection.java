@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.20 2008-05-18 19:18:59 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.21 2009-04-08 17:01:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -57,6 +57,12 @@ public class VDRConnection {
     
     public static String charset;
     
+    /**
+     * If set, the connection will be kept open for some time,
+     * so that consecutive request will be much faster
+     */
+    public static boolean persistentConnection;
+    
     
     /**
      * Sends a SVDRP command to VDR and returns a response object, which represents the vdr response
@@ -66,15 +72,24 @@ public class VDRConnection {
     public synchronized static Response send(final Command cmd) {
         Response res = null;
         try {
-            connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, charset);
+            if(connection == null) {
+                logger.trace("New connection");
+                connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, charset);
+            } else {
+                logger.trace("old connection");
+            }
             logger.trace("-->{}", cmd.getCommand());
             res = connection.send(cmd);
-            connection.close();
+            if(!persistentConnection) {
+                connection.close();
+                connection = null;
+            }
             logger.trace("<--{}", res.getMessage());
         } catch (Exception e1) {
             res = new ConnectionProblem();
             logger.error(res.getMessage(), e1);
         }
+        
         return res;
     }
   
