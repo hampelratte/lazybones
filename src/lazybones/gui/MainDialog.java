@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.13 2009-02-04 19:46:05 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.14 2009-04-08 16:47:24 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,12 +43,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import util.ui.UiUtilities;
-import util.ui.WindowClosingIf;
-
 import lazybones.LazyBones;
 import lazybones.gui.components.ScreenshotPanel;
 import lazybones.gui.components.remotecontrol.RemoteControl;
+import util.ui.UiUtilities;
+import util.ui.WindowClosingIf;
 
 public class MainDialog extends JDialog implements WindowClosingIf {
 

@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.5 2008-10-27 17:01:16 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.6 2009-04-08 16:48:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,9 +44,9 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
+import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.Timer;
-import lazybones.ChannelManager;
 import devplugin.Channel;
 
 public class TimerListCellRenderer extends JPanel implements ListCellRenderer {

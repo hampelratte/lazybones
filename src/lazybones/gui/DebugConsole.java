@@ -9,10 +9,10 @@ import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-
 import javax.swing.JFrame;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;

@@ -1,4 +1,4 @@
-/* $Id: StartStopEvent.java,v 1.3 2008-04-25 11:27:07 hampelratte Exp $
+/* $Id: StartStopEvent.java,v 1.4 2009-04-08 16:48:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,10 +32,10 @@ package lazybones.utils;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
-
-import lazybones.Timer;
 import lazybones.ChannelManager;
+import lazybones.Timer;
+
+import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
 
 public class StartStopEvent implements Comparable<StartStopEvent> {
     private Timer timer;

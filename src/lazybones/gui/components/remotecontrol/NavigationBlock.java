@@ -1,4 +1,4 @@
-/* $Id: NavigationBlock.java,v 1.4 2008-04-25 11:27:04 hampelratte Exp $
+/* $Id: NavigationBlock.java,v 1.5 2009-04-08 16:48:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,10 +39,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import util.ui.Localizer;
-
 import lazybones.Controller;
 import lazybones.LazyBones;
+import util.ui.Localizer;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
