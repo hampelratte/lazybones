@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.12 2009-02-21 12:15:21 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.13 2009-04-08 16:42:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -521,12 +521,10 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                     time.getHour() == 0 && time.getMinute() == 0) {
                 int d = Integer.parseInt(day.getText());
                 timer.getEndTime().set(Calendar.DAY_OF_MONTH, ++d);
-                day.setText(Integer.toString(d));
             } else if(oldEndTime.getHour() == 0 && oldEndTime.getMinute() == 0 &&
                     time.getHour() == 23 && time.getMinute() == 59) {
                 int d = Integer.parseInt(day.getText());
                 timer.getEndTime().set(Calendar.DAY_OF_MONTH, --d);
-                day.setText(Integer.toString(d));
             }
             oldEndTime = time.clone();
         }
