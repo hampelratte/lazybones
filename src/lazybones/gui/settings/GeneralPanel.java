@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.7 2008-05-18 19:31:06 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.8 2009-05-31 19:29:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -69,6 +69,8 @@ public class GeneralPanel extends JPanel {
     private JLabel lHost;
     private JTextField host;
     private JSpinner port;
+    private JCheckBox cbLoadRecordInfo;
+    private JLabel lLoadRecordInfo;
     private JPanel mainPanel;
     private JButton bShowLog;
     private JCheckBox showTimerOptions;
@@ -174,7 +176,7 @@ public class GeneralPanel extends JPanel {
                         }
                         {
                             bShowLog = new JButton();
-                            expertsPanel.add(bShowLog, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(bShowLog, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
                             bShowLog.setText(LazyBones.getTranslation("show_log", "Show log"));
                             bShowLog.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
@@ -184,10 +186,20 @@ public class GeneralPanel extends JPanel {
                                 }
                             });
                         }
+                        {
+                            lLoadRecordInfo = new JLabel();
+                            expertsPanel.add(lLoadRecordInfo, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            lLoadRecordInfo.setText(LazyBones.getTranslation("load_recording_information", "Load recording information"));
+                        }
+                        {
+                            cbLoadRecordInfo = new JCheckBox();
+                            cbLoadRecordInfo.setSelected(Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos")));
+                            expertsPanel.add(cbLoadRecordInfo, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                        }
                         lSupressMatchDialog.setText(LazyBones.getTranslation("supressMatchDialog", "Supress match dialog"));
                     }
-                    expertsPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-                    expertsPanelLayout.rowHeights = new int[] {7, 7, 7, 7, 7, 7};
+                    expertsPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+                    expertsPanelLayout.rowHeights = new int[] {7, 7, 7, 7, 7, 7, 7};
                     expertsPanelLayout.columnWeights = new double[] {0.1, 0.1};
                     expertsPanelLayout.columnWidths = new int[] {7, 7};
                 }
@@ -267,6 +279,7 @@ public class GeneralPanel extends JPanel {
         LazyBones.getProperties().setProperty("logConnectionErrors", Boolean.toString(logConnectionErr.isSelected()));
         LazyBones.getProperties().setProperty("logEPGErrors", Boolean.toString(logEpgErr.isSelected()));
         LazyBones.getProperties().setProperty("showTimerOptionsDialog", Boolean.toString(showTimerOptions.isSelected()));
+        LazyBones.getProperties().setProperty("loadRecordInfos", Boolean.toString(cbLoadRecordInfo.isSelected()));
     }
 
 }

@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.8 2009-05-31 19:01:09 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.9 2009-05-31 19:29:15 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones;
 
+import java.awt.Cursor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class RecordingManager extends Observable {
      * Stores all recordings as Recording objects
      */
     private List<Recording> recordings;
-   
+    
     private RecordingManager() {
         recordings = new ArrayList<Recording>();
     }
@@ -116,24 +117,28 @@ public class RecordingManager extends Observable {
                     try {
                         conn = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, VDRConnection.charset);
                         recordings = lstr.getRecordings();
-                        for (Recording rec : recordings) {
-                            logger.trace("Getting info for recording {}", rec.getNumber());
-                            Response resp = conn.send(new LSTR(rec.getNumber()));
-                            if(resp != null && resp.getCode() == 215) {
-                                // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
-                                String[] lines = resp.getMessage().split("\n");
-                                StringBuffer mesg = new StringBuffer();
-                                for (int i = 0; i < lines.length; i++) {
-                                    if(i == lines.length -1) {
-                                        mesg.append("e\n");
+                        
+                        boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
+                        if(loadInfos) {
+                            for (Recording rec : recordings) {
+                                logger.trace("Getting info for recording {}", rec.getNumber());
+                                Response resp = conn.send(new LSTR(rec.getNumber()));
+                                if(resp != null && resp.getCode() == 215) {
+                                    // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
+                                    String[] lines = resp.getMessage().split("\n");
+                                    StringBuffer mesg = new StringBuffer();
+                                    for (int i = 0; i < lines.length; i++) {
+                                        if(i == lines.length -1) {
+                                            mesg.append("e\n");
+                                        }
+                                        mesg.append(lines[i]+"\n");
                                     }
-                                    mesg.append(lines[i]+"\n");
-                                }
-                                
-                                // parse epg information
-                                List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-                                if(epg.size() > 0) {
-                                    rec.setEpgInfo(epg.get(0));
+                                    
+                                    // parse epg information
+                                    List<EPGEntry> epg = EPGParser.parse(mesg.toString());
+                                    if(epg.size() > 0) {
+                                        rec.setEpgInfo(epg.get(0));
+                                    }
                                 }
                             }
                         }
@@ -159,6 +164,7 @@ public class RecordingManager extends Observable {
     }
     
     public void loadInfo(Recording rec) {
+        LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         Response response = VDRConnection.send(new LSTR(rec.getNumber()));
         if(response != null && response.getCode() == 215) {
             // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
@@ -177,6 +183,7 @@ public class RecordingManager extends Observable {
                 rec.setEpgInfo(epg.get(0));
             }
         }
+        LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     public void playOnVdr(Recording rec) {
