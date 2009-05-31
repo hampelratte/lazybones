@@ -1,4 +1,4 @@
-/* $Id: DeleteRecordingAction.java,v 1.6 2008-07-31 21:35:53 hampelratte Exp $
+/* $Id: DeleteRecordingAction.java,v 1.7 2009-05-31 19:01:57 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,8 +67,6 @@ public class DeleteRecordingAction extends VDRAction {
         int recordingNumber = recording.getNumber();
         response = VDRConnection.send(new DELR(recordingNumber));
         if(response.getCode() == 250) {
-            // update recording list
-            RecordingManager.getInstance().synchronize();
             return true;
         } else if(response.getCode() == 550 && response.getMessage().indexOf("in use by timer") >= 0) {
             // recording is still running, we have to delete the timer first
