@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.7 2009-04-08 17:00:31 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.8 2009-05-31 19:01:09 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -117,7 +117,7 @@ public class RecordingManager extends Observable {
                         conn = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, VDRConnection.charset);
                         recordings = lstr.getRecordings();
                         for (Recording rec : recordings) {
-                            logger.trace("GEtting info for recording {}", rec.getNumber());
+                            logger.trace("Getting info for recording {}", rec.getNumber());
                             Response resp = conn.send(new LSTR(rec.getNumber()));
                             if(resp != null && resp.getCode() == 215) {
                                 // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
