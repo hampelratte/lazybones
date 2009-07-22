@@ -1,4 +1,4 @@
-/* $Id: CommandQueue.java,v 1.2 2008-04-25 11:27:05 hampelratte Exp $
+/* $Id: CommandQueue.java,v 1.3 2009-07-22 16:55:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -76,10 +76,10 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
     
     public void run() {
         running = true;
-        while(running) {
+        while(true) {
             try { Thread.sleep(10); } catch (InterruptedException e) {}
             
-            while(size() > 0) {
+            while(size() > 0 && running) {
                 new Thread(new Runnable() {
                     public void run() {
                         LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
