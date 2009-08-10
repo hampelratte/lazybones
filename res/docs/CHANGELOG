@@ -3,6 +3,7 @@ Lazy Bones 0.5.4
 * Remote control contains a slider for volume adjustment
 * Added synchronize button to the timer panel
 * Added synchronie and delete buttons to the recordings panel
+* Fixed timeline to work with all Look & Feels
 
 Lazy Bones 0.5.3
 ===============================================================================
