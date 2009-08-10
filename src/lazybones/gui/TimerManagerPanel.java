@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.16 2009-08-10 16:47:11 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.17 2009-08-10 16:54:42 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -119,35 +119,35 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.insets = new java.awt.Insets(0,10,0,10);
         gbc.gridx = 0;
         gbc.gridwidth = 1;
+        buttonSync = new JButton();
+        buttonSync.setText(LazyBones.getTranslation("resync","Synchronize"));
+        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
+        buttonSync.addActionListener(this);
+        this.add(buttonSync, gbc);
+        
+        gbc.insets = new java.awt.Insets(0,0,0,10);
+        gbc.gridx = 1;
         buttonNew = new JButton();
         buttonNew.setText(LazyBones.getTranslation("new_timer","New Timer"));
         buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 16));
         buttonNew.addActionListener(this);
         this.add(buttonNew, gbc);
         
-        gbc.insets = new java.awt.Insets(0,0,0,10);
-        gbc.gridx = 1;
+        gbc.insets = new java.awt.Insets(0,0,0,0);
+        gbc.gridx = 2;
         buttonEdit = new JButton();
         buttonEdit.setText(LazyBones.getTranslation("edit","Edit Timer"));
         buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
         buttonEdit.addActionListener(this);
         this.add(buttonEdit, gbc);
         
-        gbc.insets = new java.awt.Insets(0,0,0,0);
-        gbc.gridx = 2;
+        gbc.insets = new java.awt.Insets(0,10,0,10);
+        gbc.gridx = 3;
         buttonRemove = new JButton();
         buttonRemove.setText(LazyBones.getTranslation("dont_capture","Delete Timer"));
         buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
         buttonRemove.addActionListener(this);
         this.add(buttonRemove, gbc);
-        
-        gbc.insets = new java.awt.Insets(0,10,0,10);
-        gbc.gridx = 3;
-        buttonSync = new JButton();
-        buttonSync.setText(LazyBones.getTranslation("resync","Synchronize"));
-        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
-        buttonSync.addActionListener(this);
-        this.add(buttonSync, gbc);
         
         
         timerList.addMouseListener(new MouseListener() {
