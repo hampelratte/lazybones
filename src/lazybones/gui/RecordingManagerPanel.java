@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.14 2008-10-04 18:36:31 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.15 2009-08-10 16:47:29 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -44,6 +44,7 @@ import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -76,9 +77,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     private JScrollPane scrollPane = null;
     private DefaultListModel model = new DefaultListModel();
     private JList recordingList = new JList(model);
-    private int selectedRow = -1;
     private EPGInfoPanel epgInfoPanel = new EPGInfoPanel();
-    
+    private JButton buttonSync = null;
+    private JButton buttonRemove = null;
 
     private JPopupMenu popup = new JPopupMenu();
     
@@ -92,6 +93,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
      * 
      */
     private void initGUI() {
+        createContextMenu();
+        
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         
@@ -110,20 +113,42 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         //gbc.fill = java.awt.GridBagConstraints.VERTICAL;
         gbc.gridx = 1;
         gbc.weightx = .1;
+        gbc.insets = new java.awt.Insets(10,0,10,10);
         recordingList.addListSelectionListener(epgInfoPanel);
         epgInfoPanel.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
         epgInfoPanel.setPreferredSize(new Dimension(300,300));
         epgInfoPanel.setMinimumSize(new Dimension(300,300));
         epgInfoPanel.setMaximumSize(new Dimension(300,300));
         this.add(epgInfoPanel, gbc);
-
-        createContextMenu();
+        
+        gbc.insets = new java.awt.Insets(0,10,10,10);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0;
+        buttonSync = new JButton(LazyBones.getTranslation("resync","Synchronize"));
+        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
+        buttonSync.addActionListener(this);
+        buttonSync.setActionCommand("SYNC");
+        this.add(buttonSync, gbc);
+        
+        gbc.insets = new java.awt.Insets(0,0,10,10);
+        gbc.gridx = 1;
+        buttonRemove = new JButton(LazyBones.getTranslation("delete_recording","Delete Recording"));
+        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
+        buttonRemove.addActionListener(this);
+        buttonRemove.setActionCommand("DELETE");
+        this.add(buttonRemove, gbc);
     }
     
     public void actionPerformed(ActionEvent e) {
-        Recording rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
-        
-        if("DELETE".equals(e.getActionCommand())) {
+        Recording rec = null;
+        boolean itemSelected = false;
+        int selectedRow = recordingList.getSelectedIndex();
+        if(selectedRow >= 0 && selectedRow < recordingList.getModel().getSize()) {
+            itemSelected = true;
+            rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
+        }
+        if("DELETE".equals(e.getActionCommand()) && itemSelected) {
             VDRCallback callback = new VDRCallback() {
                 public void receiveResponse(VDRAction cmd, Response response) {
                     if(!cmd.isSuccess()) {
@@ -135,15 +160,15 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             };
             DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
             dra.enqueue();
-        } else if("INFO".equals(e.getActionCommand()) && selectedRow >= 0) {
+        } else if("INFO".equals(e.getActionCommand()) && itemSelected) {
             createEPGInfoDialog(rec);
         } else if("SYNC".equals(e.getActionCommand())) {
             RecordingManager.getInstance().synchronize();
-        } else if("PLAY".equals(e.getActionCommand())) {
+        } else if("PLAY".equals(e.getActionCommand()) && itemSelected) {
             Player.play(rec);
-        } else if("PLAY_ON_VDR".equals(e.getActionCommand())) {
+        } else if("PLAY_ON_VDR".equals(e.getActionCommand()) && itemSelected) {
             RecordingManager.getInstance().playOnVdr(rec);
-        }
+        } 
     }
 
     private void createEPGInfoDialog(Recording rec) {
@@ -221,7 +246,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
             
             private void mayTriggerPopup(MouseEvent e) {
                 if(e.isPopupTrigger()) {
-                    selectedRow = recordingList.locationToIndex(e.getPoint());
+                    int selectedRow = recordingList.locationToIndex(e.getPoint());
                     recordingList.setSelectedIndex(selectedRow);
                     popup.setLocation(e.getPoint());
                     popup.show(e.getComponent(), e.getX(), e.getY());
