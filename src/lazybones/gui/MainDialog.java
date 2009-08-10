@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.14 2009-04-08 16:47:24 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.15 2009-08-10 11:46:17 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,6 +40,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -51,6 +52,8 @@ import util.ui.WindowClosingIf;
 
 public class MainDialog extends JDialog implements WindowClosingIf {
 
+    private RemoteControl remoteControl = new RemoteControl();
+    
     private ScreenshotPanel screenshotPanel = new ScreenshotPanel();
     
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -68,17 +71,17 @@ public class MainDialog extends JDialog implements WindowClosingIf {
 
     private void initGUI() {
         this.setSize(800, 650);
-        JPanel remoteControl = new JPanel();
-        remoteControl.setLayout(new GridBagLayout());
-        remoteControl.add(new RemoteControl(), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-        remoteControl.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        JPanel rcPanel = new JPanel();
+        rcPanel.setLayout(new GridBagLayout());
+        rcPanel.add(remoteControl, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        rcPanel.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         timelinePanel = new TimelinePanel();
         
         // !! don't change the order without changing INDEX_TIMELINE and INDEX_RC !!  
         tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), timelinePanel);
         tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("recordings", "Recordings"), new RecordingManagerPanel());
-        tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), remoteControl);
+        tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), rcPanel);
         
         if(Boolean.parseBoolean(LazyBones.getProperties().getProperty("upload.enabled"))) {
             tabbedPane.add("Data upload", new DataUploadPanel());
@@ -95,6 +98,12 @@ public class MainDialog extends JDialog implements WindowClosingIf {
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if(isVisible() && tabbedPane.getSelectedIndex() == INDEX_RC) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            remoteControl.updateVolume();
+                        }
+                    });
                     screenshotPanel.startGrabbing();
                 } else {
                     screenshotPanel.stopGrabbing();
@@ -108,6 +117,7 @@ public class MainDialog extends JDialog implements WindowClosingIf {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if(visible && tabbedPane.getSelectedIndex() == INDEX_RC) {
+            remoteControl.updateVolume();
             screenshotPanel.startGrabbing();
         } else {
             screenshotPanel.stopGrabbing();
