@@ -1,3 +1,8 @@
+Lazy Bones 0.5.4
+===============================================================================
+* Remote control contains a slider for volume adjustment
+* Add synchronize button to the timer panel
+
 Lazy Bones 0.5.3
 ===============================================================================
 * Include timer path information in title comparison, if a timer path is set
