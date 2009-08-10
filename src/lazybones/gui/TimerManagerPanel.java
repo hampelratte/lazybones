@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.15 2009-08-10 12:11:26 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.16 2009-08-10 16:47:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -116,7 +116,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        gbc.insets = new java.awt.Insets(0,10,10,10);
+        gbc.insets = new java.awt.Insets(0,10,0,10);
         gbc.gridx = 0;
         gbc.gridwidth = 1;
         buttonNew = new JButton();
@@ -125,7 +125,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         buttonNew.addActionListener(this);
         this.add(buttonNew, gbc);
         
-        gbc.insets = new java.awt.Insets(0,0,10,10);
+        gbc.insets = new java.awt.Insets(0,0,0,10);
         gbc.gridx = 1;
         buttonEdit = new JButton();
         buttonEdit.setText(LazyBones.getTranslation("edit","Edit Timer"));
@@ -133,7 +133,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         buttonEdit.addActionListener(this);
         this.add(buttonEdit, gbc);
         
-        gbc.insets = new java.awt.Insets(0,0,10,0);
+        gbc.insets = new java.awt.Insets(0,0,0,0);
         gbc.gridx = 2;
         buttonRemove = new JButton();
         buttonRemove.setText(LazyBones.getTranslation("dont_capture","Delete Timer"));
@@ -141,7 +141,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         buttonRemove.addActionListener(this);
         this.add(buttonRemove, gbc);
         
-        gbc.insets = new java.awt.Insets(0,10,10,10);
+        gbc.insets = new java.awt.Insets(0,10,0,10);
         gbc.gridx = 3;
         buttonSync = new JButton();
         buttonSync.setText(LazyBones.getTranslation("resync","Synchronize"));
