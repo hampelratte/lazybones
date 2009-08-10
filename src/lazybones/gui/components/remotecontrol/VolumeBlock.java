@@ -1,4 +1,4 @@
-/* $Id: VolumeBlock.java,v 1.1 2009-08-10 11:46:17 hampelratte Exp $
+/* $Id: VolumeBlock.java,v 1.2 2009-08-10 17:19:22 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -70,14 +70,14 @@ public class VolumeBlock extends JPanel implements ChangeListener {
 
     private void initGUI() {
         GridBagLayout thisLayout = new GridBagLayout();
-        thisLayout.rowWeights = new double[] {0.1, 0.1};
-        thisLayout.rowHeights = new int[] {7, 7};
-        thisLayout.columnWeights = new double[] {0.1};
-        thisLayout.columnWidths = new int[] {7};
         this.setLayout(thisLayout);
-        this.add(new JLabel(LazyBones.getTranslation("volume", "Volume")), new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-        this.add(volSlider, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-        
+        this.add(new JLabel(LazyBones.getTranslation("volume", "Volume")), 
+                new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, 
+                        GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+        this.add(volSlider, 
+                new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+
         volSlider.addChangeListener(this);
     }
 
