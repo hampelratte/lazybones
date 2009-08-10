@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.6 2008-10-04 18:37:08 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.7 2009-08-10 12:14:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -443,6 +443,7 @@ public class ChannelPanel implements ActionListener {
             return channel;
         }
 
+        @SuppressWarnings("unused")
         public void setChannel(Channel channel) {
             this.channel = channel;
         }

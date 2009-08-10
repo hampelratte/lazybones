@@ -1,4 +1,4 @@
-/* $Id: CircularList.java,v 1.1 2008-05-18 19:18:17 hampelratte Exp $
+/* $Id: CircularList.java,v 1.2 2009-08-10 12:14:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -95,6 +95,7 @@ public class CircularList<T> implements Iterable<T>, Iterator<T> {
             this.data = data;
         }
 
+        @SuppressWarnings("unused")
         public Node getPrev() {
             return prev;
         }
