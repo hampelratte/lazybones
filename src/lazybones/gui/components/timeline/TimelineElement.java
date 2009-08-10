@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.19 2008-10-27 16:55:58 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.20 2009-08-10 17:20:10 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -58,16 +58,15 @@ public class TimelineElement extends JComponent implements MouseListener {
     private Timer timer;
     private Calendar currentDate;
     
-    public final static Color COLOR_ACTIVE = UIManager.getColor("TextField.selectionBackground");
+    public final static Color COLOR_ACTIVE = UIManager.getColor("List.selectionBackground");
     public final static Color COLOR_INACTIVE = Color.LIGHT_GRAY;
-    public final static Color TEXT_COLOR = UIManager.getColor("TextField.selectionForeground");
+    public final static Color TEXT_COLOR = UIManager.getColor("List.selectionForeground");
     public final static Color TEXT_COLOR_INACTIVE = Color.GRAY;
     public final static Color CONFLICT_COLOR = new Color(255,0,0,90);
     
     public TimelineElement(Timer timer, Calendar currentDate) {
         this.timer = timer;
         this.currentDate = currentDate;
-        //setBorder(BorderFactory.createLineBorder(COLOR_ACTIVE.darker()));
         setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_ACTIVE, COLOR_ACTIVE.darker()));
         this.addMouseListener(this);
         
