@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.111 2009-08-10 12:10:54 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.112 2009-11-05 20:50:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -164,7 +164,7 @@ public class LazyBones extends Plugin implements Observer {
         String description = LazyBones.getTranslation("desc",
                         "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
-        return new PluginInfo(getClass(), name, description, author, "AS IS", "http://hampelratte.org/blog/?page_id=6");
+        return new PluginInfo(getClass(), name, description, author, "BSD", "http://hampelratte.org/blog/?page_id=6");
     }
     
     public static Version getVersion () {
