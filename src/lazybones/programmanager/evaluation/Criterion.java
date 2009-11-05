@@ -1,4 +1,4 @@
-/* $Id: Criterion.java,v 1.1 2008-10-17 21:24:56 hampelratte Exp $
+/* $Id: Criterion.java,v 1.2 2009-11-05 20:51:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,7 @@ public interface Criterion {
      * Evaluates how much a program equals a timer
      * @param prog
      * @param timer
-     * @return a percentage of equality multiplied by a boost value
+     * @return a percentage of equality
      */
     public int evaluate(Program prog, Timer timer);
 
