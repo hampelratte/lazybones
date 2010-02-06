@@ -1,4 +1,4 @@
-/* $Id: StartStopEvent.java,v 1.4 2009-04-08 16:48:23 hampelratte Exp $
+/* $Id: StartStopEvent.java,v 1.5 2010-02-06 12:24:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,7 +35,7 @@ import java.util.Calendar;
 import lazybones.ChannelManager;
 import lazybones.Timer;
 
-import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
+import org.hampelratte.svdrp.responses.highlevel.BroadcastChannel;
 
 public class StartStopEvent implements Comparable<StartStopEvent> {
     private Timer timer;
@@ -79,7 +79,7 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
     public String toString() {
         DateFormat df = DateFormat.getDateTimeInstance();
         Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();
-        DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber()); 
+        BroadcastChannel chan = (BroadcastChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber()); 
         return (df.format(cal.getTime()) 
                 + " Transponder: " 
                 + chan.getFrequency()+ " " 

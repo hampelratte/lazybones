@@ -1,4 +1,4 @@
-/* $Id: ChannelManager.java,v 1.4 2009-02-04 19:45:14 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.5 2010-02-06 12:24:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,8 +39,8 @@ import java.util.Map.Entry;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
+import org.hampelratte.svdrp.responses.highlevel.BroadcastChannel;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
 import org.hampelratte.svdrp.util.ChannelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +64,10 @@ public class ChannelManager {
             try {
                 channels = ChannelParser.parse(res.getMessage(), true);
                 
-                // remove all non DVB channels
+                // remove all non broadcast channels
                 for (Iterator<Channel> iter = channels.iterator(); iter.hasNext();) {
                     Channel channel = iter.next();
-                    if( !(channel instanceof DVBChannel) ) {
+                    if( !(channel instanceof BroadcastChannel) ) {
                         iter.remove();
                     }
                 }

@@ -1,4 +1,4 @@
-/* $Id: LazyBonesDevice.java,v 1.1 2008-09-09 11:39:11 hampelratte Exp $
+/* $Id: LazyBonesDevice.java,v 1.2 2010-02-06 12:24:07 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -151,6 +151,12 @@ public class LazyBonesDevice implements DeviceIf {
     
     // TODO implement
     public Object clone() {
+        return null;
+    }
+
+    @Override
+    public Program getProgramForProgramInList(Program p) {
+        // TODO Auto-generated method stub
         return null;
     }
 }

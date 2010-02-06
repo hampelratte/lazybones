@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.14 2008-10-04 18:36:45 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.15 2010-02-06 12:24:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,7 +43,8 @@ import lazybones.logging.PopupHandler;
 import lazybones.utils.StartStopEvent;
 import lazybones.utils.Utilities;
 
-import org.hampelratte.svdrp.responses.highlevel.DVBChannel;
+import org.hampelratte.svdrp.responses.highlevel.BroadcastChannel;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,41 +165,47 @@ public class ConflictFinder implements Observer {
     }
     
     private void increaseTransponderUse(Timer timer) {
-        DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-        if(chan == null) {
-            logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
-                    "Couldn\'t find a channel for one timer.\n" + 
-            		"The timer conflict check will not work properly."));
-            logger.trace("Timer: {}", timer);
-            return;
-        }
-        
-        if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
-            int count = transponderUse.get(chan.getFrequency());
-            count++;
-            transponderUse.put(chan.getFrequency(), count);
-        } else {
-            transponderUse.put(chan.getFrequency(), 1);
+        Channel _chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if(_chan instanceof BroadcastChannel) {
+            BroadcastChannel chan = (BroadcastChannel) _chan;
+            if(chan == null) {
+                logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
+                        "Couldn\'t find a channel for one timer.\n" + 
+                		"The timer conflict check will not work properly."));
+                logger.trace("Timer: {}", timer);
+                return;
+            }
+            
+            if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
+                int count = transponderUse.get(chan.getFrequency());
+                count++;
+                transponderUse.put(chan.getFrequency(), count);
+            } else {
+                transponderUse.put(chan.getFrequency(), 1);
+            }
         }
     }
     
     private void decreaseTransponderUse(Timer timer) {
-        DVBChannel chan = (DVBChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-        if(chan == null) {
-            logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
-                    "Couldn\'t find a channel for one timer.\n" + 
-                    "The timer conflict check will not work properly."));
-            logger.trace("Timer: {}", timer);
-            return;
-        }
-        
-        if(transponderUse.containsKey(chan.getFrequency())) {
-            int count = transponderUse.get(chan.getFrequency());
-            if(count == 1) {
-                transponderUse.remove(chan.getFrequency());
-            } else {
-                count--;
-                transponderUse.put(chan.getFrequency(), count);
+        Channel _chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if(_chan instanceof BroadcastChannel) {
+            BroadcastChannel chan = (BroadcastChannel) _chan;
+            if(chan == null) {
+                logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
+                        "Couldn\'t find a channel for one timer.\n" + 
+                        "The timer conflict check will not work properly."));
+                logger.trace("Timer: {}", timer);
+                return;
+            }
+            
+            if(transponderUse.containsKey(chan.getFrequency())) {
+                int count = transponderUse.get(chan.getFrequency());
+                if(count == 1) {
+                    transponderUse.remove(chan.getFrequency());
+                } else {
+                    count--;
+                    transponderUse.put(chan.getFrequency(), count);
+                }
             }
         }
     }
