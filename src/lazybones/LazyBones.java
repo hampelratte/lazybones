@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.112 2009-11-05 20:50:50 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.113 2010-02-06 12:23:12 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -168,8 +168,8 @@ public class LazyBones extends Plugin implements Observer {
     }
     
     public static Version getVersion () {
-        //return new Version(0,0,false,"cvs-2008-07-30");
-        return new Version(0, 54, 0, true);
+        //return new Version(0,0,false,"cvs-2010-02-05");
+        return new Version(0, 55, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -376,6 +376,10 @@ public class LazyBones extends Plugin implements Observer {
         lazyLogger.addHandler(eph);
         lazyLogger.addHandler(dch);
         eph.setFormatter(formatter);
+        
+        // add our special handlers to all svdrp messages
+        java.util.logging.Logger svdrpLogger = java.util.logging.Logger.getLogger("org.hampelratte.svdrp");
+        svdrpLogger.addHandler(dch);
         
         // add our special handlers to the popuplogger
         java.util.logging.Logger popupLogger = java.util.logging.Logger.getLogger(PopupHandler.KEYWORD);
