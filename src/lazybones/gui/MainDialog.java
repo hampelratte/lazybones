@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.15 2009-08-10 11:46:17 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.16 2010-04-18 18:23:06 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones.gui;
 
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -70,11 +71,11 @@ public class MainDialog extends JDialog implements WindowClosingIf {
     }
 
     private void initGUI() {
-        this.setSize(800, 650);
         JPanel rcPanel = new JPanel();
         rcPanel.setLayout(new GridBagLayout());
         rcPanel.add(remoteControl, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         rcPanel.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        screenshotPanel.setPreferredSize(new Dimension(720, 540));
         timelinePanel = new TimelinePanel();
         
         // !! don't change the order without changing INDEX_TIMELINE and INDEX_RC !!  
@@ -112,6 +113,7 @@ public class MainDialog extends JDialog implements WindowClosingIf {
         });
         
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+        this.pack();
     }
     
     public void setVisible(boolean visible) {
