@@ -1,4 +1,4 @@
-/* $Id: DataUploadPanel.java,v 1.1 2009-02-04 19:46:05 hampelratte Exp $
+/* $Id: DataUploadPanel.java,v 1.2 2010-04-18 18:22:23 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -186,7 +186,8 @@ public class DataUploadPanel extends JPanel {
         if (tvbchan != null) {
             Date date = new Date();
             Iterator<Program> cdp = LazyBones.getPluginManager().getChannelDayProgram(date, tvbchan);
-            while (cdp != null) {
+            while (cdp.hasNext()) { // if it has next, it is not empty.
+                // add all programs to the resulting set
                 while (cdp.hasNext()) {
                     Program prog = cdp.next();
                     channelProgramm.add(prog);
