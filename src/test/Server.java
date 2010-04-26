@@ -1,4 +1,4 @@
-/* $Id: Server.java,v 1.4 2010-02-06 12:24:07 hampelratte Exp $
+/* $Id: Server.java,v 1.5 2010-04-26 14:56:53 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -145,7 +145,7 @@ public class Server {
         		"250-21 ZDF;ZDFvision:450000:M64:C:6900:110=2:120=deu,121=2ch;125=deu:130:0:28006:1:1079:0\n" + 
         		"250-22 ZDFinfokanal;ZDFvision:450000:M64:C:6900:610=2:620=deu:630:0:28011:1:1079:0\n" + 
         		"250-23 ZDFdokukanal;ZDFvision:450000:M64:C:6900:660=2:670=deu,671=2ch:630:0:28014:1:1079:0\n" + 
-        		"250-24 ZDFtheaterkanal;ZDFvision:450000:M64:C:6900:1110=2:1120=deu,1121=2ch:630:0:28016:1:1079:0\n" + 
+        		"250-24 DSF:783250:PVRINPUT|TV|PAL:P:0:301:300:305:0:1:0:3499:0\n" + 
         		"250-25 3sat;ZDFvision:450000:M64:C:6900:210=2:220=deu,221=2ch;225=dd:230:0:28007:1:1079:0\n" + 
         		"250-26 KiKa;ZDFvision:450000:M64:C:6900:310=2:320=deu:330:0:28008:1:1079:0\n" + 
         		"250-27 rbb Berlin;ARD:458000:M64:C:6900:601=2:602=deu:604:0:28206:1:1073:0\n" + 
