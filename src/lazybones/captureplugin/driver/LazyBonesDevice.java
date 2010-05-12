@@ -1,4 +1,4 @@
-/* $Id: LazyBonesDevice.java,v 1.2 2010-02-06 12:24:07 hampelratte Exp $
+/* $Id: LazyBonesDevice.java,v 1.3 2010-05-12 21:18:04 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -158,5 +158,11 @@ public class LazyBonesDevice implements DeviceIf {
     public Program getProgramForProgramInList(Program p) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void sendProgramsToReceiveTargets(Program[] progs) {
+        // TODO Auto-generated method stub
+        
     }
 }
