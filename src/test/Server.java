@@ -1,4 +1,4 @@
-/* $Id: Server.java,v 1.5 2010-04-26 14:56:53 hampelratte Exp $
+/* $Id: Server.java,v 1.6 2010-07-27 19:27:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -104,8 +104,39 @@ public class Server {
     }
 
     private void printRecordingsList() {
-        ps.println("250-1 08.03.07 16:13* Tagesthemen\n" + 
-                "250 2 08.03.07 16:13* Tagesthemen oder wie oder was");
+        ps.println("250-1 13.05.07 14:45* %Das Wunder von Lengede - Teil 2\n" + 
+        		"250-2 22.05.10 00:30  Frei Schnauze XXL\n" + 
+        		"250-3 19.05.10 21:40  Hart aber fair\n" + 
+        		"250-4 27.04.08 22:07* %Banditen!\n" + 
+        		"250-5 24.08.08 00:55* %Das Vermächtnis des geheimen Buches\n" + 
+        		"250-6 05.04.10 22:30* Knockin' On Heaven's Door\n" + 
+        		"250-7 22.02.09 02:19  Die Frauen von Stepford\n" + 
+        		"250-8 07.09.08 22:10  %Verführung einer Fremden (Perfect Stranger)\n" + 
+        		"250-9 21.02.10 01:15* Das Gelbe vom Ei\n" + 
+        		"250-10 05.05.10 20:10  Dresden\n" + 
+        		"250-11 13.05.10 20:10  Das Parfum - Die Geschichte eines Mörders\n" + 
+        		"250-12 21.05.10 20:55  Der Trödel-King\n" + 
+        		"250-13 15.06.09 22:40* Der steinerne Kreis\n" + 
+        		"250-14 10.05.10 21:06  FlashForward\n" + 
+        		"250-15 20.05.10 00:05* FlashForward\n" + 
+        		"250-16 01.05.08 20:30* %Das Wunder von Bern\n" + 
+        		"250-17 06.05.07 14:40* %Das Wunder von Lengede - Teil 1\n" + 
+        		"250-18 06.04.10 00:15* Der Eisbär\n" + 
+        		"250-19 11.08.09 20:10  Corellis Mandoline\n" + 
+        		"250-20 24.02.06 03:40  %Sophie Scholl - Die letzten Tage\n" + 
+        		"250-21 19.06.06 09:15  %Flightplan - Ohne jede Spur\n" + 
+        		"250-22 22.11.09 20:10* Der Baader Meinhof Komplex (1/2)\n" + 
+        		"250-23 06.04.10 01:50* Der Tunnel (1)\n" + 
+        		"250-24 07.02.10 20:09  Men in Black II\n" + 
+        		"250-25 04.02.06 22:05* %Natural Born Killers\n" + 
+        		"250-26 30.05.09 22:10  Butterfly Effect\n" + 
+        		"250-27 23.05.10 15:50* Mythbusters - Die Wissensjäger\n" + 
+        		"250-28 06.04.10 03:20  Der Tunnel (2)\n" + 
+        		"250-29 21.05.10 22:15* KDD - Kriminaldauerdienst\n" + 
+        		"250-30 22.05.10 21:35* KDD - Kriminaldauerdienst\n" + 
+        		"250-31 23.11.09 20:10* Der Baader Meinhof Komplex (2/2)\n" + 
+        		"250-32 01.11.09 23:55  The Sentinel - Wem kannst du trauen?\n" + 
+        		"250 33 01.03.09 16:35  Schöne Venus");
     }
 
     private void printTimerList() {
@@ -272,7 +303,7 @@ public class Server {
     }
 
     private void sendWelcomeMessage() {
-        String welcome = "220 ReelVDR SVDRP VideoDiskRecorder 1.4.7; Sun Jul 13 18:55:47 2008";
+        String welcome = "220 vdr SVDRP VideoDiskRecorder 1.6.0-2; Sun May 23 16:23:14 2010; UTF-8";
         ps.println(welcome);
     }
 

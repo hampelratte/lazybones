@@ -1,4 +1,4 @@
-/* $Id: SVDRP.java,v 1.3 2008-07-31 20:37:08 hampelratte Exp $
+/* $Id: SVDRP.java,v 1.4 2010-07-27 19:27:35 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,7 +43,6 @@ public class SVDRP {
         Connection conn = null;
         try {
              conn = new Connection("localhost", 2001);
-             Connection.DEBUG = true;
              Response res = conn.send(new PLUG("epgsearch", false, false, "lsts", ""));
              System.out.println(res + ": " + res.getCode() + " " + res.getMessage());
              
