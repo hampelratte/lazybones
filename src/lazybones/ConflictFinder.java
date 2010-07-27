@@ -1,4 +1,4 @@
-/* $Id: ConflictFinder.java,v 1.15 2010-02-06 12:24:06 hampelratte Exp $
+/* $Id: ConflictFinder.java,v 1.16 2010-07-27 19:29:34 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -168,14 +168,6 @@ public class ConflictFinder implements Observer {
         Channel _chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
         if(_chan instanceof BroadcastChannel) {
             BroadcastChannel chan = (BroadcastChannel) _chan;
-            if(chan == null) {
-                logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
-                        "Couldn\'t find a channel for one timer.\n" + 
-                		"The timer conflict check will not work properly."));
-                logger.trace("Timer: {}", timer);
-                return;
-            }
-            
             if(chan != null && transponderUse.containsKey(chan.getFrequency())) {
                 int count = transponderUse.get(chan.getFrequency());
                 count++;
@@ -190,14 +182,6 @@ public class ConflictFinder implements Observer {
         Channel _chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
         if(_chan instanceof BroadcastChannel) {
             BroadcastChannel chan = (BroadcastChannel) _chan;
-            if(chan == null) {
-                logger.error(LazyBones.getTranslation("conflictFinder_channel_not_found", 
-                        "Couldn\'t find a channel for one timer.\n" + 
-                        "The timer conflict check will not work properly."));
-                logger.trace("Timer: {}", timer);
-                return;
-            }
-            
             if(transponderUse.containsKey(chan.getFrequency())) {
                 int count = transponderUse.get(chan.getFrequency());
                 if(count == 1) {
