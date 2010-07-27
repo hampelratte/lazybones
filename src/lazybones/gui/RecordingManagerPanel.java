@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.15 2009-08-10 16:47:29 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.16 2010-07-27 19:28:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -65,6 +64,7 @@ import lazybones.gui.utils.RecordingListCellRenderer;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
+import org.hampelratte.svdrp.util.AlphabeticalRecordingComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,7 +195,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         model = new DefaultListModel();
         List<Recording> recordings = RecordingManager.getInstance().getRecordings();
         if(recordings != null && recordings.size() > 0) {
-            Collections.sort(recordings, new RecordingComparator());
+            Collections.sort(recordings, new AlphabeticalRecordingComparator());
             for (Recording recording : recordings) {
                 model.addElement(recording);
             }
@@ -253,21 +253,5 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
                 }
             }
         });
-    }
-    
-    private class RecordingComparator implements Comparator<Recording> {
-        public int compare(Recording r1, Recording r2) {
-            String title1 = r1.getTitle();
-            String title2 = r2.getTitle();
-            
-            if(title1.charAt(0) == '%' || title1.charAt(0) == '@') {
-                title1 = title1.substring(1);
-            }
-            if(title2.charAt(0) == '%' || title2.charAt(0) == '@') {
-                title2 = title2.substring(1);
-            }
-            
-            return title1.toLowerCase().compareTo(title2.toLowerCase());
-        }
     }
 }
