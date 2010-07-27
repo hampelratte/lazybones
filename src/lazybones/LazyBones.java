@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.114 2010-04-18 18:21:35 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.115 2010-07-27 19:30:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,8 +38,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
@@ -63,6 +64,7 @@ import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.NEWT;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +171,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 55, 0, true);
+        return new Version(0, 56, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -296,7 +298,7 @@ public class LazyBones extends Plugin implements Observer {
         
         // load title mapping
         try {
-            HashMap titleMapping = (HashMap) xstream.fromXML(props.getProperty("titleMapping"));
+            Map<String, String> titleMapping = (HashMap<String, String>) xstream.fromXML(props.getProperty("titleMapping"));
             TimerManager.getInstance().setTitleMappingValues(titleMapping);
         } catch (Exception e) {
             logger.warn("Couldn't load title mapping", e);
@@ -304,7 +306,7 @@ public class LazyBones extends Plugin implements Observer {
         
         // load channel mapping
         try {
-            Hashtable channelMapping = (Hashtable) xstream.fromXML(props.getProperty("channelMapping"));
+            Map<String, Channel> channelMapping = (Hashtable<String, Channel>) xstream.fromXML(props.getProperty("channelMapping"));
             ChannelManager.setChannelMapping(channelMapping);
         } catch (Exception e) {
             logger.warn("Couldn't load channel mapping", e);
@@ -312,7 +314,7 @@ public class LazyBones extends Plugin implements Observer {
         
         // load timers
         try {
-            ArrayList timers = (ArrayList) xstream.fromXML(props.getProperty("timers"));
+            List<Timer> timers = (ArrayList<Timer>) xstream.fromXML(props.getProperty("timers"));
             TimerManager.getInstance().setStoredTimers(timers);
         } catch (Exception e) {
             logger.warn("Couldn't load timers", e);
@@ -320,7 +322,7 @@ public class LazyBones extends Plugin implements Observer {
         
         // load channel list
         try {
-            List channelList = (List) xstream.fromXML(props.getProperty("channelList")); 
+            List<Channel> channelList = (List<Channel>) xstream.fromXML(props.getProperty("channelList")); 
             ChannelManager.getInstance().setChannels(channelList);
         } catch (Exception e) {
             logger.warn("Couldn't load channel list", e);
@@ -328,9 +330,8 @@ public class LazyBones extends Plugin implements Observer {
         
         // remove outdated timers
         Calendar today = GregorianCalendar.getInstance();
-        for (ListIterator iter = TimerManager.getInstance().getStoredTimers()
-                .listIterator(); iter.hasNext();) {
-            Timer timer = (Timer) iter.next();
+        for (Iterator<Timer> iter = TimerManager.getInstance().getStoredTimers().iterator(); iter.hasNext();) {
+            Timer timer = iter.next();
             if (timer.getEndTime().before(today) & !timer.isRepeating()) {
                 iter.remove();
             }
