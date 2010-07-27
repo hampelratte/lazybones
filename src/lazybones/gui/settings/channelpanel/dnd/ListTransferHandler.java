@@ -1,4 +1,4 @@
-/* $Id: ListTransferHandler.java,v 1.2 2007-10-14 19:09:22 hampelratte Exp $
+/* $Id: ListTransferHandler.java,v 1.3 2010-07-27 19:29:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,9 +46,8 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
     
     private Set<Channel> overwrittenChannels;
     
-    @SuppressWarnings("unchecked")
     @Override
-    protected ChannelSet exportChannels(JComponent c) {
+    protected ChannelSet<Channel> exportChannels(JComponent c) {
         ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
         JList list = (JList) c;
         indices = list.getSelectedIndices();

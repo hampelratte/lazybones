@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.3 2008-10-04 18:37:08 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.4 2010-07-27 19:29:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,15 +50,14 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         this.channelList = channelList;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
-    protected ChannelSet exportChannels(JComponent c) {
+    protected ChannelSet<Channel> exportChannels(JComponent c) {
         addCount = 0;
         JTable table = (JTable)c;
         rows = table.getSelectedRows();
-        ChannelSet channelSet = new ChannelSet();
+        ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
         for (int i = 0; i < rows.length; i++) {
-            channelSet.add(table.getValueAt(rows[i], 1));
+            channelSet.add((Channel) table.getValueAt(rows[i], 1));
         }
         return channelSet;
     }

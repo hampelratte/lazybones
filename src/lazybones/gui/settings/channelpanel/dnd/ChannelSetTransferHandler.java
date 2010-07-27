@@ -28,7 +28,7 @@ public abstract class ChannelSetTransferHandler extends TransferHandler {
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
             try {
-                ChannelSet<Channel> set = (ChannelSet)t.getTransferData(ChannelSet.FLAVOR);
+                ChannelSet<Channel> set = (ChannelSet<Channel>)t.getTransferData(ChannelSet.FLAVOR);
                 importChannels(c, set);
                 return true;
             } catch (UnsupportedFlavorException ufe) {
