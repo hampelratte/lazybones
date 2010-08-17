@@ -1,4 +1,4 @@
-/* $Id: Server.java,v 1.6 2010-07-27 19:27:35 hampelratte Exp $
+/* $Id: Server.java,v 1.7 2010-08-17 17:15:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -91,6 +91,8 @@ public class Server {
         if(request == null) return false;
         
         if("quit".equalsIgnoreCase(request)) {
+            ps.println("221 localhost closing connection");
+            ps.flush();
             socket.close();
         } else if ("lstc".equalsIgnoreCase(request)) {
             printChannelList();
@@ -187,9 +189,10 @@ public class Server {
         		"250-32 EinsPlus;ARD:466000:M64:C:6900:301=2:302=deu:304:0:28723:1:1051:0\n" + 
         		"250-33 arte;ARD:466000:M64:C:6900:401=2:402=deu,403=fra:404:0:28724:1:1051:0\n" + 
         		"250-34 Phoenix;ARD:466000:M64:C:6900:501=2:502=deu:504:0:28725:1:1051:0\n" + 
-        		"250-35 DMAX;w_pvrscan:343250:PVRINPUT|TV|PAL:P:0:301=2:300:305:0:5492:0:0:0\n" + 
-        		"250-36 Das Vierte;w_pvrscan:335250:PVRINPUT|TV|PAL:P:0:301=2:300:305:0:5364:0:0:0\n" + 
-        		"250 37 Tele5;w_pvrscan:280250:PVRINPUT|TV|PAL:P:0:301=2:300:305:0:4484:0:0:0"); 
+        		"250-35 DMAX;w_pvrscan:343250:PVRINPUT|TV|PAL:P:0:301=2:300:305:0:5492:0:0:0\n" +
+        		"250-36 Testkanal;w_pvrscan:343250:TV|PAL:P:0:301=2:300:305:0:5492:0:0:0\n" + 
+        		"250-37 Das Vierte;w_pvrscan:335250:PVRINPUT|TV|PAL:P:0:301=2:300:305:0:5364:0:0:0\n" + 
+        		"250 38 Tele5;w_pvrscan:280250:PVRINPUT|TV|PAL:P:0:301=2:300:305:0:4484:0:0:0"); 
 //        ps.println("250-1 Das Erste;ARD:11836:hC34:S19.2E:27500:101:102=deu,103=2ch;106=dd:104:0:28106:1:1101:0\n" + 
 //        		"250-2 ZDF;ZDFvision:11954:hC34:S19.2E:27500:110:120=deu,121=2ch;125=dd:130:0:28006:1:1079:0\n" + 
 //        		"250-3 SWR Fernsehen BW;ARD:11836:hC34:S19.2E:27500:801:802=deu:804:0:28113:1:1101:0\n" +  
