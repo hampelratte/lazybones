@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.39 2009-02-21 12:14:45 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.40 2010-08-29 13:20:49 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -563,21 +563,29 @@ public class TimerManager extends Observable {
             int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
             timer.setLifetime(lifetime);
 
-            int buffer_before = Integer.parseInt(LazyBones.getProperties()
-                    .getProperty("timer.before"));
-            int buffer_after = Integer.parseInt(LazyBones.getProperties()
-                    .getProperty("timer.after"));
+            int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+            int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
 
             if (vdrEPG != null) {
+                boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+                
+                // set start and end time
                 Calendar calStart = vdrEPG.getStartTime();
-                // start the recording x min before the beginning of the program
-                calStart.add(Calendar.MINUTE, -buffer_before);
                 timer.setStartTime(calStart);
-
                 Calendar calEnd = vdrEPG.getEndTime();
-                // stop the recording x min after the end of the program
-                calEnd.add(Calendar.MINUTE, buffer_after);
                 timer.setEndTime(calEnd);
+
+                // if we have a vps timer, set the status to vps, otherwise
+                // add the buffers
+                if(vpsDefault) {
+                    timer.changeStateTo(VDRTimer.VPS, true);
+                } else {
+                    // start the recording x min before the beginning of the program
+                    calStart.add(Calendar.MINUTE, -buffer_before);
+    
+                    // stop the recording x min after the end of the program
+                    calEnd.add(Calendar.MINUTE, buffer_after);
+                }
 
                 timer.setFile(vdrEPG.getTitle());
                 timer.setDescription(vdrEPG.getDescription());
