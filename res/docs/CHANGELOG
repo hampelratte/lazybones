@@ -1,3 +1,8 @@
+Lazy Bones 0.5.7
+===============================================================================
+* Take VPS setting into account, when the timer options dialog is disabled
+  (bug #17469 reported by murzl)
+
 Lazy Bones 0.5.6
 ===============================================================================
 * Detect more pvrinput channels
