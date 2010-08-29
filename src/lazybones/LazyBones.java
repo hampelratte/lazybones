@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.116 2010-08-29 13:40:09 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.117 2010-08-29 14:03:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -91,8 +91,7 @@ public class LazyBones extends Plugin implements Observer {
     private static transient Logger logger = LoggerFactory.getLogger(LazyBones.class);
     
     /** Translator */
-    private static final util.ui.Localizer mLocalizer = util.ui.Localizer
-            .getLocalizerFor(LazyBones.class);
+    private static final util.ui.Localizer mLocalizer = util.ui.Localizer.getLocalizerFor(LazyBones.class);
 
     private MainDialog mainDialog;
 
@@ -138,18 +137,15 @@ public class LazyBones extends Plugin implements Observer {
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
         
         Timer t = ((TimerProgram) selectedProgram).getTimer();
-        // start the recording x min before the beggining of
-        // the program
+        // start the recording x min before the beggining of the program
         t.getStartTime().add(Calendar.MINUTE, -buffer_before);
-        // stop the recording x min after the end of the
-        // program
+        // stop the recording x min after the end of the program
         t.getEndTime().add(Calendar.MINUTE, buffer_after);
         Response response = VDRConnection.send(new NEWT(t));
         if (response.getCode() == 250) {
             TimerManager.getInstance().assignProgramToTimer(selectedProgram, t);
         } else {
-            logger.error(LazyBones.getTranslation("couldnt_create",
-                    "Couldn\'t create timer:")
+            logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:")
                     + " " + response.getMessage());
         }
         
