@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.4 2008-12-01 15:08:42 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.5 2010-09-08 16:38:19 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -32,6 +32,7 @@ package lazybones.programmanager;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.ConcurrentModificationException;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -187,17 +188,31 @@ public class ProgramManager {
      */
     public void  markPrograms() {
         // for every timer
-        for(Timer timer : TimerManager.getInstance().getTimers()) {
-            devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
-            if (chan == null) {
-                timer.setReason(Timer.NO_CHANNEL);
-
-                // we couldn't find a channel for this timer, continue with the
-                // next timer
-                continue;
+        try {
+            for(Timer timer : TimerManager.getInstance().getTimers()) {
+                devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
+                if (chan == null) {
+                    timer.setReason(Timer.NO_CHANNEL);
+    
+                    // we couldn't find a channel for this timer, continue with the
+                    // next timer
+                    continue;
+                }
+    
+                markSingularTimer(timer, chan);
             }
+        } catch(ConcurrentModificationException e) {
+            // the timers list has changed while we were marking programs, let's start over
+            logger.debug("Timers list has changed while marking programs. Beginning from scratch.");
 
-            markSingularTimer(timer, chan);
+            // first remove all marks
+            Program[] markedPrograms = LazyBones.getPluginManager().getMarkedPrograms();
+            for (Program marked : markedPrograms) {
+                marked.unmark(LazyBones.getInstance());
+            }
+            
+            // now mark all timers
+            markPrograms();
         }
     }
     
