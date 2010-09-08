@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.118 2010-09-08 13:11:59 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.119 2010-09-08 16:36:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -168,7 +168,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 57, 0, true);
+        return new Version(0, 60, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -201,7 +201,7 @@ public class LazyBones extends Plugin implements Observer {
         host = host == null ? "localhost" : host;
         props.setProperty("host", host);
         String charset = props.getProperty("charset");
-        charset = charset == null ? "ISO-8859-1" : charset;
+        charset = charset == null ? "UTF-8" : charset;
         props.setProperty("charset", charset);
         String streamurl = props.getProperty("streamurl");
         streamurl = streamurl == null ? "http://<host>:3000/<streamtype>/<channel>" : streamurl;
@@ -245,7 +245,7 @@ public class LazyBones extends Plugin implements Observer {
         String preview_path = props.getProperty("preview.path");
         preview_path = preview_path == null ? "/pub/web/preview.jpg" : preview_path;
         String preview_method = props.getProperty("preview.method");
-        preview_method = preview_method == null ? "HTTP" : preview_method;
+        preview_method = preview_method == null ? "SVDRP" : preview_method;
         props.setProperty("preview.url", preview_url);
         props.setProperty("preview.path", preview_path);
         props.setProperty("preview.method", preview_method);
@@ -284,7 +284,7 @@ public class LazyBones extends Plugin implements Observer {
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
         VDRConnection.charset = charset;
-        VDRConnection.persistentConnection = false;
+        VDRConnection.persistentConnection = true;
         
         init();
     }
