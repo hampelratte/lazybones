@@ -1,3 +1,12 @@
+Lazy Bones 0.6
+===============================================================================
+* Adapted to TV-Browser API 3.0 RC1
+* Improved timer synchronization. Should be a little faster now.
+* Made SVDRP the default method to retrieve screenshots
+* Made UTF-8 the default charset for SVDRP
+* Implemented a keep alive option for the SVDRP connection. The connection
+  will be kept for 15 seconds after the last request.
+
 Lazy Bones 0.5.7
 ===============================================================================
 * Take VPS setting into account, when the timer options dialog is disabled
