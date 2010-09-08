@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.21 2009-04-08 17:01:39 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.22 2010-09-08 16:38:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -28,6 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lazybones;
+
+import java.io.IOException;
+import java.util.TimerTask;
 
 import lazybones.actions.responses.ConnectionProblem;
 import lazybones.logging.LoggingConstants;
@@ -63,6 +66,16 @@ public class VDRConnection {
      */
     public static boolean persistentConnection;
     
+    private static java.util.Timer timer;
+    
+    private static long lastTransmissionTime = 0;
+    
+    /**
+     * The time in ms, the connection will be kept alive after
+     * the last request. {@link #persistentConnection} has to be
+     * set to true.
+     */
+    private static final int CONNECTION_KEEP_ALIVE = 15000;
     
     /**
      * Sends a SVDRP command to VDR and returns a response object, which represents the vdr response
@@ -79,10 +92,18 @@ public class VDRConnection {
                 logger.trace("old connection");
             }
             logger.trace("-->{}", cmd.getCommand());
+            
             res = connection.send(cmd);
+            lastTransmissionTime = System.currentTimeMillis();
             if(!persistentConnection) {
                 connection.close();
                 connection = null;
+            } else {
+                if(timer == null) {
+                    logger.info("Starting connection closer");
+                    timer = new java.util.Timer("SVDRP connection closer");
+                    timer.schedule(new ConnectionCloser(), 0, 100);
+                }
             }
             logger.trace("<--{}", res.getMessage());
         } catch (Exception e1) {
@@ -93,6 +114,24 @@ public class VDRConnection {
         return res;
     }
   
+    
+    static class ConnectionCloser extends TimerTask {
+        @Override
+        public void run() {
+            if (connection != null && (System.currentTimeMillis() - lastTransmissionTime) > CONNECTION_KEEP_ALIVE) {
+                logger.info("Closing connection");
+                try {
+                    connection.close();
+                    connection = null;
+                    timer.cancel();
+                    timer = null;
+                } catch (IOException e) {
+                    logger.error("Couldn't close connection", e);
+                }
+            }
+        }
+    }
+    
     /*
      * private class ConnectionTester implements Runnable {
      * 
