@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.117 2010-08-29 14:03:46 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.118 2010-09-08 13:11:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -51,6 +51,7 @@ import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -501,14 +502,6 @@ public class LazyBones extends Plugin implements Observer {
     
     private class ContextMenuFactory {
         public ActionMenu createActionMenu(final Program program) {
-            AbstractAction action = new AbstractAction() {
-                public void actionPerformed(ActionEvent evt) {
-
-                }
-            };
-            action.putValue(Action.NAME, LazyBones.getTranslation("lazybones", "Lazy Bones"));
-            action.putValue(Action.SMALL_ICON, createImageIcon("lazybones/vdr16.png"));
-
             Marker[] markers = program.getMarkerArr();
             boolean marked = false;
             for (int i = 0; i < markers.length; i++) {
@@ -579,11 +572,8 @@ public class LazyBones extends Plugin implements Observer {
                 actions[2] = new ActionMenu(action2);
                 
                 if(notAssignedTimersExist) {
-                    AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
-                    action3.putValue(Action.NAME, LazyBones.getTranslation("assign", "Assign"));
-                    action3.putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
-                    action3.putValue(Plugin.DISABLED_ON_TASK_MENU, true);
-    
+                    //AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
+                    //action3.putValue(Plugin.DISABLED_ON_TASK_MENU, true);
                     Action[] timers = new Action[TimerManager.getInstance().getNotAssignedTimers().size()];
                     List<Timer> timerList = TimerManager.getInstance().getNotAssignedTimers();
                     for (int i = 0; i < timers.length; i++) {
@@ -599,7 +589,9 @@ public class LazyBones extends Plugin implements Observer {
                         timers[i].putValue(LazyBones.TIMER_MENU_KEY, timerList.get(i));
                         timers[i].putValue(Action.SMALL_ICON, createImageIcon("lazybones/appointment-new.png"));
                     }
-                    actions[3] = new ActionMenu(action3, timers);
+                    String name = LazyBones.getTranslation("assign", "Assign");
+                    ImageIcon icon = createImageIcon("lazybones/appointment-new.png");
+                    actions[3] = new ActionMenu(name, icon, timers);
                 }
             }
 
@@ -612,7 +604,9 @@ public class LazyBones extends Plugin implements Observer {
             action0.putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
             actions[0] = new ActionMenu(action0);
 
-            return new ActionMenu(action, actions);
+            String name = LazyBones.getTranslation("lazybones", "Lazy Bones");
+            ImageIcon icon = createImageIcon("lazybones/vdr16.png");
+            return new ActionMenu(name, icon, actions);
         }
         
         JPopupMenu simpleMenu;
