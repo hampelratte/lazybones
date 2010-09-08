@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.40 2010-08-29 13:20:49 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.41 2010-09-08 16:40:00 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -162,13 +162,6 @@ public class TimerManager extends Observable {
         setChanged();
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_REMOVED, timer));
     }
-    
-    private void removeAll() {
-        timers.clear();
-
-        setChanged();
-        notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, timers));
-    }
 
     /**
      * @return a List of Timer objects
@@ -178,7 +171,7 @@ public class TimerManager extends Observable {
     }
     
     /**
-     * @param vdrTimers an ArrayList of VDRTimer objects
+     * @param vdrTimers an List of Timer objects
      */
     public void setTimers(List<Timer> vdrTimers, boolean calculateRepeatingTimers) {
         for (Timer timer : vdrTimers) {
@@ -397,7 +390,7 @@ public class TimerManager extends Observable {
         unmarkPrograms();
         
         // clear timer list
-        removeAll();
+        this.timers.clear();
         
         // fetch current timer list from vdr
         Response res = VDRConnection.send(new LSTT());
@@ -425,6 +418,8 @@ public class TimerManager extends Observable {
         } else if (res != null && res.getCode() == 550) {
             // no timers are defined, do nothing
             logger.info("No timer defined on VDR");
+            setChanged();
+            notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
         } else { /* something went wrong, we have no timers -> 
                   * load the stored ones */
             conLog.error(LazyBones.getTranslation("using_stored_timers",
