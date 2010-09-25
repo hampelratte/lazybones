@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.9 2009-05-31 19:29:15 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.10 2010-09-25 10:54:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,7 +30,6 @@
 package lazybones;
 
 import java.awt.Cursor;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -38,7 +37,6 @@ import java.util.Observable;
 import lazybones.actions.ListRecordingsAction;
 import lazybones.actions.VDRAction;
 
-import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.commands.PLAY;
@@ -112,44 +110,28 @@ public class RecordingManager extends Observable {
                 if(lstr.isSuccess()) {
                     // clear recording list
                     removeAll();
-                    
-                    Connection conn = null;
-                    try {
-                        conn = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout, VDRConnection.charset);
-                        recordings = lstr.getRecordings();
-                        
-                        boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
-                        if(loadInfos) {
-                            for (Recording rec : recordings) {
-                                logger.trace("Getting info for recording {}", rec.getNumber());
-                                Response resp = conn.send(new LSTR(rec.getNumber()));
-                                if(resp != null && resp.getCode() == 215) {
-                                    // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
-                                    String[] lines = resp.getMessage().split("\n");
-                                    StringBuffer mesg = new StringBuffer();
-                                    for (int i = 0; i < lines.length; i++) {
-                                        if(i == lines.length -1) {
-                                            mesg.append("e\n");
-                                        }
-                                        mesg.append(lines[i]+"\n");
+                    recordings = lstr.getRecordings();
+                    boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
+                    if(loadInfos) {
+                        for (Recording rec : recordings) {
+                            logger.trace("Getting info for recording {}", rec.getNumber());
+                            Response resp = VDRConnection.send(new LSTR(rec.getNumber()));
+                            if(resp != null && resp.getCode() == 215) {
+                                // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
+                                String[] lines = resp.getMessage().split("\n");
+                                StringBuffer mesg = new StringBuffer();
+                                for (int i = 0; i < lines.length; i++) {
+                                    if(i == lines.length -1) {
+                                        mesg.append("e\n");
                                     }
-                                    
-                                    // parse epg information
-                                    List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-                                    if(epg.size() > 0) {
-                                        rec.setEpgInfo(epg.get(0));
-                                    }
+                                    mesg.append(lines[i]+"\n");
                                 }
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("Couldn't synchronize recordings", e);
-                    } finally {
-                        if(conn != null) {
-                            try {
-                                conn.close();
-                            } catch (IOException e) {
-                                logger.error("Couldn't close connection to VDR", e);
+                                
+                                // parse epg information
+                                List<EPGEntry> epg = EPGParser.parse(mesg.toString());
+                                if(epg.size() > 0) {
+                                    rec.setEpgInfo(epg.get(0));
+                                }
                             }
                         }
                     }
