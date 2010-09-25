@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.119 2010-09-08 16:36:33 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.120 2010-09-25 10:50:47 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -168,7 +168,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 60, 0, true);
+        return new Version(0, 61, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -391,6 +391,7 @@ public class LazyBones extends Plugin implements Observer {
         try {
              fh = new FileHandler(settingsDir + File.separator + "lazybones.log");
              fh.setFormatter(formatter);
+             fh.setLevel(Level.FINE);
         } catch (Exception e) {
             logger.warn("Couldn't add file handler for Lazy Bones", e);
         } 
