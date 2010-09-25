@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.5 2010-09-08 16:38:19 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.6 2010-09-25 10:53:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -311,14 +311,18 @@ public class ProgramManager {
             timer.setReason(Timer.NOT_FOUND); 
             ArrayList<String> list = new ArrayList<String>();
             String doppelpackTitle = null;
-            for (Program prog : doppelPack) {
+            for (int i = 0; i < doppelPack.size(); i++) {
+                Program prog = doppelPack.get(i);
                 String title = prog.getTitle();
-                if(list.contains(title)) {
-                    logger.debug("Doppelpack found: {}", title);
-                    timer.setReason(Timer.NO_REASON);
-                    doppelpackTitle = title;
-                } else {
-                    list.add(title);
+                if(i < doppelPack.size() - 1) {
+                    Program next = doppelPack.get(i+1);
+                    if(title.equals(next.getTitle())) {
+                        logger.debug("Doppelpack found: {}", title);
+                        timer.setReason(Timer.NO_REASON);
+                        doppelpackTitle = title;
+                    } else {
+                        list.add(title);
+                    }
                 }
             }
             
