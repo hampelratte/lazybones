@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.41 2010-09-08 16:40:00 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.42 2010-09-25 10:51:40 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -437,16 +437,9 @@ public class TimerManager extends Observable {
      * Unmarks all programs, which are marked by LazyBones
      */
     private void unmarkPrograms() {
-        for (Timer timer : timers) {
-            for (String progID : timer.getTvBrowserProgIDs()) {
-                if(progID != null) { // timer is assigned to at least one program
-                    Date date = new Date(timer.getStartTime());
-                    Program prog = LazyBones.getPluginManager().getProgram(date, progID);
-                    if(prog != null) {
-                        prog.unmark(LazyBones.getInstance());
-                    }
-                }
-            }
+        Program[] markedPrograms = LazyBones.getPluginManager().getMarkedPrograms();
+        for (Program marked : markedPrograms) {
+            marked.unmark(LazyBones.getInstance());
         }
     }
     
