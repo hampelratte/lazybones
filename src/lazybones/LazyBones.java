@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.120 2010-09-25 10:50:47 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.121 2010-09-28 16:23:18 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -68,6 +68,8 @@ import org.hampelratte.svdrp.commands.NEWT;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tvbrowser.core.Settings;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -168,7 +170,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 61, 0, true);
+        return new Version(0, 62, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -355,19 +357,21 @@ public class LazyBones extends Plugin implements Observer {
     }
     
     private void initLogging() {
-        java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
-        rootLogger.setLevel(Level.ALL);
-//        Handler[] handlers = logger.getHandlers();
-//        for (int i = 0; i < handlers.length; i++) {
-//            handlers[i].setLevel(Level.ALL);
-//        }
+        String logDirectory = Settings.propLogdirectory.getString();
+        if (logDirectory != null) {
+            if(System.getProperty("java.util.logging.config.file") == null) {
+                // no logging config file is set, so we can adjust the logging level by ourselves
+                java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
+                rootLogger.setLevel(Level.FINE);
+                logger.info("No logging configuration defined. Setting logging level to Level.FINE");
+            }
+        }
 
         // create our special logging components
         SimpleFormatter formatter = new SimpleFormatter();
         Handler eph = new PopupHandler();
-        eph.setLevel(Level.FINEST);
         Handler dch = new DebugConsoleHandler();
-        dch.setLevel(Level.FINE);
+        dch.setLevel(Level.FINEST);
         
         // add our special handlers to all lazybones.* messages
         java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
@@ -377,28 +381,31 @@ public class LazyBones extends Plugin implements Observer {
         
         // add our special handlers to all svdrp messages
         java.util.logging.Logger svdrpLogger = java.util.logging.Logger.getLogger("org.hampelratte.svdrp");
+        svdrpLogger.setLevel(Level.FINE);
         svdrpLogger.addHandler(dch);
         
         // add our special handlers to the popuplogger
         java.util.logging.Logger popupLogger = java.util.logging.Logger.getLogger(PopupHandler.KEYWORD);
-        popupLogger.setLevel(Level.ALL);
+        popupLogger.setLevel(Level.WARNING);
         popupLogger.addHandler(eph);
         popupLogger.addHandler(dch);
 
         // create a custom file handler only for lazy bones
-        Handler fh = null;
-        String settingsDir = getPluginManager().getTvBrowserSettings().getTvBrowserUserHome();
-        try {
-             fh = new FileHandler(settingsDir + File.separator + "lazybones.log");
-             fh.setFormatter(formatter);
-             fh.setLevel(Level.FINE);
-        } catch (Exception e) {
-            logger.warn("Couldn't add file handler for Lazy Bones", e);
-        } 
-        
-        if(fh != null) {
-            lazyLogger.addHandler(fh);
-            popupLogger.addHandler(fh);
+        if (logDirectory != null) {
+            Handler fh = null;
+            try {
+                 fh = new FileHandler(new File(logDirectory, "lazybones.log").getAbsolutePath());
+                 fh.setFormatter(formatter);
+                 fh.setLevel(Level.FINE);
+            } catch (Exception e) {
+                logger.warn("Couldn't add file handler for Lazy Bones", e);
+            } 
+            
+            if(fh != null) {
+                lazyLogger.addHandler(fh);
+                svdrpLogger.addHandler(fh);
+                popupLogger.addHandler(fh);
+            }
         }
     }
 
