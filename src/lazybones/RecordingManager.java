@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.10 2010-09-25 10:54:52 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.11 2010-09-28 16:31:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -73,20 +73,10 @@ public class RecordingManager extends Observable {
         return instance;
     }
 
-    @Override
-    public void notifyObservers() {
-        super.notifyObservers();
-    }
-
-    @Override
-    public void notifyObservers(Object arg) {
-        super.notifyObservers(arg);
-    }
-
     public void removeAll() {
         recordings.clear();
         setChanged();
-        notifyObservers();
+        notifyObservers(recordings);
     }
 
     /**
@@ -138,7 +128,7 @@ public class RecordingManager extends Observable {
                 }
                 
                 setChanged();
-                notifyObservers();
+                notifyObservers(recordings);
             }
         };
         ListRecordingsAction lstr = new ListRecordingsAction(callback);

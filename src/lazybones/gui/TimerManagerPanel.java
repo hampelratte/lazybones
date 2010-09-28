@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.17 2009-08-10 16:54:42 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.18 2010-09-28 16:32:00 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -56,8 +56,9 @@ import javax.swing.event.ListSelectionListener;
 import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerManager;
-import lazybones.gui.components.timeroptions.TimerOptionsPanel;
+import lazybones.TimersChangedEvent;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
+import lazybones.gui.components.timeroptions.TimerOptionsPanel;
 import lazybones.gui.utils.TimerListCellRenderer;
 import lazybones.programmanager.ProgramManager;
 
@@ -174,18 +175,16 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
             }
         });
         
-        getTimers();
+        updateTimers(TimerManager.getInstance().getTimers());
     }
     
-    private void getTimers() {
-        model.removeAllElements();
-        List<Timer> timers = TimerManager.getInstance().getTimers();
-        
+    private void updateTimers(List<Timer> timers) {
+        model = new DefaultListModel();
         Collections.sort(timers, new TimerComparator());
-        
         for (Timer timer : timers) {
             model.addElement(timer);
         }
+        timerList.setModel(model);
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -210,9 +209,10 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         }
     }
 
-    public void update(Observable arg0, Object arg1) {
-        if(arg0 == TimerManager.getInstance()) {
-            getTimers();
+    public void update(Observable observable, Object o) {
+        if(observable == TimerManager.getInstance()) {
+            TimersChangedEvent event = (TimersChangedEvent) o;
+            updateTimers(event.getTimers());
         }
     }
     

@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.16 2010-07-27 19:28:33 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.17 2010-09-28 16:31:59 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -183,17 +183,17 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     }
 
-    public void update(Observable arg0, Object recordings) {
-        if(arg0 == RecordingManager.getInstance()) {
-            updateRecordings();
+    @SuppressWarnings("unchecked")
+    public void update(Observable observable, Object recordings) {
+        if(observable == RecordingManager.getInstance()) {
+            updateRecordings((List<Recording>) recordings);
         }
     }
     
-    private void updateRecordings() {
+    private void updateRecordings(List<Recording> recordings) {
         // create a new model, because clear() made problems.
         // sometimes the list was empty after an update
         model = new DefaultListModel();
-        List<Recording> recordings = RecordingManager.getInstance().getRecordings();
         if(recordings != null && recordings.size() > 0) {
             Collections.sort(recordings, new AlphabeticalRecordingComparator());
             for (Recording recording : recordings) {
