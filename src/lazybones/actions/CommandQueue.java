@@ -1,4 +1,4 @@
-/* $Id: CommandQueue.java,v 1.3 2009-07-22 16:55:20 hampelratte Exp $
+/* $Id: CommandQueue.java,v 1.4 2010-09-28 21:30:11 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,8 +34,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
 
 import javax.swing.ListModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListDataListener;
 
 import lazybones.LazyBones;
@@ -67,7 +69,7 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
         return super.add(o);
     }
 
-    public static CommandQueue getInstance() {
+    public synchronized static CommandQueue getInstance() {
         if (instance == null) {
             instance = new CommandQueue();
         }
@@ -80,18 +82,27 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
             try { Thread.sleep(10); } catch (InterruptedException e) {}
             
             while(size() > 0 && running) {
-                new Thread(new Runnable() {
-                    public void run() {
-                        LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
-                        LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
+                final VDRAction action = poll();
+                LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
+                LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
+
+                Executors.newSingleThreadExecutor().execute(
+                    new SwingWorker<Boolean, Object>() {
+                        @Override
+                        protected Boolean doInBackground() throws Exception {
+                            boolean success = action.execute();
+                            action.setSuccess(success);
+                            action.callback();
+                            return success;
+                        }
+                        
+                        @Override
+                        protected void done() {
+                            LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
+                            LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
+                        }
                     }
-                }).start();
-                VDRAction action = poll();
-                boolean success = action.execute();
-                action.setSuccess(success);
-                action.callback();
-                LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
-                LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
+                );
             }
         }
     }
