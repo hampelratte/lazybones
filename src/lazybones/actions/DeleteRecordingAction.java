@@ -1,4 +1,4 @@
-/* $Id: DeleteRecordingAction.java,v 1.7 2009-05-31 19:01:57 hampelratte Exp $
+/* $Id: DeleteRecordingAction.java,v 1.8 2010-09-28 21:30:55 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -58,7 +58,7 @@ public class DeleteRecordingAction extends VDRAction {
     
     boolean execute() {
         int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
-                LazyBones.getTranslation("recording_delete", "Do you really want to delete this recording?"), 
+                LazyBones.getTranslation("recording_delete", "Do you really want to delete the recording {0}?", recording.getDisplayTitle()), 
                 "", JOptionPane.YES_NO_OPTION);
         if(result != JOptionPane.OK_OPTION) {
             return true;
