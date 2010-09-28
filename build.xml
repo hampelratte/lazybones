@@ -67,7 +67,6 @@
 
 	<target name="run" depends="compile,jar">
 		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
-			<!--<jvmarg value="-Dawt.toolkit=sun.awt.motif.MToolkit"/>-->
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
 		</java>
@@ -76,7 +75,7 @@
 	<target name="run-vdr-local" depends="compile,jar">
 		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
 			<jvmarg value="-Duser.home=/home/henni/.tvbrowser-vdr-local"/>
-			<!--<jvmarg value="-Dawt.toolkit=sun.awt.motif.MToolkit"/>-->
+			<jvmarg value="-Dpropertiesfile=${tvbrowser.runtime.dir}/linux.properties"/>
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
 		</java>
