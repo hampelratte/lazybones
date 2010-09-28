@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.18 2010-09-28 16:32:00 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.19 2010-09-28 21:29:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,16 +34,17 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -56,7 +57,6 @@ import javax.swing.event.ListSelectionListener;
 import lazybones.LazyBones;
 import lazybones.Timer;
 import lazybones.TimerManager;
-import lazybones.TimersChangedEvent;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.components.timeroptions.TimerOptionsPanel;
 import lazybones.gui.utils.TimerListCellRenderer;
@@ -65,13 +65,12 @@ import lazybones.programmanager.ProgramManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimerManagerPanel extends JPanel implements ActionListener, Observer, ListSelectionListener {
+public class TimerManagerPanel extends JPanel implements ActionListener, ListSelectionListener {
 
     private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
     
     private JScrollPane scrollPane = null;
-    private DefaultListModel model = new DefaultListModel();
-    private JList timerList = new JList(model);
+    private JList timerList = new JList(new TimerListAdapter());
     private JButton buttonNew = null;
     private JButton buttonEdit = null;
     private JButton buttonSync = null;
@@ -80,7 +79,6 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
     
     public TimerManagerPanel() {
         initGUI();
-        TimerManager.getInstance().addObserver(this);
     }
 
     /**
@@ -174,17 +172,17 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
                 }
             }
         });
-        
-        updateTimers(TimerManager.getInstance().getTimers());
-    }
-    
-    private void updateTimers(List<Timer> timers) {
-        model = new DefaultListModel();
-        Collections.sort(timers, new TimerComparator());
-        for (Timer timer : timers) {
-            model.addElement(timer);
-        }
-        timerList.setModel(model);
+        timerList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    Timer timer = (Timer)timerList.getSelectedValue();
+                    if(timer != null) {
+                        deleteTimer(timer);
+                    }
+                }
+            }
+        });
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -202,18 +200,30 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
         } else if(e.getSource() == buttonRemove) {
             if(timerList.getSelectedIndex() >= 0) {
                 Timer timer = (Timer)timerList.getSelectedValue();
-                TimerManager.getInstance().deleteTimer(timer);
+                deleteTimer(timer);
             }
         } else if(e.getSource() == buttonSync) {
             TimerManager.getInstance().synchronize();
         }
     }
+    
+    private void deleteTimer(Timer timer) {
+        timerList.setEnabled(false);
+        final boolean requestFocus = timerList.hasFocus();
+        TimerManager.getInstance().deleteTimer(timer, new Runnable() {
+            @Override
+            public void run() {
+                timerList.setEnabled(true);
+                if(requestFocus) {
+                    timerList.requestFocus();
+                }
+            }
+        });
+    }
 
-    public void update(Observable observable, Object o) {
-        if(observable == TimerManager.getInstance()) {
-            TimersChangedEvent event = (TimersChangedEvent) o;
-            updateTimers(event.getTimers());
-        }
+    public void valueChanged(ListSelectionEvent e) {
+        Timer timer = (Timer) timerList.getSelectedValue();
+        top.setTimer(timer);
     }
     
     private class TimerComparator implements Comparator<Timer> {
@@ -221,9 +231,35 @@ public class TimerManagerPanel extends JPanel implements ActionListener, Observe
             return t1.getStartTime().compareTo(t2.getStartTime());
         }
     }
+    
+    private class TimerListAdapter extends AbstractListModel implements Observer {
+        
+        private TimerManager tm = TimerManager.getInstance();
+        
+        public TimerListAdapter() {
+            tm.addObserver(this);
+            Collections.sort(tm.getTimers(), new TimerComparator());
+        }
+        
+        @Override
+        public int getSize() {
+            return tm.getTimers().size();
+        }
 
-    public void valueChanged(ListSelectionEvent e) {
-        Timer timer = (Timer) timerList.getSelectedValue();
-        top.setTimer(timer);
+        @Override
+        public Object getElementAt(int index) {
+            return tm.getTimers().get(index);
+        }
+
+        @Override
+        public void update(Observable o, Object arg) {
+            Collections.sort(tm.getTimers(), new TimerComparator());
+            fireContentsChanged(this, 0, tm.getTimers().size()-1);
+        }
+        
+        @Override
+        protected void fireContentsChanged(Object source, int start, int end) {
+            super.fireContentsChanged(source, start, end);
+        }
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.17 2010-09-28 16:31:59 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.18 2010-09-28 21:29:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,12 +37,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
@@ -70,13 +69,12 @@ import org.slf4j.LoggerFactory;
 
 import util.ui.Localizer;
 
-public class RecordingManagerPanel extends JPanel implements ActionListener, Observer {
+public class RecordingManagerPanel extends JPanel implements ActionListener {
     
     private static transient Logger logger = LoggerFactory.getLogger(RecordingManagerPanel.class);
     
     private JScrollPane scrollPane = null;
-    private DefaultListModel model = new DefaultListModel();
-    private JList recordingList = new JList(model);
+    private JList recordingList = new JList(new RecordingsListAdapter());
     private EPGInfoPanel epgInfoPanel = new EPGInfoPanel();
     private JButton buttonSync = null;
     private JButton buttonRemove = null;
@@ -85,7 +83,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
     
     public RecordingManagerPanel() {
         initGUI();
-        RecordingManager.getInstance().addObserver(this);
     }
 
     /**
@@ -182,26 +179,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
         dialog.setVisible(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     }
-
-    @SuppressWarnings("unchecked")
-    public void update(Observable observable, Object recordings) {
-        if(observable == RecordingManager.getInstance()) {
-            updateRecordings((List<Recording>) recordings);
-        }
-    }
-    
-    private void updateRecordings(List<Recording> recordings) {
-        // create a new model, because clear() made problems.
-        // sometimes the list was empty after an update
-        model = new DefaultListModel();
-        if(recordings != null && recordings.size() > 0) {
-            Collections.sort(recordings, new AlphabeticalRecordingComparator());
-            for (Recording recording : recordings) {
-                model.addElement(recording);
-            }
-        }
-        recordingList.setModel(model);
-    }
     
     private void createContextMenu() {
         JMenuItem menuDelete = new JMenuItem(Localizer.getLocalization(Localizer.I18N_DELETE));
@@ -253,5 +230,36 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Obs
                 }
             }
         });
+    }
+    
+    private class RecordingsListAdapter extends AbstractListModel implements Observer {
+
+        private RecordingManager rm = RecordingManager.getInstance();
+        
+        public RecordingsListAdapter() {
+            rm.addObserver(this);
+            Collections.sort(rm.getRecordings(), new AlphabeticalRecordingComparator());
+        }
+        
+        @Override
+        public int getSize() {
+            return rm.getRecordings().size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return rm.getRecordings().get(index);
+        }
+
+        @Override
+        public void update(Observable o, Object arg) {
+            Collections.sort(rm.getRecordings(), new AlphabeticalRecordingComparator());
+            fireContentsChanged(this, 0, rm.getRecordings().size()-1);
+        }
+        
+        @Override
+        protected void fireContentsChanged(Object source, int start, int end) {
+            super.fireContentsChanged(source, start, end);
+        }
     }
 }
