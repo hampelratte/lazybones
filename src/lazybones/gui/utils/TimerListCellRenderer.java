@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.6 2009-04-08 16:48:22 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.7 2010-09-28 21:28:46 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,7 +50,7 @@ import lazybones.Timer;
 import devplugin.Channel;
 
 public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
-    
+
     private JLabel date = new JLabel();
     private JLabel channel = new JLabel();
     private JLabel time = new JLabel();
@@ -150,6 +150,13 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
                 recording.setIcon(null);
                 recording.setText("");
             }
+            
+            setEnabled(list.isEnabled());
+            date.setEnabled(list.isEnabled());
+            channel.setEnabled(list.isEnabled());
+            time.setEnabled(list.isEnabled());
+            title.setEnabled(list.isEnabled());
+            recording.setEnabled(list.isEnabled());
             
             return this;
         } else {
