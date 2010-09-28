@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.42 2010-09-25 10:51:40 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.43 2010-09-28 16:25:01 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -453,25 +453,12 @@ public class TimerManager extends Observable {
             public void receiveResponse(VDRAction cmd, Response response) {
                 if(!cmd.isSuccess()) {
                     logger.error(LazyBones.getTranslation(
-                            "couldnt_delete", "Couldn\'t delete timer:")
+                            "couldnt_delete", "Couldn't delete timer:")
                             + " " + cmd.getResponse().getMessage());
                     return;
                 }
-                
-                List<String> progIDs = timer.getTvBrowserProgIDs();
-                for (String id : progIDs) {
-                    Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), id);
-                    if(prog != null) {
-                        prog.unmark(LazyBones.getInstance());
-                    } else { // can be null, if program time is near 00:00, because then
-                             // the wrong day is taken to ask tvb for the programm
-                        prog = ProgramManager.getInstance().getProgram(timer.getEndTime(), id);
-                        if(prog != null) {
-                            prog.unmark(LazyBones.getInstance());
-                        }
-                    }
-                }
-                TimerManager.getInstance().synchronize();
+
+                synchronize();
             }
         };
         DeleteTimerAction dta = new DeleteTimerAction(timer, callback);
