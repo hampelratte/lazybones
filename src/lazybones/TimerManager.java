@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.43 2010-09-28 16:25:01 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.44 2010-09-28 21:30:28 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -29,6 +29,7 @@
  */
 package lazybones;
 
+import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -96,6 +97,9 @@ public class TimerManager extends Observable {
      * the mapping will be looked up here 
      */
     private TitleMapping titleMapping = new TitleMapping();
+    
+    private final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
+    private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 
     private TimerManager() {
         timers = new ArrayList<Timer>();
@@ -386,6 +390,9 @@ public class TimerManager extends Observable {
      * Fetches the timer list from vdr
      */
     public synchronized void synchronize() {
+        LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
+        LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
+        
         // unmark all tvbrowser programs
         unmarkPrograms();
         
@@ -431,6 +438,9 @@ public class TimerManager extends Observable {
         
         // handle conflicts, if some have been detected
         ConflictFinder.getInstance().handleConflicts();
+        
+        LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
+        LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
     }
     
     /**
@@ -449,7 +459,16 @@ public class TimerManager extends Observable {
      * @param timer timer to delete
      */
     public void deleteTimer(final Timer timer) {
-        VDRCallback callback = new VDRCallback() {
+        deleteTimer(timer, null);
+    }
+    
+    /**
+     * Deletes a timer on the VDR
+     * @param timer timer to delete
+     * @param callback a Runnable object, which is run after the delete process is finished
+     */
+    public void deleteTimer(final Timer timer, final Runnable callback) {
+        VDRCallback _callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
                 if(!cmd.isSuccess()) {
                     logger.error(LazyBones.getTranslation(
@@ -459,9 +478,13 @@ public class TimerManager extends Observable {
                 }
 
                 synchronize();
+                
+                if(callback != null) {
+                    callback.run();
+                }
             }
         };
-        DeleteTimerAction dta = new DeleteTimerAction(timer, callback);
+        DeleteTimerAction dta = new DeleteTimerAction(timer, _callback);
         dta.enqueue();
     }
     
