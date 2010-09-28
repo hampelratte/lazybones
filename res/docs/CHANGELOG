@@ -1,6 +1,9 @@
 Lazy Bones 0.6.2
 ===============================================================================
 * Improved logging settings. TV-Browser should now be a little bit faster
+* Improved updates of the timer and recordings list
+* Improved deleting of timers
+* Some minor GUI tweaks
 
 
 Lazy Bones 0.6.1
