@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.8 2008-10-04 18:37:34 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.9 2010-09-29 17:44:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -148,6 +148,13 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
                 cutRec.setIcon(null);
                 cutRec.setVisible(false);
             }
+            
+            setEnabled(list.isEnabled());
+            date.setEnabled(list.isEnabled());
+            newRec.setEnabled(list.isEnabled());
+            cutRec.setEnabled(list.isEnabled());
+            time.setEnabled(list.isEnabled());
+            title.setEnabled(list.isEnabled());
             
             return this;
         } else {

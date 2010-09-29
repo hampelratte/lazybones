@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.44 2010-09-28 21:30:28 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.45 2010-09-29 17:44:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -471,13 +471,11 @@ public class TimerManager extends Observable {
         VDRCallback _callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
                 if(!cmd.isSuccess()) {
-                    logger.error(LazyBones.getTranslation(
-                            "couldnt_delete", "Couldn't delete timer:")
-                            + " " + cmd.getResponse().getMessage());
-                    return;
+                    logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn't delete timer:") + " "
+                            + cmd.getResponse().getMessage());
+                } else {
+                    synchronize();
                 }
-
-                synchronize();
                 
                 if(callback != null) {
                     callback.run();

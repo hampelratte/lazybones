@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.18 2010-09-28 21:29:32 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.19 2010-09-29 17:44:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
@@ -146,17 +148,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
             rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
         }
         if("DELETE".equals(e.getActionCommand()) && itemSelected) {
-            VDRCallback callback = new VDRCallback() {
-                public void receiveResponse(VDRAction cmd, Response response) {
-                    if(!cmd.isSuccess()) {
-                        logger.error(cmd.getResponse().getMessage());
-                    } else {
-                        RecordingManager.getInstance().synchronize();
-                    }
-                }
-            };
-            DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
-            dra.enqueue();
+            deleteRecording(rec);
         } else if("INFO".equals(e.getActionCommand()) && itemSelected) {
             createEPGInfoDialog(rec);
         } else if("SYNC".equals(e.getActionCommand())) {
@@ -166,6 +158,40 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         } else if("PLAY_ON_VDR".equals(e.getActionCommand()) && itemSelected) {
             RecordingManager.getInstance().playOnVdr(rec);
         } 
+    }
+
+    private void deleteRecording(Recording rec) {
+        recordingList.setEnabled(false);
+        buttonRemove.setEnabled(false);
+        buttonSync.setEnabled(false);
+        final boolean hasFocus = recordingList.hasFocus();
+        VDRCallback callback = new VDRCallback() {
+            public void receiveResponse(VDRAction cmd, Response response) {
+                if(!cmd.isSuccess()) {
+                    logger.error(cmd.getResponse().getMessage());
+                    recordingList.setEnabled(true);
+                    buttonRemove.setEnabled(true);
+                    buttonSync.setEnabled(true);
+                    if(hasFocus) {
+                        recordingList.requestFocus();
+                    }
+                } else {
+                    RecordingManager.getInstance().synchronize(new Runnable() {
+                        @Override
+                        public void run() {
+                            recordingList.setEnabled(true);
+                            buttonRemove.setEnabled(true);
+                            buttonSync.setEnabled(true);
+                            if(hasFocus) {
+                                recordingList.requestFocus();
+                            }
+                        }
+                    });
+                }
+            }
+        };
+        DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
+        dra.enqueue();
     }
 
     private void createEPGInfoDialog(Recording rec) {
@@ -230,6 +256,17 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
                 }
             }
         });
+        recordingList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    Recording rec = (Recording)recordingList.getSelectedValue();
+                    if(rec != null) {
+                        deleteRecording(rec);
+                    }
+                }
+            }
+        });
     }
     
     private class RecordingsListAdapter extends AbstractListModel implements Observer {
@@ -243,7 +280,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         
         @Override
         public int getSize() {
-            return rm.getRecordings().size();
+            return rm.getRecordings() != null ? rm.getRecordings().size() : 0;
         }
 
         @Override

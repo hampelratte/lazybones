@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.19 2010-09-28 21:29:32 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.20 2010-09-29 17:44:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -209,11 +209,19 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     
     private void deleteTimer(Timer timer) {
         timerList.setEnabled(false);
+        buttonNew.setEnabled(false);
+        buttonEdit.setEnabled(false);
+        buttonSync.setEnabled(false);
+        buttonRemove.setEnabled(false);
         final boolean requestFocus = timerList.hasFocus();
         TimerManager.getInstance().deleteTimer(timer, new Runnable() {
             @Override
             public void run() {
                 timerList.setEnabled(true);
+                buttonNew.setEnabled(true);
+                buttonEdit.setEnabled(true);
+                buttonSync.setEnabled(true);
+                buttonRemove.setEnabled(true);
                 if(requestFocus) {
                     timerList.requestFocus();
                 }
@@ -243,7 +251,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         
         @Override
         public int getSize() {
-            return tm.getTimers().size();
+            return tm.getTimers() != null ? tm.getTimers().size() : 0;
         }
 
         @Override

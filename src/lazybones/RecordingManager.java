@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.11 2010-09-28 16:31:59 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.12 2010-09-29 17:44:45 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -90,10 +90,18 @@ public class RecordingManager extends Observable {
      * Fetches the recording list from vdr
      */
     public synchronized void synchronize() {
+        synchronize(null);
+    }
+    
+    /**
+     * Fetches the recording list from vdr
+     * @param callback will be called after the synchronization has finished
+     */
+    public synchronized void synchronize(final Runnable callback) {
         logger.debug("Getting recordings from VDR");
         
         // fetch current recording list from vdr
-        VDRCallback callback = new VDRCallback() {
+        VDRCallback _callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
                 ListRecordingsAction lstr = (ListRecordingsAction) cmd;
 
@@ -129,9 +137,13 @@ public class RecordingManager extends Observable {
                 
                 setChanged();
                 notifyObservers(recordings);
+                
+                if(callback != null) {
+                    callback.run();
+                }
             }
         };
-        ListRecordingsAction lstr = new ListRecordingsAction(callback);
+        ListRecordingsAction lstr = new ListRecordingsAction(_callback);
         lstr.enqueue();
     }
     
