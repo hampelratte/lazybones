@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.16 2010-04-18 18:23:06 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.17 2010-10-03 18:29:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -114,6 +114,15 @@ public class MainDialog extends JDialog implements WindowClosingIf {
         
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         this.pack();
+        
+        // position lazy bones centered on tvb
+        int parentWidth = LazyBones.getInstance().getParent().getWidth();
+        int parentHeight = LazyBones.getInstance().getParent().getHeight();
+        int parentX = LazyBones.getInstance().getParent().getX();
+        int parentY = LazyBones.getInstance().getParent().getY();
+        int posX = (parentWidth - getWidth()) / 2;
+        int posY = (parentHeight - getHeight()) / 2;
+        setLocation(parentX + posX, parentY + posY);
     }
     
     public void setVisible(boolean visible) {

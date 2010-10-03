@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.121 2010-09-28 16:23:18 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.122 2010-10-03 18:29:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -170,7 +170,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 62, 0, true);
+        return new Version(0, 63, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -374,21 +374,25 @@ public class LazyBones extends Plugin implements Observer {
         dch.setLevel(Level.FINEST);
         
         // add our special handlers to all lazybones.* messages
+        LoggerFactory.getLogger("lazybones");
         java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
         lazyLogger.addHandler(eph);
         lazyLogger.addHandler(dch);
         eph.setFormatter(formatter);
         
         // add our special handlers to all svdrp messages
+        LoggerFactory.getLogger("org.hampelratte.svdrp");
         java.util.logging.Logger svdrpLogger = java.util.logging.Logger.getLogger("org.hampelratte.svdrp");
         svdrpLogger.setLevel(Level.FINE);
         svdrpLogger.addHandler(dch);
         
         // add our special handlers to the popuplogger
+        LoggerFactory.getLogger(PopupHandler.KEYWORD);
         java.util.logging.Logger popupLogger = java.util.logging.Logger.getLogger(PopupHandler.KEYWORD);
-        popupLogger.setLevel(Level.WARNING);
         popupLogger.addHandler(eph);
         popupLogger.addHandler(dch);
+        popupLogger.setLevel(Level.INFO);
+        eph.setLevel(Level.INFO);
 
         // create a custom file handler only for lazy bones
         if (logDirectory != null) {

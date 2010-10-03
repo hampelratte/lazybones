@@ -1,4 +1,4 @@
-/* $Id: ConnectionFilter.java,v 1.1 2008-04-25 15:09:42 hampelratte Exp $
+/* $Id: ConnectionFilter.java,v 1.2 2010-10-03 18:29:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -38,8 +38,7 @@ public class ConnectionFilter implements Filter {
 
     public boolean isLoggable(LogRecord record) {
         if(record.getLoggerName().equals(LoggingConstants.CONNECTION_LOGGER)) {
-            boolean logConnectionErrors = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("logConnectionErrors"));
-            return logConnectionErrors;
+            return Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("logConnectionErrors"));
         }
         
         return true;

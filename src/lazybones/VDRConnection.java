@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.23 2010-09-25 10:51:54 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.24 2010-10-03 18:29:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -100,7 +100,7 @@ public class VDRConnection {
                 connection = null;
             } else {
                 if(timer == null) {
-                    logger.info("Starting connection closer");
+                    logger.debug("Starting connection closer");
                     timer = new java.util.Timer("SVDRP connection closer");
                     timer.schedule(new ConnectionCloser(), 0, 100);
                 }
@@ -119,7 +119,7 @@ public class VDRConnection {
         @Override
         public void run() {
             if (connection != null && (System.currentTimeMillis() - lastTransmissionTime) > CONNECTION_KEEP_ALIVE) {
-                logger.info("Closing connection");
+                logger.debug("Closing connection");
                 try {
                     connection.close();
                     connection = null;

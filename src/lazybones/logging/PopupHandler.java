@@ -1,4 +1,4 @@
-/* $Id: PopupHandler.java,v 1.1 2008-05-19 17:21:28 hampelratte Exp $
+/* $Id: PopupHandler.java,v 1.2 2010-10-03 18:29:32 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,6 +42,8 @@ public class PopupHandler extends Handler {
     
     private Filter filter;
     
+    private LogMessageDialog lmd;
+    
     public PopupHandler() {
         FilterChain chain = new FilterChain();
         chain.addFilter(new ConnectionFilter());
@@ -51,16 +53,13 @@ public class PopupHandler extends Handler {
     
     @Override
     public void publish(final LogRecord record) {
-        boolean loggable = true;
-        if(filter != null) {
-            loggable = filter.isLoggable(record);
+        if(lmd == null) {
+            lmd = LogMessageDialog.getInstance();
         }
         
+        boolean loggable = filter.isLoggable(record);
         if(loggable && record.getLevel().intValue() >= Level.SEVERE.intValue() || KEYWORD.equals(record.getLoggerName())) {
-            LogMessageDialog.getInstance().addMessage(record);
-            if(!LogMessageDialog.getInstance().isVisible()) {
-                LogMessageDialog.getInstance().setVisible(true);
-            }
+            lmd.addMessage(record);
         }
     }
 

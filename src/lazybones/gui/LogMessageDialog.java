@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.18 2008-10-17 19:18:17 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.19 2010-10-03 18:29:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,11 +37,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import javax.swing.DefaultListModel;
+import javax.swing.AbstractListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -52,12 +54,17 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import lazybones.LazyBones;
 import lazybones.logging.SimpleFormatter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import util.ui.Localizer;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
@@ -79,10 +86,12 @@ import util.ui.WindowClosingIf;
 */
 public class LogMessageDialog extends JDialog implements ListSelectionListener, WindowClosingIf {
     
+    private static transient Logger logger = LoggerFactory.getLogger(LogMessageDialog.class.getName());
+    
     private static LogMessageDialog instance;
     
     public JList list;
-    public DefaultListModel model;
+    public LogMessageListModel model;
     private JSplitPane splitPane;
     private JScrollPane listScrollpane;
     private JTextArea taDetails;
@@ -119,7 +128,8 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent arg0) {
+            public void windowClosing(WindowEvent we) {
+                logger.info("Window closing {}", we);
                 close();
             }
         });
@@ -129,10 +139,9 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
     }
 
     
-    public void close() {
+    public synchronized void close() {
         setVisible(false);
-        model = new DefaultListModel();
-        list.setModel(model);
+        model.clear();
         taDetails.setText("Details...");
     }
 
@@ -141,15 +150,20 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
             instance = new LogMessageDialog();
             int parentWidth = LazyBones.getInstance().getParent().getWidth();
             int parentHeight = LazyBones.getInstance().getParent().getHeight();
+            int parentX = LazyBones.getInstance().getParent().getX();
+            int parentY = LazyBones.getInstance().getParent().getY();
             int posX = (parentWidth - instance.getWidth()) / 2;
             int posY = (parentHeight - instance.getHeight()) / 2;
-            instance.setLocation(posX, posY);
+            instance.setLocation(parentX + posX, parentY + posY);
         }
         return instance;
     }
     
     public synchronized void addMessage(LogRecord message) {
-        ((DefaultListModel)list.getModel()).addElement(message);
+        model.addMessage(message);
+        if(!isVisible()) {
+            setVisible(true);
+        }
     }
     
     private JSplitPane getSplitPane() {
@@ -167,7 +181,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         if(listScrollpane == null) {
             list = new JList();
             list.addListSelectionListener(this);
-            model = new DefaultListModel();
+            model = new LogMessageListModel();
             list.setModel(model);
             list.setCellRenderer(new LogListCellRenderer());
             listScrollpane = new JScrollPane(list);
@@ -231,4 +245,41 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
             taDetails.setCaretPosition(0);
         }
     }
+    
+    private class LogMessageListModel extends AbstractListModel {
+
+        private List<LogRecord> messages = new ArrayList<LogRecord>();
+        
+        public void addMessage(LogRecord message) {
+            messages.add(message);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    fireIntervalAdded(this, messages.size()-1, messages.size()-1);
+                }
+            });
+        }
+        
+        public void clear() {
+            messages.clear();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    int lastIndex = Math.max(0, messages.size()-1);
+                    fireIntervalRemoved(this, 0, lastIndex);
+                }
+            });
+        }
+        
+        @Override
+        public int getSize() {
+            return messages.size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return messages.get(index);
+        }
+    }
+    
 }
