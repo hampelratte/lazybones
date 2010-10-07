@@ -1,4 +1,4 @@
-/* $Id: DataUploadPanel.java,v 1.2 2010-04-18 18:22:23 hampelratte Exp $
+/* $Id: DataUploadPanel.java,v 1.3 2010-10-07 21:13:52 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -132,7 +132,9 @@ public class DataUploadPanel extends JPanel {
             Channel chan = (Channel) object;
             devplugin.Channel tvbchan = ChannelManager.getInstance().getChannel(chan);
             Set<Program> channelProgram = getChannelProgram(tvbchan);
-            pute((DVBChannel)chan, channelProgram);
+            if(channelProgram.size() > 0) {
+                pute((DVBChannel)chan, channelProgram);
+            }
         }
     }
     
@@ -174,7 +176,7 @@ public class DataUploadPanel extends JPanel {
             sb.append("e\n");
         }
         
-        sb.append("c\n.");
+        sb.append("c");
         
         logger.warn(sb.toString());
         Response res = VDRConnection.send(new PUTE(sb.toString()));
