@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.122 2010-10-03 18:29:33 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.123 2010-10-08 15:40:20 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -66,6 +66,7 @@ import lazybones.programmanager.ProgramManager;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.NEWT;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -703,5 +704,34 @@ public class LazyBones extends Plugin implements Observer {
             TimerManager.getInstance().deleteTimer(programArr[0]);
         }
         return true;
+    }
+    
+    @Override
+    public int getMarkPriorityForProgram(Program p) {
+        Timer timer = TimerManager.getInstance().getTimer(p);
+        if(timer != null) {
+            if(!timer.isActive()) {
+                return Program.LOWER_MEDIUM_MARK_PRIORITY;
+            }
+        }
+        return Program.HIGHER_MEDIUM_MARK_PRIORITY;
+    }
+    
+    @Override
+    public String getProgramTableIconText() {
+        return "VPS aktiviert";
+    }
+
+    @Override
+    public Icon[] getProgramTableIcons(Program program) {
+        Timer timer = TimerManager.getInstance().getTimer(program);
+        if(timer != null) {
+            if(timer.hasState(VDRTimer.VPS)) {
+                Icon[] icons = new ImageIcon[1];
+                icons[0] = LazyBones.getInstance().getIcon("lazybones/vps16.png");
+                return icons;
+            }
+        } 
+        return super.getProgramTableIcons(program);
     }
 }
