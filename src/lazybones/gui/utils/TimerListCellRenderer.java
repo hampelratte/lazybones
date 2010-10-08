@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.7 2010-09-28 21:28:46 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.8 2010-10-08 15:43:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -71,6 +71,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         title.setForeground(Color.BLACK);
         channel.setForeground(Color.BLACK);
         date.setForeground(Color.BLACK);
+        recording.setForeground(Color.BLACK);
         
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
@@ -109,12 +110,14 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
             title.setForeground(UIManager.getColor("List.selectionForeground"));
             channel.setForeground(UIManager.getColor("List.selectionForeground"));
             date.setForeground(UIManager.getColor("List.selectionForeground"));
+            recording.setForeground(UIManager.getColor("List.selectionForeground"));
         } else {
             setBackground(index % 2 == 0 ? background : altBackground);
             time.setForeground(UIManager.getColor("List.foreground"));
             title.setForeground(UIManager.getColor("List.foreground"));
             channel.setForeground(UIManager.getColor("List.foreground"));
             date.setForeground(UIManager.getColor("List.foreground"));
+            recording.setForeground(UIManager.getColor("List.foreground"));
         }
         
         if(value instanceof Timer) {
@@ -125,6 +128,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
                 title.setForeground(inactive);
                 channel.setForeground(inactive);
                 date.setForeground(inactive);
+                recording.setForeground(inactive);
             }
             
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
