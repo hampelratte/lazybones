@@ -1,6 +1,6 @@
-/* $Id: SpinnerTimeModel.java,v 1.4 2008-07-05 12:14:05 hampelratte Exp $
+/* $Id: SpinnerCalendarModel.java,v 1.1 2010-10-08 15:44:37 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c), Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,34 +27,60 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.utils;
+package lazybones.gui.components.timeroptions;
+
+import java.util.Calendar;
 
 import javax.swing.AbstractSpinnerModel;
 
-import lazybones.Time;
+public class SpinnerCalendarModel extends AbstractSpinnerModel {
 
-public class SpinnerTimeModel extends AbstractSpinnerModel {
-
-    private Time time = new Time();
-
-    public Object getNextValue() {
-        time.increase();
-        return time;
+    private Calendar value = Calendar.getInstance();
+    private int calendarField = Calendar.MINUTE;
+    
+    public SpinnerCalendarModel() {}
+    
+    public SpinnerCalendarModel(Calendar value) {
+        this.value = value;
     }
-
-    public Object getPreviousValue() {
-        time.decrease();
-        return time;
+    
+    public SpinnerCalendarModel(Calendar value, int calendarField) {
+        this.value = value;
+        this.calendarField = calendarField;
     }
-
+    
+    @Override
     public Object getValue() {
-        return time;
+        return value;
     }
 
-    public void setValue(Object o) {
-        if (o instanceof Time) {
-            time = (Time) o;
+    @Override
+    public void setValue(Object value) {
+        if(value instanceof Calendar) {
+            this.value = (Calendar) value;
             fireStateChanged();
+        } else {
+            throw new IllegalArgumentException("Calendar expected");
         }
+    }
+
+    @Override
+    public Object getNextValue() {
+        Calendar next = Calendar.getInstance();
+        next.setTimeInMillis(value.getTimeInMillis());
+        next.add(calendarField, 1);
+        return next;
+    }
+
+    @Override
+    public Object getPreviousValue() {
+        Calendar prev = Calendar.getInstance();
+        prev.setTimeInMillis(value.getTimeInMillis());
+        prev.add(calendarField, -1);
+        return prev;
+    }
+
+    public void setCalendarField(int calendarField) {
+        this.calendarField = calendarField;
     }
 }

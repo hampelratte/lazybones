@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.45 2010-09-29 17:44:45 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.46 2010-10-08 15:44:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -195,12 +195,16 @@ public class TimerManager extends Observable {
      */
     public Timer getTimer(Program prog) {
         String progID = prog.getID();
+        if(progID == null) {
+            return null;
+        }
+        
         Calendar cal = prog.getDate().getCalendar();
         for (Timer timer : timers) {
             List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
-            Timer bufferless = timer.getTimerWithoutBuffers();
             for (String curProgID : tvBrowserProdIDs) {
                 if (progID.equals(curProgID)) {
+                    Timer bufferless = timer.getTimerWithoutBuffers();
                     if (tvBrowserProdIDs.size() == 1 || Utilities.sameDay(cal, bufferless.getStartTime())) {
                         return timer;
                     }

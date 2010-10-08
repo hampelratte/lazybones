@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.13 2009-04-08 16:42:45 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.14 2010-10-08 15:44:37 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -57,12 +57,10 @@ import javax.swing.event.ChangeListener;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.Time;
 import lazybones.Timer;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
-import lazybones.gui.utils.SpinnerTimeModel;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -95,11 +93,13 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
     private JLabel lStarttime = new JLabel(LazyBones.getTranslation("start", "Start"));
 
-    private JSpinner spinnerStarttime = new JSpinner();
+    private SpinnerCalendarModel spinnerStarttimeModel = new SpinnerCalendarModel();
+    private JSpinner spinnerStarttime = new JSpinner(spinnerStarttimeModel);
 
     private JLabel lEndtime = new JLabel(LazyBones.getTranslation("stop", "Stop"));
 
-    private JSpinner spinnerEndtime = new JSpinner();
+    private SpinnerCalendarModel spinnerEndtimeModel = new SpinnerCalendarModel();
+    private JSpinner spinnerEndtime = new JSpinner(spinnerEndtimeModel);
 
     private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority", "Priority"));
 
@@ -142,9 +142,6 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private Program prog;
     
     private Mode mode;
-    
-    private Time oldStartTime;
-    private Time oldEndTime;
     
     public TimerOptionsPanel(Timer timer, Program prog, Mode mode) {
         this.mode = mode;
@@ -260,16 +257,16 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridx = 1;
         gbc.gridy = 6;
         add(spinnerStarttime, gbc);
-        SpinnerTimeModel model = new SpinnerTimeModel();
-        spinnerStarttime.setModel(model);
         spinnerStarttime.addChangeListener(this);
+        SpinnerCalendarEditor editor = new SpinnerCalendarEditor(spinnerStarttime, spinnerStarttimeModel); 
+        spinnerStarttime.setEditor(editor);
 
         gbc.gridx = 1;
         gbc.gridy = 7;
         add(spinnerEndtime, gbc);
-        model = new SpinnerTimeModel();
-        spinnerEndtime.setModel(model);
         spinnerEndtime.addChangeListener(this);
+        editor = new SpinnerCalendarEditor(spinnerEndtime, spinnerEndtimeModel);
+        spinnerEndtime.setEditor(editor);
         
         gbc.gridx = 1;
         gbc.gridy = 8;
@@ -367,15 +364,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
             day.setText(timer.getDayString());
             
-            int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);
-            int minute = timer.getStartTime().get(Calendar.MINUTE);
-            oldStartTime = new Time(hour, minute);
-            spinnerStarttime.getModel().setValue(oldStartTime);
-            
-            hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
-            minute = timer.getEndTime().get(Calendar.MINUTE);
-            oldEndTime = new Time(hour, minute);
-            spinnerEndtime.getModel().setValue(oldEndTime);
+            spinnerStarttimeModel.setValue(timer.getStartTime());
+            spinnerEndtimeModel.setValue(timer.getEndTime());
             
             priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
             lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
@@ -414,21 +404,19 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         if(activated) {
             if(prog != null) {
                 // VPS needs the unbuffered start time
-                int hour = prog.getHours();
-                int minute = prog.getMinutes();
-                logger.debug("Setting start time to start time of the TVB-program");
-                spinnerStarttime.getModel().setValue(new Time(hour, minute));
+                timer.setStartTime(prog.getDate().getCalendar());
+                timer.getStartTime().set(Calendar.HOUR_OF_DAY, prog.getHours());
+                timer.getStartTime().set(Calendar.MINUTE, prog.getMinutes());
+                spinnerStarttimeModel.setValue(timer.getStartTime().clone());
                 day.setText(Integer.toString(prog.getDate().getDayOfMonth()));
-                timer.getStartTime().set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
+                logger.debug("Setting start time to start time of the TVB-program {}", timer.getStartTime().getTime());
             } else {
                 logger.warn("No programm found to determine the VPS time");
             }
         } else {
             if(oldTimer != null) {
                 // set the timer to the previous startTime
-                int hour = oldTimer.getStartTime().get(Calendar.HOUR_OF_DAY);
-                int minute = oldTimer.getStartTime().get(Calendar.MINUTE);
-                spinnerStarttime.getModel().setValue(new Time(hour, minute));
+                spinnerStarttimeModel.setValue(oldTimer.getStartTime().clone());
                 day.setText(Integer.toString(oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH)));
                 timer.getStartTime().set(Calendar.DAY_OF_MONTH, oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH));
             }
@@ -446,14 +434,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             vdrc = (Channel) selected;
         }
         timer.setChannelNumber(vdrc.getChannelNumber());
-        Calendar start = timer.getStartTime();
-        start.set(Calendar.HOUR_OF_DAY, ((Time) spinnerStarttime.getValue()).getHour());
-        start.set(Calendar.MINUTE, ((Time) spinnerStarttime.getValue()).getMinute());
-        timer.setStartTime(start);
-        Calendar end = timer.getEndTime();
-        end.set(Calendar.HOUR_OF_DAY, ((Time) spinnerEndtime.getValue()).getHour());
-        end.set(Calendar.MINUTE, ((Time) spinnerEndtime.getValue()).getMinute());
-        timer.setEndTime(end);
+        timer.setStartTime((Calendar) spinnerStarttimeModel.getValue());
+        timer.setEndTime((Calendar) spinnerEndtimeModel.getValue());
         timer.setPriority(((Integer) priority.getValue()).intValue());
         timer.setLifetime(((Integer) lifetime.getValue()).intValue());
         timer.setDescription(description.getText());
@@ -502,31 +484,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     @Override
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == spinnerStarttime) {
-            Time time = (Time) spinnerStarttime.getValue();
-            if(oldStartTime.getHour() == 23 && oldStartTime.getMinute() == 59 &&
-                    time.getHour() == 0 && time.getMinute() == 0) {
-                int d = Integer.parseInt(day.getText());
-                timer.getStartTime().set(Calendar.DAY_OF_MONTH, ++d);
-                day.setText(Integer.toString(d));
-            } else if(oldStartTime.getHour() == 0 && oldStartTime.getMinute() == 0 &&
-                    time.getHour() == 23 && time.getMinute() == 59) {
-                int d = Integer.parseInt(day.getText());
-                timer.getStartTime().set(Calendar.DAY_OF_MONTH, --d);
-                day.setText(Integer.toString(d));
-            }
-            oldStartTime = time.clone();
-        } else if(e.getSource() == spinnerEndtime) {
-            Time time = (Time) spinnerEndtime.getValue();
-            if(oldEndTime.getHour() == 23 && oldEndTime.getMinute() == 59 &&
-                    time.getHour() == 0 && time.getMinute() == 0) {
-                int d = Integer.parseInt(day.getText());
-                timer.getEndTime().set(Calendar.DAY_OF_MONTH, ++d);
-            } else if(oldEndTime.getHour() == 0 && oldEndTime.getMinute() == 0 &&
-                    time.getHour() == 23 && time.getMinute() == 59) {
-                int d = Integer.parseInt(day.getText());
-                timer.getEndTime().set(Calendar.DAY_OF_MONTH, --d);
-            }
-            oldEndTime = time.clone();
-        }
+            Calendar startTime = (Calendar) spinnerStarttimeModel.getValue();
+            day.setText(Integer.toString(startTime.get(Calendar.DAY_OF_MONTH)));
+        } 
     }
 }
