@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.20 2009-08-10 17:20:10 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.21 2010-10-08 15:42:43 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,9 +67,8 @@ public class TimelineElement extends JComponent implements MouseListener {
     public TimelineElement(Timer timer, Calendar currentDate) {
         this.timer = timer;
         this.currentDate = currentDate;
-        setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_ACTIVE, COLOR_ACTIVE.darker()));
         this.addMouseListener(this);
-        
+
         // set tooltip
         setToolTipText(createToolTipText(timer));
     }
@@ -114,7 +113,17 @@ public class TimelineElement extends JComponent implements MouseListener {
     public void setCurrentDate(Calendar currentDate) {
         this.currentDate = currentDate;
     }
-
+    
+    @Override
+    protected void paintBorder(Graphics g) {
+        if(timer.isActive()) {
+            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_ACTIVE, COLOR_ACTIVE.darker()));
+        } else {
+            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_INACTIVE, COLOR_INACTIVE.darker()));
+        }
+        super.paintBorder(g);
+    };
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
