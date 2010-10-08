@@ -2,6 +2,12 @@ Lazy Bones 0.6.3
 ===============================================================================
 * Some minor GUI tweaks
 * Improved logging and the error dialog
+* Fixed color of the recording label in the timer list
+* Time spinners in timer options dialog are now editable
+* Different colors for markers. 
+  Inactive timers have prio lower than medium (color cyan)
+  Active timers have prio higher than medium  (color orange)
+* A small icon for VPS appears in the program table, if VPS is activated
 
 Lazy Bones 0.6.2
 ===============================================================================
