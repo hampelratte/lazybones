@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.46 2010-10-08 15:44:37 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.47 2010-10-08 16:02:44 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,6 +49,7 @@ import lazybones.actions.VDRAction;
 import lazybones.actions.responses.ConnectionProblem;
 import lazybones.gui.TimerSelectionDialog;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
+import lazybones.gui.components.timeroptions.TimerOptionsPanel;
 import lazybones.gui.utils.TitleMapping;
 import lazybones.logging.LoggingConstants;
 import lazybones.programmanager.ProgramManager;
@@ -588,7 +589,29 @@ public class TimerManager extends Observable {
                 }
 
                 timer.setFile(vdrEPG.getTitle());
-                timer.setDescription(vdrEPG.getDescription());
+                
+                // set the description
+                String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
+                String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
+                int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
+                switch (useTvbDescription) {
+                case TimerOptionsPanel.DESC_VDR:
+                    timer.setDescription(descVdr);
+                    break;
+                case TimerOptionsPanel.DESC_TVB:
+                    timer.setDescription(descTvb);
+                    break;
+                case TimerOptionsPanel.DESC_LONGEST:
+                    if(descVdr.length() < descTvb.length()) {
+                        timer.setDescription(descTvb);
+                    } else {
+                        timer.setDescription(descVdr);
+                    }
+                    break;
+                default:
+                    timer.setDescription(descVdr);
+                    break;
+                }
             } else { // VDR has no EPG data
                 noEPGAvailable(prog, id, automatic);
                 return;
