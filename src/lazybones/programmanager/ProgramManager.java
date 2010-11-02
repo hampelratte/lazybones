@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.7 2010-10-08 15:42:02 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.8 2010-11-02 19:32:51 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -164,18 +164,18 @@ public class ProgramManager {
     /**
      * 
      * @param time A Calendar object representing the day, the program is running at
-     * @param progID the progID of the program
-     * @return {@link devplugin.PluginManager#getProgram(Date, String)}
+     * @param uniqueProgID the unique program ID of the program
+     * @return {@link devplugin.PluginManager#getProgram(String)}
      */
-    public Program getProgram(Calendar time, String progID) {
-        return LazyBones.getPluginManager().getProgram(new devplugin.Date(time), progID);
+    public Program getProgram(String uniqueProgID) {
+        return LazyBones.getPluginManager().getProgram(uniqueProgID);
     }
     
     public JPopupMenu getContextMenuForTimer(Timer timer) {
         List<String> tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
         if(tvBrowserProgIds.size() > 0) {
-            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), tvBrowserProgIds.get(0));
+            Program prog = ProgramManager.getInstance().getProgram(tvBrowserProgIds.get(0));
             popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
         } else {
             popup = LazyBones.getInstance().getSimpleContextMenu(timer);
@@ -331,7 +331,7 @@ public class ProgramManager {
                 for (Program prog : doppelPack) {
                     if(prog.getTitle().equals(doppelpackTitle)) {
                         prog.mark(LazyBones.getInstance());
-                        timer.addTvBrowserProgID(prog.getID());
+                        timer.addTvBrowserProgID(prog.getUniqueID());
                     }
                 }
                 return;
@@ -366,7 +366,7 @@ public class ProgramManager {
     }
     
     public void assignTimerToProgram(Program prog, Timer timer) {
-        timer.addTvBrowserProgID(prog.getID());
+        timer.addTvBrowserProgID(prog.getUniqueID());
         prog.mark(LazyBones.getInstance());
         prog.validateMarking();
 //        if (timer.isRepeating()) {
@@ -381,7 +381,7 @@ public class ProgramManager {
         List<String> progIDs = timer.getTvBrowserProgIDs();
         if(progIDs.size() > 0) {
             String firstProgID = progIDs.get(0);
-            Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), firstProgID);
+            Program prog = ProgramManager.getInstance().getProgram(firstProgID);
             if(prog != null) {
                 LazyBones.getPluginManager().handleProgramDoubleClick(prog);
             }

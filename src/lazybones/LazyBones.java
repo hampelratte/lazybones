@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.123 2010-10-08 15:40:20 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.124 2010-11-02 19:32:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -171,7 +171,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 63, 0, true);
+        return new Version(0, 64, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -454,12 +454,12 @@ public class LazyBones extends Plugin implements Observer {
         for(Timer timer : TimerManager.getInstance().getTimers()) {
             if(timer.isAssigned()) {
                 for (String progID : timer.getTvBrowserProgIDs()) {
-                    Program prog = ProgramManager.getInstance().getProgram(timer.getStartTime(), progID);
+                    Program prog = ProgramManager.getInstance().getProgram(progID);
                     if(prog != null) {
                         node.addProgram(prog);
                     } else { // can be null, if program time is near 00:00, because then
                              // the wrong day is taken to ask tvb for the programm
-                        prog = ProgramManager.getInstance().getProgram(timer.getEndTime(), progID);
+                        prog = ProgramManager.getInstance().getProgram(progID);
                         if(prog != null) {
                             node.addProgram(prog);
                         }
@@ -547,7 +547,9 @@ public class LazyBones extends Plugin implements Observer {
 
                 AbstractAction action2 = new AbstractAction() {
                     public void actionPerformed(ActionEvent evt) {
+                        logger.info("Looking up timer for {}", program);
                         Timer timer = (Timer) TimerManager.getInstance().getTimer(program);
+                        logger.info("Found timer {}", timer);
                         TimerManager.getInstance().editTimer(timer);
                     }
                 };

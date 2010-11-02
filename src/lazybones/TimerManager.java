@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.47 2010-10-08 16:02:44 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.48 2010-11-02 19:32:50 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -195,7 +195,7 @@ public class TimerManager extends Observable {
      * @see Program
      */
     public Timer getTimer(Program prog) {
-        String progID = prog.getID();
+        String progID = prog.getUniqueID();
         if(progID == null) {
             return null;
         }
@@ -558,7 +558,7 @@ public class TimerManager extends Observable {
 
             Timer timer = new Timer();
             timer.setChannelNumber(id);
-            timer.addTvBrowserProgID(prog.getID());
+            timer.addTvBrowserProgID(prog.getUniqueID());
             int prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
             timer.setPriority(prio);
             int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
@@ -669,7 +669,7 @@ public class TimerManager extends Observable {
             newTimer.setLifetime(lifetime);
             newTimer.setPriority(prio);
             newTimer.setTitle(prog.getTitle());
-            newTimer.addTvBrowserProgID(prog.getID());
+            newTimer.addTvBrowserProgID(prog.getUniqueID());
 
             Calendar startTime = prog.getDate().getCalendar();
             int start = prog.getStartTime();
@@ -767,7 +767,7 @@ public class TimerManager extends Observable {
                         VDRCallback callback = new VDRCallback() {
                             public void receiveResponse(VDRAction cmd, Response response) {
                                 if(cmd.isSuccess()) {
-                                    timer.addTvBrowserProgID(prog.getID());
+                                    timer.addTvBrowserProgID(prog.getUniqueID());
                                     replaceStoredTimer(timer);
                                 }
                             }
@@ -786,7 +786,7 @@ public class TimerManager extends Observable {
     }
     
     public void assignProgramToTimer(Program prog, Timer timer) {
-        timer.addTvBrowserProgID(prog.getID());
+        timer.addTvBrowserProgID(prog.getUniqueID());
         replaceStoredTimer(timer);
         getTitleMapping().put(prog.getTitle(), timer.getTitle());
     }
@@ -892,8 +892,7 @@ public class TimerManager extends Observable {
     public void editTimer(Timer timer) {
         Program prog = null;
         if(timer.getTvBrowserProgIDs().size() > 0) {
-            Calendar starttime = timer.getTimerWithoutBuffers().getStartTime();
-            prog = ProgramManager.getInstance().getProgram(starttime, timer.getTvBrowserProgIDs().get(0));
+            prog = ProgramManager.getInstance().getProgram(timer.getTvBrowserProgIDs().get(0));
         }
         TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
         if(tod.isAccepted()) {
@@ -918,7 +917,7 @@ public class TimerManager extends Observable {
                                 .getChannelDayProgram(date, c);
                         while (iterator != null && iterator.hasNext()) {
                             Program p = iterator.next();
-                            if (p.getID().equals(progID)
+                            if (p.getUniqueID().equals(progID)
                                     && p.getDate().equals(date)) {
                                 p.mark(LazyBones.getInstance());
                                 timer.setTvBrowserProgIDs(progIDs);
