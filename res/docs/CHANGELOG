@@ -1,3 +1,7 @@
+Lazy Bones 0.6.4
+===============================================================================
+* Internal change: Program.getUniqueID() is now used to map timers to programs
+
 Lazy Bones 0.6.3
 ===============================================================================
 * Some minor GUI tweaks
