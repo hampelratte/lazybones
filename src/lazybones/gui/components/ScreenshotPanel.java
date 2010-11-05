@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.8 2010-05-12 21:13:16 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.9 2010-11-05 14:06:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -89,7 +89,7 @@ public class ScreenshotPanel extends JLabel {
         
         PreviewGrabber() {
             grab = new GRAB(".jpg");
-            grab.setQuality("80");
+            grab.setQuality(80);
         }
 
         public void run() {

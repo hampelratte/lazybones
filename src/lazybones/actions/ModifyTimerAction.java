@@ -1,4 +1,4 @@
-/* $Id: ModifyTimerAction.java,v 1.2 2007-10-14 19:05:51 hampelratte Exp $
+/* $Id: ModifyTimerAction.java,v 1.3 2010-11-05 14:06:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -51,7 +51,7 @@ public class ModifyTimerAction extends VDRAction {
     }
     
     boolean execute() {
-        response = VDRConnection.send(new LSTT(Integer.toString(oldTimer.getID())));
+        response = VDRConnection.send(new LSTT(oldTimer.getID()));
         if(response != null && response.getCode() == 250) {
             List<VDRTimer> list = TimerParser.parse(response.getMessage());
             if(list.size() <= 0) {

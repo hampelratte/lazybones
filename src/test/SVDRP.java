@@ -1,4 +1,4 @@
-/* $Id: SVDRP.java,v 1.4 2010-07-27 19:27:35 hampelratte Exp $
+/* $Id: SVDRP.java,v 1.5 2010-11-05 14:06:27 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,7 +48,7 @@ public class SVDRP {
              
              GRAB grab = new GRAB();
              grab.setFilename(".jpg");
-             grab.setQuality("80");
+             grab.setQuality(80);
              res = conn.send(grab);
              System.out.println(res + ": " + res.getCode() + " " + res.getMessage());
         } catch (UnknownHostException e) {

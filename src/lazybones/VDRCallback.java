@@ -1,4 +1,4 @@
-/* $Id: VDRCallback.java,v 1.1 2007-10-14 19:04:26 hampelratte Exp $
+/* $Id: VDRCallback.java,v 1.2 2010-11-05 14:06:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,7 @@ import org.hampelratte.svdrp.Response;
  * VDRActions are executed asynchronously. So the calling party doesn't get informed
  * about the results of the action. To get informed you can pass a VDRCallback to
  * the action and after the execution of this action the VDRCallback will be called
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  *
  */
 public interface VDRCallback {

@@ -1,4 +1,4 @@
-/* $Id: DeleteTimerAction.java,v 1.4 2007-10-14 19:05:51 hampelratte Exp $
+/* $Id: DeleteTimerAction.java,v 1.5 2010-11-05 14:06:26 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -73,7 +73,7 @@ public class DeleteTimerAction extends VDRAction {
     
     boolean execute() {
         // snychronize this timer with vdr and check if the timers on the vdr haven't changed
-        response = VDRConnection.send(new LSTT(Integer.toString(timer.getID())));
+        response = VDRConnection.send(new LSTT(timer.getID()));
         if( response == null || !(response instanceof R250) ) {
             return false;
         }
