@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.21 2010-10-08 15:42:43 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.22 2010-11-19 15:00:33 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -143,7 +143,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         // paint text
         g.setColor(timer.isActive() ? TEXT_COLOR: TEXT_COLOR_INACTIVE);
         g.setFont(new Font("SansSerif", Font.PLAIN, 9));
-        g.drawString(timer.getDisplayTitle(), 5, 12);
+        g.drawString(timer.getTitle(), 5, 12);
         DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         String time = df.format(timer.getStartTime().getTime()) + " - " + df.format(timer.getEndTime().getTime());
         g.drawString(time, 5, 25);
