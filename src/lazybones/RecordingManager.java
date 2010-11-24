@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.12 2010-09-29 17:44:45 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.13 2010-11-24 20:15:25 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -107,7 +107,6 @@ public class RecordingManager extends Observable {
 
                 if(lstr.isSuccess()) {
                     // clear recording list
-                    removeAll();
                     recordings = lstr.getRecordings();
                     boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
                     if(loadInfos) {
