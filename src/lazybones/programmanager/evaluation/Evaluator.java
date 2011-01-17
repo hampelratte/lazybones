@@ -1,4 +1,4 @@
-/* $Id: Evaluator.java,v 1.4 2008-10-27 17:02:18 hampelratte Exp $
+/* $Id: Evaluator.java,v 1.5 2011-01-17 16:01:36 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -80,8 +80,8 @@ public class Evaluator {
             results.add(new Result(program, percentage));
         }
         
-        Collections.sort(results);
         if(results.size() > 0) {
+            Collections.sort(results);
             return results.get(results.size() - 1);
         } else {
             return null;
