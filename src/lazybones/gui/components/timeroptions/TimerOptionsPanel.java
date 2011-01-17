@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.14 2010-10-08 15:44:37 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.15 2011-01-17 16:02:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -455,7 +455,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 tmpCal.set(Calendar.MINUTE, prog.getMinutes());
                 tmpCal.add(Calendar.MINUTE, prog.getLength()/2); // take the middle of the playtime to be sure, that the right program is chosen
                 getParent().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                VDRTimer tmp = ProgramManager.getInstance().getVDRProgramAt(tmpCal, prog.getChannel());
+                VDRTimer tmp = ProgramManager.getInstance().getTimerForTime(tmpCal, prog.getChannel());
                 String desc = tmp == null ? "" : tmp.getDescription();
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

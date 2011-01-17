@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.8 2010-11-02 19:32:51 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.9 2011-01-17 16:02:16 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -115,8 +115,7 @@ public class ProgramManager {
         return null;
     }
     
-    // TODO schlechter name, weil Timer zurückgeliefert wird
-    public Timer getVDRProgramAt(Calendar cal, devplugin.Channel chan) {
+    public Timer getTimerForTime(Calendar cal, devplugin.Channel chan) {
         long time_t = cal.getTimeInMillis() / 1000;
         Object o = ChannelManager.getChannelMapping().get(chan.getId());
         int channelNumber = ((Channel) o).getChannelNumber();
