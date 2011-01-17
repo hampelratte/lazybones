@@ -1,6 +1,8 @@
 Lazy Bones 0.6.5
 ===============================================================================
 * Improved display of timers with a path
+* Fixed ConcurrentModificationException, which occured, when many timers were
+  created at once
 
 Lazy Bones 0.6.4
 ===============================================================================
