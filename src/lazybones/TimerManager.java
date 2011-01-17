@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.48 2010-11-02 19:32:50 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.49 2011-01-17 16:03:47 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
@@ -119,7 +121,9 @@ public class TimerManager extends Observable {
     
     private void addTimer(Timer timer, boolean calculateRepeatingTimers, boolean notifyObservers) {
         if(!timer.isRepeating() || !calculateRepeatingTimers) {
+            timerListLock.lock();
             timers.add(timer);
+            timerListLock.unlock();
         } else {
             Calendar startTime = timer.getStartTime();
             Calendar endTime = timer.getEndTime();
@@ -141,7 +145,9 @@ public class TimerManager extends Observable {
                         oneDayTimer.setStartTime(tmpStart);
                         long start = tmpStart.getTimeInMillis();
                         oneDayTimer.getEndTime().setTimeInMillis(start + duration);
+                        timerListLock.lock();
                         timers.add(oneDayTimer);
+                        timerListLock.unlock();
                     }
                 }
             }
@@ -163,7 +169,9 @@ public class TimerManager extends Observable {
      * @param timer
      */
     public void removeTimer(Timer timer) {
+        timerListLock.lock();
         timers.remove(timer);
+        timerListLock.unlock();
         setChanged();
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_REMOVED, timer));
     }
@@ -194,23 +202,29 @@ public class TimerManager extends Observable {
      * @return the timer for this program or null
      * @see Program
      */
-    public Timer getTimer(Program prog) {
+    private Lock timerListLock = new ReentrantLock();
+    public Timer getTimer(Program prog) { 
         String progID = prog.getUniqueID();
         if(progID == null) {
             return null;
         }
         
         Calendar cal = prog.getDate().getCalendar();
-        for (Timer timer : timers) {
-            List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
-            for (String curProgID : tvBrowserProdIDs) {
-                if (progID.equals(curProgID)) {
-                    Timer bufferless = timer.getTimerWithoutBuffers();
-                    if (tvBrowserProdIDs.size() == 1 || Utilities.sameDay(cal, bufferless.getStartTime())) {
-                        return timer;
+        timerListLock.lock();
+        try {
+            for (Timer timer : timers) {
+                List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
+                for (String curProgID : tvBrowserProdIDs) {
+                    if (progID.equals(curProgID)) {
+                        Timer bufferless = timer.getTimerWithoutBuffers();
+                        if (tvBrowserProdIDs.size() == 1 || Utilities.sameDay(cal, bufferless.getStartTime())) {
+                            return timer;
+                        }
                     }
                 }
             }
+        } finally {
+            timerListLock.unlock();
         }
         return null;
     }
@@ -221,12 +235,16 @@ public class TimerManager extends Observable {
      * @return The timer with the specified number
      */
     public Timer getTimer(int timerNumber) {
-        for (Timer timer : timers) {
-            if(timer.getID() == timerNumber) {
-                return timer;
+        timerListLock.lock();
+        try {
+            for (Timer timer : timers) {
+                if(timer.getID() == timerNumber) {
+                    return timer;
+                }
             }
+        } finally {
+            timerListLock.unlock();
         }
-        
         return null;
     }
     
@@ -236,11 +254,16 @@ public class TimerManager extends Observable {
      */
     public List<Timer> getNotAssignedTimers() {
         ArrayList<Timer> list = new ArrayList<Timer>();
-        for (Timer timer : timers) {
-            if(!timer.isAssigned()) {
-                list.add(timer);
+        timerListLock.lock();
+        try {
+            for (Timer timer : timers) {
+                if(!timer.isAssigned()) {
+                    list.add(timer);
+                }
             }
-        }
+        } finally {
+            timerListLock.unlock();
+        } 
         return list;
     }
     
@@ -402,7 +425,9 @@ public class TimerManager extends Observable {
         unmarkPrograms();
         
         // clear timer list
+        timerListLock.lock();
         this.timers.clear();
+        timerListLock.unlock();
         
         // fetch current timer list from vdr
         Response res = VDRConnection.send(new LSTT());
@@ -817,7 +842,7 @@ public class TimerManager extends Observable {
         // get the program for the timer's time
         Calendar c = GregorianCalendar.getInstance();
         c.setTimeInMillis(cal.getTimeInMillis());
-        Timer t = ProgramManager.getInstance().getVDRProgramAt(c, chan);
+        Timer t = ProgramManager.getInstance().getTimerForTime(c, chan);
         if (t != null) {
             programSet.add(t);
         }
@@ -827,7 +852,7 @@ public class TimerManager extends Observable {
             c = GregorianCalendar.getInstance();
             c.setTimeInMillis(cal.getTimeInMillis());
             c.add(Calendar.MINUTE, i * -1);
-            Timer t1 = ProgramManager.getInstance().getVDRProgramAt(c, chan);
+            Timer t1 = ProgramManager.getInstance().getTimerForTime(c, chan);
             if (t1 != null) {
                 programSet.add(t1);
             }
@@ -836,7 +861,7 @@ public class TimerManager extends Observable {
             c = GregorianCalendar.getInstance();
             c.setTimeInMillis(cal.getTimeInMillis());
             c.add(Calendar.MINUTE, i);
-            Timer t2 = ProgramManager.getInstance().getVDRProgramAt(c, chan);
+            Timer t2 = ProgramManager.getInstance().getTimerForTime(c, chan);
             if (t2 != null) {
                 programSet.add(t2);
             }
