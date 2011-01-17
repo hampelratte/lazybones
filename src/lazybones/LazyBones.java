@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.125 2010-11-19 15:01:59 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.126 2011-01-17 16:06:39 hampelratte Exp $
  * 
  * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -721,7 +721,7 @@ public class LazyBones extends Plugin implements Observer {
     
     @Override
     public String getProgramTableIconText() {
-        return "VPS aktiviert";
+        return LazyBones.getTranslation("vps_activated", "VPS activated");
     }
 
     @Override
