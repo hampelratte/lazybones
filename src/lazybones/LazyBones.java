@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.127 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.128 2011-01-18 17:25:38 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -171,7 +171,7 @@ public class LazyBones extends Plugin implements Observer {
     
     public static Version getVersion () {
         //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 65, 0, true);
+        return new Version(0, 66, 0, true);
     }
 
     public MainDialog getMainDialog() {
