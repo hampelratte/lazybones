@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.17 2011-01-18 17:26:51 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.18 2011-01-18 17:29:38 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -407,7 +407,6 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         }
     }
 
-    // FIXME warum wird hier timer.getStartTime().clone() benutzt
     private void setVps(boolean activated) {
         /*
          * to set the right vps time we use start time of the tvb program the start time of the vdr epg should be rather used, but it's to complicated for this
