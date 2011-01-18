@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.5 2011-01-18 17:26:51 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.6 2011-01-18 17:34:30 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -144,9 +144,6 @@ public class DayChooser extends BrowsePanel implements ActionListener, DateSelec
                 Calendar start = timer.getStartTime();
                 Calendar end = timer.getEndTime();
 
-                System.out.println("Start " + start.getTime());
-                System.out.println("End   " + end.getTime());
-
                 long startEndDiff = end.getTimeInMillis() - start.getTimeInMillis();
 
                 start.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
@@ -155,9 +152,6 @@ public class DayChooser extends BrowsePanel implements ActionListener, DateSelec
 
                 end.setTimeInMillis(start.getTimeInMillis());
                 end.add(Calendar.MILLISECOND, (int) startEndDiff);
-
-                System.out.println("New Start " + start.getTime());
-                System.out.println("New End   " + end.getTime());
             }
 
             userInputHappened();
