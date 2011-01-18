@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.16 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.17 2011-01-18 17:26:51 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -76,11 +76,11 @@ import devplugin.Program;
 
 public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener, WindowListener, ChangeListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
-    
+
     public static final int DESC_VDR = 0;
     public static final int DESC_TVB = 1;
     public static final int DESC_LONGEST = 2;
-    
+
     private JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
     private JComboBox channels = new JComboBox();
@@ -93,13 +93,13 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
     private JLabel lStarttime = new JLabel(LazyBones.getTranslation("start", "Start"));
 
-    private SpinnerCalendarModel spinnerStarttimeModel = new SpinnerCalendarModel();
-    private JSpinner spinnerStarttime = new JSpinner(spinnerStarttimeModel);
+    private SpinnerCalendarModel spinnerStarttimeModel;// = new SpinnerCalendarModel();
+    private JSpinner spinnerStarttime;// = new JSpinner(spinnerStarttimeModel);
 
     private JLabel lEndtime = new JLabel(LazyBones.getTranslation("stop", "Stop"));
 
-    private SpinnerCalendarModel spinnerEndtimeModel = new SpinnerCalendarModel();
-    private JSpinner spinnerEndtime = new JSpinner(spinnerEndtimeModel);
+    private SpinnerCalendarModel spinnerEndtimeModel;// = new SpinnerCalendarModel();
+    private JSpinner spinnerEndtime; // = new JSpinner(spinnerEndtimeModel);
 
     private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority", "Priority"));
 
@@ -112,46 +112,46 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private JLabel lTitle = new JLabel(LazyBones.getTranslation("title", "Title"));
 
     private JTextField title = new JTextField();
-    
+
     private JLabel lDescription = new JLabel(LazyBones.getTranslation("description", "Description"));
-    
+
     private JComboBox comboDesc = new JComboBox();
 
     private JTextArea description = new JTextArea();
-    
+
     private JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
-    
+
     private JCheckBox cbActive = new JCheckBox();
-    
+
     private JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
-    
+
     private JLabel lVpsTimeHint = new JLabel(LazyBones.getTranslation("vpsTimeHint", "Starttime has been changed for VPS"));
-    
+
     private JCheckBox cbVps = new JCheckBox();
-    
+
     /**
      * The actual timer
      */
     private Timer timer;
-    
+
     /**
      * A clone of the timer containing the old settings
      */
     private Timer oldTimer;
-    
+
     private Program prog;
-    
+
     private Mode mode;
-    
+
     public TimerOptionsPanel(Timer timer, Program prog, Mode mode) {
         this.mode = mode;
-        
+
         initGUI();
-        
+
         setProgram(prog);
         setTimer(timer);
     }
-    
+
     public TimerOptionsPanel(Mode mode) {
         this.mode = mode;
         initGUI();
@@ -172,11 +172,11 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(lActive, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(lVps, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         add(lTitle, gbc);
@@ -194,7 +194,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         add(lVpsTimeHint, gbc);
         lVpsTimeHint.setForeground(Color.RED);
         lVpsTimeHint.setVisible(false);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 6;
         add(lStarttime, gbc);
@@ -218,11 +218,11 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         for (int i = 0; i < c.length; i++) {
             channels.addItem(c[i]);
         }
-        
+
         gbc.gridx = 0;
         gbc.gridy = 10;
         add(lDescription, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 11;
         gbc.gridwidth = 2;
@@ -237,12 +237,12 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridx = 1;
         gbc.gridy = 0;
         add(cbActive, gbc);
-        
+
         gbc.gridx = 1;
         gbc.gridy = 1;
         add(cbVps, gbc);
         cbVps.addActionListener(this);
-        
+
         gbc.gridx = 1;
         gbc.gridy = 2;
         add(title, gbc);
@@ -256,18 +256,16 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
         gbc.gridx = 1;
         gbc.gridy = 6;
-        add(spinnerStarttime, gbc);
+        spinnerStarttime = new JSpinner();
         spinnerStarttime.addChangeListener(this);
-        SpinnerCalendarEditor editor = new SpinnerCalendarEditor(spinnerStarttime, spinnerStarttimeModel); 
-        spinnerStarttime.setEditor(editor);
+        add(spinnerStarttime, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 7;
-        add(spinnerEndtime, gbc);
+        spinnerEndtime = new JSpinner();
         spinnerEndtime.addChangeListener(this);
-        editor = new SpinnerCalendarEditor(spinnerEndtime, spinnerEndtimeModel);
-        spinnerEndtime.setEditor(editor);
-        
+        add(spinnerEndtime, gbc);
+
         gbc.gridx = 1;
         gbc.gridy = 8;
         add(priority, gbc);
@@ -275,19 +273,19 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridx = 1;
         gbc.gridy = 9;
         add(lifetime, gbc);
-        
+
         gbc.gridx = 1;
         gbc.gridy = 10;
         add(comboDesc, gbc);
         comboDesc.addItem("VDR");
         comboDesc.addItem("TV-Browser");
-        if(mode == Mode.UPDATE || mode == Mode.VIEW) {
+        if (mode == Mode.UPDATE || mode == Mode.VIEW) {
             comboDesc.addItem("Timer");
         }
         comboDesc.addItemListener(this);
-        //comboDesc.setEnabled(!update);
-        
-        if(mode == Mode.VIEW) { // set components to readonly
+        // comboDesc.setEnabled(!update);
+
+        if (mode == Mode.VIEW) { // set components to readonly
             cbActive.setEnabled(false);
             cbVps.setEnabled(false);
             title.setEnabled(false);
@@ -299,34 +297,40 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             priority.setEnabled(false);
             comboDesc.setEnabled(false);
             description.setEnabled(false);
-        } 
+        }
     }
 
     public void setTimer(Timer timer) {
-        if(timer != null) {
+        if (timer != null) {
             this.timer = timer;
             this.oldTimer = (Timer) timer.clone();
-            
+
             // we have to remove the buffers again, to get the right start date
             // example: start time is 00.00 h with time buffers we have 23.45
             // Calendar then decreases the start date, so that we don't have the right date, but
             // the date of the day before.
             Timer tmp = timer.getTimerWithoutBuffers();
-            Program prog = ProgramManager.getInstance().getProgram(tmp);
-            if(prog != null) {
+            Program prog = null;
+            if (this.prog == null) {
+                prog = ProgramManager.getInstance().getProgram(tmp);
+            } else {
+                prog = this.prog;
+            }
+
+            if (prog != null) {
                 channels.setSelectedItem(prog.getChannel());
             } else {
                 Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
                 channels.addItem(chan);
                 channels.setSelectedItem(chan);
             }
-            
+
             // set the description
             String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
             String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
             int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
-            
-            if(mode == Mode.UPDATE || mode == Mode.VIEW) {
+
+            if (mode == Mode.UPDATE || mode == Mode.VIEW) {
                 description.setText(oldTimer.getDescription());
                 comboDesc.setSelectedIndex(2);
             } else {
@@ -340,7 +344,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                     comboDesc.setSelectedIndex(DESC_TVB);
                     break;
                 case DESC_LONGEST:
-                    if(descVdr.length() < descTvb.length()) {
+                    if (descVdr.length() < descTvb.length()) {
                         description.setText(descTvb);
                         comboDesc.setSelectedIndex(DESC_TVB);
                     } else {
@@ -354,26 +358,32 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                     break;
                 }
             }
-            
-            
+
             // set timer is active switch
             cbActive.setSelected(timer.isActive());
-            
+
             // set timer title
             title.setText(timer.getFile());
 
             day.setText(timer.getDayString());
-            
-            spinnerStarttimeModel.setValue(timer.getStartTime());
-            spinnerEndtimeModel.setValue(timer.getEndTime());
-            
+
+            // initialize the start and end time spinners
+            spinnerStarttimeModel = new SpinnerCalendarModel(timer.getStartTime());
+            spinnerStarttime.setModel(spinnerStarttimeModel);
+            SpinnerCalendarEditor editor = new SpinnerCalendarEditor(spinnerStarttime, spinnerStarttimeModel);
+            spinnerStarttime.setEditor(editor);
+            spinnerEndtimeModel = new SpinnerCalendarModel(timer.getEndTime());
+            spinnerEndtime.setModel(spinnerEndtimeModel);
+            editor = new SpinnerCalendarEditor(spinnerEndtime, spinnerEndtimeModel);
+            spinnerEndtime.setEditor(editor);
+
             priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
             lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
-            
+
             dayChooser.setTimer(timer);
-            
+
             // set timer uses VPS switch
-            if(mode == Mode.NEW) {
+            if (mode == Mode.NEW) {
                 boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
                 cbVps.setSelected(vpsDefault);
                 setVps(vpsDefault);
@@ -382,11 +392,12 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             }
         }
     }
-    
+
     public void setProgram(Program prog) {
         this.prog = prog;
     }
-    
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == cbVps) {
             setVps(cbVps.isSelected());
@@ -395,14 +406,15 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             spinnerStarttime.repaint();
         }
     }
-    
+
+    // FIXME warum wird hier timer.getStartTime().clone() benutzt
     private void setVps(boolean activated) {
-        /* to set the right vps time we use start time of the tvb program
-         * the start time of the vdr epg should be rather used, but it's to complicated
-         * for this simple case 
+        /*
+         * to set the right vps time we use start time of the tvb program the start time of the vdr epg should be rather used, but it's to complicated for this
+         * simple case
          */
-        if(activated) {
-            if(prog != null) {
+        if (activated) {
+            if (prog != null) {
                 // VPS needs the unbuffered start time
                 timer.setStartTime(prog.getDate().getCalendar());
                 timer.getStartTime().set(Calendar.HOUR_OF_DAY, prog.getHours());
@@ -414,7 +426,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 logger.warn("No programm found to determine the VPS time");
             }
         } else {
-            if(oldTimer != null) {
+            if (oldTimer != null) {
                 // set the timer to the previous startTime
                 spinnerStarttimeModel.setValue(oldTimer.getStartTime().clone());
                 day.setText(Integer.toString(oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH)));
@@ -422,20 +434,18 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             }
         }
     }
-    
+
     public Timer getTimer() {
         timer.setFile(title.getText());
         Channel vdrc = null;
         Object selected = channels.getSelectedItem();
-        if(selected instanceof devplugin.Channel) {
+        if (selected instanceof devplugin.Channel) {
             devplugin.Channel c = (devplugin.Channel) selected;
-            vdrc = (Channel) ChannelManager.getChannelMapping().get(c.getId());
-        } else if( selected instanceof Channel) {
+            vdrc = ChannelManager.getChannelMapping().get(c.getId());
+        } else if (selected instanceof Channel) {
             vdrc = (Channel) selected;
         }
         timer.setChannelNumber(vdrc.getChannelNumber());
-        timer.setStartTime((Calendar) spinnerStarttimeModel.getValue());
-        timer.setEndTime((Calendar) spinnerEndtimeModel.getValue());
         timer.setPriority(((Integer) priority.getValue()).intValue());
         timer.setLifetime(((Integer) lifetime.getValue()).intValue());
         timer.setDescription(description.getText());
@@ -443,49 +453,78 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
         return timer;
     }
-    
+
+    @Override
     public void itemStateChanged(ItemEvent e) {
-        if(e.getStateChange() == ItemEvent.SELECTED) {
-            String item = (String)e.getItem();
-            if("VDR".equals(item)) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            String item = (String) e.getItem();
+            if ("VDR".equals(item)) {
                 Date date = new Date(timer.getStartTime());
                 Program prog = Plugin.getPluginManager().getProgram(date, timer.getTvBrowserProgIDs().get(0));
                 Calendar tmpCal = (Calendar) timer.getStartTime().clone();
                 tmpCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
                 tmpCal.set(Calendar.MINUTE, prog.getMinutes());
-                tmpCal.add(Calendar.MINUTE, prog.getLength()/2); // take the middle of the playtime to be sure, that the right program is chosen
+                tmpCal.add(Calendar.MINUTE, prog.getLength() / 2); // take the middle of the playtime to be sure, that the right program is chosen
                 getParent().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 VDRTimer tmp = ProgramManager.getInstance().getTimerForTime(tmpCal, prog.getChannel());
                 String desc = tmp == null ? "" : tmp.getDescription();
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            } else if ("TV-Browser".equals(item)){
+            } else if ("TV-Browser".equals(item)) {
                 Date date = new Date(timer.getTimerWithoutBuffers().getStartTime());
-                Program prog = Plugin.getPluginManager().getProgram(date,
-                        timer.getTvBrowserProgIDs().get(0));
-                description.setText(prog.getDescription());
-                description.append("\n\n" + prog.getChannel().getCopyrightNotice());
-            } else if ("Timer".equals(item)){
+                Program prog = null;
+                if (this.prog != null) {
+                    prog = this.prog;
+                } else {
+                    prog = Plugin.getPluginManager().getProgram(date, timer.getTvBrowserProgIDs().get(0));
+                }
+
+                if (prog != null) {
+                    description.setText(prog.getDescription());
+                    description.append("\n\n" + prog.getChannel().getCopyrightNotice());
+                } else {
+                    description.setText("");
+                }
+            } else if ("Timer".equals(item)) {
                 description.setText(oldTimer.getDescription());
             }
         }
     }
-    
-    public void windowActivated(WindowEvent e) {}
-    public void windowClosed(WindowEvent e) {}
-    public void windowClosing(WindowEvent e) {}
-    public void windowDeactivated(WindowEvent e) {}
-    public void windowDeiconified(WindowEvent e) {}
-    public void windowIconified(WindowEvent e) {}
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+    }
+
+    @Override
     public void windowOpened(WindowEvent e) {
         title.requestFocus();
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if(e.getSource() == spinnerStarttime) {
+        if (e.getSource() == spinnerStarttime) {
             Calendar startTime = (Calendar) spinnerStarttimeModel.getValue();
             day.setText(Integer.toString(startTime.get(Calendar.DAY_OF_MONTH)));
-        } 
+        }
     }
 }

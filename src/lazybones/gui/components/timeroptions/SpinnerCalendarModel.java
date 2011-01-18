@@ -1,4 +1,4 @@
-/* $Id: SpinnerCalendarModel.java,v 1.1 2010-10-08 15:44:37 hampelratte Exp $
+/* $Id: SpinnerCalendarModel.java,v 1.2 2011-01-18 17:26:51 hampelratte Exp $
  * 
  * Copyright (c), Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -35,20 +35,18 @@ import javax.swing.AbstractSpinnerModel;
 
 public class SpinnerCalendarModel extends AbstractSpinnerModel {
 
-    private Calendar value = Calendar.getInstance();
+    private Calendar value;
     private int calendarField = Calendar.MINUTE;
-    
-    public SpinnerCalendarModel() {}
-    
+
     public SpinnerCalendarModel(Calendar value) {
         this.value = value;
     }
-    
+
     public SpinnerCalendarModel(Calendar value, int calendarField) {
         this.value = value;
         this.calendarField = calendarField;
     }
-    
+
     @Override
     public Object getValue() {
         return value;
@@ -56,8 +54,9 @@ public class SpinnerCalendarModel extends AbstractSpinnerModel {
 
     @Override
     public void setValue(Object value) {
-        if(value instanceof Calendar) {
-            this.value = (Calendar) value;
+        if (value instanceof Calendar) {
+            Calendar newValue = (Calendar) value;
+            this.value.setTimeInMillis(newValue.getTimeInMillis());
             fireStateChanged();
         } else {
             throw new IllegalArgumentException("Calendar expected");

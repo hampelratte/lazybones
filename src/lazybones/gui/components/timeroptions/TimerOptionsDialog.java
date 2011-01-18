@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.6 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.7 2011-01-18 17:26:51 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -138,7 +138,16 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         cancel.addActionListener(this);
 
         dialog.setSize(400, 500);
-        dialog.setLocation(50, 50);
+        
+        // position lazy bones centered on tvb
+        int parentWidth = LazyBones.getInstance().getParent().getWidth();
+        int parentHeight = LazyBones.getInstance().getParent().getHeight();
+        int parentX = LazyBones.getInstance().getParent().getX();
+        int parentY = LazyBones.getInstance().getParent().getY();
+        int posX = (parentWidth - dialog.getWidth()) / 2;
+        int posY = (parentHeight - dialog.getHeight()) / 2;
+        dialog.setLocation(parentX + posX, parentY + posY);
+        
         dialog.setVisible(true);
         dialog.pack();
     }

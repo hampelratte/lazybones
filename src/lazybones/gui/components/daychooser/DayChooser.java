@@ -1,4 +1,4 @@
-/* $Id: DayChooser.java,v 1.4 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: DayChooser.java,v 1.5 2011-01-18 17:26:51 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,29 +48,18 @@ import net.sf.nachocalendar.model.DateSelectionModel;
 
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
 
-public class DayChooser extends BrowsePanel implements ActionListener,
-        DateSelectionListener {
+public class DayChooser extends BrowsePanel implements ActionListener, DateSelectionListener {
 
     private static final long serialVersionUID = -2936338063641916673L;
 
     private VDRTimer timer;
 
     private JCheckBox monday = new JCheckBox(LazyBones.getTranslation("monday", "Monday"));
-
-    private JCheckBox tuesday = new JCheckBox(LazyBones.getTranslation("tuesday",
-            "Tuesday"));
-
-    private JCheckBox wednesday = new JCheckBox(LazyBones.getTranslation("wednesday",
-            "Wednesday"));
-
-    private JCheckBox thursday = new JCheckBox(LazyBones.getTranslation("thursday",
-            "Thursday"));
-
+    private JCheckBox tuesday = new JCheckBox(LazyBones.getTranslation("tuesday", "Tuesday"));
+    private JCheckBox wednesday = new JCheckBox(LazyBones.getTranslation("wednesday", "Wednesday"));
+    private JCheckBox thursday = new JCheckBox(LazyBones.getTranslation("thursday", "Thursday"));
     private JCheckBox friday = new JCheckBox(LazyBones.getTranslation("friday", "Friday"));
-
-    private JCheckBox saturday = new JCheckBox(LazyBones.getTranslation("saturday",
-            "Saturday"));
-
+    private JCheckBox saturday = new JCheckBox(LazyBones.getTranslation("saturday", "Saturday"));
     private JCheckBox sunday = new JCheckBox(LazyBones.getTranslation("sunday", "Sunday"));
 
     private DatePanel cal = CalendarFactory.createDatePanel();
@@ -78,12 +67,12 @@ public class DayChooser extends BrowsePanel implements ActionListener,
     public DayChooser() {
         initGUI();
     }
-    
+
     public DayChooser(VDRTimer timer) {
         setTimer(timer);
         initGUI();
     }
-    
+
     public void setTimer(VDRTimer timer) {
         this.timer = timer;
     }
@@ -125,13 +114,13 @@ public class DayChooser extends BrowsePanel implements ActionListener,
         this.setSize(300, 200);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         userInputHappened();
     }
 
     private void updateTimer() {
-        boolean[] repeatingDays = new boolean[7];
-
+        boolean[] repeatingDays = timer.getRepeatingDays();
         repeatingDays[0] = monday.isSelected();
         repeatingDays[1] = tuesday.isSelected();
         repeatingDays[2] = wednesday.isSelected();
@@ -139,10 +128,9 @@ public class DayChooser extends BrowsePanel implements ActionListener,
         repeatingDays[4] = friday.isSelected();
         repeatingDays[5] = saturday.isSelected();
         repeatingDays[6] = sunday.isSelected();
-
-        timer.setRepeatingDays(repeatingDays);
     }
 
+    @Override
     public void valueChanged(DateSelectionEvent e) {
         Object o = cal.getDateSelectionModel().getSelectedDate();
         if (o != null) {
@@ -154,18 +142,22 @@ public class DayChooser extends BrowsePanel implements ActionListener,
                 timer.setHasFirstTime(true);
             } else {
                 Calendar start = timer.getStartTime();
+                Calendar end = timer.getEndTime();
+
+                System.out.println("Start " + start.getTime());
+                System.out.println("End   " + end.getTime());
+
+                long startEndDiff = end.getTimeInMillis() - start.getTimeInMillis();
+
                 start.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
                 start.set(Calendar.MONTH, startDate.get(Calendar.MONTH));
-                start.set(Calendar.DAY_OF_MONTH, startDate
-                        .get(Calendar.DAY_OF_MONTH));
-                timer.setStartTime(start);
+                start.set(Calendar.DAY_OF_MONTH, startDate.get(Calendar.DAY_OF_MONTH));
 
-                Calendar end = timer.getStartTime();
-                end.set(Calendar.YEAR, startDate.get(Calendar.YEAR));
-                end.set(Calendar.MONTH, startDate.get(Calendar.MONTH));
-                end.set(Calendar.DAY_OF_MONTH, startDate
-                        .get(Calendar.DAY_OF_MONTH));
-                timer.setStartTime(end);
+                end.setTimeInMillis(start.getTimeInMillis());
+                end.add(Calendar.MILLISECOND, (int) startEndDiff);
+
+                System.out.println("New Start " + start.getTime());
+                System.out.println("New End   " + end.getTime());
             }
 
             userInputHappened();

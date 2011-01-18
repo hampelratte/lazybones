@@ -1,4 +1,4 @@
-/* $Id: SpinnerCalendarEditor.java,v 1.1 2010-10-08 15:44:37 hampelratte Exp $
+/* $Id: SpinnerCalendarEditor.java,v 1.2 2011-01-18 17:26:51 hampelratte Exp $
  * 
  * Copyright (c), Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,20 +43,19 @@ import javax.swing.text.DefaultFormatterFactory;
 public class SpinnerCalendarEditor extends JSpinner.DefaultEditor {
 
     private SpinnerCalendarModel model;
-    
+
     public SpinnerCalendarEditor(JSpinner spinner, final SpinnerCalendarModel model) {
         super(spinner);
         this.model = model;
         getTextField().setEditable(true);
-        getTextField().setFormatterFactory(
-                new DefaultFormatterFactory(new CalendarFormatter(new SimpleDateFormat("HH:mm"))));
+        getTextField().setFormatterFactory(new DefaultFormatterFactory(new CalendarFormatter(new SimpleDateFormat("HH:mm"))));
         getTextField().addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int amount = e.getWheelRotation();
                 Object value = null;
                 for (int i = 0; i < Math.abs(amount); i++) {
-                    if(amount > 0) {
+                    if (amount > 0) {
                         value = model.getPreviousValue();
                     } else {
                         value = model.getNextValue();
@@ -69,19 +68,19 @@ public class SpinnerCalendarEditor extends JSpinner.DefaultEditor {
 
     private class CalendarFormatter extends DefaultFormatter {
         private DateFormat dateFormat;
-        
+
         public CalendarFormatter(DateFormat dateFormat) {
             this.dateFormat = dateFormat;
         }
-        
+
         @Override
         public String valueToString(Object value) throws ParseException {
-            if( !(value instanceof Calendar) ) {
+            if (!(value instanceof Calendar)) {
                 throw new IllegalArgumentException("Not a Calendar");
             }
-            return dateFormat.format( ((Calendar)value).getTime() );
+            return dateFormat.format(((Calendar) value).getTime());
         }
-        
+
         @Override
         public Object stringToValue(String string) throws ParseException {
             Calendar value = (Calendar) model.getValue();
