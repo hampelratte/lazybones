@@ -1,6 +1,6 @@
-/* $Id: LazyBones.java,v 1.126 2011-01-17 16:06:39 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.127 2011-01-18 13:13:53 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

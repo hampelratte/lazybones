@@ -1,6 +1,6 @@
-/* $Id: TimerPanel.java,v 1.7 2009-04-08 16:48:23 hampelratte Exp $
+/* $Id: TimerPanel.java,v 1.8 2011-01-18 13:13:54 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

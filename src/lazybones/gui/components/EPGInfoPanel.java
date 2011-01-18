@@ -1,6 +1,6 @@
-/* $Id: EPGInfoPanel.java,v 1.3 2008-05-06 17:32:29 hampelratte Exp $
+/* $Id: EPGInfoPanel.java,v 1.4 2011-01-18 13:13:56 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

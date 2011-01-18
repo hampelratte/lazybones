@@ -1,6 +1,6 @@
-/* $Id: VDRConnection.java,v 1.24 2010-10-03 18:29:33 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.25 2011-01-18 13:13:53 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

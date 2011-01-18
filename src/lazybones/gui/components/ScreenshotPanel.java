@@ -1,6 +1,6 @@
-/* $Id: ScreenshotPanel.java,v 1.9 2010-11-05 14:06:26 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.10 2011-01-18 13:13:56 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

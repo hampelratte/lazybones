@@ -1,6 +1,6 @@
-/* $Id: ListRecordingsAction.java,v 1.6 2010-09-25 10:54:52 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.7 2011-01-18 13:13:54 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

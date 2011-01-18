@@ -1,6 +1,6 @@
-/* $Id: Utilities.java,v 1.6 2008-10-04 21:47:02 hampelratte Exp $
+/* $Id: Utilities.java,v 1.7 2011-01-18 13:13:55 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

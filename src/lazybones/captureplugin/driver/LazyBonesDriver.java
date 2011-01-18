@@ -1,6 +1,6 @@
-/* $Id: LazyBonesDriver.java,v 1.1 2008-09-09 11:39:11 hampelratte Exp $
+/* $Id: LazyBonesDriver.java,v 1.2 2011-01-18 13:13:57 hampelratte Exp $
  * 
- * Copyright (c) 2005, Henrik Niehaus & Lazy Bones development team
+ * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
