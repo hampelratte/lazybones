@@ -2,6 +2,9 @@ Lazy Bones 0.6.6
 ===============================================================================
 * Open timer settings dialog in the center of TV-Browser
 * Fixed a problem with the day chooser in the timer settings dialog
+* Fixed bug #17727 (crash when only one program exists and the description is
+  set to TV-Browser in the settings)
+* Improved / corrected parsing of stream types in epg entries
 
 Lazy Bones 0.6.5
 ===============================================================================
