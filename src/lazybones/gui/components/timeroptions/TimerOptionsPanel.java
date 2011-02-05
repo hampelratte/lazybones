@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsPanel.java,v 1.18 2011-01-18 17:29:38 hampelratte Exp $
+/* $Id: TimerOptionsPanel.java,v 1.19 2011-02-05 16:13:03 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -478,7 +478,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                     prog = Plugin.getPluginManager().getProgram(date, timer.getTvBrowserProgIDs().get(0));
                 }
 
-                if (prog != null) {
+                if (prog != null && prog.getDescription() != null) {
                     description.setText(prog.getDescription());
                     description.append("\n\n" + prog.getChannel().getCopyrightNotice());
                 } else {
