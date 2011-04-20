@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.129 2011-04-20 12:05:38 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.130 2011-04-20 14:17:20 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -64,6 +64,7 @@ import lazybones.logging.SimpleFormatter;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.CHAN;
 import org.hampelratte.svdrp.commands.NEWT;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
@@ -537,12 +538,13 @@ public class LazyBones extends Plugin implements Observer {
 
             boolean notAssignedTimersExist = TimerManager.getInstance().getNotAssignedTimers().size() > 0;
 
-            int size = 3;
+            int size = 4;
 
             if (marked || notAssignedTimersExist) {
                 size++;
             }
 
+            int index = 1;
             ActionMenu[] actions = null;
             if (marked) {
                 actions = new ActionMenu[size];
@@ -555,7 +557,7 @@ public class LazyBones extends Plugin implements Observer {
                 };
                 action1.putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
                 action1.putValue(Action.SMALL_ICON, createImageIcon("actions", "edit-delete", 16));
-                actions[1] = new ActionMenu(action1);
+                actions[index++] = new ActionMenu(action1);
 
                 AbstractAction action2 = new AbstractAction() {
                     @Override
@@ -568,7 +570,7 @@ public class LazyBones extends Plugin implements Observer {
                 };
                 action2.putValue(Action.NAME, LazyBones.getTranslation("edit", "Edit Timer"));
                 action2.putValue(Action.SMALL_ICON, createImageIcon("actions", "document-edit", 16));
-                actions[2] = new ActionMenu(action2);
+                actions[index++] = new ActionMenu(action2);
 
                 AbstractAction action3 = new AbstractAction() {
                     @Override
@@ -578,7 +580,7 @@ public class LazyBones extends Plugin implements Observer {
                 };
                 action3.putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
                 action3.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
-                actions[3] = new ActionMenu(action3);
+                actions[index++] = new ActionMenu(action3);
             } else {
                 actions = new ActionMenu[size];
 
@@ -590,7 +592,7 @@ public class LazyBones extends Plugin implements Observer {
                 };
                 action1.putValue(Action.NAME, LazyBones.getTranslation("capture", "Capture with VDR"));
                 action1.putValue(Action.SMALL_ICON, createImageIcon("lazybones/capture.png"));
-                actions[1] = new ActionMenu(action1);
+                actions[index++] = new ActionMenu(action1);
 
                 AbstractAction action2 = new AbstractAction() {
                     @Override
@@ -600,7 +602,7 @@ public class LazyBones extends Plugin implements Observer {
                 };
                 action2.putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
                 action2.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
-                actions[2] = new ActionMenu(action2);
+                actions[index++] = new ActionMenu(action2);
 
                 if (notAssignedTimersExist) {
                     // AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
@@ -623,19 +625,37 @@ public class LazyBones extends Plugin implements Observer {
                     }
                     String name = LazyBones.getTranslation("assign", "Assign");
                     ImageIcon icon = createImageIcon("lazybones/appointment-new.png");
-                    actions[3] = new ActionMenu(name, icon, timers);
+                    actions[index++] = new ActionMenu(name, icon, timers);
                 }
             }
 
-            AbstractAction action0 = new AbstractAction() {
+            AbstractAction watch = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
                     Player.play(program);
                 }
             };
-            action0.putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
-            action0.putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
-            actions[0] = new ActionMenu(action0);
+            watch.putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
+            watch.putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
+            actions[0] = new ActionMenu(watch);
+
+            AbstractAction switchToChan = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    // switch to channel
+                    devplugin.Channel tvbChan = program.getChannel();
+                    Channel vdrChan = ChannelManager.getChannelMapping().get(tvbChan.getId());
+                    logger.info("Swtich to channel {} of program {}", vdrChan.getName(), program.getTitle());
+                    CHAN chan = new CHAN(Integer.toString(vdrChan.getChannelNumber()));
+                    Response resp = VDRConnection.send(chan);
+                    if (resp.getCode() != 250) {
+                        logger.error(LazyBones.getTranslation("couldnt_switch", "Couldn't switch to channel", resp.getMessage()));
+                    }
+                }
+            };
+            switchToChan.putValue(Action.NAME, LazyBones.getTranslation("switch_to", "Switch to this channel"));
+            switchToChan.putValue(Action.SMALL_ICON, createImageIcon("lazybones/remote-control.png"));
+            actions[index++] = new ActionMenu(switchToChan);
 
             String name = LazyBones.getTranslation("lazybones", "Lazy Bones");
             ImageIcon icon = createImageIcon("lazybones/vdr16.png");
