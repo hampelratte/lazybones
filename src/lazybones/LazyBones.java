@@ -1,4 +1,4 @@
-/* $Id: LazyBones.java,v 1.128 2011-01-18 17:25:38 hampelratte Exp $
+/* $Id: LazyBones.java,v 1.129 2011-04-20 12:05:38 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -93,32 +93,36 @@ import devplugin.Version;
 public class LazyBones extends Plugin implements Observer {
 
     private static transient Logger logger = LoggerFactory.getLogger(LazyBones.class);
-    
+
     /** Translator */
     private static final util.ui.Localizer mLocalizer = util.ui.Localizer.getLocalizerFor(LazyBones.class);
 
     private MainDialog mainDialog;
 
     private static Properties props;
-    
+
     private ContextMenuFactory cmf = new ContextMenuFactory();
-    
+
     private static LazyBones instance;
-    
+
     public static final String TIMER_MENU_KEY = "TIMER_MENU_KEY";
-    
+
     public static LazyBones getInstance() {
         return instance;
     }
-    
+
+    @Override
     public ActionMenu getContextMenuActions(final Program program) {
         return cmf.createActionMenu(program);
     }
 
     private ButtonAction buttonAction;
+
+    @Override
     public ActionMenu getButtonAction() {
         buttonAction = new ButtonAction();
         buttonAction.setActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getMainDialog().setVisible(true);
             }
@@ -134,12 +138,13 @@ public class LazyBones extends Plugin implements Observer {
 
     /**
      * Called by TimerSelectionDialog, if a VDR-Program has been selected
+     * 
      * @param selectedProgram
      */
     public void timerSelectionCallBack(Program selectedProgram, Program originalProgram) {
         int buffer_before = Integer.parseInt(props.getProperty("timer.before"));
         int buffer_after = Integer.parseInt(props.getProperty("timer.after"));
-        
+
         Timer t = ((TimerProgram) selectedProgram).getTimer();
         // start the recording x min before the beggining of the program
         t.getStartTime().add(Calendar.MINUTE, -buffer_before);
@@ -149,44 +154,44 @@ public class LazyBones extends Plugin implements Observer {
         if (response.getCode() == 250) {
             TimerManager.getInstance().assignProgramToTimer(selectedProgram, t);
         } else {
-            logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:")
-                    + " " + response.getMessage());
+            logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:") + " " + response.getMessage());
         }
-        
+
         logger.debug("Storing {}-{} in tvb2vdr", originalProgram.getTitle(), t.getTitle());
         TimerManager.getInstance().getTitleMapping().put(originalProgram.getTitle(), t.getTitle());
     }
 
+    @Override
     public String getMarkIconName() {
         return "lazybones/vdr16.png";
     }
 
+    @Override
     public PluginInfo getInfo() {
         String name = LazyBones.getTranslation("lazybones", "Lazy Bones");
-        String description = LazyBones.getTranslation("desc",
-                        "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
+        String description = LazyBones.getTranslation("desc", "This plugin is a remote control for a VDR (by Klaus Schmidinger).");
         String author = "Henrik Niehaus, henrik.niehaus@gmx.de";
         return new PluginInfo(getClass(), name, description, author, "BSD", "http://hampelratte.org/blog/?page_id=6");
     }
-    
-    public static Version getVersion () {
-        //return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 66, 0, true);
+
+    public static Version getVersion() {
+        // return new Version(0,0,false,"cvs-2010-02-05");
+        return new Version(0, 67, 0, true);
     }
 
     public MainDialog getMainDialog() {
-        if(mainDialog == null) {
-            mainDialog = new MainDialog(getParent(), LazyBones.getTranslation(
-                "lazybones", "Lazy Bones"), false);
+        if (mainDialog == null) {
+            mainDialog = new MainDialog(getParent(), LazyBones.getTranslation("lazybones", "Lazy Bones"), false);
         }
         return mainDialog;
     }
 
-    
+    @Override
     public devplugin.SettingsTab getSettingsTab() {
         return new VDRSettingsPanel();
     }
-    
+
+    @Override
     public void onDeactivation() {
         try {
             Player.stop();
@@ -194,12 +199,13 @@ public class LazyBones extends Plugin implements Observer {
         }
     }
 
+    @Override
     public void loadSettings(Properties props) {
         LazyBones.props = props;
-        
+
         // load data
         loadData();
-        
+
         String host = props.getProperty("host");
         host = host == null ? "localhost" : host;
         props.setProperty("host", host);
@@ -234,11 +240,11 @@ public class LazyBones extends Plugin implements Observer {
         props.setProperty("timer.after", timer_after);
         props.setProperty("timer.prio", timer_prio);
         props.setProperty("timer.lifetime", timer_lifetime);
-        
+
         String vpsDefault = props.getProperty("vps.default");
         vpsDefault = vpsDefault == null ? "false" : vpsDefault;
         props.setProperty("vps.default", vpsDefault);
-        
+
         String numberOfCards = props.getProperty("numberOfCards");
         numberOfCards = numberOfCards == null ? "1" : numberOfCards;
         props.setProperty("numberOfCards", numberOfCards);
@@ -259,43 +265,43 @@ public class LazyBones extends Plugin implements Observer {
         String recordingURL = props.getProperty("recording.url");
         recordingURL = recordingURL == null ? "http://<host>:3001/rec/<recording_number>" : recordingURL;
         props.setProperty("recording.url", recordingURL);
-        
+
         String logConnectionErrors = props.getProperty("logConnectionErrors");
         logConnectionErrors = logConnectionErrors == null ? "true" : logConnectionErrors;
         props.setProperty("logConnectionErrors", logConnectionErrors);
-        
+
         String logEPGErrors = props.getProperty("logEPGErrors");
         logEPGErrors = logEPGErrors == null ? "true" : logEPGErrors;
         props.setProperty("logEPGErrors", logEPGErrors);
-        
+
         String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
         showTimerOptionsDialog = showTimerOptionsDialog == null ? "true" : showTimerOptionsDialog;
         props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
-        
+
         String descSourceTvb = props.getProperty("descSourceTvb");
         descSourceTvb = descSourceTvb == null ? "0" : descSourceTvb;
         props.setProperty("descSourceTvb", descSourceTvb);
-        
+
         String minChannelNumber = props.getProperty("minChannelNumber");
         minChannelNumber = minChannelNumber == null ? "0" : minChannelNumber;
         props.setProperty("minChannelNumber", minChannelNumber);
         String maxChannelNumber = props.getProperty("maxChannelNumber");
         maxChannelNumber = maxChannelNumber == null ? "0" : maxChannelNumber;
         props.setProperty("maxChannelNumber", maxChannelNumber);
-        
+
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
         VDRConnection.charset = charset;
         VDRConnection.persistentConnection = true;
-        
+
         init();
     }
-    
+
     @SuppressWarnings("unchecked")
     private void loadData() {
         XStream xstream = new XStream();
-        
+
         // load title mapping
         try {
             Map<String, String> titleMapping = (HashMap<String, String>) xstream.fromXML(props.getProperty("titleMapping"));
@@ -303,7 +309,7 @@ public class LazyBones extends Plugin implements Observer {
         } catch (Exception e) {
             logger.warn("Couldn't load title mapping", e);
         }
-        
+
         // load channel mapping
         try {
             Map<String, Channel> channelMapping = (Hashtable<String, Channel>) xstream.fromXML(props.getProperty("channelMapping"));
@@ -311,7 +317,7 @@ public class LazyBones extends Plugin implements Observer {
         } catch (Exception e) {
             logger.warn("Couldn't load channel mapping", e);
         }
-        
+
         // load timers
         try {
             List<Timer> timers = (ArrayList<Timer>) xstream.fromXML(props.getProperty("timers"));
@@ -319,15 +325,15 @@ public class LazyBones extends Plugin implements Observer {
         } catch (Exception e) {
             logger.warn("Couldn't load timers", e);
         }
-        
+
         // load channel list
         try {
-            List<Channel> channelList = (List<Channel>) xstream.fromXML(props.getProperty("channelList")); 
+            List<Channel> channelList = (List<Channel>) xstream.fromXML(props.getProperty("channelList"));
             ChannelManager.getInstance().setChannels(channelList);
         } catch (Exception e) {
             logger.warn("Couldn't load channel list", e);
         }
-        
+
         // remove outdated timers
         Calendar today = GregorianCalendar.getInstance();
         for (Iterator<Timer> iter = TimerManager.getInstance().getStoredTimers().iterator(); iter.hasNext();) {
@@ -338,29 +344,30 @@ public class LazyBones extends Plugin implements Observer {
         }
     }
 
+    @Override
     public void handleTvBrowserStartFinished() {
         // upload channel list from vdr
         logger.debug("Updating channel list");
         ChannelManager.getInstance().update();
-        
+
         // synchronize timers and recordings
         synchronize();
     }
-    
+
     private void init() {
         instance = this;
-        
+
         // observe the timer list
         TimerManager.getInstance().addObserver(this);
-        
+
         // initialize logging
         initLogging();
     }
-    
+
     private void initLogging() {
         String logDirectory = Settings.propLogdirectory.getString();
         if (logDirectory != null) {
-            if(System.getProperty("java.util.logging.config.file") == null) {
+            if (System.getProperty("java.util.logging.config.file") == null) {
                 // no logging config file is set, so we can adjust the logging level by ourselves
                 java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
                 rootLogger.setLevel(Level.FINE);
@@ -373,20 +380,20 @@ public class LazyBones extends Plugin implements Observer {
         Handler eph = new PopupHandler();
         Handler dch = new DebugConsoleHandler();
         dch.setLevel(Level.FINEST);
-        
+
         // add our special handlers to all lazybones.* messages
         LoggerFactory.getLogger("lazybones");
         java.util.logging.Logger lazyLogger = java.util.logging.Logger.getLogger("lazybones");
         lazyLogger.addHandler(eph);
         lazyLogger.addHandler(dch);
         eph.setFormatter(formatter);
-        
+
         // add our special handlers to all svdrp messages
         LoggerFactory.getLogger("org.hampelratte.svdrp");
         java.util.logging.Logger svdrpLogger = java.util.logging.Logger.getLogger("org.hampelratte.svdrp");
         svdrpLogger.setLevel(Level.FINE);
         svdrpLogger.addHandler(dch);
-        
+
         // add our special handlers to the popuplogger
         LoggerFactory.getLogger(PopupHandler.KEYWORD);
         java.util.logging.Logger popupLogger = java.util.logging.Logger.getLogger(PopupHandler.KEYWORD);
@@ -399,14 +406,14 @@ public class LazyBones extends Plugin implements Observer {
         if (logDirectory != null) {
             Handler fh = null;
             try {
-                 fh = new FileHandler(new File(logDirectory, "lazybones.log").getAbsolutePath());
-                 fh.setFormatter(formatter);
-                 fh.setLevel(Level.FINE);
+                fh = new FileHandler(new File(logDirectory, "lazybones.log").getAbsolutePath());
+                fh.setFormatter(formatter);
+                fh.setLevel(Level.FINE);
             } catch (Exception e) {
                 logger.warn("Couldn't add file handler for Lazy Bones", e);
-            } 
-            
-            if(fh != null) {
+            }
+
+            if (fh != null) {
                 lazyLogger.addHandler(fh);
                 svdrpLogger.addHandler(fh);
                 popupLogger.addHandler(fh);
@@ -414,17 +421,18 @@ public class LazyBones extends Plugin implements Observer {
         }
     }
 
+    @Override
     public Properties storeSettings() {
-        storeData();        
+        storeData();
         return props;
     }
-    
+
     private void storeData() {
         XStream xstream = new XStream();
-        props.setProperty( "channelMapping", xstream.toXML(ChannelManager.getChannelMapping()) );
-        props.setProperty( "timers", xstream.toXML(TimerManager.getInstance().getTimers()) );
-        props.setProperty( "titleMapping", xstream.toXML(TimerManager.getInstance().getTitleMappingValues()) );
-        props.setProperty( "channelList", xstream.toXML(ChannelManager.getInstance().getChannels()) );
+        props.setProperty("channelMapping", xstream.toXML(ChannelManager.getChannelMapping()));
+        props.setProperty("timers", xstream.toXML(TimerManager.getInstance().getTimers()));
+        props.setProperty("titleMapping", xstream.toXML(TimerManager.getInstance().getTitleMappingValues()));
+        props.setProperty("channelList", xstream.toXML(ChannelManager.getInstance().getChannels()));
     }
 
     public static Properties getProperties() {
@@ -435,6 +443,7 @@ public class LazyBones extends Plugin implements Observer {
         return createImageIcon(path);
     }
 
+    @Override
     public void handleTvDataUpdateFinished() {
         ProgramManager.getInstance().markPrograms();
     }
@@ -450,17 +459,17 @@ public class LazyBones extends Plugin implements Observer {
         PluginTreeNode node = getRootNode();
         node.removeAllActions();
         node.removeAllChildren();
-        
-        for(Timer timer : TimerManager.getInstance().getTimers()) {
-            if(timer.isAssigned()) {
+
+        for (Timer timer : TimerManager.getInstance().getTimers()) {
+            if (timer.isAssigned()) {
                 for (String progID : timer.getTvBrowserProgIDs()) {
                     Program prog = ProgramManager.getInstance().getProgram(progID);
-                    if(prog != null) {
+                    if (prog != null) {
                         node.addProgram(prog);
                     } else { // can be null, if program time is near 00:00, because then
                              // the wrong day is taken to ask tvb for the programm
                         prog = ProgramManager.getInstance().getProgram(progID);
-                        if(prog != null) {
+                        if (prog != null) {
                             node.addProgram(prog);
                         }
                     }
@@ -471,48 +480,50 @@ public class LazyBones extends Plugin implements Observer {
         node.update();
     }
 
+    @Override
     public boolean canUseProgramTree() {
         return true;
     }
 
     public static String getTranslation(String key, String altText) {
-        return mLocalizer.msg(key,altText);
+        return mLocalizer.msg(key, altText);
     }
-    
+
     public static String getTranslation(String key, String altText, String arg1) {
-        return mLocalizer.msg(key,altText, arg1);
+        return mLocalizer.msg(key, altText, arg1);
     }
-    
+
     public static String getTranslation(String key, String altText, String arg1, String arg2) {
-        return mLocalizer.msg(key,altText, arg1, arg2);
+        return mLocalizer.msg(key, altText, arg1, arg2);
     }
-    
+
     public static String getTranslation(String key, String altText, String arg1, String arg2, String arg3) {
-        return mLocalizer.msg(key,altText, arg1, arg2, arg3);
+        return mLocalizer.msg(key, altText, arg1, arg2, arg3);
     }
-    
+
     public JPopupMenu getSimpleContextMenu(Timer timer) {
         return cmf.createSimpleActionMenu(timer);
     }
-    
+
+    @Override
     public void update(Observable arg0, Object arg1) {
-        // mark all "timed" programs 
+        // mark all "timed" programs
         ProgramManager.getInstance().markPrograms();
 
         List<Timer> notAssigned = TimerManager.getInstance().getNotAssignedTimers();
-        if(notAssigned.size() > 0) {
+        if (notAssigned.size() > 0) {
             ProgramManager.getInstance().handleNotAssignedTimers();
         }
-        
+
         // update the plugin tree
         updateTree();
     }
-    
+
     public void synchronize() {
         TimerManager.getInstance().synchronize();
         RecordingManager.getInstance().synchronize();
     }
-    
+
     private class ContextMenuFactory {
         public ActionMenu createActionMenu(final Program program) {
             Marker[] markers = program.getMarkerArr();
@@ -525,18 +536,19 @@ public class LazyBones extends Plugin implements Observer {
             }
 
             boolean notAssignedTimersExist = TimerManager.getInstance().getNotAssignedTimers().size() > 0;
-            
+
             int size = 3;
-            
-            if(marked || notAssignedTimersExist) {
+
+            if (marked || notAssignedTimersExist) {
                 size++;
             }
-            
+
             ActionMenu[] actions = null;
             if (marked) {
                 actions = new ActionMenu[size];
 
                 AbstractAction action1 = new AbstractAction() {
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         TimerManager.getInstance().deleteTimer(program);
                     }
@@ -546,9 +558,10 @@ public class LazyBones extends Plugin implements Observer {
                 actions[1] = new ActionMenu(action1);
 
                 AbstractAction action2 = new AbstractAction() {
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         logger.info("Looking up timer for {}", program);
-                        Timer timer = (Timer) TimerManager.getInstance().getTimer(program);
+                        Timer timer = TimerManager.getInstance().getTimer(program);
                         logger.info("Found timer {}", timer);
                         TimerManager.getInstance().editTimer(timer);
                     }
@@ -558,6 +571,7 @@ public class LazyBones extends Plugin implements Observer {
                 actions[2] = new ActionMenu(action2);
 
                 AbstractAction action3 = new AbstractAction() {
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         LazyBones.getInstance().synchronize();
                     }
@@ -569,6 +583,7 @@ public class LazyBones extends Plugin implements Observer {
                 actions = new ActionMenu[size];
 
                 AbstractAction action1 = new AbstractAction() {
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         TimerManager.getInstance().createTimer(program, false);
                     }
@@ -578,6 +593,7 @@ public class LazyBones extends Plugin implements Observer {
                 actions[1] = new ActionMenu(action1);
 
                 AbstractAction action2 = new AbstractAction() {
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         LazyBones.getInstance().synchronize();
                     }
@@ -585,15 +601,16 @@ public class LazyBones extends Plugin implements Observer {
                 action2.putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
                 action2.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
                 actions[2] = new ActionMenu(action2);
-                
-                if(notAssignedTimersExist) {
-                    //AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
-                    //action3.putValue(Plugin.DISABLED_ON_TASK_MENU, true);
+
+                if (notAssignedTimersExist) {
+                    // AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
+                    // action3.putValue(Plugin.DISABLED_ON_TASK_MENU, true);
                     Action[] timers = new Action[TimerManager.getInstance().getNotAssignedTimers().size()];
                     List<Timer> timerList = TimerManager.getInstance().getNotAssignedTimers();
                     for (int i = 0; i < timers.length; i++) {
-                        final Timer timer = timerList.get(i); 
+                        final Timer timer = timerList.get(i);
                         timers[i] = new AbstractAction() {
+                            @Override
                             public void actionPerformed(ActionEvent e) {
                                 ProgramManager.getInstance().assignTimerToProgram(program, timer);
                                 TimerManager.getInstance().assignProgramToTimer(program, timer);
@@ -611,6 +628,7 @@ public class LazyBones extends Plugin implements Observer {
             }
 
             AbstractAction action0 = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     Player.play(program);
                 }
@@ -623,40 +641,43 @@ public class LazyBones extends Plugin implements Observer {
             ImageIcon icon = createImageIcon("lazybones/vdr16.png");
             return new ActionMenu(name, icon, actions);
         }
-        
+
         JPopupMenu simpleMenu;
+
         public JPopupMenu createSimpleActionMenu(final Timer timer) {
-            if(simpleMenu == null) {
+            if (simpleMenu == null) {
                 simpleMenu = new JPopupMenu();
                 JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("actions", "edit-delete", 16));
                 delItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         TimerManager.getInstance().deleteTimer(timer);
                     }
-                    
+
                 });
-                
+
                 JMenuItem editItem = new JMenuItem(LazyBones.getTranslation("edit", "Edit Timer"), createImageIcon("actions", "document-edit", 16));
                 editItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         TimerManager.getInstance().editTimer(timer);
                     }
-                    
+
                 });
-                
+
                 simpleMenu.add(editItem);
                 simpleMenu.add(delItem);
             }
-            
+
             return simpleMenu;
         }
-        
+
     }
 
-//################ to receive Programs from other plugins ######################
+    // ################ to receive Programs from other plugins ######################
     private final String TARGET_WATCH = "watch";
     private final String TARGET_CAPTURE = "capture";
-    
+
     @Override
     public boolean canReceiveProgramsWithTarget() {
         return true;
@@ -664,41 +685,39 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public ProgramReceiveTarget[] getProgramReceiveTargets() {
-        return new ProgramReceiveTarget[] {
-                 new ProgramReceiveTarget(this, LazyBones.getTranslation("capture", "Capture with VDR"), TARGET_CAPTURE),
-                 new ProgramReceiveTarget(this, LazyBones.getTranslation("watch", "Watch this channel"), TARGET_WATCH)
-        };
+        return new ProgramReceiveTarget[] { new ProgramReceiveTarget(this, LazyBones.getTranslation("capture", "Capture with VDR"), TARGET_CAPTURE),
+                new ProgramReceiveTarget(this, LazyBones.getTranslation("watch", "Watch this channel"), TARGET_WATCH) };
     }
 
     @Override
     public boolean receivePrograms(Program[] programArr, ProgramReceiveTarget receiveTarget) {
         logger.debug("Program received for target [{}]", receiveTarget.getTargetId());
-        if(TARGET_CAPTURE.equals(receiveTarget.getTargetId())) {
+        if (TARGET_CAPTURE.equals(receiveTarget.getTargetId())) {
             // store current property values
             String threshold = props.getProperty("percentageThreshold");
             String showTimerOptionsDialog = props.getProperty("showTimerOptionsDialog");
-            
+
             String logEpgErrors = props.getProperty("logEPGErrors");
             String logConnectionErrors = props.getProperty("logConnectionErrors");
-            
+
             // set properties to "automatic mode"
             props.setProperty("percentageThreshold", "0");
             props.setProperty("showTimerOptionsDialog", "false");
             props.setProperty("logEPGErrors", "false");
             props.setProperty("logConnectionErrors", "false");
-            
+
             // create timers for all programs
             for (int i = 0; i < programArr.length; i++) {
                 Program prog = programArr[i];
                 TimerManager.getInstance().createTimer(prog, true);
             }
-            
+
             // restore old properties
             props.setProperty("percentageThreshold", threshold);
             props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
             props.setProperty("logEPGErrors", logEpgErrors);
             props.setProperty("logConnectionErrors", logConnectionErrors);
-        } else if(TARGET_WATCH.equals(receiveTarget.getTargetId())) {
+        } else if (TARGET_WATCH.equals(receiveTarget.getTargetId())) {
             Player.play(programArr[0]);
         } else if (LazyBonesDevice.TARGET_CAPTURE_PLUGIN_ADD.equals(receiveTarget.getTargetId())) {
             TimerManager.getInstance().createTimer(programArr[0], false);
@@ -707,18 +726,18 @@ public class LazyBones extends Plugin implements Observer {
         }
         return true;
     }
-    
+
     @Override
     public int getMarkPriorityForProgram(Program p) {
         Timer timer = TimerManager.getInstance().getTimer(p);
-        if(timer != null) {
-            if(!timer.isActive()) {
+        if (timer != null) {
+            if (!timer.isActive()) {
                 return Program.LOWER_MEDIUM_MARK_PRIORITY;
             }
         }
         return Program.HIGHER_MEDIUM_MARK_PRIORITY;
     }
-    
+
     @Override
     public String getProgramTableIconText() {
         return LazyBones.getTranslation("vps_activated", "VPS activated");
@@ -727,13 +746,13 @@ public class LazyBones extends Plugin implements Observer {
     @Override
     public Icon[] getProgramTableIcons(Program program) {
         Timer timer = TimerManager.getInstance().getTimer(program);
-        if(timer != null) {
-            if(timer.hasState(VDRTimer.VPS)) {
+        if (timer != null) {
+            if (timer.hasState(VDRTimer.VPS)) {
                 Icon[] icons = new ImageIcon[1];
                 icons[0] = LazyBones.getInstance().getIcon("lazybones/vps16.png");
                 return icons;
             }
-        } 
+        }
         return super.getProgramTableIcons(program);
     }
 }
