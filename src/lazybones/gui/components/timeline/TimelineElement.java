@@ -1,4 +1,4 @@
-/* $Id: TimelineElement.java,v 1.23 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineElement.java,v 1.24 2011-04-20 12:02:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,7 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
 import lazybones.Timer;
@@ -57,13 +58,14 @@ import devplugin.Channel;
 public class TimelineElement extends JComponent implements MouseListener {
     private Timer timer;
     private Calendar currentDate;
-    
+    private DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+
     public final static Color COLOR_ACTIVE = UIManager.getColor("List.selectionBackground");
     public final static Color COLOR_INACTIVE = Color.LIGHT_GRAY;
     public final static Color TEXT_COLOR = UIManager.getColor("List.selectionForeground");
     public final static Color TEXT_COLOR_INACTIVE = Color.GRAY;
-    public final static Color CONFLICT_COLOR = new Color(255,0,0,90);
-    
+    public final static Color CONFLICT_COLOR = new Color(255, 0, 0, 90);
+
     public TimelineElement(Timer timer, Calendar currentDate) {
         this.timer = timer;
         this.currentDate = currentDate;
@@ -76,12 +78,14 @@ public class TimelineElement extends JComponent implements MouseListener {
     private String createToolTipText(Timer timer) {
         String title = timer.getDisplayTitle().replace("|", "");
         DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-        
+
         StringBuffer sb = new StringBuffer();
         sb.append("<html>");
-        sb.append("<b>"); sb.append(title); sb.append("</b><br>");
+        sb.append("<b>");
+        sb.append(title);
+        sb.append("</b><br>");
         Channel chan = ChannelManager.getInstance().getChannel(timer);
-        if(chan != null) {
+        if (chan != null) {
             sb.append(chan.getName());
         } else {
             sb.append(timer.getChannelNumber());
@@ -90,7 +94,8 @@ public class TimelineElement extends JComponent implements MouseListener {
         sb.append(dateFormatter.format(timer.getStartTime().getTime()));
         sb.append(" - ");
         sb.append(dateFormatter.format(timer.getEndTime().getTime()));
-        sb.append("<br>");sb.append("<br>");
+        sb.append("<br>");
+        sb.append("<br>");
         sb.append("<div width=\"300\">");
         sb.append(timer.getDescription());
         sb.append("</div>");
@@ -113,21 +118,20 @@ public class TimelineElement extends JComponent implements MouseListener {
     public void setCurrentDate(Calendar currentDate) {
         this.currentDate = currentDate;
     }
-    
+
     @Override
-    protected void paintBorder(Graphics g) {
-        if(timer.isActive()) {
-            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_ACTIVE, COLOR_ACTIVE.darker()));
+    public Border getBorder() {
+        if (timer.isActive()) {
+            return BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_ACTIVE, COLOR_ACTIVE.darker());
         } else {
-            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_INACTIVE, COLOR_INACTIVE.darker()));
+            return BorderFactory.createBevelBorder(BevelBorder.RAISED, COLOR_INACTIVE, COLOR_INACTIVE.darker());
         }
-        super.paintBorder(g);
-    };
-    
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         // enable font anti aliasing
         Graphics2D g2d = (Graphics2D) g;
         // storing original anitalising flag
@@ -135,94 +139,98 @@ public class TimelineElement extends JComponent implements MouseListener {
         if (state != RenderingHints.VALUE_TEXT_ANTIALIAS_ON) {
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         }
-        
+
         // paint background
         g.setColor(timer.isActive() ? COLOR_ACTIVE : COLOR_INACTIVE);
         g.fillRect(0, 0, getWidth(), getHeight());
-        
+
         // paint text
-        g.setColor(timer.isActive() ? TEXT_COLOR: TEXT_COLOR_INACTIVE);
+        g.setColor(timer.isActive() ? TEXT_COLOR : TEXT_COLOR_INACTIVE);
         g.setFont(new Font("SansSerif", Font.PLAIN, 9));
         g.drawString(timer.getTitle(), 5, 12);
-        DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         String time = df.format(timer.getStartTime().getTime()) + " - " + df.format(timer.getEndTime().getTime());
         g.drawString(time, 5, 25);
-        
+
         // paint recording indicator
-        if(timer.isRecording()) {
+        if (timer.isRecording()) {
             g.setColor(Color.RED);
             g.fillOval(5, 30, 7, 7);
         }
-        
+
         // paint conflicts
         g.setColor(CONFLICT_COLOR);
-        if(timer.getConflictPeriods() != null && timer.getConflictPeriods().size() > 0) {
+        if (timer.getConflictPeriods() != null && timer.getConflictPeriods().size() > 0) {
             for (Period period : timer.getConflictPeriods()) {
                 Calendar conflictStart = (Calendar) period.getStartTime().clone();
                 Calendar conflictEnd = (Calendar) period.getEndTime().clone();
                 Calendar timerStart = (Calendar) timer.getStartTime().clone();
                 Calendar timerEnd = (Calendar) timer.getEndTime().clone();
-                if(!Utilities.sameDay(conflictStart, currentDate)) {
+                if (!Utilities.sameDay(conflictStart, currentDate)) {
                     conflictStart.set(Calendar.HOUR_OF_DAY, 0);
                     conflictStart.set(Calendar.MINUTE, 0);
                     conflictStart.add(Calendar.DAY_OF_MONTH, 1);
                 }
-                if(!Utilities.sameDay(conflictEnd, currentDate)) {
+                if (!Utilities.sameDay(conflictEnd, currentDate)) {
                     conflictEnd.set(Calendar.HOUR_OF_DAY, 23);
                     conflictEnd.set(Calendar.MINUTE, 59);
                     conflictEnd.add(Calendar.DAY_OF_MONTH, -1);
                 }
-                if(!Utilities.sameDay(timerStart, currentDate)) {
+                if (!Utilities.sameDay(timerStart, currentDate)) {
                     timerStart.set(Calendar.HOUR_OF_DAY, 0);
                     timerStart.set(Calendar.MINUTE, 0);
                     timerStart.add(Calendar.DAY_OF_MONTH, 1);
                 }
-                if(!Utilities.sameDay(timerEnd, currentDate)) {
+                if (!Utilities.sameDay(timerEnd, currentDate)) {
                     timerEnd.set(Calendar.HOUR_OF_DAY, 23);
                     timerEnd.set(Calendar.MINUTE, 59);
                     timerEnd.add(Calendar.DAY_OF_MONTH, -1);
                 }
-                
+
                 long durationMinutes = Utilities.getDiffInMinutes(timerStart, timerEnd);
-                double pixelsPerMinute = (double)getWidth() / (double)durationMinutes;
+                double pixelsPerMinute = (double) getWidth() / (double) durationMinutes;
                 long startMinute = Utilities.getDiffInMinutes(timerStart, conflictStart);
-                int x = (int)Math.ceil(pixelsPerMinute * startMinute);
-                int width = (int)(pixelsPerMinute * Utilities.getDiffInMinutes(conflictStart, conflictEnd));
-                g.fillRect(x, 0, width, getHeight()-1);
+                int x = (int) Math.ceil(pixelsPerMinute * startMinute);
+                int width = (int) (pixelsPerMinute * Utilities.getDiffInMinutes(conflictStart, conflictEnd));
+                g.fillRect(x, 0, width, getHeight() - 1);
             }
         }
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
+        if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
             ProgramManager.getInstance().handleTimerDoubleClick(getTimer());
         }
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
         setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         mayTriggerPopup(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         mayTriggerPopup(e);
     }
-    
+
     /**
-     * Checks, if the mouse event is a popup trigger for this OS and shows the
-     * popup menu in case it is a trigger
+     * Checks, if the mouse event is a popup trigger for this OS and shows the popup menu in case it is a trigger
      * 
-     * @param e MouseEvent to check
+     * @param e
+     *            MouseEvent to check
      */
     private void mayTriggerPopup(MouseEvent e) {
-        if(e.isPopupTrigger()) {
+        if (e.isPopupTrigger()) {
             JPopupMenu popup = ProgramManager.getInstance().getContextMenuForTimer(timer);
             popup.setLocation(e.getPoint());
             popup.show(e.getComponent(), e.getX(), e.getY());
