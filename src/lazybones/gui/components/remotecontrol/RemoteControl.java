@@ -1,4 +1,4 @@
-/* $Id: RemoteControl.java,v 1.6 2011-01-18 13:13:52 hampelratte Exp $
+/* $Id: RemoteControl.java,v 1.7 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,36 +48,35 @@ import org.hampelratte.svdrp.commands.VOLU;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo
+ * SWT/Swing GUI Builder, which is free for non-commercial
+ * use. If Jigloo is being used commercially (ie, by a corporation,
+ * company or business for any purpose whatever) then you
+ * should purchase a license for each developer using Jigloo.
+ * Please visit www.cloudgarden.com for details.
+ * Use of Jigloo implies acceptance of these licensing terms.
+ * A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+ * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+ * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
  */
 public class RemoteControl extends JPanel implements ActionListener {
     private static transient Logger logger = LoggerFactory.getLogger(RemoteControl.class);
-    
+
     private NumberBlock numBlock;
 
     private NavigationBlock navBlock;
-    
+
     private VolumeBlock volBlock;
 
     private ColorButtonBlock colorButtonBlock;
 
     private JButton watch = new JButton(LazyBones.getTranslation("watch", "Watch"));
-    
+
     public RemoteControl() {
         initGUI();
     }
@@ -86,22 +85,22 @@ public class RemoteControl extends JPanel implements ActionListener {
         setLayout(new GridBagLayout());
 
         numBlock = new NumberBlock();
-        this.add(numBlock, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
-                GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5), 0, 0));
+        this.add(numBlock, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5),
+                0, 0));
         volBlock = new VolumeBlock();
-        this.add(volBlock, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
-                GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
+        this.add(volBlock, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5),
+                0, 0));
         navBlock = new NavigationBlock();
-        this.add(navBlock, new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
-                GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
+        this.add(navBlock, new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5),
+                0, 0));
         colorButtonBlock = new ColorButtonBlock();
-        this.add(colorButtonBlock, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
-                GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5), 0, 0));
+        this.add(colorButtonBlock, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+                10, 5), 0, 0));
 
         watch.addActionListener(this);
         watch.setIcon(LazyBones.getInstance().createImageIcon("action", "media-playback-start", 16));
-        this.add(watch, new GridBagConstraints(0, 4, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTHWEST,
-                GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
+        this.add(watch,
+                new GridBagConstraints(0, 4, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTHWEST, GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -119,7 +118,7 @@ public class RemoteControl extends JPanel implements ActionListener {
         Response res = VDRConnection.send(new VOLU(""));
         if (res != null && res.getCode() == 250) {
             String[] words = res.getMessage().trim().split(" ");
-            String volString = words[words.length-1];
+            String volString = words[words.length - 1];
             int volu = Integer.parseInt(volString);
             logger.info("Volume is {}", volu);
             volBlock.setVolume(volu);

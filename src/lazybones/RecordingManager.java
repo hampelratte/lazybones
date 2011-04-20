@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.14 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.15 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -54,14 +54,14 @@ import org.slf4j.LoggerFactory;
 public class RecordingManager extends Observable {
 
     private static transient Logger logger = LoggerFactory.getLogger(RecordingManager.class);
-    
+
     private static RecordingManager instance;
 
     /**
      * Stores all recordings as Recording objects
      */
     private List<Recording> recordings;
-    
+
     private RecordingManager() {
         recordings = new ArrayList<Recording>();
     }
@@ -85,59 +85,61 @@ public class RecordingManager extends Observable {
     public List<Recording> getRecordings() {
         return recordings;
     }
-    
+
     /**
      * Fetches the recording list from vdr
      */
     public synchronized void synchronize() {
         synchronize(null);
     }
-    
+
     /**
      * Fetches the recording list from vdr
-     * @param callback will be called after the synchronization has finished
+     * 
+     * @param callback
+     *            will be called after the synchronization has finished
      */
     public synchronized void synchronize(final Runnable callback) {
         logger.debug("Getting recordings from VDR");
-        
+
         // fetch current recording list from vdr
         VDRCallback _callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
                 ListRecordingsAction lstr = (ListRecordingsAction) cmd;
 
-                if(lstr.isSuccess()) {
+                if (lstr.isSuccess()) {
                     // clear recording list
                     recordings = lstr.getRecordings();
                     boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
-                    if(loadInfos) {
+                    if (loadInfos) {
                         for (Recording rec : recordings) {
                             logger.trace("Getting info for recording {}", rec.getNumber());
                             Response resp = VDRConnection.send(new LSTR(rec.getNumber()));
-                            if(resp != null && resp.getCode() == 215) {
+                            if (resp != null && resp.getCode() == 215) {
                                 // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
                                 String[] lines = resp.getMessage().split("\n");
                                 StringBuffer mesg = new StringBuffer();
                                 for (int i = 0; i < lines.length; i++) {
-                                    if(i == lines.length -1) {
+                                    if (i == lines.length - 1) {
                                         mesg.append("e\n");
                                     }
-                                    mesg.append(lines[i]+"\n");
+                                    mesg.append(lines[i] + "\n");
                                 }
-                                
+
                                 // parse epg information
                                 List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-                                if(epg.size() > 0) {
+                                if (epg.size() > 0) {
                                     rec.setEpgInfo(epg.get(0));
                                 }
                             }
                         }
                     }
                 }
-                
+
                 setChanged();
                 notifyObservers(recordings);
-                
-                if(callback != null) {
+
+                if (callback != null) {
                     callback.run();
                 }
             }
@@ -145,24 +147,24 @@ public class RecordingManager extends Observable {
         ListRecordingsAction lstr = new ListRecordingsAction(_callback);
         lstr.enqueue();
     }
-    
+
     public void loadInfo(Recording rec) {
         LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         Response response = VDRConnection.send(new LSTR(rec.getNumber()));
-        if(response != null && response.getCode() == 215) {
+        if (response != null && response.getCode() == 215) {
             // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
             String[] lines = response.getMessage().split("\n");
             StringBuffer mesg = new StringBuffer();
             for (int i = 0; i < lines.length; i++) {
-                if(i == lines.length -1) {
+                if (i == lines.length - 1) {
                     mesg.append("e\n");
                 }
-                mesg.append(lines[i]+"\n");
+                mesg.append(lines[i] + "\n");
             }
-            
+
             // parse epg information
             List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-            if(epg.size() > 0) {
+            if (epg.size() > 0) {
                 rec.setEpgInfo(epg.get(0));
             }
         }
@@ -171,7 +173,7 @@ public class RecordingManager extends Observable {
 
     public void playOnVdr(Recording rec) {
         Response res = VDRConnection.send(new PLAY(rec.getNumber()));
-        if(res.getCode() != 250) {
+        if (res.getCode() != 250) {
             logger.error(res.getMessage());
         }
     }

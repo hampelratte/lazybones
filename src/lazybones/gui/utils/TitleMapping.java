@@ -1,4 +1,4 @@
-/* $Id: TitleMapping.java,v 1.3 2011-01-18 13:13:52 hampelratte Exp $
+/* $Id: TitleMapping.java,v 1.4 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,23 +46,23 @@ public class TitleMapping implements Serializable, TableModel {
     private ArrayList<String> tvbTitles = new ArrayList<String>();
 
     public void put(String tvbTitle, String vdrTitle) {
-        if(vdrTitles.contains(vdrTitle)) {
+        if (vdrTitles.contains(vdrTitle)) {
             int index = vdrTitles.indexOf(vdrTitle);
             tvbTitles.set(index, tvbTitle);
         } else {
             vdrTitles.add(vdrTitle);
             tvbTitles.add(tvbTitle);
         }
-        
+
         fireTableChanged();
     }
-    
+
     public void removeRow(int index) {
         vdrTitles.remove(index);
         tvbTitles.remove(index);
         fireTableChanged();
     }
-    
+
     private void fireTableChanged() {
         for (TableModelListener listener : listeners) {
             listener.tableChanged(new TableModelEvent(this));
@@ -79,7 +79,7 @@ public class TitleMapping implements Serializable, TableModel {
         }
         return null;
     }
-    
+
     public String getVdrTitle(String tvbTitle) {
         int count = 0;
         for (Iterator<String> iter = tvbTitles.iterator(); iter.hasNext(); count++) {
@@ -92,10 +92,11 @@ public class TitleMapping implements Serializable, TableModel {
     }
 
     private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
+
     public void addTableModelListener(TableModelListener l) {
         listeners.add(l);
     }
-    
+
     public void removeTableModelListener(TableModelListener l) {
         listeners.remove(l);
     }
@@ -121,7 +122,7 @@ public class TitleMapping implements Serializable, TableModel {
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if(columnIndex == 0) {
+        if (columnIndex == 0) {
             return tvbTitles.get(rowIndex);
         } else {
             return vdrTitles.get(rowIndex);
@@ -133,13 +134,13 @@ public class TitleMapping implements Serializable, TableModel {
     }
 
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        if(columnIndex == 0) {
+        if (columnIndex == 0) {
             tvbTitles.set(rowIndex, aValue.toString());
         } else {
             vdrTitles.set(rowIndex, aValue.toString());
         }
     }
-    
+
     public Map<String, String> getAsMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         for (int i = 0; i < tvbTitles.size(); i++) {
@@ -147,7 +148,7 @@ public class TitleMapping implements Serializable, TableModel {
         }
         return map;
     }
-    
+
     public void setMappingFromMap(Map<String, String> map) {
         for (Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
             String key = iter.next();

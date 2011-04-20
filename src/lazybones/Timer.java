@@ -1,4 +1,4 @@
-/* $Id: Timer.java,v 1.19 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: Timer.java,v 1.20 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -141,15 +141,13 @@ public class Timer extends VDRTimer {
     }
 
     /**
-     * Returns, if <code>this</code> starts between the start time and the end time of the given timer
-     * <code>timer</code>.
+     * Returns, if <code>this</code> starts between the start time and the end time of the given timer <code>timer</code>.
      * 
      * @param timer
      * @return
      */
     public boolean startsDuringTimer(Timer timer) {
-        if (this.getStartTime().compareTo(timer.getStartTime()) >= 0
-                && this.getStartTime().compareTo(timer.getEndTime()) <= 0) {
+        if (this.getStartTime().compareTo(timer.getStartTime()) >= 0 && this.getStartTime().compareTo(timer.getEndTime()) <= 0) {
             return true;
         }
         return false;

@@ -1,4 +1,4 @@
-/* $Id: ChannelSet.java,v 1.3 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: ChannelSet.java,v 1.4 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,18 +40,18 @@ public class ChannelSet<E> extends LinkedHashSet<E> implements Transferable {
     public static final DataFlavor FLAVOR = new DataFlavor(ChannelSet.class, "VDR Channels");
 
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if(flavor.equals(FLAVOR)) {
+        if (flavor.equals(FLAVOR)) {
             return this;
         }
         return null;
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] {FLAVOR};
+        return new DataFlavor[] { FLAVOR };
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        if(flavor.equals(FLAVOR)) {
+        if (flavor.equals(FLAVOR)) {
             return true;
         } else {
             return false;

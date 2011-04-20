@@ -1,4 +1,4 @@
-/* $Id: EPGInfoPanel.java,v 1.4 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: EPGInfoPanel.java,v 1.5 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -51,49 +51,49 @@ import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 public class EPGInfoPanel extends JPanel implements ListSelectionListener {
-    
+
     private EPGEntry epg;
-    
+
     private JLabel title = new JLabel();
     private JLabel time = new JLabel();
     private DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
     private JLabel shortTextLabel = new JLabel();
     private JTextArea desc = new JTextArea();
-    
+
     public EPGInfoPanel() {
         initGUI();
     }
-    
+
     public EPGInfoPanel(EPGEntry epg) {
         this.epg = epg;
         initGUI();
         loadData();
     }
-    
+
     public void setEpg(EPGEntry epg) {
         this.epg = epg;
         loadData();
     }
-    
+
     private void initGUI() {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
-        
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         title.setFont(title.getFont().deriveFont(Font.BOLD));
         add(title, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(time, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         add(shortTextLabel, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -106,7 +106,7 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
         desc.setBackground(Color.WHITE);
         add(new JScrollPane(desc), gbc);
     }
-    
+
     private void loadData() {
         title.setText(epg.getTitle());
         time.setText(df.format(epg.getStartTime().getTime()));
@@ -118,13 +118,13 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent e) {
         JList list = (JList) e.getSource();
         Recording rec = (Recording) list.getSelectedValue();
-        if(rec == null) {
+        if (rec == null) {
             title.setText(null);
             time.setText(null);
             shortTextLabel.setText(null);
             desc.setText(null);
         } else {
-            if(rec.getEpgInfo() == null) {
+            if (rec.getEpgInfo() == null) {
                 RecordingManager.getInstance().loadInfo(rec);
             }
             setEpg(rec.getEpgInfo());

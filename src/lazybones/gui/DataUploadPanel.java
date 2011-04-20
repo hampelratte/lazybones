@@ -1,4 +1,4 @@
-/* $Id: DataUploadPanel.java,v 1.4 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: DataUploadPanel.java,v 1.5 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lazybones.gui;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -60,24 +61,18 @@ import devplugin.Date;
 import devplugin.Program;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
+ * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
+ * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class DataUploadPanel extends JPanel {
     private JList list;
     private DefaultListModel model = new DefaultListModel();
     private JButton bUploadData;
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(DataUploadPanel.class);
-    
+
     public DataUploadPanel() {
         initGUI();
         loadChannels();
@@ -88,7 +83,7 @@ public class DataUploadPanel extends JPanel {
             String id = entry.getKey();
             Channel chan = entry.getValue();
             devplugin.Channel tvbChan = ChannelManager.getInstance().getChannelById(id);
-            if(tvbChan != null) {
+            if (tvbChan != null) {
                 model.addElement(chan);
             }
         }
@@ -99,19 +94,21 @@ public class DataUploadPanel extends JPanel {
             {
                 GridBagLayout thisLayout = new GridBagLayout();
                 this.setPreferredSize(new java.awt.Dimension(562, 431));
-                thisLayout.rowWeights = new double[] {0.1, 0.1};
-                thisLayout.rowHeights = new int[] {7, 7};
-                thisLayout.columnWeights = new double[] {0.1};
-                thisLayout.columnWidths = new int[] {7};
+                thisLayout.rowWeights = new double[] { 0.1, 0.1 };
+                thisLayout.rowHeights = new int[] { 7, 7 };
+                thisLayout.columnWeights = new double[] { 0.1 };
+                thisLayout.columnWidths = new int[] { 7 };
                 this.setLayout(thisLayout);
                 {
                     list = new JList();
-                    this.add(new JScrollPane(list), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+                    this.add(new JScrollPane(list), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
+                            new Insets(5, 5, 5, 5), 0, 0));
                     list.setModel(model);
                 }
                 {
                     bUploadData = new JButton();
-                    this.add(bUploadData, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    this.add(bUploadData, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+                            5, 5), 0, 0));
                     bUploadData.setText("upload data");
                     bUploadData.addActionListener(new ActionListener() {
                         @Override
@@ -121,23 +118,23 @@ public class DataUploadPanel extends JPanel {
                     });
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Couldn't initialize the gui", e);
         }
     }
-    
+
     private void uploadData() {
         Object[] channels = list.getSelectedValues();
         for (Object object : channels) {
             Channel chan = (Channel) object;
             devplugin.Channel tvbchan = ChannelManager.getInstance().getChannel(chan);
             Set<Program> channelProgram = getChannelProgram(tvbchan);
-            if(channelProgram.size() > 0) {
-                pute((DVBChannel)chan, channelProgram);
+            if (channelProgram.size() > 0) {
+                pute((DVBChannel) chan, channelProgram);
             }
         }
     }
-    
+
     private void pute(DVBChannel chan, Set<Program> channelProgram) {
         // concatenate PUTE data
         // C channel line
@@ -146,11 +143,11 @@ public class DataUploadPanel extends JPanel {
         sb.append(chan.getNID()).append('-');
         sb.append(chan.getTID()).append('-');
         sb.append(chan.getSID());
-        if(chan.getRID()>=0) {
+        if (chan.getRID() >= 0) {
             sb.append('-').append(chan.getRID());
         }
         sb.append(' ').append(chan.getName()).append("\n");
-        
+
         // program entries
         for (Program prog : channelProgram) {
             // E entry
@@ -164,20 +161,20 @@ public class DataUploadPanel extends JPanel {
             long startTime = progStartCal.getTimeInMillis() / 1000;
             long duration = prog.getLength() * 60;
             sb.append(eventID).append(' ').append(startTime).append(' ').append(duration).append(" 0\n");
-            
+
             // T
             sb.append("T ").append(prog.getTitle().replaceAll("\n", "\\|")).append("\n");
-            
-//            // D, if exists
-//            if(prog.getDescription() != null && !prog.getDescription().isEmpty()) {
-//                sb.append("D ").append(prog.getDescription().replaceAll("\n", "\\|")).append("\n");    
-//            }
-            
+
+            // // D, if exists
+            // if(prog.getDescription() != null && !prog.getDescription().isEmpty()) {
+            // sb.append("D ").append(prog.getDescription().replaceAll("\n", "\\|")).append("\n");
+            // }
+
             sb.append("e\n");
         }
-        
+
         sb.append("c");
-        
+
         logger.warn(sb.toString());
         Response res = VDRConnection.send(new PUTE(sb.toString()));
         logger.warn("Response from VDR: {} {}", res.getCode(), res.getMessage());

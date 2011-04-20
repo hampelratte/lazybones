@@ -1,4 +1,4 @@
-/* $Id: Utilities.java,v 1.7 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: Utilities.java,v 1.8 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,7 +47,7 @@ import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  * 
- * Utility class with different functions
+ *         Utility class with different functions
  */
 public class Utilities {
 
@@ -56,32 +56,30 @@ public class Utilities {
         if (s == null || t == null || s.length() == 0 || t.length() == 0) {
             return 0;
         }
-        
+
         // check if the strings are equal
-        if(s.equals(t)) {
+        if (s.equals(t)) {
             return 100;
         }
-        
-        
-        
+
         // check if one string is a substring of the other
         String shorter;
         String longer;
-        if(s.length() > t.length()) {
+        if (s.length() > t.length()) {
             shorter = t;
             longer = s;
         } else {
             shorter = s;
             longer = t;
         }
-        if(longer.startsWith(shorter) && longer.length() > shorter.length()) {
-            if(longer.charAt(shorter.length()) == ' ') {
+        if (longer.startsWith(shorter) && longer.length() > shorter.length()) {
+            if (longer.charAt(shorter.length()) == ' ') {
                 return 99;
             } else {
                 return 98;
             }
         }
-        
+
         s = s.toLowerCase();
         s = s.replaceAll("-", " ");
         s = s.replaceAll(":", " ");
@@ -98,7 +96,7 @@ public class Utilities {
         t = t.replaceAll("_", " ");
         t = t.replaceAll("\\.", "\\. ");
         t = t.trim();
-        
+
         // calculate levenshteinDistance
         int levenshteinDistance = Utilities.getLevenshteinDistance(s, t);
         int length = Math.max(s.length(), t.length());
@@ -139,8 +137,8 @@ public class Utilities {
                 }
 
                 d[i][j] = min(d[i - 1][j] + 1, // insertion
-                              d[i][j - 1] + 1, // deletion
-                              d[i - 1][j - 1] + cost); // substitution
+                        d[i][j - 1] + 1, // deletion
+                        d[i - 1][j - 1] + cost); // substitution
             }
         }
         return d[n][m];
@@ -156,8 +154,7 @@ public class Utilities {
         return a;
     }
 
-    public static boolean isCellVisible(JTable table, int rowIndex,
-            int vColIndex) {
+    public static boolean isCellVisible(JTable table, int rowIndex, int vColIndex) {
         if (!(table.getParent() instanceof JViewport)) {
             return false;
         }
@@ -200,24 +197,24 @@ public class Utilities {
         // Scroll the area into view
         viewport.scrollRectToVisible(rect);
     }
-    
-    
+
     /**
      * 
-     * @param a Calendar
-     * @param b Calendar
+     * @param a
+     *            Calendar
+     * @param b
+     *            Calendar
      * @return true if the Calendars describe the same day (day, month, year)
      */
     public static boolean sameDay(Calendar a, Calendar b) {
-        return a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR) 
-                && a.get(Calendar.MONTH) == b.get(Calendar.MONTH)
+        return a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR) && a.get(Calendar.MONTH) == b.get(Calendar.MONTH)
                 && a.get(Calendar.YEAR) == b.get(Calendar.YEAR);
     }
 
     public static List<StartStopEvent> createStartStopEventList(List<Timer> timers) {
         ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
         for (Timer timer : timers) {
-            if(timer.isActive()) {
+            if (timer.isActive()) {
                 startStopEvents.add(new StartStopEvent(timer, true));
                 startStopEvents.add(new StartStopEvent(timer, false));
             }
@@ -225,9 +222,10 @@ public class Utilities {
         Collections.sort(startStopEvents);
         return startStopEvents;
     }
-    
+
     /**
      * Returns the difference of two calendars in minutes
+     * 
      * @param startTime
      * @param endTime
      * @return difference of two calendars in minutes
@@ -236,25 +234,21 @@ public class Utilities {
         long diffMillis = Math.abs(endTime.getTimeInMillis() - startTime.getTimeInMillis());
         return TimeUnit.MILLISECONDS.toMinutes(diffMillis);
     }
-    
+
     /**
-     * Filters a list of EPGEntries by a provided VDR channel name and a time
-     * which has to be in between a EPGEntries start and end time.
+     * Filters a list of EPGEntries by a provided VDR channel name and a time which has to be in between a EPGEntries start and end time.
      * 
      * @param epgList
      *            list of EPGEntries retrieved from VDR
      * @param vdrChannelName
      *            VDR channel name which has to match a EPGEntry channel name
      * @param middleTime
-     *            time of a program which has to be between start and end time
-     *            of a EPGEntry
+     *            time of a program which has to be between start and end time of a EPGEntry
      * @return EPGEntry from the list which matches channel and time
      */
-    public static EPGEntry filterEPGDate(List<EPGEntry> epgList, String vdrChannelName,
-            long middleTime) {
+    public static EPGEntry filterEPGDate(List<EPGEntry> epgList, String vdrChannelName, long middleTime) {
         for (EPGEntry entry : epgList) {
-            if (entry.getStartTime().getTimeInMillis() <= middleTime
-                    && middleTime <= entry.getEndTime().getTimeInMillis()
+            if (entry.getStartTime().getTimeInMillis() <= middleTime && middleTime <= entry.getEndTime().getTimeInMillis()
                     && vdrChannelName.equals(entry.getChannelName())) {
                 return entry;
             }

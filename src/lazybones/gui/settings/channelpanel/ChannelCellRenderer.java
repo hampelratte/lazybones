@@ -1,4 +1,4 @@
-/* $Id: ChannelCellRenderer.java,v 1.3 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: ChannelCellRenderer.java,v 1.4 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,27 +43,26 @@ import util.ui.ChannelLabel;
 
 public class ChannelCellRenderer extends DefaultTableCellRenderer {
 
-    private Color uneven = new Color(240,240,240);
+    private Color uneven = new Color(240, 240, 240);
 
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (column == 0) {
-            if( !(value instanceof devplugin.Channel) ) {
+            if (!(value instanceof devplugin.Channel)) {
                 return null;
             }
-            
+
             ChannelLabel channelLabel = new ChannelLabel((devplugin.Channel) value);
             channelLabel.setFont(table.getFont());
             channelLabel.setBorder(noFocusBorder);
             channelLabel.setHorizontalAlignment(JLabel.LEFT);
             channelLabel.setOpaque(true);
-            
+
             // set colors
             if (isSelected) {
                 channelLabel.setForeground(table.getSelectionForeground());
                 channelLabel.setBackground(table.getSelectionBackground());
             } else {
-                if( (row & 1) == 0 ) { // even lines
+                if ((row & 1) == 0) { // even lines
                     channelLabel.setBackground(table.getBackground());
                     channelLabel.setForeground(table.getForeground());
                 } else { // uneven lines
@@ -77,7 +76,7 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
                 super.setForeground(table.getSelectionForeground());
                 super.setBackground(table.getSelectionBackground());
             } else {
-                if( (row & 1) == 0 ) { // even lines
+                if ((row & 1) == 0) { // even lines
                     super.setForeground(table.getForeground());
                     super.setBackground(table.getBackground());
                 } else { // uneven lines
@@ -105,10 +104,10 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
                 setBorder(noFocusBorder);
             }
 
-            if(value != null) {
-                Channel chan = (Channel)value;
+            if (value != null) {
+                Channel chan = (Channel) value;
                 String channelName = chan.getShortName().length() > 0 ? chan.getShortName() : chan.getName();
-                setValue("[" + chan.getChannelNumber()+ "] " + channelName);
+                setValue("[" + chan.getChannelNumber() + "] " + channelName);
             } else {
                 setValue(null);
             }

@@ -1,4 +1,4 @@
-/* $Id: ScreenshotSettingsPanel.java,v 1.3 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: ScreenshotSettingsPanel.java,v 1.4 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,53 +47,41 @@ import javax.swing.UIManager;
 
 import lazybones.LazyBones;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
+ * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
+ * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class ScreenshotSettingsPanel implements ItemListener {
     private String lMethod = LazyBones.getTranslation("method", "Method");
-    
+
     private JComboBox method = new JComboBox();
-    
+
     private CardLayout cardLayout = new CardLayout();
-    
+
     private JPanel cardsContainer = new JPanel(cardLayout);
 
     private JPanel httpPanel = new JPanel();
-    
-    private final JLabel lURL = new JLabel(LazyBones.getTranslation("url",
-            "URL to preview picture"));
+
+    private final JLabel lURL = new JLabel(LazyBones.getTranslation("url", "URL to preview picture"));
 
     private JTextField url;
 
-    private final JLabel lPicturePath = new JLabel(LazyBones.getTranslation("path",
-            "Path to preview picture"));
+    private final JLabel lPicturePath = new JLabel(LazyBones.getTranslation("path", "Path to preview picture"));
 
-    private final String lDescription = LazyBones.getTranslation(
-					"desc_url", "The URL is the URL, where"
-							+ " VDRRemoteControl can download the preview image. The path is the path to the preview"
-							+ " image on the VDR host. This should be the document root of the webserver, which has"
-							+ " been specified in the URL");
-                                    
+    private final String lDescription = LazyBones.getTranslation("desc_url", "The URL is the URL, where"
+            + " VDRRemoteControl can download the preview image. The path is the path to the preview"
+            + " image on the VDR host. This should be the document root of the webserver, which has" + " been specified in the URL");
 
     private JTextField picturePath;
-    
+
     private JComponent note;
 
     public ScreenshotSettingsPanel() {
         initComponents();
     }
-    
+
     private void initComponents() {
         url = new JTextField(20);
         url.setText(LazyBones.getProperties().getProperty("preview.url"));
@@ -108,34 +96,35 @@ public class ScreenshotSettingsPanel implements ItemListener {
         description.setWrapStyleWord(true);
         description.setBackground(UIManager.getColor("JPanel.background"));
 
-        note = new JScrollPane(description,
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        note = new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         GridBagLayout httpPanelLayout = new GridBagLayout();
         httpPanel.setLayout(httpPanelLayout);
         httpPanel.add(lURL, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
         httpPanel.add(url, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-        httpPanel.add(lPicturePath, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-        httpPanel.add(picturePath, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-        httpPanel.add(note, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+        httpPanel.add(lPicturePath,
+                new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        httpPanel.add(picturePath, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5),
+                0, 0));
+        httpPanel.add(note,
+                new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
 
-        httpPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1};
-        httpPanelLayout.rowHeights = new int[] {7, 7, 7};
-        httpPanelLayout.columnWeights = new double[] {0.1, 0.1};
-        httpPanelLayout.columnWidths = new int[] {7, 7};
+        httpPanelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1 };
+        httpPanelLayout.rowHeights = new int[] { 7, 7, 7 };
+        httpPanelLayout.columnWeights = new double[] { 0.1, 0.1 };
+        httpPanelLayout.columnWidths = new int[] { 7, 7 };
         cardsContainer.add(httpPanel, "HTTP");
         {
             cardsContainer.add(new JPanel(), "SVDRP");
         }
-        
+
         method.addItem("HTTP");
         method.addItem("SVDRP");
         method.addItemListener(this);
         String m = LazyBones.getProperties().getProperty("preview.method");
-        for(int i=0; i<method.getItemCount(); i++) {
-            String item = (String)method.getItemAt(i);
-            if(m.equals(item)) {
+        for (int i = 0; i < method.getItemCount(); i++) {
+            String item = (String) method.getItemAt(i);
+            if (m.equals(item)) {
                 method.setSelectedIndex(i);
                 break;
             }
@@ -143,40 +132,39 @@ public class ScreenshotSettingsPanel implements ItemListener {
     }
 
     public JPanel getPanel() {
-		JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setPreferredSize(new java.awt.Dimension(473, 264));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(10,10,10,10);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(new JLabel(lMethod), gbc);
-        
+
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(method, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(0,0,0,0);
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        panel.add(cardsContainer, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        panel.add(cardsContainer, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0,
+                0), 0, 0));
         return panel;
     }
 
     public void saveSettings() {
         LazyBones.getProperties().setProperty("preview.url", url.getText());
-        LazyBones.getProperties().setProperty("preview.path",
-                picturePath.getText());
-        LazyBones.getProperties().setProperty("preview.method",
-                method.getSelectedItem().toString());
+        LazyBones.getProperties().setProperty("preview.path", picturePath.getText());
+        LazyBones.getProperties().setProperty("preview.method", method.getSelectedItem().toString());
     }
 
     public void itemStateChanged(ItemEvent e) {
-        if(e.getStateChange() == ItemEvent.SELECTED) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
             cardLayout.show(cardsContainer, e.getItem().toString());
         }
     }

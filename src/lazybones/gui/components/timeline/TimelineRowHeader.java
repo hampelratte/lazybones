@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeader.java,v 1.4 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineRowHeader.java,v 1.5 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,7 +43,7 @@ public class TimelineRowHeader extends JPanel implements TimelineListener {
     private List<Integer> channels = new ArrayList<Integer>();
     private int rowHeight = 40;
     private int padding = 0;
-    
+
     public TimelineRowHeader(TimelineList list, int rowHeight, int padding) {
         this.rowHeight = rowHeight;
         this.padding = padding;
@@ -51,32 +51,32 @@ public class TimelineRowHeader extends JPanel implements TimelineListener {
         list.addTimelineListener(this);
         setDoubleBuffered(true);
     }
-    
+
     public void addTimer(Timer timer) {
-        if(!channels.contains(timer.getChannelNumber())) {
+        if (!channels.contains(timer.getChannelNumber())) {
             add(new TimelineRowHeaderElement(timer));
             channels.add(timer.getChannelNumber());
         }
     }
-    
+
     public void timelineChanged(List<Timer> timers) {
         this.removeAll();
         channels.clear();
         for (Timer timer : timers) {
             addTimer(timer);
         }
-        
+
         revalidate();
         repaint();
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         g.setColor(Color.GRAY);
         for (int i = 0; i <= getComponentCount(); i++) {
-            g.drawLine(0, i*(rowHeight + padding), getWidth(), i*(rowHeight + padding));
+            g.drawLine(0, i * (rowHeight + padding), getWidth(), i * (rowHeight + padding));
         }
     }
 }

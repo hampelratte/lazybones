@@ -1,4 +1,4 @@
-/* $Id: TimelinePanel.java,v 1.9 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: TimelinePanel.java,v 1.10 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -55,15 +55,15 @@ import lazybones.gui.components.timeline.TimelineWeekdayButton;
 import lazybones.utils.Utilities;
 
 public class TimelinePanel extends JPanel implements ActionListener, Observer {
-    
+
     private JLabel date = new JLabel();
     private JButton nextDateButton;
     private JButton prevDateButton;
     private Timeline timeline;
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
-    
+
     private TimelineWeekdayButton[] weekdayButtons = new TimelineWeekdayButton[7];
-    
+
     public TimelinePanel() {
         timeline = new Timeline();
         initGUI();
@@ -73,14 +73,14 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
 
     private void initGUI() {
         setLayout(new BorderLayout());
-        
+
         nextDateButton = new JButton(LazyBones.getInstance().createImageIcon("action", "go-next", 16));
         nextDateButton.addActionListener(this);
         nextDateButton.setActionCommand("NEXT_DAY");
         prevDateButton = new JButton(LazyBones.getInstance().createImageIcon("action", "go-previous", 16));
         prevDateButton.addActionListener(this);
         prevDateButton.setActionCommand("PREVIOUS_DAY");
-        
+
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
@@ -95,10 +95,10 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
             weekdayButtons[i].addActionListener(this);
             northPanel.add(weekdayButtons[i]);
         }
-        
+
         add(northPanel, BorderLayout.NORTH);
-        
-        date.setFont(new Font("SansSerif",Font.PLAIN, 18));
+
+        date.setFont(new Font("SansSerif", Font.PLAIN, 18));
         setCalendar(GregorianCalendar.getInstance());
 
         add(timeline, BorderLayout.CENTER);
@@ -106,26 +106,26 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == nextDateButton) {
+        if (e.getSource() == nextDateButton) {
             Calendar currentDay = timeline.getList().getCalendar();
             Calendar nextDay = TimerManager.getInstance().getNextDayWithEvent(currentDay);
-            if(nextDay != null) {
+            if (nextDay != null) {
                 setCalendar(nextDay);
-            } 
-        } else if(e.getSource() == prevDateButton) {
+            }
+        } else if (e.getSource() == prevDateButton) {
             Calendar currentDay = timeline.getList().getCalendar();
             Calendar previousDay = TimerManager.getInstance().getPreviousDayWithEvent(currentDay);
-            if(previousDay != null) {
+            if (previousDay != null) {
                 setCalendar(previousDay);
-            } 
+            }
         } else { // one of the weekdayButtons has been hit
             TimelineWeekdayButton button = (TimelineWeekdayButton) e.getSource();
             setCalendar(button.getDay());
         }
-        
+
         // enable disable next and prev buttons
         enableDisableButtons();
-        
+
         // display the new timers in the timeline
         timeline.getList().showTimersForCurrentDate(TimerManager.getInstance().getTimers());
     }
@@ -136,11 +136,11 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         nextDateButton.setEnabled(enableNextButton);
         boolean enablePrevButton = TimerManager.getInstance().hasPreviousDayWithEvent(cal);
         prevDateButton.setEnabled(enablePrevButton);
-        
+
         // weekday buttons
         for (int i = 0; i < weekdayButtons.length; i++) {
             TimelineWeekdayButton button = weekdayButtons[i];
-            if(Utilities.sameDay(cal, button.getDay())) {
+            if (Utilities.sameDay(cal, button.getDay())) {
                 button.setSelected(true);
             } else {
                 button.setSelected(false);
@@ -149,20 +149,20 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     }
 
     public void update(Observable o, Object arg) {
-        if(o == TimerManager.getInstance()) {
+        if (o == TimerManager.getInstance()) {
             enableDisableButtons();
         }
     }
-    
+
     public void setCalendar(Calendar calendar) {
         // set calendar in timeline
         timeline.getList().setCalendar(calendar);
-        
+
         // show new date
         Date d = calendar.getTime();
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE ", Locale.getDefault());
         date.setText(sdf.format(d) + " " + df.format(d));
-        
+
         // update buttons
         enableDisableButtons();
     }

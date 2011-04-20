@@ -1,4 +1,4 @@
-/* $Id: CreateTimerAction.java,v 1.3 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: CreateTimerAction.java,v 1.4 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,30 +43,28 @@ import org.slf4j.LoggerFactory;
 public class CreateTimerAction extends VDRAction {
 
     private static transient Logger logger = LoggerFactory.getLogger(CreateTimerAction.class);
-    
+
     private Timer timer;
-    
+
     public CreateTimerAction(Timer timer) {
         this.timer = timer;
     }
-    
+
     @Override
     boolean execute() {
         response = VDRConnection.send(new NEWT(timer));
-        
+
         if (response == null) {
             response = new ConnectionProblem();
         }
-        
+
         if (response instanceof R250) {
             // since we dont have the ID of the new timer, we
             // have to get the whole timer list again :-(
             TimerManager.getInstance().synchronize();
             return true;
         } else {
-            logger.error(LazyBones.getTranslation("couldnt_create",
-                    "Couldn\'t create timer:")
-                    + " " + response.getMessage());
+            logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:") + " " + response.getMessage());
             return false;
         }
     }

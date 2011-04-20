@@ -1,4 +1,4 @@
-/* $Id: TimerManagerPanel.java,v 1.21 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: TimerManagerPanel.java,v 1.22 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
 public class TimerManagerPanel extends JPanel implements ActionListener, ListSelectionListener {
 
     private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
-    
+
     private JScrollPane scrollPane = null;
     private JList timerList = new JList(new TimerListAdapter());
     private JButton buttonNew = null;
@@ -76,7 +76,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     private JButton buttonSync = null;
     private JButton buttonRemove = null;
     private TimerOptionsPanel top = new TimerOptionsPanel(Mode.VIEW);
-    
+
     public TimerManagerPanel() {
         initGUI();
     }
@@ -88,86 +88,92 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     private void initGUI() {
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.gridwidth = 2;
-        gbc.insets = new java.awt.Insets(10,10,10,10);
+        gbc.insets = new java.awt.Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         timerList.setCellRenderer(new TimerListCellRenderer());
         timerList.addListSelectionListener(this);
         scrollPane = new JScrollPane(timerList);
         this.add(scrollPane, gbc);
-        
+
         gbc.gridwidth = 2;
         gbc.gridx = 2;
-        gbc.insets = new java.awt.Insets(10,0,10,10);
+        gbc.insets = new java.awt.Insets(10, 0, 10, 10);
         top.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
-        top.setPreferredSize(new Dimension(300,300));
-        top.setMinimumSize(new Dimension(300,300));
-        top.setMaximumSize(new Dimension(300,300));
+        top.setPreferredSize(new Dimension(300, 300));
+        top.setMinimumSize(new Dimension(300, 300));
+        top.setMaximumSize(new Dimension(300, 300));
         this.add(top, gbc);
-        
+
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        gbc.insets = new java.awt.Insets(0,10,0,10);
+        gbc.insets = new java.awt.Insets(0, 10, 0, 10);
         gbc.gridx = 0;
         gbc.gridwidth = 1;
         buttonSync = new JButton();
-        buttonSync.setText(LazyBones.getTranslation("resync","Synchronize"));
+        buttonSync.setText(LazyBones.getTranslation("resync", "Synchronize"));
         buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
         buttonSync.addActionListener(this);
         this.add(buttonSync, gbc);
-        
-        gbc.insets = new java.awt.Insets(0,0,0,10);
+
+        gbc.insets = new java.awt.Insets(0, 0, 0, 10);
         gbc.gridx = 1;
         buttonNew = new JButton();
-        buttonNew.setText(LazyBones.getTranslation("new_timer","New Timer"));
+        buttonNew.setText(LazyBones.getTranslation("new_timer", "New Timer"));
         buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 16));
         buttonNew.addActionListener(this);
         this.add(buttonNew, gbc);
-        
-        gbc.insets = new java.awt.Insets(0,0,0,0);
+
+        gbc.insets = new java.awt.Insets(0, 0, 0, 0);
         gbc.gridx = 2;
         buttonEdit = new JButton();
-        buttonEdit.setText(LazyBones.getTranslation("edit","Edit Timer"));
+        buttonEdit.setText(LazyBones.getTranslation("edit", "Edit Timer"));
         buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
         buttonEdit.addActionListener(this);
         this.add(buttonEdit, gbc);
-        
-        gbc.insets = new java.awt.Insets(0,10,0,10);
+
+        gbc.insets = new java.awt.Insets(0, 10, 0, 10);
         gbc.gridx = 3;
         buttonRemove = new JButton();
-        buttonRemove.setText(LazyBones.getTranslation("dont_capture","Delete Timer"));
+        buttonRemove.setText(LazyBones.getTranslation("dont_capture", "Delete Timer"));
         buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
         buttonRemove.addActionListener(this);
         this.add(buttonRemove, gbc);
-        
-        
+
         timerList.addMouseListener(new MouseListener() {
             public void mousePressed(MouseEvent e) {
                 mayTriggerPopup(e);
             }
-            public void mouseClicked(MouseEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
+
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            public void mouseExited(MouseEvent e) {
+            }
+
             public void mouseReleased(MouseEvent e) {
                 mayTriggerPopup(e);
             }
-            
+
             private void mayTriggerPopup(MouseEvent e) {
                 int index = timerList.locationToIndex(e.getPoint());
                 Timer timer = (Timer) timerList.getModel().getElementAt(index);
-                if(e.isPopupTrigger()) {
+                if (e.isPopupTrigger()) {
                     JPopupMenu popup = ProgramManager.getInstance().getContextMenuForTimer(timer);
                     popup.setLocation(e.getPoint());
                     popup.show(e.getComponent(), e.getX(), e.getY());
-                } else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
+                } else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
                     ProgramManager.getInstance().handleTimerDoubleClick(timer);
                 }
             }
@@ -175,38 +181,38 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         timerList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_DELETE) {
-                    Timer timer = (Timer)timerList.getSelectedValue();
-                    if(timer != null) {
+                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    Timer timer = (Timer) timerList.getSelectedValue();
+                    if (timer != null) {
                         deleteTimer(timer);
                     }
                 }
             }
         });
     }
-    
+
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == buttonNew) {
+        if (e.getSource() == buttonNew) {
             TimerManager.getInstance().createTimer();
-        } else if(e.getSource() == buttonEdit) {
-            if(timerList.getSelectedIndex() >= 0) {
-                Timer timer = (Timer)timerList.getSelectedValue();
+        } else if (e.getSource() == buttonEdit) {
+            if (timerList.getSelectedIndex() >= 0) {
+                Timer timer = (Timer) timerList.getSelectedValue();
                 try {
-                	TimerManager.getInstance().editTimer(timer);
-                } catch(Exception ex) {
+                    TimerManager.getInstance().editTimer(timer);
+                } catch (Exception ex) {
                     logger.error("An error occured", ex);
                 }
             }
-        } else if(e.getSource() == buttonRemove) {
-            if(timerList.getSelectedIndex() >= 0) {
-                Timer timer = (Timer)timerList.getSelectedValue();
+        } else if (e.getSource() == buttonRemove) {
+            if (timerList.getSelectedIndex() >= 0) {
+                Timer timer = (Timer) timerList.getSelectedValue();
                 deleteTimer(timer);
             }
-        } else if(e.getSource() == buttonSync) {
+        } else if (e.getSource() == buttonSync) {
             TimerManager.getInstance().synchronize();
         }
     }
-    
+
     private void deleteTimer(Timer timer) {
         timerList.setEnabled(false);
         buttonNew.setEnabled(false);
@@ -222,7 +228,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
                 buttonEdit.setEnabled(true);
                 buttonSync.setEnabled(true);
                 buttonRemove.setEnabled(true);
-                if(requestFocus) {
+                if (requestFocus) {
                     timerList.requestFocus();
                 }
             }
@@ -233,22 +239,22 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         Timer timer = (Timer) timerList.getSelectedValue();
         top.setTimer(timer);
     }
-    
+
     private class TimerComparator implements Comparator<Timer> {
         public int compare(Timer t1, Timer t2) {
             return t1.getStartTime().compareTo(t2.getStartTime());
         }
     }
-    
+
     private class TimerListAdapter extends AbstractListModel implements Observer {
-        
+
         private TimerManager tm = TimerManager.getInstance();
-        
+
         public TimerListAdapter() {
             tm.addObserver(this);
             Collections.sort(tm.getTimers(), new TimerComparator());
         }
-        
+
         @Override
         public int getSize() {
             return tm.getTimers() != null ? tm.getTimers().size() : 0;
@@ -262,9 +268,9 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         @Override
         public void update(Observable o, Object arg) {
             Collections.sort(tm.getTimers(), new TimerComparator());
-            fireContentsChanged(this, 0, tm.getTimers().size()-1);
+            fireContentsChanged(this, 0, tm.getTimers().size() - 1);
         }
-        
+
         @Override
         protected void fireContentsChanged(Object source, int start, int end) {
             super.fireContentsChanged(source, start, end);

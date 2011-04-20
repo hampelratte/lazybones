@@ -1,4 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.7 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.8 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,51 +46,35 @@ public class ListRecordingsAction extends VDRAction {
 
     private static transient Logger logger = LoggerFactory.getLogger(ListRecordingsAction.class);
     private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
-    
+
     private List<Recording> recordings;
-    
+
     public ListRecordingsAction(VDRCallback callback) {
         super(callback);
     }
-    
+
     boolean execute() {
         response = VDRConnection.send(new LSTR());
-        
+
         if (response != null && response.getCode() == 250) {
             String recordingsString = response.getMessage();
             recordings = RecordingsParser.parse(recordingsString);
-            
+
             // retrieve infos for all recordings
             // this is to slow, instead we load the info on demand
             /*
-            for (Iterator iter = recordings.iterator(); iter.hasNext();) {
-                Recording rec = (Recording) iter.next();
-                response = connection.send(new LSTR(rec.getNumber()));
-                if(response != null && response.getCode() == 215) {
-                    // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
-                    String[] lines = response.getMessage().split("\n");
-                    StringBuffer mesg = new StringBuffer();
-                    for (int i = 0; i < lines.length; i++) {
-                        if(i == lines.length -1) {
-                            mesg.append("e\n");
-                        }
-                        mesg.append(lines[i]+"\n");
-                    }
-                    
-                    // parse epg information
-                    List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-                    if(epg.size() > 0) {
-                        rec.setEpgInfo(epg.get(0));
-                    }
-                }
-            }
-            */
+             * for (Iterator iter = recordings.iterator(); iter.hasNext();) { Recording rec = (Recording) iter.next(); response = connection.send(new
+             * LSTR(rec.getNumber())); if(response != null && response.getCode() == 215) { // workaround for the epg parser, because LSTR does not send an 'e'
+             * as entry terminator String[] lines = response.getMessage().split("\n"); StringBuffer mesg = new StringBuffer(); for (int i = 0; i < lines.length;
+             * i++) { if(i == lines.length -1) { mesg.append("e\n"); } mesg.append(lines[i]+"\n"); }
+             * 
+             * // parse epg information List<EPGEntry> epg = EPGParser.parse(mesg.toString()); if(epg.size() > 0) { rec.setEpgInfo(epg.get(0)); } } }
+             */
         } else if (response != null && response.getCode() == 550) {
             // no recordings, do nothing
             logger.info("No recording on VDR");
         } else { /* something went wrong */
-            conLog.error(LazyBones.getTranslation("error_retrieve_recordings",
-                "Couldn't retrieve recordings from VDR."));
+            conLog.error(LazyBones.getTranslation("error_retrieve_recordings", "Couldn't retrieve recordings from VDR."));
         }
 
         return true;

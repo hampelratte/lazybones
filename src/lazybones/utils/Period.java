@@ -1,4 +1,4 @@
-/* $Id: Period.java,v 1.2 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: Period.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -64,11 +64,9 @@ public class Period implements Serializable {
     public void setStartTime(Calendar startTime) {
         this.startTime = startTime;
     }
-    
+
     public String toString() {
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, 
-                                                       DateFormat.SHORT, 
-                                                       Locale.getDefault());
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
         return df.format(startTime.getTime()) + " - " + df.format(endTime.getTime());
     }
 }

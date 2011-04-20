@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.10 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.11 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -84,9 +84,9 @@ public class ScreenshotPanel extends JLabel {
     private class PreviewGrabber extends Thread {
 
         private boolean running = true;
-        
-        private GRAB grab; 
-        
+
+        private GRAB grab;
+
         PreviewGrabber() {
             grab = new GRAB(".jpg");
             grab.setQuality(80);
@@ -97,8 +97,7 @@ public class ScreenshotPanel extends JLabel {
                 try {
                     Thread.sleep(1000);
                     grab.setResolution(getWidth() + " " + getHeight());
-                    String method = LazyBones.getProperties().getProperty(
-                            "preview.method");
+                    String method = LazyBones.getProperties().getProperty("preview.method");
                     if ("HTTP".equals(method)) {
                         image = getHTTPImage();
                     } else if ("SVDRP".equals(method)) {
@@ -110,20 +109,19 @@ public class ScreenshotPanel extends JLabel {
                     } else {
                         logger.warn("Grabbed image is null");
                         setFont(new Font("SansSerif", Font.PLAIN, 24));
-                        setText("  " + LazyBones.getTranslation("no_preview","Couldn't load screenshot."));
+                        setText("  " + LazyBones.getTranslation("no_preview", "Couldn't load screenshot."));
                         setIcon(null);
                         stopGrabbing();
                     }
                 } catch (InterruptedException e) {
                     logger.error("Problem with grabber thread:", e);
-                } 
+                }
             }
         }
-        
+
         private ImageIcon getHTTPImage() {
             logger.debug("Grabbing image over HTTP");
-            grab.setFilename(LazyBones.getProperties()
-                    .getProperty("preview.path"));
+            grab.setFilename(LazyBones.getProperties().getProperty("preview.path"));
             ImageIcon preview = null;
             try {
                 Response res = VDRConnection.send(grab);
@@ -146,12 +144,12 @@ public class ScreenshotPanel extends JLabel {
             }
             return preview;
         }
-        
+
         private ImageIcon getSVDRPImage() {
             logger.debug("Grabbing image over SVDRP");
             Response res = VDRConnection.send(grab);
             if (res != null && res.getCode() == 216) {
-                R216 r216 = (R216)res;
+                R216 r216 = (R216) res;
                 ImageIcon preview = new ImageIcon();
                 try {
                     preview = r216.getImage();

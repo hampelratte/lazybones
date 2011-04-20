@@ -1,4 +1,4 @@
-/* $Id: LogMessageDialog.java,v 1.20 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: LogMessageDialog.java,v 1.21 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -69,59 +69,50 @@ import util.ui.Localizer;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
 
-
-
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
+ * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
+ * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class LogMessageDialog extends JDialog implements ListSelectionListener, WindowClosingIf {
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(LogMessageDialog.class.getName());
-    
+
     private static LogMessageDialog instance;
-    
+
     public JList list;
     public LogMessageListModel model;
     private JSplitPane splitPane;
     private JScrollPane listScrollpane;
     private JTextArea taDetails;
     private JScrollPane textScrollpane;
-    private HashMap<Level,Icon> icons = new HashMap<Level,Icon>();
+    private HashMap<Level, Icon> icons = new HashMap<Level, Icon>();
 
     private LogMessageDialog() {
         super(LazyBones.getInstance().getParent(), false);
         initGUI();
         UiUtilities.registerForClosing(this);
     }
-    
+
     private void initGUI() {
         setTitle("Lazy Bones - " + LazyBones.getTranslation("msg", "Message"));
         setSize(700, 400);
-        getContentPane().setLayout(new BorderLayout(10,10));
-        
-        icons.put(Level.SEVERE,  UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
+        getContentPane().setLayout(new BorderLayout(10, 10));
+
+        icons.put(Level.SEVERE, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
         icons.put(Level.WARNING, UIManager.getDefaults().getIcon("OptionPane.warningIcon"));
-        icons.put(Level.INFO,    UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.CONFIG,  UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.FINE,    UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.FINER,   UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.FINEST,  UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.INFO, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.CONFIG, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.FINE, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.FINER, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        icons.put(Level.FINEST, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
 
         JButton okButton = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 close();
-            } 
+            }
         });
         getContentPane().add(okButton, BorderLayout.SOUTH);
         getContentPane().add(getSplitPane(), BorderLayout.CENTER);
@@ -133,12 +124,11 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
                 close();
             }
         });
-        
+
         // requires java 1.6
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
 
-    
     public synchronized void close() {
         setVisible(false);
         model.clear();
@@ -158,16 +148,16 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         }
         return instance;
     }
-    
+
     public synchronized void addMessage(LogRecord message) {
         model.addMessage(message);
-        if(!isVisible()) {
+        if (!isVisible()) {
             setVisible(true);
         }
     }
-    
+
     private JSplitPane getSplitPane() {
-        if(splitPane == null) {
+        if (splitPane == null) {
             splitPane = new JSplitPane();
             splitPane.add(getListScrollpane(), JSplitPane.LEFT);
             splitPane.add(getTextScrollpane(), JSplitPane.RIGHT);
@@ -176,9 +166,9 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         }
         return splitPane;
     }
-    
+
     private JScrollPane getListScrollpane() {
-        if(listScrollpane == null) {
+        if (listScrollpane == null) {
             list = new JList();
             list.addListSelectionListener(this);
             model = new LogMessageListModel();
@@ -188,17 +178,17 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         }
         return listScrollpane;
     }
-    
+
     private JScrollPane getTextScrollpane() {
-        if(textScrollpane == null) {
+        if (textScrollpane == null) {
             textScrollpane = new JScrollPane();
             textScrollpane.setViewportView(getTaDetails());
         }
         return textScrollpane;
     }
-    
+
     private JTextArea getTaDetails() {
-        if(taDetails == null) {
+        if (taDetails == null) {
             taDetails = new JTextArea();
             taDetails.setText("Details...");
             taDetails.setWrapStyleWord(true);
@@ -210,67 +200,67 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
     private class LogListCellRenderer extends JLabel implements ListCellRenderer {
 
         private Color altColor = new Color(250, 250, 220);
-        
+
         public LogListCellRenderer() {
             setOpaque(true);
         }
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean hasFocus) {
-            LogRecord log = (LogRecord)value;
+            LogRecord log = (LogRecord) value;
             StringBuilder sb = new StringBuilder("<html>");
             sb.append(log.getMessage().replaceAll("\n", "<br>"));
             sb.append("</html>");
-            
+
             setText(sb.toString());
             setIcon(icons.get(log.getLevel()));
             setForeground(Color.BLACK);
-            
-            if(selected) {
+
+            if (selected) {
                 setBackground(UIManager.getColor("List.selectionBackground"));
             } else {
                 setBackground(index % 2 == 0 ? Color.WHITE : altColor);
             }
-            
+
             return this;
         }
-        
-        
+
     }
 
     private SimpleFormatter formatter = new SimpleFormatter();
+
     public void valueChanged(ListSelectionEvent e) {
         LogRecord log = (LogRecord) list.getSelectedValue();
-        if(log != null) {
+        if (log != null) {
             taDetails.setText(formatter.format(log));
             taDetails.setCaretPosition(0);
         }
     }
-    
+
     private class LogMessageListModel extends AbstractListModel {
 
         private List<LogRecord> messages = new ArrayList<LogRecord>();
-        
+
         public void addMessage(LogRecord message) {
             messages.add(message);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    fireIntervalAdded(this, messages.size()-1, messages.size()-1);
+                    fireIntervalAdded(this, messages.size() - 1, messages.size() - 1);
                 }
             });
         }
-        
+
         public void clear() {
             messages.clear();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    int lastIndex = Math.max(0, messages.size()-1);
+                    int lastIndex = Math.max(0, messages.size() - 1);
                     fireIntervalRemoved(this, 0, lastIndex);
                 }
             });
         }
-        
+
         @Override
         public int getSize() {
             return messages.size();
@@ -281,5 +271,5 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
             return messages.get(index);
         }
     }
-    
+
 }

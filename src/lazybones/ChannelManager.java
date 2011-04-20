@@ -1,4 +1,4 @@
-/* $Id: ChannelManager.java,v 1.6 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.7 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,17 +45,16 @@ import org.hampelratte.svdrp.util.ChannelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class ChannelManager {
 
     private static transient Logger logger = LoggerFactory.getLogger(ChannelManager.class);
-    
+
     private static ChannelManager instance;
-    
+
     private static Map<String, Channel> channelMapping = new Hashtable<String, Channel>();
 
     private List<Channel> channels = null;
-    
+
     private List<Channel> filteredChannels = new ArrayList<Channel>();
 
     public void update() {
@@ -63,11 +62,11 @@ public class ChannelManager {
         if (res != null && res.getCode() == 250) {
             try {
                 channels = ChannelParser.parse(res.getMessage(), true);
-                
+
                 // remove all non broadcast channels
                 for (Iterator<Channel> iter = channels.iterator(); iter.hasNext();) {
                     Channel channel = iter.next();
-                    if( !(channel instanceof BroadcastChannel) ) {
+                    if (!(channel instanceof BroadcastChannel)) {
                         iter.remove();
                     }
                 }
@@ -83,44 +82,44 @@ public class ChannelManager {
         }
         return instance;
     }
-    
+
     public List<Channel> getFilteredChannels() {
         filteredChannels.clear();
         int min = Integer.parseInt(LazyBones.getProperties().getProperty("minChannelNumber"));
         int max = Integer.parseInt(LazyBones.getProperties().getProperty("maxChannelNumber"));
 
         for (Channel chan : channels) {
-            if(chan.getChannelNumber() >= min && (chan.getChannelNumber() <= max || max == 0 )) {
+            if (chan.getChannelNumber() >= min && (chan.getChannelNumber() <= max || max == 0)) {
                 filteredChannels.add(chan);
             }
         }
-        
+
         return filteredChannels;
     }
-    
+
     public List<Channel> getChannels() {
         return channels;
     }
-    
+
     public void setChannels(List<Channel> channels) {
         this.channels = channels;
     }
 
     public Channel getChannelByNumber(int channelNumber) {
-        if(channels == null) {
+        if (channels == null) {
             return null;
         }
-        
+
         for (Iterator<Channel> iter = channels.iterator(); iter.hasNext();) {
             Channel chan = iter.next();
-            if(chan.getChannelNumber() == channelNumber) {
+            if (chan.getChannelNumber() == channelNumber) {
                 return chan;
             }
         }
-        
+
         return null;
     }
-    
+
     public static Map<String, Channel> getChannelMapping() {
         return channelMapping;
     }
@@ -128,10 +127,10 @@ public class ChannelManager {
     public static void setChannelMapping(Map<String, Channel> channelMapping) {
         ChannelManager.channelMapping = channelMapping;
     }
-    
+
     public devplugin.Channel getChannel(Timer timer) {
         devplugin.Channel chan = null;
-        for(String channelID : channelMapping.keySet()) {
+        for (String channelID : channelMapping.keySet()) {
             Channel channel = (Channel) ChannelManager.getChannelMapping().get(channelID);
             if (channel.getChannelNumber() == timer.getChannelNumber()) {
                 chan = getChannelById(channelID);
@@ -139,12 +138,12 @@ public class ChannelManager {
         }
         return chan;
     }
-    
+
     public devplugin.Channel getChannel(Channel chan) {
         devplugin.Channel tvbchan = null;
-        for(Entry<String, Channel> entry : channelMapping.entrySet()) {
+        for (Entry<String, Channel> entry : channelMapping.entrySet()) {
             Channel ctemp = entry.getValue();
-            if(ctemp.getChannelNumber() == chan.getChannelNumber()) {
+            if (ctemp.getChannelNumber() == chan.getChannelNumber()) {
                 tvbchan = getChannelById(entry.getKey());
             }
         }

@@ -1,4 +1,4 @@
-/* $Id: TimelineRowHeaderElement.java,v 1.7 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineRowHeaderElement.java,v 1.8 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,9 +45,9 @@ import util.ui.ChannelLabel;
 import devplugin.Channel;
 
 public class TimelineRowHeaderElement extends JPanel {
-    
+
     private Timer timer;
-    
+
     public TimelineRowHeaderElement(Timer timer) {
         this.timer = timer;
         initGUI();
@@ -56,31 +56,31 @@ public class TimelineRowHeaderElement extends JPanel {
     private void initGUI() {
         setBorder(new TimelineRowHeaderElementBorder(TimelineRowHeaderElementBorder.TOP));
         Channel tvbChannel = ChannelManager.getInstance().getChannel(timer);
-        if(tvbChannel != null) {
+        if (tvbChannel != null) {
             ChannelLabel label = new ChannelLabel(tvbChannel);
             add(label);
         } else {
             org.hampelratte.svdrp.responses.highlevel.Channel vdrChannel = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-            if(vdrChannel != null) {
+            if (vdrChannel != null) {
                 JLabel l = new JLabel(vdrChannel.getName());
                 l.setFont(l.getFont().deriveFont(Font.BOLD));
                 add(l);
             }
         }
     }
-    
+
     public class TimelineRowHeaderElementBorder implements Border {
         public static final int TOP = 1;
         public static final int BOTTOM = 2;
         public static final int LEFT = 4;
         public static final int RIGHT = 8;
-        
+
         private int borders = 0;
-        
+
         public TimelineRowHeaderElementBorder(int borders) {
             this.borders = borders;
         }
-        
+
         public Insets getBorderInsets(Component c) {
             int top = (borders & TOP) == TOP ? 1 : 0;
             int bottom = (borders & BOTTOM) == BOTTOM ? 1 : 0;

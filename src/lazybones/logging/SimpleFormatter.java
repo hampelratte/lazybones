@@ -1,4 +1,4 @@
-/* $Id: SimpleFormatter.java,v 1.3 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: SimpleFormatter.java,v 1.4 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,7 +36,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 public class SimpleFormatter extends Formatter {
-    
+
     @Override
     public String format(LogRecord record) {
         StringBuffer sb = new StringBuffer();

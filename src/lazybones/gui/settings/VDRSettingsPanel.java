@@ -1,4 +1,4 @@
-/* $Id: VDRSettingsPanel.java,v 1.5 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: VDRSettingsPanel.java,v 1.6 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,24 +67,19 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             tabbedPane.setPreferredSize(new Dimension(380, 380));
 
             generalPanel = new GeneralPanel();
-            tabbedPane.addTab(LazyBones.getTranslation("general", "General"), generalPanel
-					.getPanel());
+            tabbedPane.addTab(LazyBones.getTranslation("general", "General"), generalPanel.getPanel());
 
             channelPanel = new ChannelPanel();
-            tabbedPane.addTab(Localizer.getLocalization(Localizer.I18N_CHANNELS), channelPanel
-					.getPanel());
+            tabbedPane.addTab(Localizer.getLocalization(Localizer.I18N_CHANNELS), channelPanel.getPanel());
 
             playerPanel = new PlayerPanel();
-            tabbedPane.addTab(LazyBones.getTranslation("player", "Player"), playerPanel
-					.getPanel());
+            tabbedPane.addTab(LazyBones.getTranslation("player", "Player"), playerPanel.getPanel());
 
             timerPanel = new TimerPanel();
-            tabbedPane.addTab(LazyBones.getTranslation("timers", "Timers"), timerPanel
-					.getPanel());
+            tabbedPane.addTab(LazyBones.getTranslation("timers", "Timers"), timerPanel.getPanel());
 
             previewPanel = new ScreenshotSettingsPanel();
-            tabbedPane.addTab(LazyBones.getTranslation("remoteControl", "Remote control"), previewPanel
-					.getPanel());
+            tabbedPane.addTab(LazyBones.getTranslation("remoteControl", "Remote control"), previewPanel.getPanel());
         }
 
         JPanel p = new JPanel();
@@ -102,8 +97,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(ImageUtilities.createImageFromJar(
-                "lazybones/vdr16.png", VDRSettingsPanel.class));
+        return new ImageIcon(ImageUtilities.createImageFromJar("lazybones/vdr16.png", VDRSettingsPanel.class));
     }
 
     public String getTitle() {

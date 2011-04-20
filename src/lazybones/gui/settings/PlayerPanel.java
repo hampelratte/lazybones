@@ -1,4 +1,4 @@
-/* $Id: PlayerPanel.java,v 1.4 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: PlayerPanel.java,v 1.5 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,26 +42,17 @@ import javax.swing.JTextField;
 
 import lazybones.LazyBones;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
+ * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
+ * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class PlayerPanel {
 
-    private final String lSwitchBefore = LazyBones.getTranslation(
-            "switch_before", "Switch to channel before streaming");
+    private final String lSwitchBefore = LazyBones.getTranslation("switch_before", "Switch to channel before streaming");
 
-    private final String ttSwitchBefore = LazyBones.getTranslation(
-            "switch_before.tooltip", "This is useful, if you only have one DVB Tuner");
+    private final String ttSwitchBefore = LazyBones.getTranslation("switch_before.tooltip", "This is useful, if you only have one DVB Tuner");
 
     private JPanel panel;
     private JTextField urlRecordings;
@@ -81,105 +72,117 @@ public class PlayerPanel {
     public PlayerPanel() {
         initComponents();
     }
-    
+
     private void initComponents() {
-    	{
-    	    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    	    GridBagLayout panelLayout = new GridBagLayout();
-    	    panelLayout.rowWeights = new double[] {0.1};
-    	    panelLayout.rowHeights = new int[] {7};
-    	    panelLayout.columnWeights = new double[] {0.1};
-    	    panelLayout.columnWidths = new int[] {7};
-    	    panel.setLayout(panelLayout);
+        {
+            panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            GridBagLayout panelLayout = new GridBagLayout();
+            panelLayout.rowWeights = new double[] { 0.1 };
+            panelLayout.rowHeights = new int[] { 7 };
+            panelLayout.columnWeights = new double[] { 0.1 };
+            panelLayout.columnWidths = new int[] { 7 };
+            panel.setLayout(panelLayout);
             panel.setPreferredSize(new java.awt.Dimension(346, 183));
-	    	{
-	    		container = new JPanel();
-	    		panel.add(container, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-	    		GridBagLayout containerLayout = new GridBagLayout();
-	    		containerLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1};
-	    		containerLayout.rowHeights = new int[] {0, 0, 0, 0, 7};
-	    		containerLayout.columnWeights = new double[] {0.1, 0.1};
-	    		containerLayout.columnWidths = new int[] {7, 7};
-	    		container.setLayout(containerLayout);
-	    		{
-	    			lPlayer = new JLabel();
-	    			container.add(lPlayer, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-	    			lPlayer.setText(LazyBones.getTranslation("player","Player"));
-	    		}
-	    		{
-	    			player = new JTextField();
-	    			container.add(player, new GridBagConstraints(1, 0, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-	    		}
-	    		{
-	    			lParams = new JLabel();
-	    			container.add(lParams, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-	    			lParams.setText(LazyBones.getTranslation("params","Parameters"));
-	    		}
-	    		{
-	    			params = new JTextField();
-	    			container.add(params, new GridBagConstraints(1, 1, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-	    		}
-	    		{
-	    			streamType = new JComboBox();
-	    			container.add(streamType, new GridBagConstraints(1, 4, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-	    		}
-	    		{
-	    			dummy = new JPanel();
-	    			GridBagLayout dummyLayout = new GridBagLayout();
-	    			container.add(dummy, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-	    			dummyLayout.rowWeights = new double[] {0.1};
-	    			dummyLayout.rowHeights = new int[] {7};
-	    			dummyLayout.columnWeights = new double[] {0.1, 0.1};
-	    			dummyLayout.columnWidths = new int[] {7, 7};
-	    			dummy.setLayout(dummyLayout);
-	    			{
-	    				switchBefore = new JCheckBox();
-	    				switchBefore.setToolTipText(ttSwitchBefore);
-	    				dummy.add(switchBefore, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 5), 0, 0));
-	    			}
-	    			{
-                        dummy.add(new JLabel(lSwitchBefore), new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+            {
+                container = new JPanel();
+                panel.add(container, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0,
+                        0, 0), 0, 0));
+                GridBagLayout containerLayout = new GridBagLayout();
+                containerLayout.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1 };
+                containerLayout.rowHeights = new int[] { 0, 0, 0, 0, 7 };
+                containerLayout.columnWeights = new double[] { 0.1, 0.1 };
+                containerLayout.columnWidths = new int[] { 7, 7 };
+                container.setLayout(containerLayout);
+                {
+                    lPlayer = new JLabel();
+                    container.add(lPlayer, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                            new Insets(5, 5, 5, 5), 0, 0));
+                    lPlayer.setText(LazyBones.getTranslation("player", "Player"));
+                }
+                {
+                    player = new JTextField();
+                    container.add(player, new GridBagConstraints(1, 0, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+                            5, 5), 0, 0));
+                }
+                {
+                    lParams = new JLabel();
+                    container.add(lParams, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                            new Insets(5, 5, 5, 5), 0, 0));
+                    lParams.setText(LazyBones.getTranslation("params", "Parameters"));
+                }
+                {
+                    params = new JTextField();
+                    container.add(params, new GridBagConstraints(1, 1, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+                            5, 5), 0, 0));
+                }
+                {
+                    streamType = new JComboBox();
+                    container.add(streamType, new GridBagConstraints(1, 4, 1, 1, 0.9, 0.1, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(
+                            5, 5, 5, 5), 0, 0));
+                }
+                {
+                    dummy = new JPanel();
+                    GridBagLayout dummyLayout = new GridBagLayout();
+                    container.add(dummy, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
+                            0, 0));
+                    dummyLayout.rowWeights = new double[] { 0.1 };
+                    dummyLayout.rowHeights = new int[] { 7 };
+                    dummyLayout.columnWeights = new double[] { 0.1, 0.1 };
+                    dummyLayout.columnWidths = new int[] { 7, 7 };
+                    dummy.setLayout(dummyLayout);
+                    {
+                        switchBefore = new JCheckBox();
+                        switchBefore.setToolTipText(ttSwitchBefore);
+                        dummy.add(switchBefore, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0,
+                                0, 5), 0, 0));
                     }
-	    		}
-	    		{
-	    			lUrlRecordings = new JLabel();
-	    			container.add(lUrlRecordings, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                    lUrlRecordings.setText(LazyBones.getTranslation("url","URL") + " " +
-                            LazyBones.getTranslation("recordings","Recordings"));
-	    		}
-	    		{
-	    		    lURL = new JLabel();
-	    		    container.add(lURL, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-	    		    lURL.setText(LazyBones.getTranslation("url","URL"));
-	    		}
-	    		{
-	    		    url = new JTextField();
-	    		    container.add(url, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-	    		}
-	    		{
-	    		    lStreamtype = new JLabel();
-	    		    container.add(lStreamtype, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                    lStreamtype.setText(LazyBones.getTranslation("streamtype","Stream type"));
-	    		}
-	    		{
-	    		    urlRecordings = new JTextField();
-	    		    container.add(urlRecordings, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-	    		}
-	    	}
-    	}
+                    {
+                        dummy.add(new JLabel(lSwitchBefore), new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                new Insets(0, 0, 0, 0), 0, 0));
+                    }
+                }
+                {
+                    lUrlRecordings = new JLabel();
+                    container.add(lUrlRecordings, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+                            5, 5, 5), 0, 0));
+                    lUrlRecordings.setText(LazyBones.getTranslation("url", "URL") + " " + LazyBones.getTranslation("recordings", "Recordings"));
+                }
+                {
+                    lURL = new JLabel();
+                    container.add(lURL, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
+                            0, 0));
+                    lURL.setText(LazyBones.getTranslation("url", "URL"));
+                }
+                {
+                    url = new JTextField();
+                    container.add(url, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5,
+                            5), 0, 0));
+                }
+                {
+                    lStreamtype = new JLabel();
+                    container.add(lStreamtype, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5,
+                            5, 5), 0, 0));
+                    lStreamtype.setText(LazyBones.getTranslation("streamtype", "Stream type"));
+                }
+                {
+                    urlRecordings = new JTextField();
+                    container.add(urlRecordings, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                            new Insets(5, 5, 5, 5), 0, 0));
+                }
+            }
+        }
         player.setText(LazyBones.getProperties().getProperty("player"));
         params.setText(LazyBones.getProperties().getProperty("player_params"));
         url.setText(LazyBones.getProperties().getProperty("streamurl"));
         urlRecordings.setText(LazyBones.getProperties().getProperty("recording.url"));
-        switchBefore.setSelected(new Boolean(LazyBones.getProperties()
-                .getProperty("switchBefore")).booleanValue());
+        switchBefore.setSelected(new Boolean(LazyBones.getProperties().getProperty("switchBefore")).booleanValue());
         streamType.addItem("TS");
         streamType.addItem("PS");
         streamType.addItem("PES");
         streamType.addItem("ES");
         String streamString = LazyBones.getProperties().getProperty("streamtype");
-        for(int i=0; i<streamType.getItemCount(); i++) {
-            if(streamType.getItemAt(i).equals(streamString)) {
+        for (int i = 0; i < streamType.getItemCount(); i++) {
+            if (streamType.getItemAt(i).equals(streamString)) {
                 streamType.setSelectedIndex(i);
             }
         }
@@ -190,13 +193,12 @@ public class PlayerPanel {
         LazyBones.getProperties().setProperty("player_params", params.getText());
         LazyBones.getProperties().setProperty("streamurl", url.getText());
         LazyBones.getProperties().setProperty("recording.url", urlRecordings.getText());
-        LazyBones.getProperties().setProperty("switchBefore",
-                new Boolean(switchBefore.isSelected()).toString());
+        LazyBones.getProperties().setProperty("switchBefore", new Boolean(switchBefore.isSelected()).toString());
         LazyBones.getProperties().setProperty("streamtype", streamType.getSelectedItem().toString());
     }
 
     public JPanel getPanel() {
         return panel;
     }
-    
+
 }

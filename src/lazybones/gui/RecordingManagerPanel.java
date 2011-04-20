@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.20 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.21 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -72,9 +72,9 @@ import org.slf4j.LoggerFactory;
 import util.ui.Localizer;
 
 public class RecordingManagerPanel extends JPanel implements ActionListener {
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(RecordingManagerPanel.class);
-    
+
     private JScrollPane scrollPane = null;
     private JList recordingList = new JList(new RecordingsListAdapter());
     private EPGInfoPanel epgInfoPanel = new EPGInfoPanel();
@@ -82,7 +82,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
     private JButton buttonRemove = null;
 
     private JPopupMenu popup = new JPopupMenu();
-    
+
     public RecordingManagerPanel() {
         initGUI();
     }
@@ -93,71 +93,71 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
      */
     private void initGUI() {
         createContextMenu();
-        
+
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.insets = new java.awt.Insets(10,10,10,10);
+        gbc.insets = new java.awt.Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         recordingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         recordingList.setCellRenderer(new RecordingListCellRenderer());
         scrollPane = new JScrollPane(recordingList);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         this.add(scrollPane, gbc);
-        
-        //gbc.fill = java.awt.GridBagConstraints.VERTICAL;
+
+        // gbc.fill = java.awt.GridBagConstraints.VERTICAL;
         gbc.gridx = 1;
         gbc.weightx = .1;
-        gbc.insets = new java.awt.Insets(10,0,10,10);
+        gbc.insets = new java.awt.Insets(10, 0, 10, 10);
         recordingList.addListSelectionListener(epgInfoPanel);
         epgInfoPanel.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
-        epgInfoPanel.setPreferredSize(new Dimension(300,300));
-        epgInfoPanel.setMinimumSize(new Dimension(300,300));
-        epgInfoPanel.setMaximumSize(new Dimension(300,300));
+        epgInfoPanel.setPreferredSize(new Dimension(300, 300));
+        epgInfoPanel.setMinimumSize(new Dimension(300, 300));
+        epgInfoPanel.setMaximumSize(new Dimension(300, 300));
         this.add(epgInfoPanel, gbc);
-        
-        gbc.insets = new java.awt.Insets(0,10,10,10);
+
+        gbc.insets = new java.awt.Insets(0, 10, 10, 10);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weighty = 0;
-        buttonSync = new JButton(LazyBones.getTranslation("resync","Synchronize"));
+        buttonSync = new JButton(LazyBones.getTranslation("resync", "Synchronize"));
         buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
         buttonSync.addActionListener(this);
         buttonSync.setActionCommand("SYNC");
         this.add(buttonSync, gbc);
-        
-        gbc.insets = new java.awt.Insets(0,0,10,10);
+
+        gbc.insets = new java.awt.Insets(0, 0, 10, 10);
         gbc.gridx = 1;
-        buttonRemove = new JButton(LazyBones.getTranslation("delete_recording","Delete Recording"));
+        buttonRemove = new JButton(LazyBones.getTranslation("delete_recording", "Delete Recording"));
         buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
         buttonRemove.addActionListener(this);
         buttonRemove.setActionCommand("DELETE");
         this.add(buttonRemove, gbc);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         Recording rec = null;
         boolean itemSelected = false;
         int selectedRow = recordingList.getSelectedIndex();
-        if(selectedRow >= 0 && selectedRow < recordingList.getModel().getSize()) {
+        if (selectedRow >= 0 && selectedRow < recordingList.getModel().getSize()) {
             itemSelected = true;
             rec = (Recording) recordingList.getModel().getElementAt(selectedRow);
         }
-        if("DELETE".equals(e.getActionCommand()) && itemSelected) {
+        if ("DELETE".equals(e.getActionCommand()) && itemSelected) {
             deleteRecording(rec);
-        } else if("INFO".equals(e.getActionCommand()) && itemSelected) {
+        } else if ("INFO".equals(e.getActionCommand()) && itemSelected) {
             createEPGInfoDialog(rec);
-        } else if("SYNC".equals(e.getActionCommand())) {
+        } else if ("SYNC".equals(e.getActionCommand())) {
             RecordingManager.getInstance().synchronize();
-        } else if("PLAY".equals(e.getActionCommand()) && itemSelected) {
+        } else if ("PLAY".equals(e.getActionCommand()) && itemSelected) {
             Player.play(rec);
-        } else if("PLAY_ON_VDR".equals(e.getActionCommand()) && itemSelected) {
+        } else if ("PLAY_ON_VDR".equals(e.getActionCommand()) && itemSelected) {
             RecordingManager.getInstance().playOnVdr(rec);
-        } 
+        }
     }
 
     private void deleteRecording(Recording rec) {
@@ -167,12 +167,12 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         final boolean hasFocus = recordingList.hasFocus();
         VDRCallback callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
-                if(!cmd.isSuccess()) {
+                if (!cmd.isSuccess()) {
                     logger.error(cmd.getResponse().getMessage());
                     recordingList.setEnabled(true);
                     buttonRemove.setEnabled(true);
                     buttonSync.setEnabled(true);
-                    if(hasFocus) {
+                    if (hasFocus) {
                         recordingList.requestFocus();
                     }
                 } else {
@@ -182,7 +182,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
                             recordingList.setEnabled(true);
                             buttonRemove.setEnabled(true);
                             buttonSync.setEnabled(true);
-                            if(hasFocus) {
+                            if (hasFocus) {
                                 recordingList.requestFocus();
                             }
                         }
@@ -196,16 +196,16 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
 
     private void createEPGInfoDialog(Recording rec) {
         final JDialog dialog = new JDialog();
-        if(rec.getEpgInfo() == null) {
+        if (rec.getEpgInfo() == null) {
             RecordingManager.getInstance().loadInfo(rec);
         }
         dialog.getContentPane().add(new EPGInfoPanel(rec.getEpgInfo()));
-        dialog.setSize(400,300);
+        dialog.setSize(400, 300);
         dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());
         dialog.setVisible(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     }
-    
+
     private void createContextMenu() {
         JMenuItem menuDelete = new JMenuItem(Localizer.getLocalization(Localizer.I18N_DELETE));
         menuDelete.addActionListener(this);
@@ -235,20 +235,27 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         popup.add(menuPlay);
         popup.add(menuDelete);
         popup.add(menuSync);
-        
+
         recordingList.addMouseListener(new MouseListener() {
             public void mousePressed(MouseEvent e) {
                 mayTriggerPopup(e);
             }
-            public void mouseClicked(MouseEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
+
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            public void mouseExited(MouseEvent e) {
+            }
+
             public void mouseReleased(MouseEvent e) {
                 mayTriggerPopup(e);
             }
-            
+
             private void mayTriggerPopup(MouseEvent e) {
-                if(e.isPopupTrigger()) {
+                if (e.isPopupTrigger()) {
                     int selectedRow = recordingList.locationToIndex(e.getPoint());
                     recordingList.setSelectedIndex(selectedRow);
                     popup.setLocation(e.getPoint());
@@ -259,25 +266,25 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         recordingList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_DELETE) {
-                    Recording rec = (Recording)recordingList.getSelectedValue();
-                    if(rec != null) {
+                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    Recording rec = (Recording) recordingList.getSelectedValue();
+                    if (rec != null) {
                         deleteRecording(rec);
                     }
                 }
             }
         });
     }
-    
+
     private class RecordingsListAdapter extends AbstractListModel implements Observer {
 
         private RecordingManager rm = RecordingManager.getInstance();
-        
+
         public RecordingsListAdapter() {
             rm.addObserver(this);
             Collections.sort(rm.getRecordings(), new AlphabeticalRecordingComparator());
         }
-        
+
         @Override
         public int getSize() {
             return rm.getRecordings() != null ? rm.getRecordings().size() : 0;
@@ -291,9 +298,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         @Override
         public void update(Observable o, Object arg) {
             Collections.sort(rm.getRecordings(), new AlphabeticalRecordingComparator());
-            fireContentsChanged(this, 0, rm.getRecordings().size()-1);
+            fireContentsChanged(this, 0, rm.getRecordings().size() - 1);
         }
-        
+
         @Override
         protected void fireContentsChanged(Object source, int start, int end) {
             super.fireContentsChanged(source, start, end);

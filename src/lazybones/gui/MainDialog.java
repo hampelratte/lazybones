@@ -1,4 +1,4 @@
-/* $Id: MainDialog.java,v 1.18 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: MainDialog.java,v 1.19 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -54,16 +54,16 @@ import util.ui.WindowClosingIf;
 public class MainDialog extends JDialog implements WindowClosingIf {
 
     private RemoteControl remoteControl = new RemoteControl();
-    
+
     private ScreenshotPanel screenshotPanel = new ScreenshotPanel();
-    
+
     private JTabbedPane tabbedPane = new JTabbedPane();
-    
+
     private TimelinePanel timelinePanel;
-    
+
     private static final int INDEX_TIMELINE = 0;
     private static final int INDEX_RC = 3;
-    
+
     public MainDialog(Frame parent, String title, boolean modal) {
         super(parent, title, modal);
         initGUI();
@@ -73,21 +73,23 @@ public class MainDialog extends JDialog implements WindowClosingIf {
     private void initGUI() {
         JPanel rcPanel = new JPanel();
         rcPanel.setLayout(new GridBagLayout());
-        rcPanel.add(remoteControl, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-        rcPanel.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        rcPanel.add(remoteControl, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5),
+                0, 0));
+        rcPanel.add(screenshotPanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
+                new Insets(5, 5, 5, 5), 0, 0));
         screenshotPanel.setPreferredSize(new Dimension(720, 540));
         timelinePanel = new TimelinePanel();
-        
-        // !! don't change the order without changing INDEX_TIMELINE and INDEX_RC !!  
+
+        // !! don't change the order without changing INDEX_TIMELINE and INDEX_RC !!
         tabbedPane.add(LazyBones.getTranslation("timeline", "Timeline"), timelinePanel);
         tabbedPane.add(LazyBones.getTranslation("timers", "Timers"), new TimerManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("recordings", "Recordings"), new RecordingManagerPanel());
         tabbedPane.add(LazyBones.getTranslation("remoteControl", "Remote Control"), rcPanel);
-        
-        if(Boolean.parseBoolean(LazyBones.getProperties().getProperty("upload.enabled"))) {
+
+        if (Boolean.parseBoolean(LazyBones.getProperties().getProperty("upload.enabled"))) {
             tabbedPane.add("Data upload", new DataUploadPanel());
         }
-        
+
         this.add(tabbedPane);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
@@ -95,10 +97,10 @@ public class MainDialog extends JDialog implements WindowClosingIf {
                 setVisible(false);
             }
         });
-        
+
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if(isVisible() && tabbedPane.getSelectedIndex() == INDEX_RC) {
+                if (isVisible() && tabbedPane.getSelectedIndex() == INDEX_RC) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -111,10 +113,10 @@ public class MainDialog extends JDialog implements WindowClosingIf {
                 }
             }
         });
-        
+
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         this.pack();
-        
+
         // position lazy bones centered on tvb
         int parentWidth = LazyBones.getInstance().getParent().getWidth();
         int parentHeight = LazyBones.getInstance().getParent().getHeight();
@@ -124,10 +126,10 @@ public class MainDialog extends JDialog implements WindowClosingIf {
         int posY = (parentHeight - getHeight()) / 2;
         setLocation(parentX + posX, parentY + posY);
     }
-    
+
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        if(visible && tabbedPane.getSelectedIndex() == INDEX_RC) {
+        if (visible && tabbedPane.getSelectedIndex() == INDEX_RC) {
             remoteControl.updateVolume();
             screenshotPanel.startGrabbing();
         } else {

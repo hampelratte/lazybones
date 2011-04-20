@@ -1,4 +1,4 @@
-/* $Id: ChannelPanel.java,v 1.8 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: ChannelPanel.java,v 1.9 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -70,7 +70,7 @@ public class ChannelPanel implements ActionListener {
     private JButton up = new JButton();
 
     private JButton down = new JButton();
-    
+
     private JButton assign = new JButton();
 
     private JButton remove = new JButton();
@@ -78,23 +78,23 @@ public class ChannelPanel implements ActionListener {
     private JButton refresh = new JButton(LazyBones.getTranslation("refresh_channels", "Refresh"));
 
     private JButton autoAssign = new JButton(LazyBones.getTranslation("sort_channels", "Sort"));
-    
+
     private JScrollPane tableScrollpane;
-    
+
     private JScrollPane listScrollpane;
-    
+
     private JList list = new JList();
-    
+
     private JTable table = new JTable();
-    
-    private JSpinner minChannelNumber = new JSpinner(new SpinnerNumberModel(0,0,10000,1));
-    
-    private JSpinner maxChannelNumber = new JSpinner(new SpinnerNumberModel(0,0,10000,1));
+
+    private JSpinner minChannelNumber = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+
+    private JSpinner maxChannelNumber = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
 
     public ChannelPanel() {
         initComponents();
     }
-    
+
     private void initComponents() {
         up.setIcon(LazyBones.getInstance().createImageIcon("action", "go-up", 16));
         down.setIcon(LazyBones.getInstance().createImageIcon("action", "go-down", 16));
@@ -121,20 +121,20 @@ public class ChannelPanel implements ActionListener {
         table.setRowHeight(23);
         table.setDragEnabled(true);
         table.setTransferHandler(new TableTransferHandler(list));
-        
+
         list.setCellRenderer(new ChannelListCellrenderer());
         list.setModel(new DefaultListModel());
         list.setDragEnabled(true);
         list.setTransferHandler(new ListTransferHandler());
-        
+
         tableScrollpane = new JScrollPane(table);
         listScrollpane = new JScrollPane(list);
-        
+
         String minChannel = LazyBones.getProperties().getProperty("minChannelNumber");
         minChannelNumber.setValue(new Integer(minChannel));
         String maxChannel = LazyBones.getProperties().getProperty("maxChannelNumber");
         maxChannelNumber.setValue(new Integer(maxChannel));
-        
+
         refresh.addActionListener(this);
         autoAssign.addActionListener(this);
         up.addActionListener(this);
@@ -146,10 +146,10 @@ public class ChannelPanel implements ActionListener {
     public JPanel getPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
-        
+        gbc.insets = new Insets(5, 5, 5, 5);
+
         // table
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -167,8 +167,8 @@ public class ChannelPanel implements ActionListener {
         gbc.gridheight = 1;
         gbc.weightx = 1.0;
         panel.add(listScrollpane, gbc);
-        
-        // channel interval spinner 
+
+        // channel interval spinner
         JPanel channelInterval = new JPanel();
         channelInterval.add(new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNELS)));
         channelInterval.add(minChannelNumber);
@@ -177,20 +177,20 @@ public class ChannelPanel implements ActionListener {
         gbc.gridx = 4;
         gbc.gridy = 1;
         gbc.weighty = 0.0;
-        gbc.insets = new Insets(0,0,0,0);
+        gbc.insets = new Insets(0, 0, 0, 0);
         panel.add(channelInterval, gbc);
-        
+
         // assign buttons
-        JPanel assignButtonPanel = new JPanel(new GridLayout(2,1,0,5));
+        JPanel assignButtonPanel = new JPanel(new GridLayout(2, 1, 0, 5));
         assignButtonPanel.add(assign);
         assignButtonPanel.add(remove);
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.gridheight = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(assignButtonPanel, gbc);
-        
+
         // autoAssign
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -198,25 +198,25 @@ public class ChannelPanel implements ActionListener {
         gbc.weighty = 0.0;
         gbc.gridheight = 1;
         panel.add(autoAssign, gbc);
-        
+
         // up
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         panel.add(up, gbc);
-        
+
         // down
         gbc.gridx = 2;
         gbc.gridy = 2;
         panel.add(down, gbc);
-        
+
         // refresh
         gbc.gridx = 4;
         gbc.gridy = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(refresh, gbc);
-        
+
         return panel;
     }
 
@@ -226,7 +226,7 @@ public class ChannelPanel implements ActionListener {
         } else if (e.getSource() == autoAssign) {
             try {
                 tryToAssignChannels();
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else if (e.getSource() == up) {
@@ -259,7 +259,7 @@ public class ChannelPanel implements ActionListener {
             int[] rows = table.getSelectedRows();
             for (int i = 0; i < rows.length; i++) {
                 Object channel = table.getValueAt(rows[i], 1);
-                if(channel != null) {
+                if (channel != null) {
                     DefaultListModel model = (DefaultListModel) list.getModel();
                     model.addElement(channel);
                     table.setValueAt(null, rows[i], 1);
@@ -268,19 +268,19 @@ public class ChannelPanel implements ActionListener {
         } else if (e.getSource() == assign) {
             int[] rows = list.getSelectedIndices();
             int tableRow = table.getSelectedRow();
-            if(tableRow < 0) {
+            if (tableRow < 0) {
                 return;
             }
-            
+
             for (int i = rows.length - 1; i >= 0; i--) {
                 int row = tableRow + i;
-                if(row > table.getRowCount()-1) {
+                if (row > table.getRowCount() - 1) {
                     continue;
                 }
-                    
+
                 Object tableValue = table.getValueAt(row, 1);
                 DefaultListModel model = (DefaultListModel) list.getModel();
-                if(tableValue != null) {
+                if (tableValue != null) {
                     model.addElement(tableValue);
                 }
                 table.setValueAt(model.getElementAt(rows[i]), row, 1);
@@ -293,7 +293,7 @@ public class ChannelPanel implements ActionListener {
         // set min and max channel number
         LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
         LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
-        
+
         try {
             DefaultListModel model = (DefaultListModel) list.getModel();
             model.clear();
@@ -304,7 +304,7 @@ public class ChannelPanel implements ActionListener {
                 for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
                     Channel chan = iter.next();
                     int index = getChannelIndex(chan);
-                    if(index == -1) {
+                    if (index == -1) {
                         model.addElement(chan);
                     }
                 }
@@ -313,26 +313,25 @@ public class ChannelPanel implements ActionListener {
             ex.printStackTrace();
         }
     }
-    
+
     private int getChannelIndex(Channel chan) {
-        for(int i = 0; i<tableModel.getRowCount(); i++) {
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
             Object o = tableModel.getValueAt(i, 1);
-            if(o != null && o instanceof Channel) {
+            if (o != null && o instanceof Channel) {
                 Channel c = (Channel) o;
-                if(c.equals(chan)) {
+                if (c.equals(chan)) {
                     return i;
                 }
             }
         }
-        
+
         return -1;
     }
 
     private void restoreSelection(int[] indices) {
         table.getSelectionModel().setSelectionInterval(indices[0], indices[0]);
         for (int i = 1; i < indices.length; i++) {
-            table.getSelectionModel().addSelectionInterval(indices[i],
-                    indices[i]);
+            table.getSelectionModel().addSelectionInterval(indices[i], indices[i]);
         }
     }
 
@@ -355,8 +354,8 @@ public class ChannelPanel implements ActionListener {
         // set min and max channel number
         LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
         LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
-        
-        Hashtable<String,Channel> channelMapping = new Hashtable<String,Channel>();
+
+        Hashtable<String, Channel> channelMapping = new Hashtable<String, Channel>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             devplugin.Channel c = (devplugin.Channel) tableModel.getValueAt(i, 0);
 
@@ -371,17 +370,17 @@ public class ChannelPanel implements ActionListener {
         }
         ChannelManager.setChannelMapping(channelMapping);
     }
-    
+
     public void tryToAssignChannels() {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             ArrayList<Container> list = new ArrayList<Container>();
-            Object tvbc = tableModel.getValueAt(i,0);
-            if(tvbc == null) {
+            Object tvbc = tableModel.getValueAt(i, 0);
+            if (tvbc == null) {
                 continue;
             }
-            String tvbChan = ((devplugin.Channel)tvbc).getName();
+            String tvbChan = ((devplugin.Channel) tvbc).getName();
             tvbChan = tvbChan.toLowerCase();
-            
+
             DefaultListModel listModel = (DefaultListModel) this.list.getModel();
             for (int j = 0; j < listModel.getSize(); j++) {
                 Object o = listModel.getElementAt(j);
@@ -391,26 +390,26 @@ public class ChannelPanel implements ActionListener {
                 int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
                 list.add(new Container(percent, i, chan));
             }
-            
+
             Collections.sort(list);
-            if(list.size() <= 0) {
+            if (list.size() <= 0) {
                 return;
             }
-            Container c = list.get(list.size()-1);
+            Container c = list.get(list.size() - 1);
             int index = c.getIndex();
             Object o = tableModel.getValueAt(index, 1);
-            if( o == null || "".equals(o.toString()) ) {
+            if (o == null || "".equals(o.toString())) {
                 tableModel.setValueAt(c.getChannel(), index, 1);
                 listModel.removeElement(c.getChannel());
             }
         }
     }
-    
+
     private class Container implements Comparable<Container> {
         private int percent;
         private int index;
         private Channel channel;
-        
+
         Container(int percent, int index, Channel channel) {
             this.percent = percent;
             this.index = index;
@@ -418,25 +417,25 @@ public class ChannelPanel implements ActionListener {
         }
 
         public int compareTo(Container c) {
-            if(c.getPercent() == percent) {
+            if (c.getPercent() == percent) {
                 return 0;
-            } else if(percent < c.getPercent()) {
+            } else if (percent < c.getPercent()) {
                 return -1;
             } else {
                 return 1;
             }
         }
-        
+
         public int getPercent() {
             return percent;
         }
-        
+
         public int getIndex() {
             return index;
         }
-        
+
         public String toString() {
-            return percent+"% "+index + " " + channel.toString();
+            return percent + "% " + index + " " + channel.toString();
         }
 
         public Channel getChannel() {

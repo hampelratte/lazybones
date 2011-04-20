@@ -1,4 +1,4 @@
-/* $Id: DurationCriterion.java,v 1.2 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: DurationCriterion.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,29 +39,28 @@ import org.slf4j.LoggerFactory;
 import devplugin.Program;
 
 /**
- * Compares the duration of a {@link Program} and {@link Timer} and returns
- * the percentage of equality
+ * Compares the duration of a {@link Program} and {@link Timer} and returns the percentage of equality
  * 
  * @author <a href="hampelratte@users.berlios.de">hampelratte@users.berlios.de</a>
  */
 public class DurationCriterion extends AbstractCriterion {
 
     private static transient Logger logger = LoggerFactory.getLogger(DurationCriterion.class);
-    
+
     public int evaluate(Program prog, Timer timer) {
         // program duration in minutes
         int durationProg = prog.getLength();
-        
+
         // timer duration in minutes
         Timer bufferless = timer.getTimerWithoutBuffers();
         long start = bufferless.getStartTime().getTimeInMillis();
         long end = bufferless.getEndTime().getTimeInMillis();
         long durationInMillis = end - start;
         int durationTimer = (int) TimeUnit.MILLISECONDS.toMinutes(durationInMillis);
-        
+
         // return 100% - the difference in minutes
         int percentage = 100 - Math.abs(durationTimer - durationProg);
-        logger.trace("DurationCriterion for timer {} and prog {}: {}", new Object[] {timer.getTitle(), prog.getTitle(), percentage});
+        logger.trace("DurationCriterion for timer {} and prog {}: {}", new Object[] { timer.getTitle(), prog.getTitle(), percentage });
         return percentage;
     }
 

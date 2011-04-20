@@ -1,4 +1,4 @@
-/* $Id: Timeline.java,v 1.2 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: Timeline.java,v 1.3 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,32 +36,30 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
-
 public class Timeline extends JPanel {
 
     private TimelineList list = null;
-    
+
     private JScrollPane scrollPane = new JScrollPane();
-    
+
     public Timeline() {
         setLayout(new BorderLayout());
         initGUI();
     }
-    
+
     private void initGUI() {
         int rowHeight = 40;
         int padding = 0;
-        
+
         list = new TimelineList(rowHeight, padding);
-        
+
         TimelineRowHeader rowHeader = new TimelineRowHeader(list, rowHeight, padding);
         scrollPane.setRowHeaderView(rowHeader);
         scrollPane.setColumnHeaderView(new TimelineHeader());
         scrollPane.setViewportView(list);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane);
-        
+
         scrollPane.getViewport().addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 list.revalidate();

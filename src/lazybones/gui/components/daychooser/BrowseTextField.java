@@ -1,4 +1,4 @@
-/* $Id: BrowseTextField.java,v 1.4 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: BrowseTextField.java,v 1.5 2011-04-20 12:09:15 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,8 +42,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 
-
-
 public class BrowseTextField extends JPanel implements ActionListener, PropertyChangeListener {
 
     private JToggleButton button = new JToggleButton("...");
@@ -57,8 +55,7 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
         panel.setTextField(textfield);
 
         /*
-         * panel.setBackground(UIManager.getColor("ToolTip.background")); for
-         * (int i = 0; i < panel.getComponents().length; i++) {
+         * panel.setBackground(UIManager.getColor("ToolTip.background")); for (int i = 0; i < panel.getComponents().length; i++) {
          * panel.getComponent(i).setBackground(UIManager.getColor("ToolTip.background")); }
          */
 
@@ -75,7 +72,7 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
         JPopupMenu menu = new JPopupMenu();
         menu.add(panel);
         menu.setBorder(BorderFactory.createLineBorder(Color.RED));
-        menu.show(button,x,y);
+        menu.show(button, x, y);
         menu.addPropertyChangeListener(this);
     }
 
@@ -97,14 +94,14 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
     public void setText(String text) {
         textfield.setText(text);
     }
-    
+
     public String getText() {
         return textfield.getText();
     }
 
     public void propertyChange(PropertyChangeEvent pce) {
-        if( "visible".equals(pce.getPropertyName()) ) {
-            if( ((Boolean)pce.getNewValue()).booleanValue() == false ) {
+        if ("visible".equals(pce.getPropertyName())) {
+            if (((Boolean) pce.getNewValue()).booleanValue() == false) {
                 button.setSelected(false);
             }
         }

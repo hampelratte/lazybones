@@ -1,4 +1,4 @@
-/* $Id: NavigationBlock.java,v 1.6 2011-01-18 13:13:52 hampelratte Exp $
+/* $Id: NavigationBlock.java,v 1.7 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -61,7 +61,7 @@ public class NavigationBlock extends JPanel {
     JButton bRight = new JButton();
 
     JButton bOk = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
-    
+
     public NavigationBlock() {
         initGUI();
     }
@@ -84,7 +84,7 @@ public class NavigationBlock extends JPanel {
         bLeft.addActionListener(Controller.getController());
         bRight.addActionListener(Controller.getController());
         bOk.addActionListener(Controller.getController());
-        
+
         bUp.setIcon(LazyBones.getInstance().createImageIcon("action", "go-up", 16));
         bDown.setIcon(LazyBones.getInstance().createImageIcon("action", "go-down", 16));
         bLeft.setIcon(LazyBones.getInstance().createImageIcon("action", "go-previous", 16));

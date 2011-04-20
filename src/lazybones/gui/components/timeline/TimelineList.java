@@ -1,4 +1,4 @@
-/* $Id: TimelineList.java,v 1.12 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineList.java,v 1.13 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -59,14 +59,15 @@ public class TimelineList extends JPanel implements Observer {
         this.padding = padding;
         setLayout(new TimelineLayout(rowHeight, padding));
         TimerManager.getInstance().addObserver(this);
-        
+
         Thread repainter = new Thread() {
             public void run() {
-                while(true) {
+                while (true) {
                     try {
                         Thread.sleep(10 * 1000);
                         repaint();
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
         };
@@ -81,58 +82,58 @@ public class TimelineList extends JPanel implements Observer {
     public void addTimer(Timer timer) {
         for (int i = 0; i < data.size(); i++) {
             Timer t = (Timer) data.get(i);
-            if(t.getChannelNumber() > timer.getChannelNumber()) {
+            if (t.getChannelNumber() > timer.getChannelNumber()) {
                 data.add(i, timer);
                 fireTimelineChanged();
                 return;
             }
         }
-        
+
         // the channelNumber was greater than the channelNumber of the other timers
         // -> add this timer at the end of the table
         data.add(timer);
         fireTimelineChanged();
     }
-    
+
     public void removeTimer(Timer timer) {
         int index = data.indexOf(timer);
-        if(index >= 0) {
+        if (index >= 0) {
             data.remove(timer);
             fireTimelineChanged();
         }
     }
-    
+
     public void clear() {
         data.clear();
         fireTimelineChanged();
     }
-    
+
     private void fireTimelineChanged() {
         this.removeAll();
         for (Timer timer : data) {
             TimelineElement te = new TimelineElement(timer, getCalendar());
             add(te);
         }
-        
+
         for (TimelineListener l : listeners) {
             l.timelineChanged(data);
         }
-        
+
         revalidate();
         repaint();
     }
-    
+
     public Calendar getCalendar() {
         return calendar;
     }
 
     public void setCalendar(Calendar calendar) {
-        this.calendar = (Calendar)calendar.clone();
+        this.calendar = (Calendar) calendar.clone();
         this.calendar.set(Calendar.HOUR_OF_DAY, 0);
         this.calendar.set(Calendar.MINUTE, 0);
         this.calendar.set(Calendar.SECOND, 0);
         this.calendar.set(Calendar.MILLISECOND, 0);
-        
+
         showTimersForCurrentDate(TimerManager.getInstance().getTimers());
     }
 
@@ -143,83 +144,81 @@ public class TimelineList extends JPanel implements Observer {
         // paint row background
         Color altColor = new Color(250, 250, 220);
         for (int i = 0; i < getComponentCount(); i++) {
-            g.setColor( i % 2 == 0 ? Color.WHITE : altColor);
-            g.fillRect(0, i*(rowHeight + padding), getWidth(), (rowHeight + padding));
+            g.setColor(i % 2 == 0 ? Color.WHITE : altColor);
+            g.fillRect(0, i * (rowHeight + padding), getWidth(), (rowHeight + padding));
         }
-        
+
         // paint vertical lines
         g.setColor(Color.LIGHT_GRAY);
-        double pixelsPerHour = (double)(getWidth()-1) / (double)24;
+        double pixelsPerHour = (double) (getWidth() - 1) / (double) 24;
         for (int i = 0; i < 25; i++) {
-            g.drawLine((int)(i * pixelsPerHour), 0, (int)(i * pixelsPerHour), getHeight());
+            g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), getHeight());
         }
     }
-    
+
     @Override
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
-        
+
         // paint current time line
         Calendar currentTime = Calendar.getInstance();
-        if(isToday(getCalendar())) { // are we showing the current day ?
-            g.setColor(new Color(255,0,0,128));
-            double pixelsPerMinute = (double)(getWidth()-1) / (double)(24 * 60);
+        if (isToday(getCalendar())) { // are we showing the current day ?
+            g.setColor(new Color(255, 0, 0, 128));
+            double pixelsPerMinute = (double) (getWidth() - 1) / (double) (24 * 60);
             int minute = currentTime.get(Calendar.MINUTE);
             minute += currentTime.get(Calendar.HOUR_OF_DAY) * 60;
-            int position = (int)(minute * pixelsPerMinute); 
+            int position = (int) (minute * pixelsPerMinute);
             g.drawLine(position, 0, position, getHeight());
         }
     }
-    
-    
+
     /**
      * Returns, if the day of the given calendar is today
+     * 
      * @param cal
      */
     private boolean isToday(Calendar cal) {
         Calendar today = Calendar.getInstance();
-        if(today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR) 
-                && today.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
-                && today.get(Calendar.YEAR) == cal.get(Calendar.YEAR))
-        {
+        if (today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR) && today.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
+                && today.get(Calendar.YEAR) == cal.get(Calendar.YEAR)) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     public void showTimersForCurrentDate(List<Timer> timers) {
         clear();
         for (Timer timer : timers) {
-            if(runsOnCurrentDate(timer)) {
+            if (runsOnCurrentDate(timer)) {
                 addTimer(timer);
             }
         }
     }
-    
+
     public void update(Observable o, Object arg) {
-        if(o == TimerManager.getInstance()) {
-            if(arg instanceof TimersChangedEvent) {
+        if (o == TimerManager.getInstance()) {
+            if (arg instanceof TimersChangedEvent) {
                 TimersChangedEvent tce = (TimersChangedEvent) arg;
-                switch(tce.getType()) {
+                switch (tce.getType()) {
                 case TimersChangedEvent.ALL:
                     List<Timer> timers = tce.getTimers();
                     clear();
                     for (Timer timer : timers) {
-                        if(runsOnCurrentDate(timer)) {
+                        if (runsOnCurrentDate(timer)) {
                             addTimer(timer);
                         }
                     }
                     break;
                 case TimersChangedEvent.TIMER_ADDED:
                     Timer timer = tce.getTimer();
-                    if(runsOnCurrentDate(timer)) {
+                    if (runsOnCurrentDate(timer)) {
                         addTimer(timer);
                     }
                     break;
                 case TimersChangedEvent.TIMER_REMOVED:
                     timer = tce.getTimer();
-                    if(runsOnCurrentDate(timer)) {
+                    if (runsOnCurrentDate(timer)) {
                         removeTimer(timer);
                     }
                     break;
@@ -227,24 +226,23 @@ public class TimelineList extends JPanel implements Observer {
             }
         }
     }
-    
+
     private boolean runsOnCurrentDate(Timer timer) {
         Calendar nextDate = (Calendar) getCalendar().clone();
         nextDate.add(Calendar.DAY_OF_MONTH, 1);
-        
-        if( timer.getStartTime().after(getCalendar()) & timer.getStartTime().before(nextDate) 
-                || timer.getEndTime().after(getCalendar()) & timer.getEndTime().before(nextDate)) 
-        {
+
+        if (timer.getStartTime().after(getCalendar()) & timer.getStartTime().before(nextDate) || timer.getEndTime().after(getCalendar())
+                & timer.getEndTime().before(nextDate)) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     public void addTimelineListener(TimelineListener l) {
         listeners.add(l);
     }
-    
+
     public void removeTimelineListener(TimelineListener l) {
         listeners.remove(l);
     }

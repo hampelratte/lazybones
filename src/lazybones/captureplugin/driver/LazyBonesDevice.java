@@ -1,4 +1,4 @@
-/* $Id: LazyBonesDevice.java,v 1.4 2011-01-18 13:13:57 hampelratte Exp $
+/* $Id: LazyBonesDevice.java,v 1.5 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,33 +46,33 @@ import devplugin.Program;
 import devplugin.ProgramReceiveTarget;
 
 public class LazyBonesDevice implements DeviceIf {
-    
+
     public static final String TARGET_CAPTURE_PLUGIN_ADD = "capture_plugin_add";
     public static final String TARGET_CAPTURE_PLUGIN_REMOVE = "capture_plugin_remove";
 
     private List<Program> programs = new ArrayList<Program>();
-    
+
     private String name;
-    
+
     private DriverIf driver;
-    
+
     private PluginAccess lazyBones;
     private ProgramReceiveTarget addTarget;
     private ProgramReceiveTarget removeTarget;
-    
+
     public LazyBonesDevice(String name, DriverIf driver) {
         this.name = name;
         this.driver = driver;
-        
+
         PluginManager pm = PluginManagerImpl.getInstance();
         lazyBones = pm.getActivatedPluginForId("java.lazybones.LazyBones");
-        
+
         addTarget = new ProgramReceiveTarget(lazyBones, "Lazy Bones", TARGET_CAPTURE_PLUGIN_ADD);
         removeTarget = new ProgramReceiveTarget(lazyBones, "Lazy Bones", TARGET_CAPTURE_PLUGIN_REMOVE);
     }
-    
+
     public boolean add(Window parent, Program program) {
-        lazyBones.receivePrograms(new Program[] {program}, addTarget);
+        lazyBones.receivePrograms(new Program[] { program }, addTarget);
         return programs.add(program);
     }
 
@@ -83,7 +83,7 @@ public class LazyBonesDevice implements DeviceIf {
 
     public void configDevice(Window parent) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public boolean executeAdditionalCommand(Window parent, int num, Program program) {
@@ -127,11 +127,11 @@ public class LazyBonesDevice implements DeviceIf {
 
     public void readData(ObjectInputStream stream, boolean importDevice) throws IOException, ClassNotFoundException {
         // TODO Auto-generated method stub
-        
+
     }
 
     public boolean remove(Window parent, Program program) {
-        lazyBones.receivePrograms(new Program[] {program}, removeTarget);
+        lazyBones.receivePrograms(new Program[] { program }, removeTarget);
         return programs.remove(program);
     }
 
@@ -146,9 +146,9 @@ public class LazyBonesDevice implements DeviceIf {
 
     public void writeData(ObjectOutputStream stream) throws IOException {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     // TODO implement
     public Object clone() {
         return null;
@@ -163,6 +163,6 @@ public class LazyBonesDevice implements DeviceIf {
     @Override
     public void sendProgramsToReceiveTargets(Program[] progs) {
         // TODO Auto-generated method stub
-        
+
     }
 }

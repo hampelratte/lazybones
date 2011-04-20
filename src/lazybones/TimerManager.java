@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.50 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.51 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -75,10 +75,11 @@ import devplugin.Program;
 
 /**
  * Class to manage all timers.
+ * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  */
 public class TimerManager extends Observable {
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(TimerManager.class);
     private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
 
@@ -88,19 +89,17 @@ public class TimerManager extends Observable {
      * Stores all timers as Timer objects
      */
     private List<Timer> timers;
-    
+
     /**
      * The VDR timers from the last session, which have been stored to disk
      */
     private List<Timer> storedTimers = new ArrayList<Timer>();
-    
+
     /**
-     * Stores mappings the user has made for later use.
-     * The user has to map one Program only once. Later 
-     * the mapping will be looked up here 
+     * Stores mappings the user has made for later use. The user has to map one Program only once. Later the mapping will be looked up here
      */
     private TitleMapping titleMapping = new TitleMapping();
-    
+
     private final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
     private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 
@@ -118,9 +117,9 @@ public class TimerManager extends Observable {
     public void addTimer(Timer timer, boolean calculateRepeatingTimers) {
         addTimer(timer, calculateRepeatingTimers, true);
     }
-    
+
     private void addTimer(Timer timer, boolean calculateRepeatingTimers, boolean notifyObservers) {
-        if(!timer.isRepeating() || !calculateRepeatingTimers) {
+        if (!timer.isRepeating() || !calculateRepeatingTimers) {
             timerListLock.lock();
             timers.add(timer);
             timerListLock.unlock();
@@ -128,20 +127,20 @@ public class TimerManager extends Observable {
             Calendar startTime = timer.getStartTime();
             Calendar endTime = timer.getEndTime();
             long duration = endTime.getTimeInMillis() - startTime.getTimeInMillis();
-                        
-            if(timer.hasFirstTime()) {
+
+            if (timer.hasFirstTime()) {
                 Calendar tmp = timer.getFirstTime();
                 startTime.set(Calendar.DAY_OF_MONTH, tmp.get(Calendar.DAY_OF_MONTH));
                 startTime.set(Calendar.MONTH, tmp.get(Calendar.MONTH));
                 startTime.set(Calendar.YEAR, tmp.get(Calendar.YEAR));
             }
-            
-            if(calculateRepeatingTimers) {
+
+            if (calculateRepeatingTimers) {
                 for (int j = 0; j < 21; j++) { // next 3 weeks, more data is never available in TVB
-                    Calendar tmpStart = (Calendar)startTime.clone();
+                    Calendar tmpStart = (Calendar) startTime.clone();
                     tmpStart.add(Calendar.DAY_OF_MONTH, j);
-                    if(timer.isDaySet(tmpStart)) {
-                        Timer oneDayTimer = (Timer)timer.clone();
+                    if (timer.isDaySet(tmpStart)) {
+                        Timer oneDayTimer = (Timer) timer.clone();
                         oneDayTimer.setStartTime(tmpStart);
                         long start = tmpStart.getTimeInMillis();
                         oneDayTimer.getEndTime().setTimeInMillis(start + duration);
@@ -152,20 +151,18 @@ public class TimerManager extends Observable {
                 }
             }
         }
-        
-        if(notifyObservers) {
+
+        if (notifyObservers) {
             setChanged();
             notifyObservers(new TimersChangedEvent(TimersChangedEvent.TIMER_ADDED, timer));
         }
     }
 
     /**
-     * Removes this timer from the internal list.
-     * This will result in a disappearence of this timer
-     * in any GUI element.
+     * Removes this timer from the internal list. This will result in a disappearence of this timer in any GUI element.
      * 
-     * <string>Note!</strong>This method will not delete the timer on the VDR.
-     * To achieve that, use {@link #deleteTimer(Timer)}
+     * <string>Note!</strong>This method will not delete the timer on the VDR. To achieve that, use {@link #deleteTimer(Timer)}
+     * 
      * @param timer
      */
     public void removeTimer(Timer timer) {
@@ -182,15 +179,16 @@ public class TimerManager extends Observable {
     public List<Timer> getTimers() {
         return timers;
     }
-    
+
     /**
-     * @param vdrTimers an List of Timer objects
+     * @param vdrTimers
+     *            an List of Timer objects
      */
     public void setTimers(List<Timer> vdrTimers, boolean calculateRepeatingTimers) {
         for (Timer timer : vdrTimers) {
             addTimer(new Timer(timer), calculateRepeatingTimers, false);
         }
-        
+
         setChanged();
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
     }
@@ -203,12 +201,13 @@ public class TimerManager extends Observable {
      * @see Program
      */
     private Lock timerListLock = new ReentrantLock();
-    public Timer getTimer(Program prog) { 
+
+    public Timer getTimer(Program prog) {
         String progID = prog.getUniqueID();
-        if(progID == null) {
+        if (progID == null) {
             return null;
         }
-        
+
         Calendar cal = prog.getDate().getCalendar();
         timerListLock.lock();
         try {
@@ -228,17 +227,18 @@ public class TimerManager extends Observable {
         }
         return null;
     }
-    
+
     /**
      * 
-     * @param timerNumber The number of the timer
+     * @param timerNumber
+     *            The number of the timer
      * @return The timer with the specified number
      */
     public Timer getTimer(int timerNumber) {
         timerListLock.lock();
         try {
             for (Timer timer : timers) {
-                if(timer.getID() == timerNumber) {
+                if (timer.getID() == timerNumber) {
                     return timer;
                 }
             }
@@ -247,9 +247,10 @@ public class TimerManager extends Observable {
         }
         return null;
     }
-    
+
     /**
      * Returns all timers, which couldn't be assigned to a program
+     * 
      * @return an ArrayList with Timer objects
      */
     public List<Timer> getNotAssignedTimers() {
@@ -257,19 +258,19 @@ public class TimerManager extends Observable {
         timerListLock.lock();
         try {
             for (Timer timer : timers) {
-                if(!timer.isAssigned()) {
+                if (!timer.isAssigned()) {
                     list.add(timer);
                 }
             }
         } finally {
             timerListLock.unlock();
-        } 
+        }
         return list;
     }
-    
+
     /**
      * For DEBUG only - print all timers to System.out
-     *
+     * 
      */
     public void printTimers() {
         System.out.println("########## Listing timers #################");
@@ -286,16 +287,17 @@ public class TimerManager extends Observable {
     public void setStoredTimers(List<Timer> storedTimers) {
         this.storedTimers = storedTimers;
     }
-    
+
     /**
      * Checks storedTimers, if this timer has been mapped to Program before
+     * 
      * @param timer
      * @return the ProgramID or null
      */
     public List<String> hasBeenMappedBefore(Timer timer) {
         for (Timer storedTimer : storedTimers) {
-            if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
-                if(storedTimer.getReason() == Timer.NO_PROGRAM) {
+            if (timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
+                if (storedTimer.getReason() == Timer.NO_PROGRAM) {
                     List<String> timers = new ArrayList<String>();
                     timers.add("NO_PROGRAM");
                     return timers;
@@ -306,17 +308,16 @@ public class TimerManager extends Observable {
         }
         return null;
     }
-    
-    
+
     public void replaceStoredTimer(Timer timer) {
         for (Timer storedTimer : storedTimers) {
-            if(timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
+            if (timer.getUniqueKey().equals(storedTimer.getUniqueKey())) {
                 storedTimers.remove(storedTimer);
                 storedTimers.add(timer);
                 return;
             }
         }
-        
+
         // timer couldn't be found -> this is a new timer
         storedTimers.add(timer);
     }
@@ -325,21 +326,21 @@ public class TimerManager extends Observable {
      * 
      * @see TimerManager#titleMapping
      */
-	public Map<String, String> getTitleMappingValues() {
-		return titleMapping.getAsMap();
-	}
+    public Map<String, String> getTitleMappingValues() {
+        return titleMapping.getAsMap();
+    }
 
-	/**
+    /**
      * 
      * @see TimerManager#titleMapping
      */
-	public void setTitleMappingValues(Map<String, String> titleMapping) {
-		this.titleMapping.setMappingFromMap(titleMapping);
-	}
-    
-    
+    public void setTitleMappingValues(Map<String, String> titleMapping) {
+        this.titleMapping.setMappingFromMap(titleMapping);
+    }
+
     /**
      * Returns the next day, on which a timer events starts or stops, after the given calendar
+     * 
      * @param currentDay
      * @return the next day, on which a timer events starts or stops, after the given calendar
      */
@@ -351,17 +352,17 @@ public class TimerManager extends Observable {
             events.add(timer.getStartTime());
             events.add(timer.getEndTime());
         }
-        
+
         for (Iterator<Calendar> iter = events.iterator(); iter.hasNext();) {
             Calendar event = iter.next();
-            if( !event.before(currentDay) & !Utilities.sameDay(event, currentDay)) {
+            if (!event.before(currentDay) & !Utilities.sameDay(event, currentDay)) {
                 return event;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * @see #getNextDayWithEvent(Calendar)
      * @param currentDay
@@ -375,19 +376,19 @@ public class TimerManager extends Observable {
             events.add(timer.getStartTime());
             events.add(timer.getEndTime());
         }
-        
+
         ArrayList<Calendar> eventList = new ArrayList<Calendar>(events);
         Collections.reverse(eventList);
         for (Iterator<Calendar> iter = eventList.iterator(); iter.hasNext();) {
             Calendar event = iter.next();
-            if( !event.after(currentDay) & !Utilities.sameDay(event, currentDay)) {
+            if (!event.after(currentDay) & !Utilities.sameDay(event, currentDay)) {
                 return event;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * @see #getNextDayWithEvent(Calendar)
      * @param currentDay
@@ -396,7 +397,7 @@ public class TimerManager extends Observable {
     public boolean hasNextDayWithEvent(Calendar currentDay) {
         return getNextDayWithEvent(currentDay) != null;
     }
-    
+
     /**
      * @see #getPreviousDayWithEvent(Calendar)
      * @param currentDay
@@ -413,22 +414,22 @@ public class TimerManager extends Observable {
     public void setTitleMapping(TitleMapping mapping) {
         this.titleMapping = mapping;
     }
-    
+
     /**
      * Fetches the timer list from vdr
      */
     public synchronized void synchronize() {
         LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
         LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
-        
+
         // unmark all tvbrowser programs
         unmarkPrograms();
-        
+
         // clear timer list
         timerListLock.lock();
         this.timers.clear();
         timerListLock.unlock();
-        
+
         // fetch current timer list from vdr
         Response res = VDRConnection.send(new LSTT());
         if (res != null && res.getCode() == 250) {
@@ -436,20 +437,20 @@ public class TimerManager extends Observable {
             String timersString = res.getMessage();
             List<VDRTimer> vdrtimers = TimerParser.parse(timersString);
             List<Timer> timers = new ArrayList<Timer>();
-            for(VDRTimer vdrtimer : vdrtimers) {
+            for (VDRTimer vdrtimer : vdrtimers) {
                 timers.add(new Timer(vdrtimer));
             }
             setTimers(timers, true);
-            
+
             // update recording list if necessary
             boolean updateRecordings = false;
             for (VDRTimer timer : vdrtimers) {
-                if(timer.isRecording()) {
+                if (timer.isRecording()) {
                     updateRecordings = true;
                     break;
                 }
             }
-            if(updateRecordings) {
+            if (updateRecordings) {
                 RecordingManager.getInstance().synchronize();
             }
         } else if (res != null && res.getCode() == 550) {
@@ -457,22 +458,22 @@ public class TimerManager extends Observable {
             logger.info("No timer defined on VDR");
             setChanged();
             notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
-        } else { /* something went wrong, we have no timers -> 
-                  * load the stored ones */
-            conLog.error(LazyBones.getTranslation("using_stored_timers",
-                "Couldn't retrieve timers from VDR, using stored ones."));
-            
+        } else { /*
+                  * something went wrong, we have no timers -> load the stored ones
+                  */
+            conLog.error(LazyBones.getTranslation("using_stored_timers", "Couldn't retrieve timers from VDR, using stored ones."));
+
             List<Timer> vdrtimers = getStoredTimers();
             setTimers(vdrtimers, false);
         }
-        
+
         // handle conflicts, if some have been detected
         ConflictFinder.getInstance().handleConflicts();
-        
+
         LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
         LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
     }
-    
+
     /**
      * Unmarks all programs, which are marked by LazyBones
      */
@@ -482,32 +483,35 @@ public class TimerManager extends Observable {
             marked.unmark(LazyBones.getInstance());
         }
     }
-    
-    
+
     /**
      * Deletes a timer on the VDR
-     * @param timer timer to delete
+     * 
+     * @param timer
+     *            timer to delete
      */
     public void deleteTimer(final Timer timer) {
         deleteTimer(timer, null);
     }
-    
+
     /**
      * Deletes a timer on the VDR
-     * @param timer timer to delete
-     * @param callback a Runnable object, which is run after the delete process is finished
+     * 
+     * @param timer
+     *            timer to delete
+     * @param callback
+     *            a Runnable object, which is run after the delete process is finished
      */
     public void deleteTimer(final Timer timer, final Runnable callback) {
         VDRCallback _callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
-                if(!cmd.isSuccess()) {
-                    logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn't delete timer:") + " "
-                            + cmd.getResponse().getMessage());
+                if (!cmd.isSuccess()) {
+                    logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn't delete timer:") + " " + cmd.getResponse().getMessage());
                 } else {
                     synchronize();
                 }
-                
-                if(callback != null) {
+
+                if (callback != null) {
                     callback.run();
                 }
             }
@@ -515,28 +519,31 @@ public class TimerManager extends Observable {
         DeleteTimerAction dta = new DeleteTimerAction(timer, _callback);
         dta.enqueue();
     }
-    
+
     public void createTimer() {
         Timer timer = new Timer();
         timer.setChannelNumber(1);
         Program prog = ProgramManager.getInstance().getProgram(timer);
-        
+
         // in this situation it makes sense to show the timer options
         // so we override the user setting (hide options dialog)
         boolean showTimerOptions = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
-        LazyBones.getProperties().setProperty("showTimerOptionsDialog",Boolean.TRUE.toString());
+        LazyBones.getProperties().setProperty("showTimerOptionsDialog", Boolean.TRUE.toString());
         createTimer(prog, false);
-        LazyBones.getProperties().setProperty("showTimerOptionsDialog",Boolean.toString(showTimerOptions));
+        LazyBones.getProperties().setProperty("showTimerOptionsDialog", Boolean.toString(showTimerOptions));
     }
-    
+
     /**
      * Creates a new timer on the VDR
-     * @param prog the Program to create a timer for
-     * @param automatic supresses all user interaction
+     * 
+     * @param prog
+     *            the Program to create a timer for
+     * @param automatic
+     *            supresses all user interaction
      */
     public void createTimer(Program prog, boolean automatic) {
         if (prog.isExpired()) {
-            if(!automatic) {
+            if (!automatic) {
                 logger.error(LazyBones.getTranslation("expired", "This program has expired"));
             }
             return;
@@ -554,13 +561,11 @@ public class TimerManager extends Observable {
 
         Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
-            logger.error(LazyBones.getTranslation("no_channel_defined",
-                    "No channel defined", prog.toString()));
+            logger.error(LazyBones.getTranslation("no_channel_defined", "No channel defined", prog.toString()));
             return;
         }
         int id = ((Channel) o).getChannelNumber();
-        Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at "
-                + Long.toString(millis / 1000)));
+        Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at " + Long.toString(millis / 1000)));
 
         if (res != null && res.getCode() == 215) {
             List<EPGEntry> epgList = EPGParser.parse(res.getMessage());
@@ -571,15 +576,11 @@ public class TimerManager extends Observable {
             }
 
             /*
-             * VDR 1.3 already returns the matching entry, for 1.2 we need to
-             * search for a match
+             * VDR 1.3 already returns the matching entry, for 1.2 we need to search for a match
              */
             VDRVersion version = Connection.getVersion();
-            boolean isOlderThan1_3 = version.getMajor() < 1
-                    || (version.getMajor() == 1 && version.getMinor() < 3);
-            EPGEntry vdrEPG = isOlderThan1_3 ? Utilities.filterEPGDate(epgList,
-                    ((Channel) o).getName(), millis) : (EPGEntry) epgList
-                    .get(0);
+            boolean isOlderThan1_3 = version.getMajor() < 1 || (version.getMajor() == 1 && version.getMinor() < 3);
+            EPGEntry vdrEPG = isOlderThan1_3 ? Utilities.filterEPGDate(epgList, ((Channel) o).getName(), millis) : (EPGEntry) epgList.get(0);
 
             Timer timer = new Timer();
             timer.setChannelNumber(id);
@@ -594,7 +595,7 @@ public class TimerManager extends Observable {
 
             if (vdrEPG != null) {
                 boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
-                
+
                 // set start and end time
                 Calendar calStart = vdrEPG.getStartTime();
                 timer.setStartTime(calStart);
@@ -603,18 +604,18 @@ public class TimerManager extends Observable {
 
                 // if we have a vps timer, set the status to vps, otherwise
                 // add the buffers
-                if(vpsDefault) {
+                if (vpsDefault) {
                     timer.changeStateTo(VDRTimer.VPS, true);
                 } else {
                     // start the recording x min before the beginning of the program
                     calStart.add(Calendar.MINUTE, -buffer_before);
-    
+
                     // stop the recording x min after the end of the program
                     calEnd.add(Calendar.MINUTE, buffer_after);
                 }
 
                 timer.setFile(vdrEPG.getTitle());
-                
+
                 // set the description
                 String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
                 String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
@@ -627,7 +628,7 @@ public class TimerManager extends Observable {
                     timer.setDescription(descTvb);
                     break;
                 case TimerOptionsPanel.DESC_LONGEST:
-                    if(descVdr.length() < descTvb.length()) {
+                    if (descVdr.length() < descTvb.length()) {
                         timer.setDescription(descTvb);
                     } else {
                         timer.setDescription(descVdr);
@@ -642,38 +643,37 @@ public class TimerManager extends Observable {
                 return;
             }
 
-            boolean showOptionsDialog = !automatic && Boolean.TRUE.toString().equals(
-                    LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
-            
-            if(showOptionsDialog) {
+            boolean showOptionsDialog = !automatic && Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
+
+            if (showOptionsDialog) {
                 TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.NEW);
-                if(tod.isAccepted()) {
+                if (tod.isAccepted()) {
                     commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), false, false);
                 }
             } else {
                 commitTimer(timer, null, prog, false, automatic);
             }
-            
 
-        } else if(res != null && res.getCode() == 550 & "No schedule found\n".equals(res.getMessage())) {
+        } else if (res != null && res.getCode() == 550 & "No schedule found\n".equals(res.getMessage())) {
             noEPGAvailable(prog, id, automatic);
         } else {
-            if(res instanceof ConnectionProblem) {
-                conLog.error(LazyBones.getTranslation("couldnt_create",
-                "Couldn\'t create timer\n: ") + " " + res.getMessage());
+            if (res instanceof ConnectionProblem) {
+                conLog.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer\n: ") + " " + res.getMessage());
             } else {
                 String msg = res != null ? res.getMessage() : "Reason unknown";
-                logger.error(LazyBones.getTranslation("couldnt_create",
-                    "Couldn\'t create timer\n: ") + " " + msg);
+                logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer\n: ") + " " + msg);
             }
         }
     }
-    
+
     /**
      * 
-     * @param prog Program to create a timer for
-     * @param channelNumber the corresponding VDR channel
-     * @param automatic supresses all user interaction
+     * @param prog
+     *            Program to create a timer for
+     * @param channelNumber
+     *            the corresponding VDR channel
+     * @param automatic
+     *            supresses all user interaction
      */
     private void noEPGAvailable(Program prog, int channelNumber, boolean automatic) {
         int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
@@ -681,9 +681,8 @@ public class TimerManager extends Observable {
 
         boolean dontCare = automatic || Boolean.FALSE.toString().equals(LazyBones.getProperties().getProperty("logEPGErrors"));
         int result = JOptionPane.NO_OPTION;
-        if(!dontCare) {
-            result = JOptionPane.showConfirmDialog(null, LazyBones.getTranslation(
-                "noEPGdata", ""), "", JOptionPane.YES_NO_OPTION);
+        if (!dontCare) {
+            result = JOptionPane.showConfirmDialog(null, LazyBones.getTranslation("noEPGdata", ""), "", JOptionPane.YES_NO_OPTION);
         }
         if (dontCare || result == JOptionPane.OK_OPTION) {
             Timer newTimer = new Timer();
@@ -705,32 +704,31 @@ public class TimerManager extends Observable {
 
             Calendar endTime = (Calendar) startTime.clone();
             endTime.add(Calendar.MINUTE, prog.getLength());
-            
+
             // add buffers
             startTime.add(Calendar.MINUTE, -buffer_before);
             newTimer.setStartTime(startTime);
             endTime.add(Calendar.MINUTE, buffer_after);
             newTimer.setEndTime(endTime);
 
-            if(automatic) {
+            if (automatic) {
                 commitTimer(newTimer, null, prog, false, true);
             } else {
                 TimerOptionsDialog tod = new TimerOptionsDialog(newTimer, prog, TimerOptionsDialog.Mode.NEW);
-                if(tod.isAccepted()) {
+                if (tod.isAccepted()) {
                     commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), false, false);
                 }
             }
         }
     }
-    
+
     /**
      * Commits a new or changed timer to VDR
      * 
      * @param timer
      *            The new created / updated Timer
      * @param oldTimer
-     *            A clone of the timer with the old settings. Can be null for
-     *            new timers.
+     *            A clone of the timer with the old settings. Can be null for new timers.
      * @param prog
      *            The according Program
      * @param update
@@ -740,24 +738,22 @@ public class TimerManager extends Observable {
      */
     private void commitTimer(final Timer timer, Timer oldTimer, final Program prog, boolean update, boolean automatic) {
         int id = -1;
-        if(prog != null) {
+        if (prog != null) {
             Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
             if (o == null) {
-                logger.error(LazyBones.getTranslation("no_channel_defined","No channel defined", prog.toString()));
+                logger.error(LazyBones.getTranslation("no_channel_defined", "No channel defined", prog.toString()));
                 return;
             }
             id = ((Channel) o).getChannelNumber();
         }
-        
+
         if (update) {
             VDRCallback callback = new VDRCallback() {
                 public void receiveResponse(VDRAction cmd, Response response) {
-                    if(cmd.isSuccess()) {
+                    if (cmd.isSuccess()) {
                         TimerManager.getInstance().synchronize();
                     } else {
-                        String mesg =  LazyBones.getTranslation(
-                                "couldnt_change", "Couldn\'t change timer:")
-                                + " " + cmd.getResponse().getMessage();
+                        String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
                         logger.error(mesg);
                     }
                 }
@@ -773,10 +769,7 @@ public class TimerManager extends Observable {
                 } else {
                     percentage = Utilities.percentageOfEquality(prog.getTitle(), timer.getTitle());
                 }
-                if (timer.getFile().indexOf("EPISODE") >= 0
-                        || timer.getFile().indexOf("TITLE") >= 0
-                        || timer.isRepeating()
-                        || automatic) {
+                if (timer.getFile().indexOf("EPISODE") >= 0 || timer.getFile().indexOf("TITLE") >= 0 || timer.isRepeating() || automatic) {
                     percentage = 100;
                 }
                 int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
@@ -787,11 +780,11 @@ public class TimerManager extends Observable {
                     logger.debug("Looking in title mapping for timer {}", timer);
                     // lookup in mapping history
                     TimerManager tm = TimerManager.getInstance();
-                    String timerTitle = (String)tm.getTitleMapping().getVdrTitle(prog.getTitle());
-                    if(timer.getTitle().equals(timerTitle)) {
+                    String timerTitle = (String) tm.getTitleMapping().getVdrTitle(prog.getTitle());
+                    if (timer.getTitle().equals(timerTitle)) {
                         VDRCallback callback = new VDRCallback() {
                             public void receiveResponse(VDRAction cmd, Response response) {
-                                if(cmd.isSuccess()) {
+                                if (cmd.isSuccess()) {
                                     timer.addTvBrowserProgID(prog.getUniqueID());
                                     replaceStoredTimer(timer);
                                 }
@@ -809,16 +802,15 @@ public class TimerManager extends Observable {
             }
         }
     }
-    
+
     public void assignProgramToTimer(Program prog, Timer timer) {
         timer.addTvBrowserProgID(prog.getUniqueID());
         replaceStoredTimer(timer);
         getTitleMapping().put(prog.getTitle(), timer.getTitle());
     }
-    
+
     /**
-     * If a Program can't be assigned to a VDR-Program, this method shows a
-     * dialog to select the right VDR-Program
+     * If a Program can't be assigned to a VDR-Program, this method shows a dialog to select the right VDR-Program
      * 
      * @param prog
      *            the Program selected in TV-Browser
@@ -846,7 +838,7 @@ public class TimerManager extends Observable {
         if (t != null) {
             programSet.add(t);
         }
-        
+
         for (int i = 10; i <= 120; i += 10) {
             // get the program before the given one
             c = GregorianCalendar.getInstance();
@@ -871,8 +863,7 @@ public class TimerManager extends Observable {
         int i = 0;
         for (Timer timer : programSet) {
             Calendar time = timer.getStartTime();
-            TimerProgram p = new TimerProgram(chan, new Date(time), time
-                    .get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
+            TimerProgram p = new TimerProgram(chan, new Date(time), time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
             p.setTitle(timer.getTitle());
             p.setDescription("");
             p.setTimer(timer);
@@ -888,23 +879,21 @@ public class TimerManager extends Observable {
 
         // show dialog
         new TimerSelectionDialog(programs, timerOptions, prog);
-        
+
         LazyBones.getInstance().synchronize();
     }
-    
+
     public void deleteTimer(final Program prog) {
         Timer timer = TimerManager.getInstance().getTimer(prog);
         logger.debug("Deleting timer {}", timer);
         VDRCallback callback = new VDRCallback() {
             public void receiveResponse(VDRAction cmd, Response response) {
-                if(cmd instanceof DeleteTimerAction) {
-                    if(!cmd.isSuccess()) {
-                        logger.error(LazyBones.getTranslation(
-                                "couldnt_delete", "Couldn\'t delete timer:")
-                                + " " + cmd.getResponse().getMessage());
+                if (cmd instanceof DeleteTimerAction) {
+                    if (!cmd.isSuccess()) {
+                        logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn\'t delete timer:") + " " + cmd.getResponse().getMessage());
                         return;
                     }
-                    
+
                     prog.unmark(LazyBones.getInstance());
                     TimerManager.getInstance().synchronize();
                 }
@@ -913,24 +902,24 @@ public class TimerManager extends Observable {
         DeleteTimerAction dta = new DeleteTimerAction(timer, callback);
         dta.enqueue();
     }
-    
+
     public void editTimer(Timer timer) {
         Program prog = null;
-        if(timer.getTvBrowserProgIDs().size() > 0) {
+        if (timer.getTvBrowserProgIDs().size() > 0) {
             prog = ProgramManager.getInstance().getProgram(timer.getTvBrowserProgIDs().get(0));
         }
         TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
-        if(tod.isAccepted()) {
+        if (tod.isAccepted()) {
             commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), true, false);
         }
     }
-    
+
     public boolean lookUpTimer(Timer timer, Program candidate) {
         logger.debug("Looking in storedTimers for: {}", timer.toString());
         List<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
         if (progIDs != null) { // we have a mapping of this timer to a program
             for (String progID : progIDs) {
-                if(progID.equals("NO_PROGRAM")) {
+                if (progID.equals("NO_PROGRAM")) {
                     logger.debug("Timer {} should never be assigned", timer.toString());
                     timer.setReason(Timer.NO_PROGRAM);
                     return true;
@@ -938,12 +927,10 @@ public class TimerManager extends Observable {
                     devplugin.Channel c = ChannelManager.getInstance().getChannel(timer);
                     if (c != null) {
                         Date date = new Date(timer.getStartTime());
-                        Iterator<Program> iterator = LazyBones.getPluginManager()
-                                .getChannelDayProgram(date, c);
+                        Iterator<Program> iterator = LazyBones.getPluginManager().getChannelDayProgram(date, c);
                         while (iterator != null && iterator.hasNext()) {
                             Program p = iterator.next();
-                            if (p.getUniqueID().equals(progID)
-                                    && p.getDate().equals(date)) {
+                            if (p.getUniqueID().equals(progID) && p.getDate().equals(date)) {
                                 p.mark(LazyBones.getInstance());
                                 timer.setTvBrowserProgIDs(progIDs);
                                 logger.debug("Mapping found for: {}", timer.toString());
@@ -953,13 +940,13 @@ public class TimerManager extends Observable {
                     }
                 }
             }
-        } else  {
+        } else {
             logger.debug("No mapping found for: {}", timer.toString());
-            if(candidate != null) {
+            if (candidate != null) {
                 logger.debug("Looking up old mappings");
                 TimerManager tm = TimerManager.getInstance();
-                String progTitle = (String)tm.getTitleMapping().getTvbTitle(timer.getTitle());
-                if(candidate.getTitle().equals(progTitle)) {
+                String progTitle = (String) tm.getTitleMapping().getTvbTitle(timer.getTitle());
+                if (candidate.getTitle().equals(progTitle)) {
                     candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
                     timer.addTvBrowserProgID(candidate.getID());
                     logger.debug("Old mapping found for: {}", timer.toString());

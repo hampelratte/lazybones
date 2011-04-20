@@ -1,4 +1,4 @@
-/* $Id: TimelineLayout.java,v 1.5 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineLayout.java,v 1.6 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,24 +41,25 @@ import java.util.Map;
 import lazybones.Timer;
 
 public class TimelineLayout implements LayoutManager2 {
-    
+
     private int rowHeight = 50;
-    
+
     private int padding = 0;
-    
+
     private ArrayList<Component> components = new ArrayList<Component>();
 
-    public TimelineLayout() {}
-    
+    public TimelineLayout() {
+    }
+
     public TimelineLayout(int rowHeight) {
         this.rowHeight = rowHeight;
     }
-    
+
     public TimelineLayout(int rowHeight, int padding) {
         this(rowHeight);
         this.padding = padding;
     }
-    
+
     public void addLayoutComponent(Component comp, Object constraints) {
         components.add(comp);
     }
@@ -83,19 +84,19 @@ public class TimelineLayout implements LayoutManager2 {
     }
 
     public void layoutContainer(Container parent) {
-        if(parent.isValid()) {
+        if (parent.isValid()) {
             return;
         }
-        
+
         int width = parent instanceof TimelineRowHeader ? 0 : parent.getParent().getWidth();
         int height = parent.getHeight();
-        
-        double pixelsPerMinute = (double)(width-1) / (double)(24 * 60);
-        
+
+        double pixelsPerMinute = (double) (width - 1) / (double) (24 * 60);
+
         int rowCount = 0;
         Map<Integer, Integer> channelRowMap = new HashMap<Integer, Integer>();
         for (Component comp : components) {
-            if(comp instanceof TimelineElement) {
+            if (comp instanceof TimelineElement) {
                 TimelineElement te = (TimelineElement) comp;
                 Timer timer = te.getTimer();
                 Calendar currentDate = te.getCurrentDate();
@@ -103,42 +104,42 @@ public class TimelineLayout implements LayoutManager2 {
                 nextDate.add(Calendar.DAY_OF_MONTH, 1);
                 int startMinute = timer.getStartTime().get(Calendar.MINUTE);
                 startMinute += timer.getStartTime().get(Calendar.HOUR_OF_DAY) * 60;
-                int startPos = (int)(startMinute * pixelsPerMinute);
+                int startPos = (int) (startMinute * pixelsPerMinute);
                 int endMinute = timer.getEndTime().get(Calendar.MINUTE);
                 endMinute += timer.getEndTime().get(Calendar.HOUR_OF_DAY) * 60;
-                int endPos = (int)(endMinute * pixelsPerMinute);
-                if(timer.getStartTime().before(currentDate)) {
+                int endPos = (int) (endMinute * pixelsPerMinute);
+                if (timer.getStartTime().before(currentDate)) {
                     startPos = 0;
                 }
-                if(timer.getEndTime().after(nextDate)) {
+                if (timer.getEndTime().after(nextDate)) {
                     endPos = width;
                 }
                 int length = endPos - startPos;
                 Integer channelRow = channelRowMap.get(timer.getChannelNumber());
                 int row = rowCount;
-                if(channelRow == null) {
+                if (channelRow == null) {
                     channelRowMap.put(timer.getChannelNumber(), rowCount);
                     rowCount++;
                 } else {
                     row = channelRow.intValue();
                 }
-                
-                te.setLocation(startPos, (rowHeight+padding) * row);
+
+                te.setLocation(startPos, (rowHeight + padding) * row);
                 te.setSize(length, rowHeight);
             } else if (comp instanceof TimelineRowHeaderElement) {
                 comp.setSize(comp.getPreferredSize());
                 comp.setLocation(0, (rowHeight + padding) * rowCount);
                 rowCount++;
-                if(comp.getWidth() > width) {
+                if (comp.getWidth() > width) {
                     width = comp.getWidth();
                 }
             }
         }
-        
-        if(components.size() == 0 && parent instanceof TimelineRowHeader) {
-            width=0;
+
+        if (components.size() == 0 && parent instanceof TimelineRowHeader) {
+            width = 0;
         }
-        
+
         parent.setPreferredSize(new Dimension(width, height));
         parent.setSize(width, height);
     }
@@ -148,7 +149,7 @@ public class TimelineLayout implements LayoutManager2 {
         d.width = parent.getWidth();
         d.height = 0;
         for (Component comp : components) {
-            if(comp.getWidth() > d.width) {
+            if (comp.getWidth() > d.width) {
                 d.width = comp.getWidth();
             }
             d.height += rowHeight + padding;
@@ -161,7 +162,7 @@ public class TimelineLayout implements LayoutManager2 {
         d.width = parent.getWidth();
         d.height = 0;
         for (Component comp : components) {
-            if(comp.getWidth() > d.width) {
+            if (comp.getWidth() > d.width) {
                 d.width = comp.getWidth();
             }
             d.height += rowHeight + padding;

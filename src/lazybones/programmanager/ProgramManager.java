@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.10 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.11 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -65,11 +65,11 @@ public class ProgramManager {
     private static transient Logger logger = LoggerFactory.getLogger(ProgramManager.class);
     private static transient Logger epgLog = LoggerFactory.getLogger(LoggingConstants.EPG_LOGGER);
     private static transient Logger popupLog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
-    
+
     private static ProgramManager instance;
-    
+
     private Evaluator evaluator = new Evaluator();
-    
+
     private ProgramManager() {
     }
 
@@ -79,27 +79,27 @@ public class ProgramManager {
         }
         return instance;
     }
-    
+
     /**
-     * @param startTime the startTime of the Program
-     * @param middleTime the middleTime of the Program
-     * @param chan the channel of the Program
+     * @param startTime
+     *            the startTime of the Program
+     * @param middleTime
+     *            the middleTime of the Program
+     * @param chan
+     *            the channel of the Program
      * @return the Program or null
      * 
-     * startTime ist notwendig, weil getChannelDayProgram benutzt wird.
-     * Bsp.: start 23:30 ende 01:00 middleTime würde dann schon am nächsten tag
-     * liegen (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt
-     * und das Program nicht findet 
+     *         startTime ist notwendig, weil getChannelDayProgram benutzt wird. Bsp.: start 23:30 ende 01:00 middleTime würde dann schon am nächsten tag liegen
+     *         (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt und das Program nicht findet
      */
     public Program getProgramAt(Calendar startTime, Calendar middleTime, devplugin.Channel chan) {
-        Iterator<Program> dayProgram = LazyBones.getPluginManager().getChannelDayProgram(
-                new Date(startTime), chan);
+        Iterator<Program> dayProgram = LazyBones.getPluginManager().getChannelDayProgram(new Date(startTime), chan);
         while (dayProgram != null && dayProgram.hasNext()) {
             Program prog = dayProgram.next();
-            
+
             Calendar progStart = GregorianCalendar.getInstance();
             progStart.set(Calendar.YEAR, prog.getDate().getYear());
-            progStart.set(Calendar.MONTH, prog.getDate().getMonth()-1);
+            progStart.set(Calendar.MONTH, prog.getDate().getMonth() - 1);
             progStart.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
             progStart.set(Calendar.HOUR_OF_DAY, prog.getHours());
             progStart.set(Calendar.MINUTE, prog.getMinutes());
@@ -107,14 +107,14 @@ public class ProgramManager {
             Calendar progEnd = GregorianCalendar.getInstance();
             progEnd.setTimeInMillis(progStart.getTimeInMillis());
             progEnd.add(Calendar.MINUTE, prog.getLength());
-            
+
             if (middleTime.after(progStart) && middleTime.before(progEnd)) {
                 return prog;
             }
         }
         return null;
     }
-    
+
     public Timer getTimerForTime(Calendar cal, devplugin.Channel chan) {
         long time_t = cal.getTimeInMillis() / 1000;
         Object o = ChannelManager.getChannelMapping().get(chan.getId());
@@ -141,39 +141,41 @@ public class ProgramManager {
         }
         return null;
     }
-    
+
     public Program getProgram(Timer timer) {
         // determine channel
         devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
-        
-        if(chan == null) 
+
+        if (chan == null)
             return null;
-            
+
         // determine middle of the program
         long startTime = timer.getStartTime().getTimeInMillis();
         long endTime = timer.getEndTime().getTimeInMillis();
         long duration = endTime - startTime;
         Calendar time = GregorianCalendar.getInstance();
-        long middleTime = startTime + duration/2;
+        long middleTime = startTime + duration / 2;
         time.setTimeInMillis(middleTime);
-        
+
         return getProgramAt(timer.getStartTime(), time, chan);
     }
-    
+
     /**
      * 
-     * @param time A Calendar object representing the day, the program is running at
-     * @param uniqueProgID the unique program ID of the program
+     * @param time
+     *            A Calendar object representing the day, the program is running at
+     * @param uniqueProgID
+     *            the unique program ID of the program
      * @return {@link devplugin.PluginManager#getProgram(String)}
      */
     public Program getProgram(String uniqueProgID) {
         return LazyBones.getPluginManager().getProgram(uniqueProgID);
     }
-    
+
     public JPopupMenu getContextMenuForTimer(Timer timer) {
         List<String> tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
-        if(tvBrowserProgIds.size() > 0) {
+        if (tvBrowserProgIds.size() > 0) {
             Program prog = ProgramManager.getInstance().getProgram(tvBrowserProgIds.get(0));
             popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
         } else {
@@ -181,26 +183,26 @@ public class ProgramManager {
         }
         return popup;
     }
-    
+
     /**
      * Called to mark all Programs
      */
-    public void  markPrograms() {
+    public void markPrograms() {
         // for every timer
         try {
-            for(Timer timer : TimerManager.getInstance().getTimers()) {
+            for (Timer timer : TimerManager.getInstance().getTimers()) {
                 devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
                 if (chan == null) {
                     timer.setReason(Timer.NO_CHANNEL);
-    
+
                     // we couldn't find a channel for this timer, continue with the
                     // next timer
                     continue;
                 }
-    
+
                 markSingularTimer(timer, chan);
             }
-        } catch(ConcurrentModificationException e) {
+        } catch (ConcurrentModificationException e) {
             // the timers list has changed while we were marking programs, let's start over
             logger.debug("Timers list has changed while marking programs. Beginning from scratch.");
 
@@ -209,40 +211,41 @@ public class ProgramManager {
             for (Program marked : markedPrograms) {
                 marked.unmark(LazyBones.getInstance());
             }
-            
+
             // now mark all timers
             markPrograms();
         }
     }
-    
+
     /**
      * Handles all timers, which couldn't be assigned automatically
-     *
+     * 
      */
     public void handleNotAssignedTimers() {
-        if (Boolean.TRUE.toString().equals(
-                LazyBones.getProperties().getProperty("supressMatchDialog"))) {
+        if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
             return;
         }
         Iterator<Timer> iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
-        logger.debug("Not assigned timers: {}",
-                + TimerManager.getInstance().getNotAssignedTimers().size());
+        logger.debug("Not assigned timers: {}", +TimerManager.getInstance().getNotAssignedTimers().size());
         while (iterator.hasNext()) {
             Timer timer = iterator.next();
-            switch(timer.getReason()) {
+            switch (timer.getReason()) {
             case Timer.NOT_FOUND:
-                //  show message
+                // show message
                 java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
                 String dateString = sdf.format(date);
                 String title = timer.getPath() + timer.getTitle();
                 Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-                String msg = LazyBones.getTranslation("message_programselect", "I couldn\'t find a program, which matches the vdr timer\n<b>{0}</b> at <b>{1}</b> on <b>{2}</b>.\n" + "You may assign this timer to a program in the context menu.", title, dateString, chan.getName());
+                String msg = LazyBones.getTranslation("message_programselect",
+                        "I couldn\'t find a program, which matches the vdr timer\n<b>{0}</b> at <b>{1}</b> on <b>{2}</b>.\n"
+                                + "You may assign this timer to a program in the context menu.", title, dateString, chan.getName());
                 popupLog.warn(msg);
                 break;
             case Timer.NO_EPG:
                 logger.warn("Couldn't assign timer: ", timer);
-                String mesg = LazyBones.getTranslation("noEPGdataTVB","<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>",timer.toString());
+                String mesg = LazyBones.getTranslation("noEPGdataTVB",
+                        "<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>", timer.toString());
                 epgLog.error(mesg);
                 break;
             case Timer.NO_CHANNEL:
@@ -257,7 +260,7 @@ public class ProgramManager {
             }
         }
     }
-    
+
     /**
      * 
      * @param timer
@@ -272,25 +275,25 @@ public class ProgramManager {
 
         // get the day program of the day, the previous day and the next day
         Date date = new Date(year, month, day);
-        List<Program> threeDayProgram = getThreeDayProgram(date, chan); 
-        
-        Iterator<Program> it = threeDayProgram.iterator(); 
+        List<Program> threeDayProgram = getThreeDayProgram(date, chan);
+
+        Iterator<Program> it = threeDayProgram.iterator();
         if (it == null) {
-            if(!timer.isRepeating()) {
+            if (!timer.isRepeating()) {
                 timer.setReason(Timer.NO_EPG);
             }
             return;
         }
-            
+
         // contains programs, which start and stop between the start and the stop time
         // of the timer and could be part of a Doppelpack
         List<Program> doppelPack = new ArrayList<Program>();
 
         // iterate over all programs and
         // compare start and end time to collect doppelpack candidates
-        while (it.hasNext()) { 
+        while (it.hasNext()) {
             Program prog = it.next();
-            
+
             // get prog start and end
             Calendar progStartCal = prog.getDate().getCalendar();
             progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
@@ -298,24 +301,24 @@ public class ProgramManager {
             progStartCal.set(Calendar.SECOND, 0);
             Calendar progEndCal = (Calendar) progStartCal.clone();
             progEndCal.add(Calendar.MINUTE, prog.getLength());
-            
+
             // collect doppelpack candidates
             // use timer with buffers
-            if(progStartCal.after(timer.getStartTime()) && progEndCal.before(timer.getEndTime())) {
+            if (progStartCal.after(timer.getStartTime()) && progEndCal.before(timer.getEndTime())) {
                 doppelPack.add(prog);
             }
         }
 
         if (doppelPack.size() > 1) {
-            timer.setReason(Timer.NOT_FOUND); 
+            timer.setReason(Timer.NOT_FOUND);
             ArrayList<String> list = new ArrayList<String>();
             String doppelpackTitle = null;
             for (int i = 0; i < doppelPack.size(); i++) {
                 Program prog = doppelPack.get(i);
                 String title = prog.getTitle();
-                if(i < doppelPack.size() - 1) {
-                    Program next = doppelPack.get(i+1);
-                    if(title.equals(next.getTitle())) {
+                if (i < doppelPack.size() - 1) {
+                    Program next = doppelPack.get(i + 1);
+                    if (title.equals(next.getTitle())) {
                         logger.debug("Doppelpack found: {}", title);
                         timer.setReason(Timer.NO_REASON);
                         doppelpackTitle = title;
@@ -324,11 +327,11 @@ public class ProgramManager {
                     }
                 }
             }
-            
+
             // mark all doppelpack programs
-            if(doppelpackTitle != null) {
+            if (doppelpackTitle != null) {
                 for (Program prog : doppelPack) {
-                    if(prog.getTitle().equals(doppelpackTitle)) {
+                    if (prog.getTitle().equals(doppelpackTitle)) {
                         prog.mark(LazyBones.getInstance());
                         timer.addTvBrowserProgID(prog.getUniqueID());
                     }
@@ -336,17 +339,18 @@ public class ProgramManager {
                 return;
             }
         }
-        
+
         // no doppelpacks, we can now valuate the programs with
         // several criteria
         Result bestMatching = evaluator.evaluate(threeDayProgram, timer);
-        if(bestMatching == null) {
+        if (bestMatching == null) {
             logger.warn("Couldn't assign timer: ", timer);
             timer.setReason(Timer.NOT_FOUND);
             return;
-        } 
+        }
 
-        logger.debug("Best matching program for timer {} is {} with a percentage of {}", new Object[] { timer.getTitle(), bestMatching.getProgram().getTitle(), bestMatching.getPercentage() });
+        logger.debug("Best matching program for timer {} is {} with a percentage of {}", new Object[] { timer.getTitle(), bestMatching.getProgram().getTitle(),
+                bestMatching.getPercentage() });
         int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
         // if the percentage of equality is higher than the config value
         // percentageThreshold, mark this program
@@ -363,32 +367,33 @@ public class ProgramManager {
             }
         }
     }
-    
+
     public void assignTimerToProgram(Program prog, Timer timer) {
         timer.addTvBrowserProgID(prog.getUniqueID());
         prog.mark(LazyBones.getInstance());
         prog.validateMarking();
-//        if (timer.isRepeating()) {
-//            Date d = prog.getDate();
-//            timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
-//            timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
-//            timer.getStartTime().set(Calendar.YEAR, d.getYear());
-//        }
+        // if (timer.isRepeating()) {
+        // Date d = prog.getDate();
+        // timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
+        // timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
+        // timer.getStartTime().set(Calendar.YEAR, d.getYear());
+        // }
     }
-    
+
     public void handleTimerDoubleClick(Timer timer) {
         List<String> progIDs = timer.getTvBrowserProgIDs();
-        if(progIDs.size() > 0) {
+        if (progIDs.size() > 0) {
             String firstProgID = progIDs.get(0);
             Program prog = ProgramManager.getInstance().getProgram(firstProgID);
-            if(prog != null) {
+            if (prog != null) {
                 LazyBones.getPluginManager().handleProgramDoubleClick(prog);
             }
         }
     }
-    
+
     /**
      * Returns the day program of a day + the previous day's program + the next day's program
+     * 
      * @param date
      * @param chan
      * @return

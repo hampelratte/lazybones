@@ -1,4 +1,4 @@
-/* $Id: CircularList.java,v 1.3 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: CircularList.java,v 1.4 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -31,43 +31,42 @@ package lazybones.logging;
 
 import java.util.Iterator;
 
-
 public class CircularList<T> implements Iterable<T>, Iterator<T> {
     /** Points to the start of the list */
     private Node start;
-    
+
     /** Points to the next free node */
     private Node current;
-    
+
     /** Holds the current Node for iteration */
     private Node iterPos;
-    
+
     private boolean firstRotation = true;
-    
+
     public CircularList(int capacity) {
-        
+
         start = new Node(null, null, null);
         current = start;
-        
+
         // create a link list
-        for (int i = 0; i < capacity-1; i++) {
+        for (int i = 0; i < capacity - 1; i++) {
             Node next = new Node(current, null, null);
             current.setNext(next);
             current = next;
         }
-        
+
         // link the last node to first, so we get an circular list
         current.setNext(start);
         start.setPrev(current);
-        
+
         // reset the current node to the start
         current = start;
     }
-    
+
     public void add(T data) {
         current.setData(data);
-        if(current == start) {
-            if(firstRotation) {
+        if (current == start) {
+            if (firstRotation) {
                 firstRotation = false;
             } else {
                 start = current.getNext();
@@ -75,12 +74,12 @@ public class CircularList<T> implements Iterable<T>, Iterator<T> {
         }
         current = current.getNext();
     }
-    
+
     private class Node {
         private T data;
         private Node prev;
         private Node next;
-        
+
         public Node(Node prev, Node next, T data) {
             this.prev = prev;
             this.next = next;
@@ -120,8 +119,8 @@ public class CircularList<T> implements Iterable<T>, Iterator<T> {
     }
 
     public boolean hasNext() {
-        if(iterPos == start) {
-            if(firstRotation) {
+        if (iterPos == start) {
+            if (firstRotation) {
                 firstRotation = false;
                 return true;
             } else {
@@ -141,14 +140,14 @@ public class CircularList<T> implements Iterable<T>, Iterator<T> {
     public void remove() {
         throw new RuntimeException("remove() is not implemented");
     }
-    
+
     public static void main(String[] args) {
         final int size = 5;
         CircularList<String> list = new CircularList<String>(size);
-        for (int i = 0; i < size+20; i++) {
+        for (int i = 0; i < size + 20; i++) {
             list.add(Integer.toString(i));
         }
-        
+
         for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
             String s = iterator.next();
             System.out.println(s);

@@ -1,4 +1,4 @@
-/* $Id: TimerSelectionDialog.java,v 1.12 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: TimerSelectionDialog.java,v 1.13 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -57,8 +57,7 @@ import util.ui.WindowClosingIf;
 import devplugin.Program;
 
 /**
- * Shown, if a Program and a VDRTimer have totally different titles. The user
- * has to choose the right program, then.
+ * Shown, if a Program and a VDRTimer have totally different titles. The user has to choose the right program, then.
  * 
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  */
@@ -76,11 +75,11 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
     private LazyBones control;
 
     private JDialog dialog;
-    
+
     private Program[] programs;
-    
+
     private Program originalProgram;
-    
+
     private Timer timerOptions;
 
     public TimerSelectionDialog(Program[] programs, Timer timerOptions, Program prog) {
@@ -107,11 +106,8 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
         dialog.getContentPane().add(
-               new JLabel(LazyBones.getTranslation(
-                        "message_vdrselect", "<html>I couldn\'t find a program,"
-                                   + " which matches the selected one.<br>Please select the"
-                                   + " right program in the given list and press OK.</html>")),
-                        gbc);
+                new JLabel(LazyBones.getTranslation("message_vdrselect", "<html>I couldn\'t find a program,"
+                        + " which matches the selected one.<br>Please select the" + " right program in the given list and press OK.</html>")), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -138,7 +134,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
 
         ok.addActionListener(this);
         cancel.addActionListener(this);
-        
+
         dialog.setSize(1024, 768);
         model.removeAllElements();
         for (int i = 0; i < programs.length; i++) {
@@ -166,7 +162,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
                 t.setRepeatingDays(timerOptions.getRepeatingDays());
                 control.timerSelectionCallBack(selectedProgram, originalProgram);
             }
-        } 
+        }
         dialog.dispose();
     }
 

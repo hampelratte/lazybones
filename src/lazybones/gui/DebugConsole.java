@@ -33,23 +33,16 @@ import org.slf4j.LoggerFactory;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
+ * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
+ * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf {
-	
-	private static transient Logger logger = LoggerFactory.getLogger(DebugConsole.class);
-	
+
+    private static transient Logger logger = LoggerFactory.getLogger(DebugConsole.class);
+
     private final boolean AUTOSCROLL = true;
 
     private SimpleFormatter formatter = new SimpleFormatter();
@@ -63,7 +56,7 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
     private JTextPane textpane = new JTextPane();
 
     private Document doc = textpane.getDocument();
-    
+
     private Level selectedLevel = Level.FINEST;
 
     public DebugConsole() {
@@ -84,11 +77,11 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
         s = textpane.addStyle(Level.FINER.toString(), def);
         StyleConstants.setForeground(s, Color.LIGHT_GRAY);
         StyleConstants.setFontFamily(s, "monospace");
-        
+
         s = textpane.addStyle(Level.FINEST.toString(), def);
         StyleConstants.setForeground(s, Color.LIGHT_GRAY);
         StyleConstants.setFontFamily(s, "monospace");
-        
+
         s = textpane.addStyle(Level.INFO.toString(), def);
         StyleConstants.setForeground(s, Color.BLACK);
         StyleConstants.setFontFamily(s, "monospace");
@@ -118,14 +111,14 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
     }
 
     private synchronized void insertLine(LogRecord record) {
-        if(record != null && record.getLevel().intValue() >= selectedLevel.intValue()) {
+        if (record != null && record.getLevel().intValue() >= selectedLevel.intValue()) {
             String line = formatter.format(record);
             try {
-                doc.insertString(doc.getLength(), line, textpane.getStyle(record.getLevel().toString()) );
+                doc.insertString(doc.getLength(), line, textpane.getStyle(record.getLevel().toString()));
             } catch (Exception e) {
                 logger.error("Couldn't insert line", e);
             }
-    
+
             if (AUTOSCROLL)
                 scrollbar.setValue(scrollbar.getMaximum());
         }
@@ -139,9 +132,7 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
         scrollbar = scrollpane.getVerticalScrollBar();
         getContentPane().add(scrollpane, BorderLayout.CENTER);
         {
-            ComboBoxModel comboLevelModel = 
-                new DefaultComboBoxModel(
-                        new Level[] { Level.FINEST, Level.FINE, Level.INFO, Level.WARNING, Level.SEVERE });
+            ComboBoxModel comboLevelModel = new DefaultComboBoxModel(new Level[] { Level.FINEST, Level.FINE, Level.INFO, Level.WARNING, Level.SEVERE });
             comboLevel = new JComboBox();
             getContentPane().add(comboLevel, BorderLayout.SOUTH);
             comboLevel.setModel(comboLevelModel);

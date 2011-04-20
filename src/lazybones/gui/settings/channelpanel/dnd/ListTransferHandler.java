@@ -1,4 +1,4 @@
-/* $Id: ListTransferHandler.java,v 1.4 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: ListTransferHandler.java,v 1.5 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,15 +37,13 @@ import javax.swing.JList;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 
-
-
 public class ListTransferHandler extends ChannelSetTransferHandler {
     private int[] indices = null;
-    private int addIndex = -1; //Location where items were added
-    private int addCount = 0;  //Number of items added.
-    
+    private int addIndex = -1; // Location where items were added
+    private int addCount = 0; // Number of items added.
+
     private Set<Channel> overwrittenChannels;
-    
+
     @Override
     protected ChannelSet<Channel> exportChannels(JComponent c) {
         ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
@@ -53,9 +51,9 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
         indices = list.getSelectedIndices();
         Object[] values = list.getSelectedValues();
         for (int i = 0; i < values.length; i++) {
-            channelSet.add((Channel)values[i]);
+            channelSet.add((Channel) values[i]);
         }
-        
+
         return channelSet;
     }
 
@@ -65,11 +63,11 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
         DefaultListModel listModel = (DefaultListModel) target.getModel();
         int index = target.getSelectedIndex();
 
-        //Prevent the user from dropping data back on itself.
-        //For example, if the user is moving items #4,#5,#6 and #7 and
-        //attempts to insert the items after item #5, this would
-        //be problematic when removing the original items.
-        //So this is not allowed.
+        // Prevent the user from dropping data back on itself.
+        // For example, if the user is moving items #4,#5,#6 and #7 and
+        // attempts to insert the items after item #5, this would
+        // be problematic when removing the original items.
+        // So this is not allowed.
         if (indices != null && index >= indices[0] - 1 && index <= indices[indices.length - 1]) {
             indices = null;
             return;
@@ -90,15 +88,15 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
             listModel.add(index++, chan);
         }
     }
-    
+
     @Override
     protected void cleanup(JComponent c, boolean remove) {
         if (remove && indices != null) {
-            JList source = (JList)c;
-            DefaultListModel model  = (DefaultListModel)source.getModel();
-            //If we are moving items around in the same list, we
-            //need to adjust the indices accordingly, since those
-            //after the insertion point have moved.
+            JList source = (JList) c;
+            DefaultListModel model = (DefaultListModel) source.getModel();
+            // If we are moving items around in the same list, we
+            // need to adjust the indices accordingly, since those
+            // after the insertion point have moved.
             if (addCount > 0) {
                 for (int i = 0; i < indices.length; i++) {
                     if (indices[i] > addIndex) {
@@ -109,9 +107,9 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
             for (int i = indices.length - 1; i >= 0; i--) {
                 model.remove(indices[i]);
             }
-            
+
             // add channels to this list, which have been replaced in the table
-            if(overwrittenChannels != null) {
+            if (overwrittenChannels != null) {
                 for (Channel chan : overwrittenChannels) {
                     model.add(indices[0], chan);
                 }

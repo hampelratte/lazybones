@@ -1,4 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.7 2011-01-18 17:26:51 hampelratte Exp $
+/* $Id: TimerOptionsDialog.java,v 1.8 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -54,7 +54,7 @@ import devplugin.Program;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
  */
 public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
-    
+
     private JButton ok = new JButton();
 
     private JButton cancel = new JButton();
@@ -64,37 +64,35 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
     private JDialog dialog;
 
     private TimerOptionsPanel top;
-    
+
     private JPanel panel;
-    
+
     /**
      * The actual timer
      */
     private Timer timer;
-    
+
     /**
      * A clone of the timer containing the old settings
      */
     private Timer oldTimer;
-    
+
     private Program program;
-    
+
     private boolean accepted = false;
-    
+
     public enum Mode {
-        NEW,
-        UPDATE,
-        VIEW
+        NEW, UPDATE, VIEW
     }
-    
+
     public TimerOptionsDialog(Timer timer, Program prog, Mode mode) {
         this.control = LazyBones.getInstance();
         top = new TimerOptionsPanel(timer, prog, mode);
-        
+
         this.timer = timer;
         this.oldTimer = (Timer) timer.clone();
         this.program = prog;
-        
+
         initGUI();
     }
 
@@ -103,10 +101,10 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
         dialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         panel = new JPanel(new GridBagLayout());
-        
+
         // register escape listener
         UiUtilities.registerForClosing(this);
-        
+
         dialog.getContentPane().add(panel);
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -127,7 +125,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         gbc.gridwidth = 1;
         gbc.gridy = 1;
         panel.add(cancel, gbc);
-        
+
         gbc.gridx = 1;
         panel.add(ok, gbc);
 
@@ -138,7 +136,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         cancel.addActionListener(this);
 
         dialog.setSize(400, 500);
-        
+
         // position lazy bones centered on tvb
         int parentWidth = LazyBones.getInstance().getParent().getWidth();
         int parentHeight = LazyBones.getInstance().getParent().getHeight();
@@ -147,7 +145,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         int posX = (parentWidth - dialog.getWidth()) / 2;
         int posY = (parentHeight - dialog.getHeight()) / 2;
         dialog.setLocation(parentX + posX, parentY + posY);
-        
+
         dialog.setVisible(true);
         dialog.pack();
     }
@@ -159,7 +157,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
             accepted = true;
         } else if (e.getSource() == cancel) {
             dialog.dispose();
-        } 
+        }
     }
 
     public Timer getTimer() {

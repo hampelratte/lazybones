@@ -1,4 +1,4 @@
-/* $Id: Controller.java,v 1.4 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: Controller.java,v 1.5 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,7 +37,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.hampelratte.svdrp.commands.HITK;
-
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>

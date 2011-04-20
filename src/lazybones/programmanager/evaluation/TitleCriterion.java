@@ -1,4 +1,4 @@
-/* $Id: TitleCriterion.java,v 1.3 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: TitleCriterion.java,v 1.4 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,7 +40,7 @@ import devplugin.Program;
 public class TitleCriterion extends AbstractCriterion {
 
     private static transient Logger logger = LoggerFactory.getLogger(TitleCriterion.class);
-    
+
     public int evaluate(Program prog, Timer timer) {
         // calculate the precentage of common words
         int percentage = 0;
@@ -50,7 +50,7 @@ public class TitleCriterion extends AbstractCriterion {
         percentage = Math.max(percentagePath, percentageTitle);
         percentage = Math.max(percentage, percentageBoth);
 
-        logger.trace("TitleCriterion for timer {} and prog {}: {}", new Object[] {timer.getTitle(), prog.getTitle(), percentage});
+        logger.trace("TitleCriterion for timer {} and prog {}: {}", new Object[] { timer.getTitle(), prog.getTitle(), percentage });
         return percentage;
     }
 

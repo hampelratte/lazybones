@@ -1,4 +1,4 @@
-/* $Id: Result.java,v 1.2 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: Result.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -63,9 +63,9 @@ public class Result implements Comparable<Result> {
     }
 
     public int compareTo(Result o) {
-        if(percentage == o.getPercentage()) {
+        if (percentage == o.getPercentage()) {
             return 0;
-        } else if(percentage > o.getPercentage()) {
+        } else if (percentage > o.getPercentage()) {
             return 1;
         } else {
             return -1;

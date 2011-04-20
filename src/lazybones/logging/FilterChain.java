@@ -1,4 +1,4 @@
-/* $Id: FilterChain.java,v 1.2 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: FilterChain.java,v 1.3 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,21 +37,21 @@ import java.util.logging.LogRecord;
 public class FilterChain implements Filter {
 
     private List<Filter> filters = new ArrayList<Filter>();
-    
+
     public boolean isLoggable(LogRecord record) {
         for (Filter filter : filters) {
-            if(!filter.isLoggable(record)) {
+            if (!filter.isLoggable(record)) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     public void addFilter(Filter filter) {
         filters.add(filter);
     }
-    
+
     public void removeFilter(Filter filter) {
         filters.remove(filter);
     }

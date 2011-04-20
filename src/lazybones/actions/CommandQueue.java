@@ -1,4 +1,4 @@
-/* $Id: CommandQueue.java,v 1.5 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: CommandQueue.java,v 1.6 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -45,15 +45,14 @@ import lazybones.LazyBones;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements ListModel, Runnable {
 
     private static CommandQueue instance;
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(CommandQueue.class);
-    
+
     private boolean running = false;
-    
+
     private final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
     private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 
@@ -75,46 +74,46 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
         }
         return instance;
     }
-    
+
     public void run() {
         running = true;
-        while(true) {
-            try { Thread.sleep(10); } catch (InterruptedException e) {}
-            
-            while(size() > 0 && running) {
+        while (true) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+
+            while (size() > 0 && running) {
                 final VDRAction action = poll();
                 LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
                 LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
 
-                Executors.newSingleThreadExecutor().execute(
-                    new SwingWorker<Boolean, Object>() {
-                        @Override
-                        protected Boolean doInBackground() throws Exception {
-                            boolean success = action.execute();
-                            action.setSuccess(success);
-                            action.callback();
-                            return success;
-                        }
-                        
-                        @Override
-                        protected void done() {
-                            LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
-                            LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
-                        }
+                Executors.newSingleThreadExecutor().execute(new SwingWorker<Boolean, Object>() {
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        boolean success = action.execute();
+                        action.setSuccess(success);
+                        action.callback();
+                        return success;
                     }
-                );
+
+                    @Override
+                    protected void done() {
+                        LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
+                        LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
+                    }
+                });
             }
         }
     }
-    
+
     public void stopThread() {
         this.running = false;
     }
-    
-    
-//######################### stuff for ListModel #######################################    
+
+    // ######################### stuff for ListModel #######################################
     private Vector<ListDataListener> listDataListeners = new Vector<ListDataListener>();
-    
+
     public void addListDataListener(ListDataListener l) {
         listDataListeners.add(l);
     }
@@ -123,11 +122,11 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
         int count = 0;
         for (Iterator<VDRAction> iter = iterator(); iter.hasNext(); count++) {
             Object element = iter.next();
-            if(count == index) {
+            if (count == index) {
                 return element;
             }
         }
-        
+
         throw new NoSuchElementException("No element with index " + index);
     }
 
@@ -138,5 +137,5 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
     public void removeListDataListener(ListDataListener l) {
         listDataListeners.remove(l);
     }
-//  ######################### end stuff for ListModel ####################################### 
+    // ######################### end stuff for ListModel #######################################
 }

@@ -1,4 +1,4 @@
-/* $Id: TimersChangedEvent.java,v 1.3 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: TimersChangedEvent.java,v 1.4 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,7 +43,7 @@ public class TimersChangedEvent {
     private List<Timer> timers = null;
 
     private Timer timer = null;
-    
+
     /**
      * @param type
      * @param timer

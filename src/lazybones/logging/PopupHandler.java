@@ -1,4 +1,4 @@
-/* $Id: PopupHandler.java,v 1.3 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: PopupHandler.java,v 1.4 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,33 +39,35 @@ import lazybones.gui.LogMessageDialog;
 public class PopupHandler extends Handler {
 
     public static final String KEYWORD = "PopupLogger";
-    
+
     private Filter filter;
-    
+
     private LogMessageDialog lmd;
-    
+
     public PopupHandler() {
         FilterChain chain = new FilterChain();
         chain.addFilter(new ConnectionFilter());
         chain.addFilter(new EpgFilter());
         filter = chain;
     }
-    
+
     @Override
     public void publish(final LogRecord record) {
-        if(lmd == null) {
+        if (lmd == null) {
             lmd = LogMessageDialog.getInstance();
         }
-        
+
         boolean loggable = filter.isLoggable(record);
-        if(loggable && record.getLevel().intValue() >= Level.SEVERE.intValue() || KEYWORD.equals(record.getLoggerName())) {
+        if (loggable && record.getLevel().intValue() >= Level.SEVERE.intValue() || KEYWORD.equals(record.getLoggerName())) {
             lmd.addMessage(record);
         }
     }
 
     @Override
-    public void close() throws SecurityException {}
+    public void close() throws SecurityException {
+    }
 
     @Override
-    public void flush() {}
+    public void flush() {
+    }
 }

@@ -1,4 +1,4 @@
-/* $Id: StartStopEvent.java,v 1.6 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: StartStopEvent.java,v 1.7 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -67,7 +67,7 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
     public void setTimer(Timer timer) {
         this.timer = timer;
     }
-    
+
     public Calendar getEventTime() {
         return isStartEvent() ? timer.getStartTime() : timer.getEndTime();
     }
@@ -75,14 +75,11 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
     public int compareTo(StartStopEvent o) {
         return getEventTime().compareTo(o.getEventTime());
     }
-    
+
     public String toString() {
         DateFormat df = DateFormat.getDateTimeInstance();
         Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();
-        BroadcastChannel chan = (BroadcastChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber()); 
-        return (df.format(cal.getTime()) 
-                + " Transponder: " 
-                + chan.getFrequency()+ " " 
-                + timer);
+        BroadcastChannel chan = (BroadcastChannel) ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        return (df.format(cal.getTime()) + " Transponder: " + chan.getFrequency() + " " + timer);
     }
 }

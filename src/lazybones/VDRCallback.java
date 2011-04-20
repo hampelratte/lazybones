@@ -1,4 +1,4 @@
-/* $Id: VDRCallback.java,v 1.3 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: VDRCallback.java,v 1.4 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,11 +34,11 @@ import lazybones.actions.VDRAction;
 import org.hampelratte.svdrp.Response;
 
 /**
- * VDRActions are executed asynchronously. So the calling party doesn't get informed
- * about the results of the action. To get informed you can pass a VDRCallback to
- * the action and after the execution of this action the VDRCallback will be called
+ * VDRActions are executed asynchronously. So the calling party doesn't get informed about the results of the action. To get informed you can pass a VDRCallback
+ * to the action and after the execution of this action the VDRCallback will be called
+ * 
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
- *
+ * 
  */
 public interface VDRCallback {
     public void receiveResponse(VDRAction cmd, Response response);

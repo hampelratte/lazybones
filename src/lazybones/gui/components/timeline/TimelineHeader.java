@@ -1,4 +1,4 @@
-/* $Id: TimelineHeader.java,v 1.3 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineHeader.java,v 1.4 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,15 +43,15 @@ import javax.swing.UIManager;
 public class TimelineHeader extends JComponent {
 
     public final static int HEIGHT = 20;
-    
+
     public TimelineHeader() {
         setPreferredSize(new Dimension(getWidth(), HEIGHT));
     }
-    
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         // enable font anti aliasing
         Graphics2D g2d = (Graphics2D) g;
         // storing original anitalising flag
@@ -59,25 +59,25 @@ public class TimelineHeader extends JComponent {
         if (state != RenderingHints.VALUE_TEXT_ANTIALIAS_ON) {
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         }
-        
+
         int w = getWidth();
         int h = getHeight();
-        
+
         int fontSize = 8;
         Font font = new Font("SansSerif", Font.PLAIN, fontSize);
         FontMetrics fm = g.getFontMetrics(font);
-        
-        double pixelsPerHour = (double)(w-1) / (double)24;
+
+        double pixelsPerHour = (double) (w - 1) / (double) 24;
 
         g.setColor(Color.GRAY);
-        g.drawLine(0, h-1, w-1, h-1); // draw the bottom border
+        g.drawLine(0, h - 1, w - 1, h - 1); // draw the bottom border
         for (int i = 0; i < 25; i++) {
             g.setColor(Color.GRAY);
-            g.drawLine((int)(i * pixelsPerHour), 0, (int)(i * pixelsPerHour), h);
-            if(i < 24) {
+            g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), h);
+            if (i < 24) {
                 int hourWidth = fm.stringWidth(Integer.toString(i));
                 int hourHeight = fm.getHeight();
-                int x = (int)(i * pixelsPerHour) + ((int)pixelsPerHour - hourWidth) / 2 - 2;
+                int x = (int) (i * pixelsPerHour) + ((int) pixelsPerHour - hourWidth) / 2 - 2;
                 int y = (h - hourHeight) / 2;
                 g.setColor(UIManager.getColor("Label.foreground"));
                 g.drawString(Integer.toString(i), x, y + 9);

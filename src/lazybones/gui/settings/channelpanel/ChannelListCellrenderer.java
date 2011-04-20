@@ -1,4 +1,4 @@
-/* $Id: ChannelListCellrenderer.java,v 1.2 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: ChannelListCellrenderer.java,v 1.3 2011-04-20 12:09:12 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -36,13 +36,12 @@ import javax.swing.JList;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 
-
 public class ChannelListCellrenderer extends DefaultListCellRenderer {
 
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        if(value instanceof Channel) {
+        if (value instanceof Channel) {
             Channel chan = (Channel) value;
-            return super.getListCellRendererComponent(list, "[" + chan.getChannelNumber()+ "] " + chan.getName(), index, isSelected, cellHasFocus);
+            return super.getListCellRendererComponent(list, "[" + chan.getChannelNumber() + "] " + chan.getName(), index, isSelected, cellHasFocus);
         } else {
             return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }

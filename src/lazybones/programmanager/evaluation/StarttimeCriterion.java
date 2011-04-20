@@ -1,4 +1,4 @@
-/* $Id: StarttimeCriterion.java,v 1.2 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: StarttimeCriterion.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -40,15 +40,14 @@ import org.slf4j.LoggerFactory;
 import devplugin.Program;
 
 /**
- * Compares the start time of a {@link Program} and {@link Timer} and returns
- * the percentage of equality
+ * Compares the start time of a {@link Program} and {@link Timer} and returns the percentage of equality
  * 
  * @author <a href="hampelratte@users.berlios.de">hampelratte@users.berlios.de</a>
  */
 public class StarttimeCriterion extends AbstractCriterion {
 
     private static transient Logger logger = LoggerFactory.getLogger(StarttimeCriterion.class);
-    
+
     public int evaluate(Program prog, Timer timer) {
         // program start time
         Calendar progStartCal = prog.getDate().getCalendar();
@@ -56,16 +55,16 @@ public class StarttimeCriterion extends AbstractCriterion {
         progStartCal.set(Calendar.MINUTE, prog.getMinutes());
         progStartCal.set(Calendar.SECOND, 0);
         long progInMillis = progStartCal.getTimeInMillis();
-        
+
         // timer start time
         Timer bufferless = timer.getTimerWithoutBuffers();
         long timerInMillis = bufferless.getStartTime().getTimeInMillis();
-        
+
         int diffInMin = (int) TimeUnit.MILLISECONDS.toMinutes((Math.abs(progInMillis - timerInMillis)));
-        
+
         // return 100% - the difference in minutes
         int percentage = 100 - diffInMin;
-        logger.trace("StarttimeCriterion for timer {} and prog {}: {}", new Object[] {timer.getTitle(), prog.getTitle(), percentage});
+        logger.trace("StarttimeCriterion for timer {} and prog {}: {}", new Object[] { timer.getTitle(), prog.getTitle(), percentage });
         return percentage;
     }
 

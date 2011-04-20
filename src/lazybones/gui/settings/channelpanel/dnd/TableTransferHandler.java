@@ -1,4 +1,4 @@
-/* $Id: TableTransferHandler.java,v 1.5 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TableTransferHandler.java,v 1.6 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -41,19 +41,19 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 
 public class TableTransferHandler extends ChannelSetTransferHandler {
     private int[] rows = null;
-    private int addCount = 0;  //Number of items added.
-    
+    private int addCount = 0; // Number of items added.
+
     private JList channelList;
     private Set<Channel> overwrittenChannels = new HashSet<Channel>();
-    
+
     public TableTransferHandler(JList channelList) {
         this.channelList = channelList;
     }
-    
+
     @Override
     protected ChannelSet<Channel> exportChannels(JComponent c) {
         addCount = 0;
-        JTable table = (JTable)c;
+        JTable table = (JTable) c;
         rows = table.getSelectedRows();
         ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
         for (int i = 0; i < rows.length; i++) {
@@ -64,17 +64,16 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
 
     @Override
     protected void importChannels(JComponent c, ChannelSet<Channel> set) {
-        JTable target = (JTable)c;
-        DefaultTableModel model = (DefaultTableModel)target.getModel();
+        JTable target = (JTable) c;
+        DefaultTableModel model = (DefaultTableModel) target.getModel();
         int index = target.getSelectedRow();
 
-        //Prevent the user from dropping data back on itself.
-        //For example, if the user is moving rows #4,#5,#6 and #7 and
-        //attempts to insert the rows after row #5, this would
-        //be problematic when removing the original rows.
-        //So this is not allowed.
-        if (rows != null && index >= rows[0] - 1 &&
-              index <= rows[rows.length - 1]) {
+        // Prevent the user from dropping data back on itself.
+        // For example, if the user is moving rows #4,#5,#6 and #7 and
+        // attempts to insert the rows after row #5, this would
+        // be problematic when removing the original rows.
+        // So this is not allowed.
+        if (rows != null && index >= rows[0] - 1 && index <= rows[rows.length - 1]) {
             rows = null;
             return;
         }
@@ -82,35 +81,35 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         int max = model.getRowCount();
         if (index < 0) {
             index = max;
-        } 
-        
+        }
+
         addCount = set.size();
         overwrittenChannels.clear();
         for (Channel chan : set) {
             Object o = model.getValueAt(index, 1);
-            if(o != null) {
-                overwrittenChannels.add((Channel)o);
+            if (o != null) {
+                overwrittenChannels.add((Channel) o);
             }
             model.setValueAt(chan, index, 1);
             index++;
         }
-        
+
         // move overwritten to list
-        if(overwrittenChannels.size() > 0) {
+        if (overwrittenChannels.size() > 0) {
             ListTransferHandler lth = (ListTransferHandler) channelList.getTransferHandler();
             lth.setOverwrittenChannels(overwrittenChannels);
         }
     }
-    
+
     @Override
     protected void cleanup(JComponent c, boolean remove) {
-        JTable source = (JTable)c;
+        JTable source = (JTable) c;
         if (remove && rows != null) {
-            DefaultTableModel model = (DefaultTableModel)source.getModel();
+            DefaultTableModel model = (DefaultTableModel) source.getModel();
 
             // If we are moving items around in the same table, we
             // move the overwritten channels to the arisen empty cells
-            // else remove them 
+            // else remove them
             if (addCount > 0) {
                 int i = 0;
                 for (Channel chan : overwrittenChannels) {

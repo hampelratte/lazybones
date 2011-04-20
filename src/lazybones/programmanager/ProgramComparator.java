@@ -1,4 +1,4 @@
-/* $Id: ProgramComparator.java,v 1.2 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: ProgramComparator.java,v 1.3 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -77,16 +77,14 @@ public class ProgramComparator implements Comparator<Program> {
 
         if (cal.get(Calendar.DAY_OF_MONTH) < thisCal.get(Calendar.DAY_OF_MONTH)) {
             return -1;
-        } else if (cal.get(Calendar.DAY_OF_MONTH) > thisCal
-                .get(Calendar.DAY_OF_MONTH)) {
+        } else if (cal.get(Calendar.DAY_OF_MONTH) > thisCal.get(Calendar.DAY_OF_MONTH)) {
             return 1;
         }
         // at this point: day is equal
 
         if (cal.get(Calendar.HOUR_OF_DAY) < thisCal.get(Calendar.HOUR_OF_DAY)) {
             return -1;
-        } else if (cal.get(Calendar.HOUR_OF_DAY) > thisCal
-                .get(Calendar.HOUR_OF_DAY)) {
+        } else if (cal.get(Calendar.HOUR_OF_DAY) > thisCal.get(Calendar.HOUR_OF_DAY)) {
             return 1;
         }
         // at this point: hour is equal

@@ -1,4 +1,4 @@
-/* $Id: Player.java,v 1.21 2011-01-18 13:13:53 hampelratte Exp $
+/* $Id: Player.java,v 1.22 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -49,11 +49,11 @@ import devplugin.Program;
  */
 public class Player {
     private static PlayerThread playerThread;
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(Player.class);
 
     public static void play(Program prog) {
-    	Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
+        Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
         if (o != null) {
             Channel chan = (Channel) o;
             int id = chan.getChannelNumber();
@@ -69,11 +69,9 @@ public class Player {
                 playerThread.stopThread();
             }
 
-            boolean switchBefore = new Boolean(LazyBones.getProperties()
-                    .getProperty("switchBefore")).booleanValue();
+            boolean switchBefore = new Boolean(LazyBones.getProperties().getProperty("switchBefore")).booleanValue();
             if (switchBefore) {
-                Response res = VDRConnection.send(new CHAN(Integer
-                        .toString(channel)));
+                Response res = VDRConnection.send(new CHAN(Integer.toString(channel)));
                 if (res == null || res.getCode() != 250) {
                     String mesg = Localizer.getLocalization(Localizer.I18N_ERROR) + ": " + res.getMessage();
                     logger.error(mesg);
@@ -81,8 +79,7 @@ public class Player {
                 }
             }
 
-            String parameters = LazyBones.getProperties().getProperty(
-                    "player_params");
+            String parameters = LazyBones.getProperties().getProperty("player_params");
             String[] arguments;
             if (parameters.trim().length() > 0) {
                 String[] params = parameters.split(" ");
@@ -92,7 +89,7 @@ public class Player {
                 arguments = new String[2];
             }
             arguments[0] = LazyBones.getProperties().getProperty("player");
-            
+
             String host = LazyBones.getProperties().getProperty("host");
             String streamtype = LazyBones.getProperties().getProperty("streamtype");
             String url = LazyBones.getProperties().getProperty("streamurl");
@@ -102,18 +99,17 @@ public class Player {
             arguments[arguments.length - 1] = url;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
-            String mesg = Localizer.getLocalization(Localizer.I18N_ERROR)+ ": " + e1;
+            String mesg = Localizer.getLocalization(Localizer.I18N_ERROR) + ": " + e1;
             logger.error(mesg);
         }
     }
-    
+
     public static void play(Recording rec) {
         if (playerThread != null && playerThread.isRunning()) {
             playerThread.stopThread();
         }
-        
-        String parameters = LazyBones.getProperties().getProperty(
-        "player_params");
+
+        String parameters = LazyBones.getProperties().getProperty("player_params");
         String[] arguments;
         if (parameters.trim().length() > 0) {
             String[] params = parameters.split(" ");

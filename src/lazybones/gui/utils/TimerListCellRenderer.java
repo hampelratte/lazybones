@@ -1,4 +1,4 @@
-/* $Id: TimerListCellRenderer.java,v 1.9 2011-01-18 13:13:52 hampelratte Exp $
+/* $Id: TimerListCellRenderer.java,v 1.10 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -56,11 +56,11 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     private JLabel time = new JLabel();
     private JLabel title = new JLabel();
     private JLabel recording = new JLabel();
-    
+
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
     private Color inactive = Color.LIGHT_GRAY;
-    
+
     public TimerListCellRenderer() {
         initGUI();
     }
@@ -72,24 +72,24 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         channel.setForeground(Color.BLACK);
         date.setForeground(Color.BLACK);
         recording.setForeground(Color.BLACK);
-        
+
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
         title.setFont(bold);
         recording.setFont(recording.getFont().deriveFont(9.0f));
-        
+
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(date, gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        add(channel, gbc);        
+        add(channel, gbc);
         gbc.gridx = 2;
         gbc.gridy = 0;
         add(recording, gbc);
@@ -104,7 +104,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     }
 
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        if(isSelected) {
+        if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
             time.setForeground(UIManager.getColor("List.selectionForeground"));
             title.setForeground(UIManager.getColor("List.selectionForeground"));
@@ -119,49 +119,49 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
             date.setForeground(UIManager.getColor("List.foreground"));
             recording.setForeground(UIManager.getColor("List.foreground"));
         }
-        
-        if(value instanceof Timer) {
-            Timer timer = (Timer)value;
-            
-            if(!timer.isActive()) {
+
+        if (value instanceof Timer) {
+            Timer timer = (Timer) value;
+
+            if (!timer.isActive()) {
                 time.setForeground(inactive);
                 title.setForeground(inactive);
                 channel.setForeground(inactive);
                 date.setForeground(inactive);
                 recording.setForeground(inactive);
             }
-            
+
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
             DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-            
+
             date.setText(df.format(timer.getStartTime().getTime()));
             time.setText(tf.format(timer.getStartTime().getTime()));
             title.setText(timer.getDisplayTitle());
-            
+
             Channel chan = ChannelManager.getInstance().getChannel(timer);
-            if(chan != null) {
+            if (chan != null) {
                 channel.setText(chan.getName());
             } else {
                 org.hampelratte.svdrp.responses.highlevel.Channel c = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-                if(c != null)
+                if (c != null)
                     channel.setText(c.getName());
             }
-            
-            if(timer.isRecording()) {
-                recording.setIcon( LazyBones.getInstance().getIcon("lazybones/capture.png") );
+
+            if (timer.isRecording()) {
+                recording.setIcon(LazyBones.getInstance().getIcon("lazybones/capture.png"));
                 recording.setText(LazyBones.getTranslation("tooltip_recording", "Currently recording"));
             } else {
                 recording.setIcon(null);
                 recording.setText("");
             }
-            
+
             setEnabled(list.isEnabled());
             date.setEnabled(list.isEnabled());
             channel.setEnabled(list.isEnabled());
             time.setEnabled(list.isEnabled());
             title.setEnabled(list.isEnabled());
             recording.setEnabled(list.isEnabled());
-            
+
             return this;
         } else {
             return new JLabel(value.toString());

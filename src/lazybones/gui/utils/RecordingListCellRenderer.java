@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.10 2011-01-18 13:13:52 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.11 2011-04-20 12:09:11 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -50,16 +50,16 @@ import lazybones.LazyBones;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 public class RecordingListCellRenderer extends JPanel implements ListCellRenderer {
-    
+
     private JLabel date = new JLabel();
     private JLabel newRec = new JLabel();
     private JLabel cutRec = new JLabel();
     private JLabel time = new JLabel();
     private JLabel title = new JLabel();
-    
+
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
-    
+
     public RecordingListCellRenderer() {
         initGUI();
     }
@@ -71,17 +71,17 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         newRec.setForeground(Color.BLACK);
         cutRec.setForeground(Color.BLACK);
         date.setForeground(Color.BLACK);
-        
+
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
         title.setFont(bold);
-        
+
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(date, gbc);
@@ -102,7 +102,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
     }
 
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        if(isSelected) {
+        if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
             date.setForeground(UIManager.getColor("List.selectionForeground"));
             time.setForeground(UIManager.getColor("List.selectionForeground"));
@@ -113,60 +113,60 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             time.setForeground(UIManager.getColor("List.foreground"));
             title.setForeground(UIManager.getColor("List.foreground"));
         }
-        
-        if(value instanceof Recording) {
-            Recording rec = (Recording)value;
+
+        if (value instanceof Recording) {
+            Recording rec = (Recording) value;
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
             DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-            
+
             date.setText(df.format(rec.getStartTime().getTime()));
             time.setText(tf.format(rec.getStartTime().getTime()));
-            
-            String recTitle = rec.getDisplayTitle(); 
-            if(rec.getEpgInfo() != null) {
+
+            String recTitle = rec.getDisplayTitle();
+            if (rec.getEpgInfo() != null) {
                 StringBuilder sb = new StringBuilder(rec.getEpgInfo().getTitle());
-                if(rec.getEpgInfo().getShortText().length() > 0) {
+                if (rec.getEpgInfo().getShortText().length() > 0) {
                     sb.append(" - ");
                     sb.append(rec.getEpgInfo().getShortText());
                 }
                 recTitle = sb.toString();
             }
             title.setText(recTitle);
-            
-            if(rec.isNew()) {
+
+            if (rec.isNew()) {
                 newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
                 newRec.setVisible(true);
             } else {
                 newRec.setIcon(null);
                 newRec.setVisible(false);
             }
-            
-            if(rec.isCut()) {
+
+            if (rec.isCut()) {
                 cutRec.setIcon(LazyBones.getInstance().getIcon("lazybones/edit-cut.png"));
                 cutRec.setVisible(true);
             } else {
                 cutRec.setIcon(null);
                 cutRec.setVisible(false);
             }
-            
+
             setEnabled(list.isEnabled());
             date.setEnabled(list.isEnabled());
             newRec.setEnabled(list.isEnabled());
             cutRec.setEnabled(list.isEnabled());
             time.setEnabled(list.isEnabled());
             title.setEnabled(list.isEnabled());
-            
+
             return this;
         } else {
             return new JLabel(value.toString());
         }
     }
-    
+
     @Override
     public String getToolTipText(MouseEvent event) {
-        if(newRec.getBounds().contains(event.getPoint()) && newRec.isVisible()) {
+        if (newRec.getBounds().contains(event.getPoint()) && newRec.isVisible()) {
             return LazyBones.getTranslation("new_recording", "New recording");
-        } else if(cutRec.getBounds().contains(event.getPoint()) && cutRec.isVisible()) {
+        } else if (cutRec.getBounds().contains(event.getPoint()) && cutRec.isVisible()) {
             return LazyBones.getTranslation("cut_recording", "Cut recording");
         } else {
             return super.getToolTipText(event);

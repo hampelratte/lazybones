@@ -1,4 +1,4 @@
-/* $Id: TimelineWeekdayButton.java,v 1.7 2011-01-18 13:13:55 hampelratte Exp $
+/* $Id: TimelineWeekdayButton.java,v 1.8 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -48,43 +48,42 @@ import lazybones.utils.Period;
 import lazybones.utils.Utilities;
 
 public class TimelineWeekdayButton extends JToggleButton implements Observer {
-    
+
     boolean hasChanged = false;
-    
+
     private Calendar day;
-    
+
     private int timerCount = 0;
-    
+
     private int conflictCount = 0;
-    
+
     private SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
     private SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-    
+
     public TimelineWeekdayButton(Calendar day) {
         TimerManager.getInstance().addObserver(this);
         setDay(day);
     }
-    
+
     public void update(Observable o, Object arg) {
-        if(o instanceof TimerManager) {
+        if (o instanceof TimerManager) {
             hasChanged = true;
         }
     }
-    
+
     /**
-     * Updates the small dots on the button,
-     * the tooltip text and the enabled state
+     * Updates the small dots on the button, the tooltip text and the enabled state
      */
     private void updateIndicators() {
         timerCount = 0;
         conflictCount = 0;
         List<Timer> timers = TimerManager.getInstance().getTimers();
         for (Timer timer : timers) {
-            if(timerRunsOnThisDay(timer)) {
+            if (timerRunsOnThisDay(timer)) {
                 timerCount++;
                 for (Iterator<Period> iterator = timer.getConflictPeriods().iterator(); iterator.hasNext();) {
                     Period period = (Period) iterator.next();
-                    if(Utilities.sameDay(day, period.getStartTime()) || Utilities.sameDay(day, period.getEndTime())) {
+                    if (Utilities.sameDay(day, period.getStartTime()) || Utilities.sameDay(day, period.getEndTime())) {
                         conflictCount++;
                         break; // only count a timer once, though it has more than one conflict
                     }
@@ -94,14 +93,11 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
 
         // enable if there is a timer event today
         setEnabled(timerCount > 0);
-        
+
         // update tooltip text
-        setToolTipText(LazyBones.getTranslation("weekdayButton.tooltip", 
-                "{0} timers with {1} conflicts on {2}", 
-                Integer.toString(timerCount),
-                Integer.toString(conflictCount),
-                longFormat.format(day.getTime() )));
-        
+        setToolTipText(LazyBones.getTranslation("weekdayButton.tooltip", "{0} timers with {1} conflicts on {2}", Integer.toString(timerCount),
+                Integer.toString(conflictCount), longFormat.format(day.getTime())));
+
         repaint();
     }
 
@@ -118,38 +114,38 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private boolean timerRunsOnThisDay(Timer timer) {
         Calendar startTime = timer.getStartTime();
         Calendar endTime = timer.getEndTime();
-        if(Utilities.sameDay(startTime, getDay()) || Utilities.sameDay(endTime, getDay())) {
+        if (Utilities.sameDay(startTime, getDay()) || Utilities.sameDay(endTime, getDay())) {
             return true;
         }
-        
+
         return false;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
-        if(hasChanged) {
+
+        if (hasChanged) {
             hasChanged = false;
             updateIndicators();
         }
-        
+
         final int INDICATOR_SIZE = 3;
         final int PADDING = 2;
-        
+
         int element_size = INDICATOR_SIZE + PADDING;
-        int pos_y = getHeight()- element_size;
-        
+        int pos_y = getHeight() - element_size;
+
         int i = 0;
-        
+
         g.setColor(Color.RED);
         for (i = 0; i < conflictCount; i++) {
-            g.fillRect(PADDING + i*element_size, pos_y, INDICATOR_SIZE, INDICATOR_SIZE);
+            g.fillRect(PADDING + i * element_size, pos_y, INDICATOR_SIZE, INDICATOR_SIZE);
         }
-        
+
         g.setColor(Color.BLACK);
         for (; i < timerCount; i++) {
-            g.fillRect(PADDING + i*element_size, pos_y, INDICATOR_SIZE, INDICATOR_SIZE);
+            g.fillRect(PADDING + i * element_size, pos_y, INDICATOR_SIZE, INDICATOR_SIZE);
         }
     }
 }

@@ -1,4 +1,4 @@
-/* $Id: Evaluator.java,v 1.6 2011-01-18 13:13:56 hampelratte Exp $
+/* $Id: Evaluator.java,v 1.7 2011-04-20 12:09:14 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,22 +43,22 @@ import org.slf4j.LoggerFactory;
 import devplugin.Program;
 
 public class Evaluator {
-    
+
     private static transient Logger logger = LoggerFactory.getLogger(Evaluator.class);
-    
+
     private List<Criterion> criteria = new ArrayList<Criterion>();
-    
+
     private List<Result> results = new ArrayList<Result>();
-    
+
     public Evaluator() {
         criteria.add(new TitleCriterion());
         criteria.add(new DurationCriterion());
         criteria.add(new StarttimeCriterion());
     }
-    
+
     /**
-     * Evaluates a collection of programs concerning their equality to a timer
-     * with the help of several criteria
+     * Evaluates a collection of programs concerning their equality to a timer with the help of several criteria
+     * 
      * @param candidates
      * @param timer
      * @return the most equal program
@@ -74,13 +74,13 @@ public class Evaluator {
                 total += percentage * criterion.getBoost();
                 factors += criterion.getBoost();
             }
-            
+
             int percentage = total / factors;
-            logger.trace("Total percentage for timer {} and prog {}: {}", new Object[] {timer.getTitle(), program.getTitle(), percentage});
+            logger.trace("Total percentage for timer {} and prog {}: {}", new Object[] { timer.getTitle(), program.getTitle(), percentage });
             results.add(new Result(program, percentage));
         }
-        
-        if(results.size() > 0) {
+
+        if (results.size() > 0) {
             Collections.sort(results);
             return results.get(results.size() - 1);
         } else {

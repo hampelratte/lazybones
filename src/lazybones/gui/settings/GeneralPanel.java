@@ -1,4 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.9 2011-01-18 13:13:54 hampelratte Exp $
+/* $Id: GeneralPanel.java,v 1.10 2011-04-20 12:09:13 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package lazybones.gui.settings;
+
 import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -54,17 +55,11 @@ import lazybones.VDRConnection;
 import lazybones.gui.DebugConsole;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
+ * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
+ * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class GeneralPanel extends JPanel {
     private JLabel lHost;
     private JTextField host;
@@ -93,7 +88,7 @@ public class GeneralPanel extends JPanel {
     public GeneralPanel() {
         initGUI();
     }
-    
+
     private void initGUI() {
         try {
             {
@@ -104,17 +99,18 @@ public class GeneralPanel extends JPanel {
                 {
                     mainPanel = new JPanel();
                     GridBagLayout mainPanelLayout = new GridBagLayout();
-                    mainPanelLayout.columnWidths = new int[] {7, 7};
-                    mainPanelLayout.rowHeights = new int[] {7, 7, 7, 7};
-                    mainPanelLayout.columnWeights = new double[] {0.1, 0.1};
-                    mainPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1};
+                    mainPanelLayout.columnWidths = new int[] { 7, 7 };
+                    mainPanelLayout.rowHeights = new int[] { 7, 7, 7, 7 };
+                    mainPanelLayout.columnWeights = new double[] { 0.1, 0.1 };
+                    mainPanelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1 };
                     this.add(mainPanel);
                     mainPanel.setLayout(mainPanelLayout);
                 }
                 {
                     lHost = new JLabel();
                     lHost.setText(LazyBones.getTranslation("host", "Host"));
-                    mainPanel.add(lHost, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lHost, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
+                            0, 0));
                 }
                 {
                     expertsPanel = new JPanel();
@@ -127,7 +123,8 @@ public class GeneralPanel extends JPanel {
                     }
                     {
                         logConnectionErr = new JCheckBox();
-                        expertsPanel.add(logConnectionErr, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                        expertsPanel.add(logConnectionErr, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                new Insets(5, 5, 5, 5), 0, 0));
                         logConnectionErr.setSelected(Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("logConnectionErrors")));
                     }
                     {
@@ -136,7 +133,7 @@ public class GeneralPanel extends JPanel {
                     }
                     {
                         int percentageThreshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
-                        SpinnerModel percentageModel = new SpinnerNumberModel(percentageThreshold,0,100,1);
+                        SpinnerModel percentageModel = new SpinnerNumberModel(percentageThreshold, 0, 100, 1);
                         percentage = new JSpinner();
                         percentage.setModel(percentageModel);
                         percentage.getEditor().setPreferredSize(new java.awt.Dimension(138, 18));
@@ -144,39 +141,50 @@ public class GeneralPanel extends JPanel {
                     }
                     {
                         supressMatchDialog = new JCheckBox();
-                        expertsPanel.add(supressMatchDialog, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                        expertsPanel.add(percentage, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-                        expertsPanel.add(lFuzzyness, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                        supressMatchDialog.setToolTipText(LazyBones.getTranslation("supressMatchDialog.tooltip", "Do not show EPG selection dialog for non matching VDR timer"));
+                        expertsPanel.add(supressMatchDialog, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                new Insets(5, 5, 5, 5), 0, 0));
+                        expertsPanel.add(percentage, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                new Insets(5, 5, 5, 5), 0, 0));
+                        expertsPanel.add(lFuzzyness, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(
+                                5, 5, 5, 5), 0, 0));
+                        supressMatchDialog.setToolTipText(LazyBones.getTranslation("supressMatchDialog.tooltip",
+                                "Do not show EPG selection dialog for non matching VDR timer"));
                         supressMatchDialog.setSelected(Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog")));
                     }
                     {
                         lSupressMatchDialog = new JLabel();
-                        expertsPanel.add(lSupressMatchDialog, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                        expertsPanel.add(lLogConnectionErr, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                        expertsPanel.add(lSupressMatchDialog, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                new Insets(5, 5, 5, 5), 0, 0));
+                        expertsPanel.add(lLogConnectionErr, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                new Insets(5, 5, 5, 5), 0, 0));
                         {
                             lLogEpgErr = new JLabel();
-                            expertsPanel.add(lLogEpgErr, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(lLogEpgErr, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                             lLogEpgErr.setText(LazyBones.getTranslation("logEPGErrors", "Show error dialogs, if EPG data are missing"));
                         }
                         {
                             logEpgErr = new JCheckBox();
                             logEpgErr.setSelected(Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("logEPGErrors")));
-                            expertsPanel.add(logEpgErr, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(logEpgErr, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                         }
                         {
                             lShowTimerOptions = new JLabel();
-                            expertsPanel.add(lShowTimerOptions, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(lShowTimerOptions, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                             lShowTimerOptions.setText(LazyBones.getTranslation("showTimerOptionsDialog", "Show timer options dialog on timer creation"));
                         }
                         {
                             showTimerOptions = new JCheckBox();
                             showTimerOptions.setSelected(Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("showTimerOptionsDialog")));
-                            expertsPanel.add(showTimerOptions, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(showTimerOptions, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                         }
                         {
                             bShowLog = new JButton();
-                            expertsPanel.add(bShowLog, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(bShowLog, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                             bShowLog.setText(LazyBones.getTranslation("show_log", "Show log"));
                             bShowLog.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
@@ -188,45 +196,51 @@ public class GeneralPanel extends JPanel {
                         }
                         {
                             lLoadRecordInfo = new JLabel();
-                            expertsPanel.add(lLoadRecordInfo, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(lLoadRecordInfo, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                             lLoadRecordInfo.setText(LazyBones.getTranslation("load_recording_information", "Load recording information"));
                         }
                         {
                             cbLoadRecordInfo = new JCheckBox();
                             cbLoadRecordInfo.setSelected(Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos")));
-                            expertsPanel.add(cbLoadRecordInfo, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                            expertsPanel.add(cbLoadRecordInfo, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                    new Insets(5, 5, 5, 5), 0, 0));
                         }
                         lSupressMatchDialog.setText(LazyBones.getTranslation("supressMatchDialog", "Supress match dialog"));
                     }
-                    expertsPanelLayout.rowWeights = new double[] {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-                    expertsPanelLayout.rowHeights = new int[] {7, 7, 7, 7, 7, 7, 7};
-                    expertsPanelLayout.columnWeights = new double[] {0.1, 0.1};
-                    expertsPanelLayout.columnWidths = new int[] {7, 7};
+                    expertsPanelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
+                    expertsPanelLayout.rowHeights = new int[] { 7, 7, 7, 7, 7, 7, 7 };
+                    expertsPanelLayout.columnWeights = new double[] { 0.1, 0.1 };
+                    expertsPanelLayout.columnWidths = new int[] { 7, 7 };
                 }
                 {
-                    ComboBoxModel charsetModel = new DefaultComboBoxModel(new Object[] {"ISO-8859-1", "ISO-8859-15", "UTF-8"});
+                    ComboBoxModel charsetModel = new DefaultComboBoxModel(new Object[] { "ISO-8859-1", "ISO-8859-15", "UTF-8" });
                     charset = new JComboBox();
-                    mainPanel.add(charset, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(charset, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5,
+                            5, 5, 5), 0, 0));
                     charset.setModel(charsetModel);
                     String c = LazyBones.getProperties().getProperty("charset");
                     charset.setSelectedItem(c);
                 }
                 {
                     lCharset = new JLabel();
-                    mainPanel.add(lCharset, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lCharset, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+                            5), 0, 0));
                     lCharset.setText(LazyBones.getTranslation("charset", "Charset"));
                 }
                 {
                     int value = Integer.parseInt(LazyBones.getProperties().getProperty("timeout"));
                     SpinnerNumberModel timeoutModel = new SpinnerNumberModel(value, 1, 30000, 1);
                     timeout = new JSpinner();
-                    mainPanel.add(timeout, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(timeout, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5,
+                            5, 5, 5), 0, 0));
                     timeout.setModel(timeoutModel);
                     timeout.setEditor(new JSpinner.NumberEditor(timeout, "#"));
                 }
                 {
                     lTimeout = new JLabel();
-                    mainPanel.add(lTimeout, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lTimeout, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+                            5), 0, 0));
                     lTimeout.setText("Timeout");
                 }
                 {
@@ -237,28 +251,32 @@ public class GeneralPanel extends JPanel {
                     int value = Integer.parseInt(LazyBones.getProperties().getProperty("port"));
                     SpinnerNumberModel portModel = new SpinnerNumberModel(value, 1, 65535, 1);
                     port = new JSpinner();
-                    mainPanel.add(port, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(port, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+                            5, 5), 0, 0));
                     port.setModel(portModel);
                     port.setEditor(new JSpinner.NumberEditor(port, "#"));
                 }
                 {
                     lPort = new JLabel();
-                    mainPanel.add(lPort, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-                    mainPanel.add(host, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-                    mainPanel.add(expertsPanel, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+                    mainPanel.add(lPort, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
+                            0, 0));
+                    mainPanel.add(host, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+                            5, 5), 0, 0));
+                    mainPanel.add(expertsPanel, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                            new Insets(5, 5, 5, 5), 0, 0));
                     expertsPanel.setSize(10, 10);
                     lPort.setText(LazyBones.getTranslation("port", "Port"));
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     public GeneralPanel getPanel() {
         return this;
     }
-    
+
     public void saveSettings() {
         int p = (Integer) port.getValue();
         int t = (Integer) timeout.getValue();
