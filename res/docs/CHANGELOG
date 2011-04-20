@@ -1,3 +1,7 @@
+Lazy Bones 0.6.7
+===============================================================================
+* Fixed bug, which let the cpu usage go up on the timeline panel
+
 Lazy Bones 0.6.6
 ===============================================================================
 * Open timer settings dialog in the center of TV-Browser
