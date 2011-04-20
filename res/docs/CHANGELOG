@@ -1,6 +1,7 @@
 Lazy Bones 0.6.7
 ===============================================================================
 * Fixed bug, which let the cpu usage go up on the timeline panel
+* Added new context menu item to switch to a channel
 
 Lazy Bones 0.6.6
 ===============================================================================
