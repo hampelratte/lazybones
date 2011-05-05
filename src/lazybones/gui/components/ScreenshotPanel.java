@@ -1,4 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.11 2011-04-20 12:09:14 hampelratte Exp $
+/* $Id: ScreenshotPanel.java,v 1.12 2011-05-05 16:58:29 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -46,6 +46,7 @@ import lazybones.VDRConnection;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.GRAB;
+import org.hampelratte.svdrp.commands.GRAB.Resolution;
 import org.hampelratte.svdrp.responses.R216;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,11 +93,13 @@ public class ScreenshotPanel extends JLabel {
             grab.setQuality(80);
         }
 
+        @Override
         public void run() {
             while (running) {
                 try {
                     Thread.sleep(1000);
-                    grab.setResolution(getWidth() + " " + getHeight());
+                    Resolution res = new GRAB.Resolution(getWidth(), getHeight());
+                    grab.setResolution(res);
                     String method = LazyBones.getProperties().getProperty("preview.method");
                     if ("HTTP".equals(method)) {
                         image = getHTTPImage();
