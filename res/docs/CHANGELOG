@@ -1,3 +1,9 @@
+Lazy Bones 0.6.8
+===============================================================================
+* Fixed layout problem in the recordings details view
+* Recordings details view now shows the recorded streams (Video,Audio,Subtitle) 
+* Use new version of svdrp4j
+
 Lazy Bones 0.6.7
 ===============================================================================
 * Fixed bug, which let the cpu usage go up on the timeline panel

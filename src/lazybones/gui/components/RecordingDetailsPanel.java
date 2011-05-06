@@ -1,4 +1,4 @@
-/* $Id: RecordingDetailsPanel.java,v 1.1 2011-05-06 13:09:57 hampelratte Exp $
+/* $Id: RecordingDetailsPanel.java,v 1.2 2011-05-06 15:52:05 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -34,6 +34,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.util.Locale;
 
@@ -45,9 +47,11 @@ import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import lazybones.LazyBones;
 import lazybones.RecordingManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Recording;
+import org.hampelratte.svdrp.responses.highlevel.Stream;
 
 public class RecordingDetailsPanel extends JPanel implements ListSelectionListener {
 
@@ -57,6 +61,9 @@ public class RecordingDetailsPanel extends JPanel implements ListSelectionListen
     private JLabel time = new JLabel();
     private DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
     private JLabel shortTextLabel = new JLabel();
+    private ExpandToggleButton showStreamsToggle = new ExpandToggleButton();
+    private JLabel streamsLabelShort = new JLabel();
+    private JLabel streamsLabel = new JLabel();
     private JTextArea desc = new JTextArea();
 
     public RecordingDetailsPanel() {
@@ -81,23 +88,50 @@ public class RecordingDetailsPanel extends JPanel implements ListSelectionListen
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
 
+        int y = 0;
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = y++;
         title.setFont(title.getFont().deriveFont(Font.BOLD));
         add(title, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = y++;
         add(time, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = y++;
         add(shortTextLabel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridy = y;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 0;
+        gbc.gridwidth = 1;
+        add(showStreamsToggle, gbc);
+        showStreamsToggle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                boolean selected = showStreamsToggle.isSelected();
+                adjustStreamLabelVisibility(selected);
+            }
+        });
+
+        gbc.gridx = 1;
+        gbc.gridy = y++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+        add(streamsLabelShort, gbc);
+        streamsLabelShort.setText("Audio Stream and more ...");
+        add(streamsLabel, gbc);
+        streamsLabel.setVisible(false);
+        streamsLabel.setText("<html>1<br>2<br>3<br></html>");
+
+        gbc.gridx = 0;
+        gbc.gridy = y++;
+        gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
         desc.setWrapStyleWord(true);
@@ -105,6 +139,31 @@ public class RecordingDetailsPanel extends JPanel implements ListSelectionListen
         desc.setEditable(false);
         desc.setBackground(Color.WHITE);
         add(new JScrollPane(desc), gbc);
+
+        adjustStreamLabelVisibility(showStreamsToggle.isSelected());
+    }
+
+    private void adjustStreamLabelVisibility(boolean selected) {
+        if (recording != null && recording.getStreams().size() > 0) {
+            if (recording.getStreams().size() > 1) {
+                showStreamsToggle.setVisible(true);
+                if (selected) {
+                    streamsLabelShort.setVisible(false);
+                    streamsLabel.setVisible(true);
+                } else {
+                    streamsLabelShort.setVisible(true);
+                    streamsLabel.setVisible(false);
+                }
+            } else {
+                showStreamsToggle.setVisible(false);
+                streamsLabelShort.setVisible(false);
+                streamsLabel.setVisible(true);
+            }
+        } else {
+            showStreamsToggle.setVisible(false);
+            streamsLabelShort.setVisible(false);
+            streamsLabel.setVisible(false);
+        }
     }
 
     private void loadData() {
@@ -115,6 +174,27 @@ public class RecordingDetailsPanel extends JPanel implements ListSelectionListen
         shortTextLabel.setText(shortText);
         shortTextLabel.setToolTipText(shortTextLabel.getText());
         desc.setText(recording.getDescription());
+
+        if (recording.getStreams().size() > 0) {
+            streamsLabelShort.setText(createStreamInfoString(recording.getStreams().get(0)));
+
+            String allStreams = "<html>";
+            for (Stream stream : recording.getStreams()) {
+                String info = createStreamInfoString(stream);
+                allStreams += info + "<br>";
+            }
+            allStreams += "</html>";
+            streamsLabel.setText(allStreams);
+        }
+
+        adjustStreamLabelVisibility(showStreamsToggle.isSelected());
+    }
+
+    private String createStreamInfoString(Stream stream) {
+        String content = LazyBones.getTranslation(stream.getContent().toString(), stream.getContent().toString());
+        String language = stream.getLanguage();
+        String description = stream.getDescription();
+        return content + ' ' + description + " (" + language + ")";
     }
 
     @Override
@@ -126,6 +206,8 @@ public class RecordingDetailsPanel extends JPanel implements ListSelectionListen
             time.setText(null);
             shortTextLabel.setText(null);
             desc.setText(null);
+            recording = null;
+            adjustStreamLabelVisibility(showStreamsToggle.isSelected());
         } else {
             RecordingManager.getInstance().loadInfo(rec);
             setRecording(rec);
