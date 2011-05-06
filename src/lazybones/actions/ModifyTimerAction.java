@@ -1,4 +1,4 @@
-/* $Id: ModifyTimerAction.java,v 1.5 2011-04-20 12:09:13 hampelratte Exp $
+/* $Id: ModifyTimerAction.java,v 1.6 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,8 +37,9 @@ import lazybones.actions.responses.TimersOutOfSync;
 
 import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.MODT;
+import org.hampelratte.svdrp.parsers.TimerParser;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-import org.hampelratte.svdrp.util.TimerParser;
+
 
 public class ModifyTimerAction extends VDRAction {
 

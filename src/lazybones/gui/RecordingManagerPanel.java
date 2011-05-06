@@ -1,4 +1,4 @@
-/* $Id: RecordingManagerPanel.java,v 1.21 2011-04-20 12:09:12 hampelratte Exp $
+/* $Id: RecordingManagerPanel.java,v 1.22 2011-05-06 13:09:58 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -60,7 +60,7 @@ import lazybones.RecordingManager;
 import lazybones.VDRCallback;
 import lazybones.actions.DeleteRecordingAction;
 import lazybones.actions.VDRAction;
-import lazybones.gui.components.EPGInfoPanel;
+import lazybones.gui.components.RecordingDetailsPanel;
 import lazybones.gui.utils.RecordingListCellRenderer;
 
 import org.hampelratte.svdrp.Response;
@@ -77,7 +77,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
 
     private JScrollPane scrollPane = null;
     private JList recordingList = new JList(new RecordingsListAdapter());
-    private EPGInfoPanel epgInfoPanel = new EPGInfoPanel();
+    private RecordingDetailsPanel recordingDetailsPanel = new RecordingDetailsPanel();
     private JButton buttonSync = null;
     private JButton buttonRemove = null;
 
@@ -113,12 +113,12 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         gbc.gridx = 1;
         gbc.weightx = .1;
         gbc.insets = new java.awt.Insets(10, 0, 10, 10);
-        recordingList.addListSelectionListener(epgInfoPanel);
-        epgInfoPanel.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
-        epgInfoPanel.setPreferredSize(new Dimension(300, 300));
-        epgInfoPanel.setMinimumSize(new Dimension(300, 300));
-        epgInfoPanel.setMaximumSize(new Dimension(300, 300));
-        this.add(epgInfoPanel, gbc);
+        recordingList.addListSelectionListener(recordingDetailsPanel);
+        recordingDetailsPanel.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
+        recordingDetailsPanel.setPreferredSize(new Dimension(300, 300));
+        recordingDetailsPanel.setMinimumSize(new Dimension(300, 300));
+        recordingDetailsPanel.setMaximumSize(new Dimension(300, 300));
+        this.add(recordingDetailsPanel, gbc);
 
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
         gbc.gridx = 0;
@@ -139,6 +139,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         this.add(buttonRemove, gbc);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         Recording rec = null;
         boolean itemSelected = false;
@@ -150,7 +151,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         if ("DELETE".equals(e.getActionCommand()) && itemSelected) {
             deleteRecording(rec);
         } else if ("INFO".equals(e.getActionCommand()) && itemSelected) {
-            createEPGInfoDialog(rec);
+            createRecordingDetailsDialog(rec);
         } else if ("SYNC".equals(e.getActionCommand())) {
             RecordingManager.getInstance().synchronize();
         } else if ("PLAY".equals(e.getActionCommand()) && itemSelected) {
@@ -166,6 +167,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         buttonSync.setEnabled(false);
         final boolean hasFocus = recordingList.hasFocus();
         VDRCallback callback = new VDRCallback() {
+            @Override
             public void receiveResponse(VDRAction cmd, Response response) {
                 if (!cmd.isSuccess()) {
                     logger.error(cmd.getResponse().getMessage());
@@ -194,12 +196,10 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         dra.enqueue();
     }
 
-    private void createEPGInfoDialog(Recording rec) {
+    private void createRecordingDetailsDialog(Recording rec) {
         final JDialog dialog = new JDialog();
-        if (rec.getEpgInfo() == null) {
-            RecordingManager.getInstance().loadInfo(rec);
-        }
-        dialog.getContentPane().add(new EPGInfoPanel(rec.getEpgInfo()));
+        RecordingManager.getInstance().loadInfo(rec);
+        dialog.getContentPane().add(new RecordingDetailsPanel(rec));
         dialog.setSize(400, 300);
         dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());
         dialog.setVisible(true);
@@ -237,19 +237,24 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         popup.add(menuSync);
 
         recordingList.addMouseListener(new MouseListener() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 mayTriggerPopup(e);
             }
 
+            @Override
             public void mouseClicked(MouseEvent e) {
             }
 
+            @Override
             public void mouseEntered(MouseEvent e) {
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
             }
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 mayTriggerPopup(e);
             }

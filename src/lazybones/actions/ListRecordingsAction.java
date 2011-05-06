@@ -1,4 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.8 2011-04-20 12:09:12 hampelratte Exp $
+/* $Id: ListRecordingsAction.java,v 1.9 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -37,10 +37,11 @@ import lazybones.VDRConnection;
 import lazybones.logging.LoggingConstants;
 
 import org.hampelratte.svdrp.commands.LSTR;
+import org.hampelratte.svdrp.parsers.RecordingListParser;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
-import org.hampelratte.svdrp.util.RecordingsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class ListRecordingsAction extends VDRAction {
 
@@ -58,7 +59,7 @@ public class ListRecordingsAction extends VDRAction {
 
         if (response != null && response.getCode() == 250) {
             String recordingsString = response.getMessage();
-            recordings = RecordingsParser.parse(recordingsString);
+            recordings = RecordingListParser.parse(recordingsString);
 
             // retrieve infos for all recordings
             // this is to slow, instead we load the info on demand

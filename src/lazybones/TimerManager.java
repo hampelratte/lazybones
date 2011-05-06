@@ -1,4 +1,4 @@
-/* $Id: TimerManager.java,v 1.51 2011-04-20 12:09:11 hampelratte Exp $
+/* $Id: TimerManager.java,v 1.52 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -62,11 +62,11 @@ import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.VDRVersion;
 import org.hampelratte.svdrp.commands.LSTE;
 import org.hampelratte.svdrp.commands.LSTT;
+import org.hampelratte.svdrp.parsers.EPGParser;
+import org.hampelratte.svdrp.parsers.TimerParser;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-import org.hampelratte.svdrp.util.EPGParser;
-import org.hampelratte.svdrp.util.TimerParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -504,6 +504,7 @@ public class TimerManager extends Observable {
      */
     public void deleteTimer(final Timer timer, final Runnable callback) {
         VDRCallback _callback = new VDRCallback() {
+            @Override
             public void receiveResponse(VDRAction cmd, Response response) {
                 if (!cmd.isSuccess()) {
                     logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn't delete timer:") + " " + cmd.getResponse().getMessage());
@@ -568,7 +569,7 @@ public class TimerManager extends Observable {
         Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at " + Long.toString(millis / 1000)));
 
         if (res != null && res.getCode() == 215) {
-            List<EPGEntry> epgList = EPGParser.parse(res.getMessage());
+            List<EPGEntry> epgList = new EPGParser().parse(res.getMessage());
 
             if (epgList.size() <= 0) {
                 noEPGAvailable(prog, id, automatic);
@@ -749,6 +750,7 @@ public class TimerManager extends Observable {
 
         if (update) {
             VDRCallback callback = new VDRCallback() {
+                @Override
                 public void receiveResponse(VDRAction cmd, Response response) {
                     if (cmd.isSuccess()) {
                         TimerManager.getInstance().synchronize();
@@ -780,9 +782,10 @@ public class TimerManager extends Observable {
                     logger.debug("Looking in title mapping for timer {}", timer);
                     // lookup in mapping history
                     TimerManager tm = TimerManager.getInstance();
-                    String timerTitle = (String) tm.getTitleMapping().getVdrTitle(prog.getTitle());
+                    String timerTitle = tm.getTitleMapping().getVdrTitle(prog.getTitle());
                     if (timer.getTitle().equals(timerTitle)) {
                         VDRCallback callback = new VDRCallback() {
+                            @Override
                             public void receiveResponse(VDRAction cmd, Response response) {
                                 if (cmd.isSuccess()) {
                                     timer.addTvBrowserProgID(prog.getUniqueID());
@@ -887,6 +890,7 @@ public class TimerManager extends Observable {
         Timer timer = TimerManager.getInstance().getTimer(prog);
         logger.debug("Deleting timer {}", timer);
         VDRCallback callback = new VDRCallback() {
+            @Override
             public void receiveResponse(VDRAction cmd, Response response) {
                 if (cmd instanceof DeleteTimerAction) {
                     if (!cmd.isSuccess()) {
@@ -945,7 +949,7 @@ public class TimerManager extends Observable {
             if (candidate != null) {
                 logger.debug("Looking up old mappings");
                 TimerManager tm = TimerManager.getInstance();
-                String progTitle = (String) tm.getTitleMapping().getTvbTitle(timer.getTitle());
+                String progTitle = tm.getTitleMapping().getTvbTitle(timer.getTitle());
                 if (candidate.getTitle().equals(progTitle)) {
                     candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
                     timer.addTvBrowserProgID(candidate.getID());

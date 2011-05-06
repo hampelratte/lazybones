@@ -1,4 +1,4 @@
-/* $Id: ChannelManager.java,v 1.7 2011-04-20 12:09:11 hampelratte Exp $
+/* $Id: ChannelManager.java,v 1.8 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -39,11 +39,12 @@ import java.util.Map.Entry;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
+import org.hampelratte.svdrp.parsers.ChannelParser;
 import org.hampelratte.svdrp.responses.highlevel.BroadcastChannel;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.util.ChannelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class ChannelManager {
 

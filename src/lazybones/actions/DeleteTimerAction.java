@@ -1,4 +1,4 @@
-/* $Id: DeleteTimerAction.java,v 1.7 2011-04-20 12:09:12 hampelratte Exp $
+/* $Id: DeleteTimerAction.java,v 1.8 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -43,9 +43,10 @@ import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.DELT;
 import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.UPDT;
+import org.hampelratte.svdrp.parsers.TimerParser;
 import org.hampelratte.svdrp.responses.R250;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-import org.hampelratte.svdrp.util.TimerParser;
+
 
 public class DeleteTimerAction extends VDRAction {
 

@@ -1,4 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.11 2011-04-20 12:09:11 hampelratte Exp $
+/* $Id: RecordingListCellRenderer.java,v 1.12 2011-05-06 13:09:58 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -101,6 +101,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         add(title, gbc);
     }
 
+    @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
@@ -123,14 +124,12 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             time.setText(tf.format(rec.getStartTime().getTime()));
 
             String recTitle = rec.getDisplayTitle();
-            if (rec.getEpgInfo() != null) {
-                StringBuilder sb = new StringBuilder(rec.getEpgInfo().getTitle());
-                if (rec.getEpgInfo().getShortText().length() > 0) {
-                    sb.append(" - ");
-                    sb.append(rec.getEpgInfo().getShortText());
-                }
-                recTitle = sb.toString();
+            StringBuilder sb = new StringBuilder(rec.getDisplayTitle());
+            if (rec.getShortText().length() > 0) {
+                sb.append(" - ");
+                sb.append(rec.getShortText());
             }
+            recTitle = sb.toString();
             title.setText(recTitle);
 
             if (rec.isNew()) {

@@ -1,4 +1,4 @@
-/* $Id: EPGInfoPanel.java,v 1.5 2011-04-20 12:09:14 hampelratte Exp $
+/* $Id: RecordingDetailsPanel.java,v 1.1 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -47,12 +47,11 @@ import javax.swing.event.ListSelectionListener;
 
 import lazybones.RecordingManager;
 
-import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 
-public class EPGInfoPanel extends JPanel implements ListSelectionListener {
+public class RecordingDetailsPanel extends JPanel implements ListSelectionListener {
 
-    private EPGEntry epg;
+    private Recording recording;
 
     private JLabel title = new JLabel();
     private JLabel time = new JLabel();
@@ -60,18 +59,18 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
     private JLabel shortTextLabel = new JLabel();
     private JTextArea desc = new JTextArea();
 
-    public EPGInfoPanel() {
+    public RecordingDetailsPanel() {
         initGUI();
     }
 
-    public EPGInfoPanel(EPGEntry epg) {
-        this.epg = epg;
+    public RecordingDetailsPanel(Recording recording) {
+        this.recording = recording;
         initGUI();
         loadData();
     }
 
-    public void setEpg(EPGEntry epg) {
-        this.epg = epg;
+    public void setRecording(Recording recording) {
+        this.recording = recording;
         loadData();
     }
 
@@ -80,6 +79,8 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -98,7 +99,6 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         desc.setWrapStyleWord(true);
         desc.setLineWrap(true);
@@ -108,13 +108,16 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
     }
 
     private void loadData() {
-        title.setText(epg.getTitle());
-        time.setText(df.format(epg.getStartTime().getTime()));
-        String shortText = (epg.getShortText() != null && epg.getShortText().length() > 0) ? epg.getShortText() : "";
+        title.setText(recording.getDisplayTitle());
+        title.setToolTipText(title.getText());
+        time.setText(df.format(recording.getStartTime().getTime()));
+        String shortText = (recording.getShortText() != null && recording.getShortText().length() > 0) ? recording.getShortText() : "";
         shortTextLabel.setText(shortText);
-        desc.setText(epg.getDescription());
+        shortTextLabel.setToolTipText(shortTextLabel.getText());
+        desc.setText(recording.getDescription());
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         JList list = (JList) e.getSource();
         Recording rec = (Recording) list.getSelectedValue();
@@ -124,10 +127,8 @@ public class EPGInfoPanel extends JPanel implements ListSelectionListener {
             shortTextLabel.setText(null);
             desc.setText(null);
         } else {
-            if (rec.getEpgInfo() == null) {
-                RecordingManager.getInstance().loadInfo(rec);
-            }
-            setEpg(rec.getEpgInfo());
+            RecordingManager.getInstance().loadInfo(rec);
+            setRecording(rec);
         }
     }
 }

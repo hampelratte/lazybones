@@ -1,4 +1,4 @@
-/* $Id: VDRConnection.java,v 1.26 2011-04-20 12:09:11 hampelratte Exp $
+/* $Id: VDRConnection.java,v 1.27 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class VDRConnection {

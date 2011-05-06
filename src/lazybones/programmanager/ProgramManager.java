@@ -1,4 +1,4 @@
-/* $Id: ProgramManager.java,v 1.11 2011-04-20 12:09:13 hampelratte Exp $
+/* $Id: ProgramManager.java,v 1.12 2011-05-06 13:09:58 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -51,10 +51,10 @@ import lazybones.programmanager.evaluation.Result;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTE;
+import org.hampelratte.svdrp.parsers.EPGParser;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-import org.hampelratte.svdrp.util.EPGParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +123,7 @@ public class ProgramManager {
         LSTE cmd = new LSTE(channelNumber, time_t);
         Response res = VDRConnection.send(cmd);
         if (res != null && res.getCode() == 215) {
-            List<EPGEntry> epg = EPGParser.parse(res.getMessage());
+            List<EPGEntry> epg = new EPGParser().parse(res.getMessage());
             if (epg.size() > 0) {
                 EPGEntry entry = epg.get(0); // we can use the first element, because there will be only one item in the list
                 VDRTimer timer = new VDRTimer();
@@ -146,8 +146,9 @@ public class ProgramManager {
         // determine channel
         devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
 
-        if (chan == null)
+        if (chan == null) {
             return null;
+        }
 
         // determine middle of the program
         long startTime = timer.getStartTime().getTimeInMillis();

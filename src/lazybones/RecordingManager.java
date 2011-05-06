@@ -1,4 +1,4 @@
-/* $Id: RecordingManager.java,v 1.15 2011-04-20 12:09:11 hampelratte Exp $
+/* $Id: RecordingManager.java,v 1.16 2011-05-06 13:09:57 hampelratte Exp $
  * 
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
@@ -30,6 +30,7 @@
 package lazybones;
 
 import java.awt.Cursor;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -40,9 +41,8 @@ import lazybones.actions.VDRAction;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.commands.PLAY;
-import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
+import org.hampelratte.svdrp.parsers.RecordingParser;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
-import org.hampelratte.svdrp.util.EPGParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +104,7 @@ public class RecordingManager extends Observable {
 
         // fetch current recording list from vdr
         VDRCallback _callback = new VDRCallback() {
+            @Override
             public void receiveResponse(VDRAction cmd, Response response) {
                 ListRecordingsAction lstr = (ListRecordingsAction) cmd;
 
@@ -116,20 +117,11 @@ public class RecordingManager extends Observable {
                             logger.trace("Getting info for recording {}", rec.getNumber());
                             Response resp = VDRConnection.send(new LSTR(rec.getNumber()));
                             if (resp != null && resp.getCode() == 215) {
-                                // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
-                                String[] lines = resp.getMessage().split("\n");
-                                StringBuffer mesg = new StringBuffer();
-                                for (int i = 0; i < lines.length; i++) {
-                                    if (i == lines.length - 1) {
-                                        mesg.append("e\n");
-                                    }
-                                    mesg.append(lines[i] + "\n");
-                                }
-
                                 // parse epg information
-                                List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-                                if (epg.size() > 0) {
-                                    rec.setEpgInfo(epg.get(0));
+                                try {
+                                    new RecordingParser().parseRecording(rec, resp.getMessage());
+                                } catch (ParseException e) {
+                                    logger.error("Couldn't parse epg information", e);
                                 }
                             }
                         }
@@ -152,20 +144,11 @@ public class RecordingManager extends Observable {
         LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         Response response = VDRConnection.send(new LSTR(rec.getNumber()));
         if (response != null && response.getCode() == 215) {
-            // workaround for the epg parser, because LSTR does not send an 'e' as entry terminator
-            String[] lines = response.getMessage().split("\n");
-            StringBuffer mesg = new StringBuffer();
-            for (int i = 0; i < lines.length; i++) {
-                if (i == lines.length - 1) {
-                    mesg.append("e\n");
-                }
-                mesg.append(lines[i] + "\n");
-            }
-
             // parse epg information
-            List<EPGEntry> epg = EPGParser.parse(mesg.toString());
-            if (epg.size() > 0) {
-                rec.setEpgInfo(epg.get(0));
+            try {
+                new RecordingParser().parseRecording(rec, response.getMessage());
+            } catch (ParseException e) {
+                logger.error("Couldn't parse epg information", e);
             }
         }
         LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
