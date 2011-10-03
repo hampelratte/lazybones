@@ -55,7 +55,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import lazybones.captureplugin.driver.LazyBonesDevice;
 import lazybones.gui.MainDialog;
 import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
@@ -739,11 +738,7 @@ public class LazyBones extends Plugin implements Observer {
             props.setProperty("logConnectionErrors", logConnectionErrors);
         } else if (TARGET_WATCH.equals(receiveTarget.getTargetId())) {
             Player.play(programArr[0]);
-        } else if (LazyBonesDevice.TARGET_CAPTURE_PLUGIN_ADD.equals(receiveTarget.getTargetId())) {
-            TimerManager.getInstance().createTimer(programArr[0], false);
-        } else if (LazyBonesDevice.TARGET_CAPTURE_PLUGIN_REMOVE.equals(receiveTarget.getTargetId())) {
-            TimerManager.getInstance().deleteTimer(programArr[0]);
-        }
+        } 
         return true;
     }
 
