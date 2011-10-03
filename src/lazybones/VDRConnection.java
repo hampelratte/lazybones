@@ -59,6 +59,12 @@ public class VDRConnection {
 
     public static String charset;
 
+    public static String clientHost;
+
+    public static int clientPort;
+    
+    public static String clientUserId;
+
     /**
      * If set, the connection will be kept open for some time, so that consecutive request will be much faster
      */
@@ -103,6 +109,37 @@ public class VDRConnection {
                     timer.schedule(new ConnectionCloser(), 0, 100);
                 }
             }
+            logger.debug("<--{}", res.getMessage());
+        } catch (Exception e1) {
+            res = new ConnectionProblem();
+            logger.error(res.getMessage(), e1);
+        }
+
+        return res;
+    }
+
+    /**
+     * Sends a SVDRP command to Client-VDR and returns a response object, which represents the vdr response
+     * 
+     * @param cmd
+     *            The SVDRP command to send
+     * @return The SVDRP response or null, if the Command couldn't be sent
+     */
+    public synchronized static Response sendClient(final Command cmd) {
+    	// Fallback to server connection if client host is null
+    	if (VDRConnection.host == null) {
+    		return send(cmd);    		
+    	}
+    	
+        Response res = null;
+        try {
+        	Connection clientConnection = new Connection(VDRConnection.clientHost, VDRConnection.clientPort, VDRConnection.timeout, "UTF-8");
+            
+            logger.debug("-->{}", cmd.getCommand());
+
+            res = clientConnection.send(cmd);
+            clientConnection.close();
+            clientConnection = null;
             logger.debug("<--{}", res.getMessage());
         } catch (Exception e1) {
             res = new ConnectionProblem();

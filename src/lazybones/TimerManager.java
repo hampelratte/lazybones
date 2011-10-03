@@ -438,7 +438,10 @@ public class TimerManager extends Observable {
             List<VDRTimer> vdrtimers = TimerParser.parse(timersString);
             List<Timer> timers = new ArrayList<Timer>();
             for (VDRTimer vdrtimer : vdrtimers) {
+            	// check permission
+            	if (Utilities.hasRemotetimerPermission(vdrtimer.getDescription())) {
                 timers.add(new Timer(vdrtimer));
+            }
             }
             setTimers(timers, true);
 
@@ -618,6 +621,11 @@ public class TimerManager extends Observable {
                 timer.setFile(vdrEPG.getTitle());
 
                 // set the description
+                // Unschön: Falls wir mit dem RemoteTimer arbeiten, muss die Description speziell gesetzt werden.
+                //          In diesem Fall wird die Einstellung der Beschreibung ignoriert.
+                if (VDRConnection.clientHost != null) {
+                	timer.setDescription("<remotetimers>" + VDRConnection.clientUserId + "</remotetimers>");
+                } else {
                 String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
                 String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
                 int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
@@ -638,6 +646,7 @@ public class TimerManager extends Observable {
                 default:
                     timer.setDescription(descVdr);
                     break;
+                }
                 }
             } else { // VDR has no EPG data
                 noEPGAvailable(prog, id, automatic);

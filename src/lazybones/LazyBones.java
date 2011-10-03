@@ -228,6 +228,17 @@ public class LazyBones extends Plugin implements Observer {
         threshold = threshold == null ? "45" : threshold;
         props.setProperty("percentageThreshold", threshold);
 
+        String clientHost = props.getProperty("clientHost");
+        String clientCharset = props.getProperty("clientCharset");
+        clientCharset = clientCharset == null ? "UTF-8" : clientCharset;
+        props.setProperty("clientCharset", charset);
+        String clientPort = props.getProperty("clientPort");
+        clientPort = clientPort == null ? "2001" : clientPort;
+        props.setProperty("clientPort", clientPort);
+        String clientUserId = props.getProperty("clientUserId");
+        clientUserId = clientUserId == null ? "0" : clientUserId;
+        props.setProperty("clientUserId", clientUserId);
+        
         String timer_before = props.getProperty("timer.before");
         timer_before = timer_before == null ? "5" : timer_before;
         String timer_after = props.getProperty("timer.after");
@@ -295,6 +306,10 @@ public class LazyBones extends Plugin implements Observer {
         VDRConnection.charset = charset;
         VDRConnection.persistentConnection = true;
 
+        VDRConnection.clientHost = clientHost;
+        VDRConnection.clientPort = Integer.parseInt(clientPort);
+        VDRConnection.clientUserId = clientUserId;
+        
         init();
     }
 
@@ -646,7 +661,7 @@ public class LazyBones extends Plugin implements Observer {
                     Channel vdrChan = ChannelManager.getChannelMapping().get(tvbChan.getId());
                     logger.info("Swtich to channel {} of program {}", vdrChan.getName(), program.getTitle());
                     CHAN chan = new CHAN(Integer.toString(vdrChan.getChannelNumber()));
-                    Response resp = VDRConnection.send(chan);
+                    Response resp = VDRConnection.sendClient(chan);
                     if (resp.getCode() != 250) {
                         logger.error(LazyBones.getTranslation("couldnt_switch", "Couldn't switch to channel", resp.getMessage()));
                     }

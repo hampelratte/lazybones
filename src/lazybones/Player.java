@@ -71,7 +71,7 @@ public class Player {
 
             boolean switchBefore = new Boolean(LazyBones.getProperties().getProperty("switchBefore")).booleanValue();
             if (switchBefore) {
-                Response res = VDRConnection.send(new CHAN(Integer.toString(channel)));
+                Response res = VDRConnection.sendClient(new CHAN(Integer.toString(channel)));
                 if (res == null || res.getCode() != 250) {
                     String mesg = Localizer.getLocalization(Localizer.I18N_ERROR) + ": " + res.getMessage();
                     logger.error(mesg);

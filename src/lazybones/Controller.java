@@ -54,6 +54,6 @@ public class Controller implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        VDRConnection.send(new HITK(e.getActionCommand()));
+        VDRConnection.sendClient(new HITK(e.getActionCommand()));
     }
 }

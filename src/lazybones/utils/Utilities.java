@@ -36,13 +36,19 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTable;
 import javax.swing.JViewport;
 
+import lazybones.RecordingManager;
 import lazybones.Timer;
+import lazybones.VDRConnection;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -50,6 +56,7 @@ import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
  *         Utility class with different functions
  */
 public class Utilities {
+	private static transient Logger logger = LoggerFactory.getLogger(Utilities.class);
 
     public static int percentageOfEquality(String s, String t) {
         // check if strings are empty
@@ -254,5 +261,35 @@ public class Utilities {
             }
         }
         return null;
+    }
+    
+    /**
+     * Pattern for remotetimers
+     */
+    private static Pattern remoteTimers = Pattern.compile(".*?<remotetimers>(.+?)</remotetimers>.*?", Pattern.DOTALL);
+    
+    /**
+     * Checks if the current user are allowed to see this timer or recording
+     */
+    public static boolean hasRemotetimerPermission(String desc) {
+    	boolean hasPermission = false;
+    	
+    	// check remotetimers
+    	if (desc != null) {
+    		Matcher m = remoteTimers.matcher(desc);
+    		if (m.matches()) {
+    			// check userid
+    			String userId = m.group(1);
+    			if ("0".equals(userId) || userId.equals(VDRConnection.clientUserId)) {
+    				hasPermission = true;
+    			}
+    		} else {
+    			hasPermission = true;
+    		}
+    	} else {            
+    		hasPermission = true;
+    	}
+    	
+    	return hasPermission;
     }
 }

@@ -61,6 +61,8 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 
     private ScreenshotSettingsPanel previewPanel;
 
+    private ClientPanel clientPanel;
+
     public JPanel createSettingsPanel() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
@@ -80,6 +82,9 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 
             previewPanel = new ScreenshotSettingsPanel();
             tabbedPane.addTab(LazyBones.getTranslation("remoteControl", "Remote control"), previewPanel.getPanel());
+            
+            clientPanel = new ClientPanel();
+            tabbedPane.addTab(LazyBones.getTranslation("client", "Client"), clientPanel.getPanel());
         }
 
         JPanel p = new JPanel();
@@ -94,6 +99,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
         playerPanel.saveSettings();
         timerPanel.saveSettings();
         previewPanel.saveSettings();
+        clientPanel.saveSettings();
     }
 
     public Icon getIcon() {

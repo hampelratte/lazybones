@@ -155,7 +155,7 @@ public class RecordingManager extends Observable {
     }
 
     public void playOnVdr(Recording rec) {
-        Response res = VDRConnection.send(new PLAY(rec.getNumber()));
+        Response res = VDRConnection.sendClient(new PLAY(rec.getNumber()));
         if (res.getCode() != 250) {
             logger.error(res.getMessage());
         }

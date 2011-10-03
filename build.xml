@@ -26,7 +26,7 @@
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
 
-		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
+		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true" includeantruntime="false">
 			<classpath>
 				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
@@ -34,7 +34,7 @@
 			</classpath>
 		</javac>
 
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true" includeantruntime="false">
 			<classpath>
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${tvbrowser.runtime.dir}/plugins/CapturePlugin.jar" />

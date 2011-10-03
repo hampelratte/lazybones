@@ -105,7 +105,7 @@ public class RemoteControl extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == watch) {
-            Response res = VDRConnection.send(new CHAN());
+            Response res = VDRConnection.sendClient(new CHAN());
             if (res != null && res.getCode() == 250) {
                 int chan = Integer.parseInt(res.getMessage().split(" ")[0]);
                 Player.play(chan);
@@ -115,7 +115,7 @@ public class RemoteControl extends JPanel implements ActionListener {
 
     public void updateVolume() {
         logger.info("Updating volume slider");
-        Response res = VDRConnection.send(new VOLU(""));
+        Response res = VDRConnection.sendClient(new VOLU(""));
         if (res != null && res.getCode() == 250) {
             String[] words = res.getMessage().trim().split(" ");
             String volString = words[words.length - 1];

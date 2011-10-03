@@ -29,12 +29,14 @@
  */
 package lazybones.actions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lazybones.LazyBones;
 import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 import lazybones.logging.LoggingConstants;
+import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.parsers.RecordingListParser;
@@ -59,7 +61,19 @@ public class ListRecordingsAction extends VDRAction {
 
         if (response != null && response.getCode() == 250) {
             String recordingsString = response.getMessage();
-            recordings = RecordingListParser.parse(recordingsString);
+            List<Recording> tmpRecordings =  RecordingListParser.parse(recordingsString);
+            recordings = new ArrayList<Recording>();
+
+            // check remotetimers: is is not necessary to fully parse the epg data
+            for (Recording rec : tmpRecordings) {
+            	response = VDRConnection.sendClient(new LSTR(rec.getNumber()));
+            	
+            	if(response != null && response.getCode() == 215) {
+            		if (Utilities.hasRemotetimerPermission(response.getMessage())) {
+            			recordings.add(rec);
+            		}
+            	}
+            }
 
             // retrieve infos for all recordings
             // this is to slow, instead we load the info on demand
