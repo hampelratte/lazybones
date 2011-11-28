@@ -1,6 +1,5 @@
-/* $Id: StarttimeCriterion.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +31,7 @@ package lazybones.programmanager.evaluation;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ public class StarttimeCriterion extends AbstractCriterion {
 
     private static transient Logger logger = LoggerFactory.getLogger(StarttimeCriterion.class);
 
-    public int evaluate(Program prog, Timer timer) {
+    public int evaluate(Program prog, LazyBonesTimer timer) {
         // program start time
         Calendar progStartCal = prog.getDate().getCalendar();
         progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
@@ -57,7 +56,7 @@ public class StarttimeCriterion extends AbstractCriterion {
         long progInMillis = progStartCal.getTimeInMillis();
 
         // timer start time
-        Timer bufferless = timer.getTimerWithoutBuffers();
+        LazyBonesTimer bufferless = timer.getTimerWithoutBuffers();
         long timerInMillis = bufferless.getStartTime().getTimeInMillis();
 
         int diffInMin = (int) TimeUnit.MILLISECONDS.toMinutes((Math.abs(progInMillis - timerInMillis)));

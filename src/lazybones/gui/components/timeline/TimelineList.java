@@ -1,6 +1,5 @@
-/* $Id: TimelineList.java,v 1.13 2011-04-20 12:09:13 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -41,13 +40,13 @@ import java.util.Observer;
 
 import javax.swing.JPanel;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.TimersChangedEvent;
 
 public class TimelineList extends JPanel implements Observer {
-    private List<Timer> data = new ArrayList<Timer>();
-    private List<TimelineListener> listeners = new ArrayList<TimelineListener>();
+    private final List<LazyBonesTimer> data = new ArrayList<LazyBonesTimer>();
+    private final List<TimelineListener> listeners = new ArrayList<TimelineListener>();
     private Calendar calendar = new GregorianCalendar();
     private int rowHeight = 40;
     private int padding = 0;
@@ -61,6 +60,7 @@ public class TimelineList extends JPanel implements Observer {
         TimerManager.getInstance().addObserver(this);
 
         Thread repainter = new Thread() {
+            @Override
             public void run() {
                 while (true) {
                     try {
@@ -79,9 +79,9 @@ public class TimelineList extends JPanel implements Observer {
         return data.size();
     }
 
-    public void addTimer(Timer timer) {
+    public void addTimer(LazyBonesTimer timer) {
         for (int i = 0; i < data.size(); i++) {
-            Timer t = (Timer) data.get(i);
+            LazyBonesTimer t = data.get(i);
             if (t.getChannelNumber() > timer.getChannelNumber()) {
                 data.add(i, timer);
                 fireTimelineChanged();
@@ -95,7 +95,7 @@ public class TimelineList extends JPanel implements Observer {
         fireTimelineChanged();
     }
 
-    public void removeTimer(Timer timer) {
+    public void removeTimer(LazyBonesTimer timer) {
         int index = data.indexOf(timer);
         if (index >= 0) {
             data.remove(timer);
@@ -110,7 +110,7 @@ public class TimelineList extends JPanel implements Observer {
 
     private void fireTimelineChanged() {
         this.removeAll();
-        for (Timer timer : data) {
+        for (LazyBonesTimer timer : data) {
             TimelineElement te = new TimelineElement(timer, getCalendar());
             add(te);
         }
@@ -187,31 +187,32 @@ public class TimelineList extends JPanel implements Observer {
         return false;
     }
 
-    public void showTimersForCurrentDate(List<Timer> timers) {
+    public void showTimersForCurrentDate(List<LazyBonesTimer> timers) {
         clear();
-        for (Timer timer : timers) {
+        for (LazyBonesTimer timer : timers) {
             if (runsOnCurrentDate(timer)) {
                 addTimer(timer);
             }
         }
     }
 
+    @Override
     public void update(Observable o, Object arg) {
         if (o == TimerManager.getInstance()) {
             if (arg instanceof TimersChangedEvent) {
                 TimersChangedEvent tce = (TimersChangedEvent) arg;
                 switch (tce.getType()) {
                 case TimersChangedEvent.ALL:
-                    List<Timer> timers = tce.getTimers();
+                    List<LazyBonesTimer> timers = tce.getTimers();
                     clear();
-                    for (Timer timer : timers) {
+                    for (LazyBonesTimer timer : timers) {
                         if (runsOnCurrentDate(timer)) {
                             addTimer(timer);
                         }
                     }
                     break;
                 case TimersChangedEvent.TIMER_ADDED:
-                    Timer timer = tce.getTimer();
+                    LazyBonesTimer timer = tce.getTimer();
                     if (runsOnCurrentDate(timer)) {
                         addTimer(timer);
                     }
@@ -227,7 +228,7 @@ public class TimelineList extends JPanel implements Observer {
         }
     }
 
-    private boolean runsOnCurrentDate(Timer timer) {
+    private boolean runsOnCurrentDate(LazyBonesTimer timer) {
         Calendar nextDate = (Calendar) getCalendar().clone();
         nextDate.add(Calendar.DAY_OF_MONTH, 1);
 

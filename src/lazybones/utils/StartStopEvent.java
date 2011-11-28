@@ -1,6 +1,5 @@
-/* $Id: StartStopEvent.java,v 1.7 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,12 +32,12 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 import lazybones.ChannelManager;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 import org.hampelratte.svdrp.responses.highlevel.BroadcastChannel;
 
 public class StartStopEvent implements Comparable<StartStopEvent> {
-    private Timer timer;
+    private LazyBonesTimer timer;
 
     private boolean startEvent = true;
 
@@ -46,7 +45,7 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
      * @param timer
      * @param startEvent
      */
-    public StartStopEvent(Timer timer, boolean startEvent) {
+    public StartStopEvent(LazyBonesTimer timer, boolean startEvent) {
         super();
         this.timer = timer;
         this.startEvent = startEvent;
@@ -60,11 +59,11 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
         this.startEvent = startEvent;
     }
 
-    public Timer getTimer() {
+    public LazyBonesTimer getTimer() {
         return timer;
     }
 
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer) {
         this.timer = timer;
     }
 
@@ -72,10 +71,12 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
         return isStartEvent() ? timer.getStartTime() : timer.getEndTime();
     }
 
+    @Override
     public int compareTo(StartStopEvent o) {
         return getEventTime().compareTo(o.getEventTime());
     }
 
+    @Override
     public String toString() {
         DateFormat df = DateFormat.getDateTimeInstance();
         Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();

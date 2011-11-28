@@ -1,6 +1,5 @@
-/* $Id: Utilities.java,v 1.8 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 
@@ -102,7 +101,7 @@ public class Utilities {
         int length = Math.max(s.length(), t.length());
 
         // calculate the percentage of equality
-        int percentage = 100 - (int) ((double) levenshteinDistance * 100 / (double) length);
+        int percentage = 100 - (int) ((double) levenshteinDistance * 100 / length);
         return percentage;
     }
 
@@ -211,9 +210,9 @@ public class Utilities {
                 && a.get(Calendar.YEAR) == b.get(Calendar.YEAR);
     }
 
-    public static List<StartStopEvent> createStartStopEventList(List<Timer> timers) {
+    public static List<StartStopEvent> createStartStopEventList(List<LazyBonesTimer> timers) {
         ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
-        for (Timer timer : timers) {
+        for (LazyBonesTimer timer : timers) {
             if (timer.isActive()) {
                 startStopEvents.add(new StartStopEvent(timer, true));
                 startStopEvents.add(new StartStopEvent(timer, false));

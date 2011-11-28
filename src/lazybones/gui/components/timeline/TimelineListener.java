@@ -1,6 +1,5 @@
-/* $Id: TimelineListener.java,v 1.3 2011-01-18 13:13:55 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +30,8 @@ package lazybones.gui.components.timeline;
 
 import java.util.List;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 public interface TimelineListener {
-    public void timelineChanged(List<Timer> timers);
+    public void timelineChanged(List<LazyBonesTimer> timers);
 }

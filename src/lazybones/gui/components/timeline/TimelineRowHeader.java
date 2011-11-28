@@ -1,6 +1,5 @@
-/* $Id: TimelineRowHeader.java,v 1.5 2011-04-20 12:09:13 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,11 +35,11 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 public class TimelineRowHeader extends JPanel implements TimelineListener {
 
-    private List<Integer> channels = new ArrayList<Integer>();
+    private final List<Integer> channels = new ArrayList<Integer>();
     private int rowHeight = 40;
     private int padding = 0;
 
@@ -52,17 +51,17 @@ public class TimelineRowHeader extends JPanel implements TimelineListener {
         setDoubleBuffered(true);
     }
 
-    public void addTimer(Timer timer) {
+    public void addTimer(LazyBonesTimer timer) {
         if (!channels.contains(timer.getChannelNumber())) {
             add(new TimelineRowHeaderElement(timer));
             channels.add(timer.getChannelNumber());
         }
     }
 
-    public void timelineChanged(List<Timer> timers) {
+    public void timelineChanged(List<LazyBonesTimer> timers) {
         this.removeAll();
         channels.clear();
-        for (Timer timer : timers) {
+        for (LazyBonesTimer timer : timers) {
             addTimer(timer);
         }
 

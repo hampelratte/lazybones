@@ -1,6 +1,5 @@
-/* $Id: ProgramManager.java,v 1.12 2011-05-06 13:09:58 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +40,7 @@ import javax.swing.JPopupMenu;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.VDRConnection;
 import lazybones.logging.LoggingConstants;
@@ -54,7 +53,7 @@ import org.hampelratte.svdrp.commands.LSTE;
 import org.hampelratte.svdrp.parsers.EPGParser;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +67,7 @@ public class ProgramManager {
 
     private static ProgramManager instance;
 
-    private Evaluator evaluator = new Evaluator();
+    private final Evaluator evaluator = new Evaluator();
 
     private ProgramManager() {
     }
@@ -115,7 +114,7 @@ public class ProgramManager {
         return null;
     }
 
-    public Timer getTimerForTime(Calendar cal, devplugin.Channel chan) {
+    public LazyBonesTimer getTimerForTime(Calendar cal, devplugin.Channel chan) {
         long time_t = cal.getTimeInMillis() / 1000;
         Object o = ChannelManager.getChannelMapping().get(chan.getId());
         int channelNumber = ((Channel) o).getChannelNumber();
@@ -126,7 +125,7 @@ public class ProgramManager {
             List<EPGEntry> epg = new EPGParser().parse(res.getMessage());
             if (epg.size() > 0) {
                 EPGEntry entry = epg.get(0); // we can use the first element, because there will be only one item in the list
-                VDRTimer timer = new VDRTimer();
+                Timer timer = new Timer();
                 timer.setChannelNumber(channelNumber);
                 timer.setTitle(entry.getTitle());
                 timer.setStartTime(entry.getStartTime());
@@ -136,13 +135,13 @@ public class ProgramManager {
                 int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
                 timer.setLifetime(lifetime);
                 timer.setPriority(prio);
-                return new Timer(timer);
+                return new LazyBonesTimer(timer);
             }
         }
         return null;
     }
 
-    public Program getProgram(Timer timer) {
+    public Program getProgram(LazyBonesTimer timer) {
         // determine channel
         devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
 
@@ -173,7 +172,7 @@ public class ProgramManager {
         return LazyBones.getPluginManager().getProgram(uniqueProgID);
     }
 
-    public JPopupMenu getContextMenuForTimer(Timer timer) {
+    public JPopupMenu getContextMenuForTimer(LazyBonesTimer timer) {
         List<String> tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
         if (tvBrowserProgIds.size() > 0) {
@@ -191,10 +190,10 @@ public class ProgramManager {
     public void markPrograms() {
         // for every timer
         try {
-            for (Timer timer : TimerManager.getInstance().getTimers()) {
+            for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
                 devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
                 if (chan == null) {
-                    timer.setReason(Timer.NO_CHANNEL);
+                    timer.setReason(LazyBonesTimer.NO_CHANNEL);
 
                     // we couldn't find a channel for this timer, continue with the
                     // next timer
@@ -226,12 +225,12 @@ public class ProgramManager {
         if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
             return;
         }
-        Iterator<Timer> iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
+        Iterator<LazyBonesTimer> iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
         logger.debug("Not assigned timers: {}", +TimerManager.getInstance().getNotAssignedTimers().size());
         while (iterator.hasNext()) {
-            Timer timer = iterator.next();
+            LazyBonesTimer timer = iterator.next();
             switch (timer.getReason()) {
-            case Timer.NOT_FOUND:
+            case LazyBonesTimer.NOT_FOUND:
                 // show message
                 java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
@@ -243,17 +242,17 @@ public class ProgramManager {
                                 + "You may assign this timer to a program in the context menu.", title, dateString, chan.getName());
                 popupLog.warn(msg);
                 break;
-            case Timer.NO_EPG:
+            case LazyBonesTimer.NO_EPG:
                 logger.warn("Couldn't assign timer: ", timer);
                 String mesg = LazyBones.getTranslation("noEPGdataTVB",
                         "<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>", timer.toString());
                 epgLog.error(mesg);
                 break;
-            case Timer.NO_CHANNEL:
+            case LazyBonesTimer.NO_CHANNEL:
                 mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString());
                 epgLog.error(mesg);
                 break;
-            case Timer.NO_PROGRAM:
+            case LazyBonesTimer.NO_PROGRAM:
                 // do nothing
                 break;
             default:
@@ -267,9 +266,9 @@ public class ProgramManager {
      * @param timer
      * @param chan
      */
-    private void markSingularTimer(Timer timer, devplugin.Channel chan) {
+    private void markSingularTimer(LazyBonesTimer timer, devplugin.Channel chan) {
         // create a clone of the timer and subtract the recording buffers
-        Timer bufferLessTimer = timer.getTimerWithoutBuffers();
+        LazyBonesTimer bufferLessTimer = timer.getTimerWithoutBuffers();
         int day = bufferLessTimer.getStartTime().get(Calendar.DAY_OF_MONTH);
         int month = bufferLessTimer.getStartTime().get(Calendar.MONTH) + 1;
         int year = bufferLessTimer.getStartTime().get(Calendar.YEAR);
@@ -281,7 +280,7 @@ public class ProgramManager {
         Iterator<Program> it = threeDayProgram.iterator();
         if (it == null) {
             if (!timer.isRepeating()) {
-                timer.setReason(Timer.NO_EPG);
+                timer.setReason(LazyBonesTimer.NO_EPG);
             }
             return;
         }
@@ -311,7 +310,7 @@ public class ProgramManager {
         }
 
         if (doppelPack.size() > 1) {
-            timer.setReason(Timer.NOT_FOUND);
+            timer.setReason(LazyBonesTimer.NOT_FOUND);
             ArrayList<String> list = new ArrayList<String>();
             String doppelpackTitle = null;
             for (int i = 0; i < doppelPack.size(); i++) {
@@ -321,7 +320,7 @@ public class ProgramManager {
                     Program next = doppelPack.get(i + 1);
                     if (title.equals(next.getTitle())) {
                         logger.debug("Doppelpack found: {}", title);
-                        timer.setReason(Timer.NO_REASON);
+                        timer.setReason(LazyBonesTimer.NO_REASON);
                         doppelpackTitle = title;
                     } else {
                         list.add(title);
@@ -346,7 +345,7 @@ public class ProgramManager {
         Result bestMatching = evaluator.evaluate(threeDayProgram, timer);
         if (bestMatching == null) {
             logger.warn("Couldn't assign timer: ", timer);
-            timer.setReason(Timer.NOT_FOUND);
+            timer.setReason(LazyBonesTimer.NOT_FOUND);
             return;
         }
 
@@ -364,12 +363,12 @@ public class ProgramManager {
             if (!found) { // we have no mapping
                 logger.warn("Couldn't find a program with that title: ", timer.getTitle());
                 logger.warn("Couldn't assign timer: ", timer);
-                timer.setReason(Timer.NOT_FOUND);
+                timer.setReason(LazyBonesTimer.NOT_FOUND);
             }
         }
     }
 
-    public void assignTimerToProgram(Program prog, Timer timer) {
+    public void assignTimerToProgram(Program prog, LazyBonesTimer timer) {
         timer.addTvBrowserProgID(prog.getUniqueID());
         prog.mark(LazyBones.getInstance());
         prog.validateMarking();
@@ -381,7 +380,7 @@ public class ProgramManager {
         // }
     }
 
-    public void handleTimerDoubleClick(Timer timer) {
+    public void handleTimerDoubleClick(LazyBonesTimer timer) {
         List<String> progIDs = timer.getTvBrowserProgIDs();
         if (progIDs.size() > 0) {
             String firstProgID = progIDs.get(0);

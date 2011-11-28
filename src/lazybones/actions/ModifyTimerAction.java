@@ -31,36 +31,36 @@ package lazybones.actions;
 
 import java.util.List;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.TimersOutOfSync;
 
 import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.MODT;
 import org.hampelratte.svdrp.parsers.TimerParser;
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 public class ModifyTimerAction extends VDRAction {
 
-    private Timer newTimer;
-    private Timer oldTimer;
+    private final LazyBonesTimer newTimer;
+    private final LazyBonesTimer oldTimer;
 
-    public ModifyTimerAction(Timer newTimer, Timer oldTimer) {
+    public ModifyTimerAction(LazyBonesTimer newTimer, LazyBonesTimer oldTimer) {
         this.newTimer = newTimer;
         this.oldTimer = oldTimer;
     }
 
+    @Override
     boolean execute() {
         response = VDRConnection.send(new LSTT(oldTimer.getID()));
         if (response != null && response.getCode() == 250) {
-            List<VDRTimer> list = TimerParser.parse(response.getMessage());
+            List<Timer> list = TimerParser.parse(response.getMessage());
             if (list.size() <= 0) {
                 response = new TimersOutOfSync();
                 return false;
             }
 
-            VDRTimer vdrTimer = (VDRTimer) list.get(0);
+            Timer vdrTimer = list.get(0);
             if (vdrTimer.getUniqueKey().equals(oldTimer.getUniqueKey())) {
                 response = VDRConnection.send(new MODT(oldTimer.getID(), newTimer));
                 if (response.getCode() == 250) {

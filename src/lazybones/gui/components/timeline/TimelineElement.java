@@ -1,6 +1,5 @@
-/* $Id: TimelineElement.java,v 1.24 2011-04-20 12:02:11 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -49,16 +48,16 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Period;
 import lazybones.utils.Utilities;
 import devplugin.Channel;
 
 public class TimelineElement extends JComponent implements MouseListener {
-    private Timer timer;
+    private LazyBonesTimer timer;
     private Calendar currentDate;
-    private DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+    private final DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
     public final static Color COLOR_ACTIVE = UIManager.getColor("List.selectionBackground");
     public final static Color COLOR_INACTIVE = Color.LIGHT_GRAY;
@@ -66,7 +65,7 @@ public class TimelineElement extends JComponent implements MouseListener {
     public final static Color TEXT_COLOR_INACTIVE = Color.GRAY;
     public final static Color CONFLICT_COLOR = new Color(255, 0, 0, 90);
 
-    public TimelineElement(Timer timer, Calendar currentDate) {
+    public TimelineElement(LazyBonesTimer timer, Calendar currentDate) {
         this.timer = timer;
         this.currentDate = currentDate;
         this.addMouseListener(this);
@@ -75,7 +74,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         setToolTipText(createToolTipText(timer));
     }
 
-    private String createToolTipText(Timer timer) {
+    private String createToolTipText(LazyBonesTimer timer) {
         String title = timer.getDisplayTitle().replace("|", "");
         DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
@@ -103,11 +102,11 @@ public class TimelineElement extends JComponent implements MouseListener {
         return sb.toString();
     }
 
-    public Timer getTimer() {
+    public LazyBonesTimer getTimer() {
         return timer;
     }
 
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer) {
         this.timer = timer;
     }
 

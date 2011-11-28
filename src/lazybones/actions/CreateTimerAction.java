@@ -30,7 +30,7 @@
 package lazybones.actions;
 
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.ConnectionProblem;
@@ -44,9 +44,9 @@ public class CreateTimerAction extends VDRAction {
 
     private static transient Logger logger = LoggerFactory.getLogger(CreateTimerAction.class);
 
-    private Timer timer;
+    private final LazyBonesTimer timer;
 
-    public CreateTimerAction(Timer timer) {
+    public CreateTimerAction(LazyBonesTimer timer) {
         this.timer = timer;
     }
 

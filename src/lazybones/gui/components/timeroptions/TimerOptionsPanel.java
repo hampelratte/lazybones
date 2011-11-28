@@ -57,14 +57,14 @@ import javax.swing.event.ChangeListener;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,69 +81,69 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     public static final int DESC_TVB = 1;
     public static final int DESC_LONGEST = 2;
 
-    private JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
+    private final JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
-    private JComboBox channels = new JComboBox();
+    private final JComboBox channels = new JComboBox();
 
-    private JLabel lDay = new JLabel(LazyBones.getTranslation("day", "Day"));
+    private final JLabel lDay = new JLabel(LazyBones.getTranslation("day", "Day"));
 
     private DayChooser dayChooser;
 
     private BrowseTextField day;
 
-    private JLabel lStarttime = new JLabel(LazyBones.getTranslation("start", "Start"));
+    private final JLabel lStarttime = new JLabel(LazyBones.getTranslation("start", "Start"));
 
     private SpinnerCalendarModel spinnerStarttimeModel;// = new SpinnerCalendarModel();
     private JSpinner spinnerStarttime;// = new JSpinner(spinnerStarttimeModel);
 
-    private JLabel lEndtime = new JLabel(LazyBones.getTranslation("stop", "Stop"));
+    private final JLabel lEndtime = new JLabel(LazyBones.getTranslation("stop", "Stop"));
 
     private SpinnerCalendarModel spinnerEndtimeModel;// = new SpinnerCalendarModel();
     private JSpinner spinnerEndtime; // = new JSpinner(spinnerEndtimeModel);
 
-    private JLabel lPriority = new JLabel(LazyBones.getTranslation("priority", "Priority"));
+    private final JLabel lPriority = new JLabel(LazyBones.getTranslation("priority", "Priority"));
 
-    private JSpinner priority = new JSpinner();
+    private final JSpinner priority = new JSpinner();
 
-    private JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
+    private final JLabel lLifetime = new JLabel(LazyBones.getTranslation("lifetime", "Lifetime"));
 
-    private JSpinner lifetime = new JSpinner();
+    private final JSpinner lifetime = new JSpinner();
 
-    private JLabel lTitle = new JLabel(LazyBones.getTranslation("title", "Title"));
+    private final JLabel lTitle = new JLabel(LazyBones.getTranslation("title", "Title"));
 
-    private JTextField title = new JTextField();
+    private final JTextField title = new JTextField();
 
-    private JLabel lDescription = new JLabel(LazyBones.getTranslation("description", "Description"));
+    private final JLabel lDescription = new JLabel(LazyBones.getTranslation("description", "Description"));
 
-    private JComboBox comboDesc = new JComboBox();
+    private final JComboBox comboDesc = new JComboBox();
 
-    private JTextArea description = new JTextArea();
+    private final JTextArea description = new JTextArea();
 
-    private JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
+    private final JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
 
-    private JCheckBox cbActive = new JCheckBox();
+    private final JCheckBox cbActive = new JCheckBox();
 
-    private JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
+    private final JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
 
-    private JLabel lVpsTimeHint = new JLabel(LazyBones.getTranslation("vpsTimeHint", "Starttime has been changed for VPS"));
+    private final JLabel lVpsTimeHint = new JLabel(LazyBones.getTranslation("vpsTimeHint", "Starttime has been changed for VPS"));
 
-    private JCheckBox cbVps = new JCheckBox();
+    private final JCheckBox cbVps = new JCheckBox();
 
     /**
      * The actual timer
      */
-    private Timer timer;
+    private LazyBonesTimer timer;
 
     /**
      * A clone of the timer containing the old settings
      */
-    private Timer oldTimer;
+    private LazyBonesTimer oldTimer;
 
     private Program prog;
 
-    private Mode mode;
+    private final Mode mode;
 
-    public TimerOptionsPanel(Timer timer, Program prog, Mode mode) {
+    public TimerOptionsPanel(LazyBonesTimer timer, Program prog, Mode mode) {
         this.mode = mode;
 
         initGUI();
@@ -300,16 +300,16 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         }
     }
 
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer) {
         if (timer != null) {
             this.timer = timer;
-            this.oldTimer = (Timer) timer.clone();
+            this.oldTimer = (LazyBonesTimer) timer.clone();
 
             // we have to remove the buffers again, to get the right start date
             // example: start time is 00.00 h with time buffers we have 23.45
             // Calendar then decreases the start date, so that we don't have the right date, but
             // the date of the day before.
-            Timer tmp = timer.getTimerWithoutBuffers();
+            LazyBonesTimer tmp = timer.getTimerWithoutBuffers();
             Program prog = null;
             if (this.prog == null) {
                 prog = ProgramManager.getInstance().getProgram(tmp);
@@ -388,7 +388,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 cbVps.setSelected(vpsDefault);
                 setVps(vpsDefault);
             } else {
-                cbVps.setSelected(timer.hasState(VDRTimer.VPS));
+                cbVps.setSelected(timer.hasState(Timer.VPS));
             }
         }
     }
@@ -434,7 +434,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         }
     }
 
-    public Timer getTimer() {
+    public LazyBonesTimer getTimer() {
         timer.setFile(title.getText());
         Channel vdrc = null;
         Object selected = channels.getSelectedItem();
@@ -448,8 +448,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         timer.setPriority(((Integer) priority.getValue()).intValue());
         timer.setLifetime(((Integer) lifetime.getValue()).intValue());
         timer.setDescription(description.getText());
-        timer.changeStateTo(VDRTimer.ACTIVE, cbActive.isSelected());
-        timer.changeStateTo(VDRTimer.VPS, cbVps.isSelected());
+        timer.changeStateTo(Timer.ACTIVE, cbActive.isSelected());
+        timer.changeStateTo(Timer.VPS, cbVps.isSelected());
         return timer;
     }
 
@@ -465,7 +465,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 tmpCal.set(Calendar.MINUTE, prog.getMinutes());
                 tmpCal.add(Calendar.MINUTE, prog.getLength() / 2); // take the middle of the playtime to be sure, that the right program is chosen
                 getParent().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                VDRTimer tmp = ProgramManager.getInstance().getTimerForTime(tmpCal, prog.getChannel());
+                Timer tmp = ProgramManager.getInstance().getTimerForTime(tmpCal, prog.getChannel());
                 String desc = tmp == null ? "" : tmp.getDescription();
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

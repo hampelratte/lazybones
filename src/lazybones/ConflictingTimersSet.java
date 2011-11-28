@@ -1,6 +1,5 @@
-/* $Id: ConflictingTimersSet.java,v 1.5 2011-04-20 12:09:11 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +66,7 @@ public class ConflictingTimersSet<E> extends HashSet<E> {
 
     private void addConflictTimeToTimers() {
         for (Iterator<E> iter = this.iterator(); iter.hasNext();) {
-            Timer timer = (Timer) iter.next();
+            LazyBonesTimer timer = (LazyBonesTimer) iter.next();
             Period p = new Period(conflictStartTime, conflictEndTime);
             timer.addConflictPeriod(p);
         }

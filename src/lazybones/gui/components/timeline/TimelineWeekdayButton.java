@@ -1,6 +1,5 @@
-/* $Id: TimelineWeekdayButton.java,v 1.8 2011-04-20 12:09:13 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +41,7 @@ import java.util.Observer;
 import javax.swing.JToggleButton;
 
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.utils.Period;
 import lazybones.utils.Utilities;
@@ -57,14 +56,15 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
 
     private int conflictCount = 0;
 
-    private SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
-    private SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+    private final SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
+    private final SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
     public TimelineWeekdayButton(Calendar day) {
         TimerManager.getInstance().addObserver(this);
         setDay(day);
     }
 
+    @Override
     public void update(Observable o, Object arg) {
         if (o instanceof TimerManager) {
             hasChanged = true;
@@ -77,12 +77,12 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private void updateIndicators() {
         timerCount = 0;
         conflictCount = 0;
-        List<Timer> timers = TimerManager.getInstance().getTimers();
-        for (Timer timer : timers) {
+        List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
+        for (LazyBonesTimer timer : timers) {
             if (timerRunsOnThisDay(timer)) {
                 timerCount++;
                 for (Iterator<Period> iterator = timer.getConflictPeriods().iterator(); iterator.hasNext();) {
-                    Period period = (Period) iterator.next();
+                    Period period = iterator.next();
                     if (Utilities.sameDay(day, period.getStartTime()) || Utilities.sameDay(day, period.getEndTime())) {
                         conflictCount++;
                         break; // only count a timer once, though it has more than one conflict
@@ -111,7 +111,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
         updateIndicators();
     }
 
-    private boolean timerRunsOnThisDay(Timer timer) {
+    private boolean timerRunsOnThisDay(LazyBonesTimer timer) {
         Calendar startTime = timer.getStartTime();
         Calendar endTime = timer.getEndTime();
         if (Utilities.sameDay(startTime, getDay()) || Utilities.sameDay(endTime, getDay())) {

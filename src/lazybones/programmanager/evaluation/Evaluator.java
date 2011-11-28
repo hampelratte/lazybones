@@ -1,6 +1,5 @@
-/* $Id: Evaluator.java,v 1.7 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +34,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +45,9 @@ public class Evaluator {
 
     private static transient Logger logger = LoggerFactory.getLogger(Evaluator.class);
 
-    private List<Criterion> criteria = new ArrayList<Criterion>();
+    private final List<Criterion> criteria = new ArrayList<Criterion>();
 
-    private List<Result> results = new ArrayList<Result>();
+    private final List<Result> results = new ArrayList<Result>();
 
     public Evaluator() {
         criteria.add(new TitleCriterion());
@@ -63,7 +62,7 @@ public class Evaluator {
      * @param timer
      * @return the most equal program
      */
-    public Result evaluate(Collection<Program> candidates, Timer timer) {
+    public Result evaluate(Collection<Program> candidates, LazyBonesTimer timer) {
         results.clear();
         for (Iterator<Program> iterator = candidates.iterator(); iterator.hasNext();) {
             Program program = iterator.next();

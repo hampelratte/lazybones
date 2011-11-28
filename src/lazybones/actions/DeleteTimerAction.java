@@ -34,7 +34,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.VDRCallback;
 import lazybones.VDRConnection;
 import lazybones.actions.responses.TimersOutOfSync;
@@ -45,19 +45,18 @@ import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.commands.UPDT;
 import org.hampelratte.svdrp.parsers.TimerParser;
 import org.hampelratte.svdrp.responses.R250;
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
-
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 public class DeleteTimerAction extends VDRAction {
 
-    private Timer timer;
+    private final LazyBonesTimer timer;
     private boolean forceDeletion = false;
 
-    public DeleteTimerAction(Timer timer) {
+    public DeleteTimerAction(LazyBonesTimer timer) {
         this(timer, null);
     }
 
-    public DeleteTimerAction(Timer timer, VDRCallback callback) {
+    public DeleteTimerAction(LazyBonesTimer timer, VDRCallback callback) {
         setCallback(callback);
         this.timer = timer;
     }
@@ -69,11 +68,12 @@ public class DeleteTimerAction extends VDRAction {
      * @param forceDeletion
      *            If set, the timer will be deleted without user confirmation
      */
-    public DeleteTimerAction(Timer timer, boolean forceDeletion) {
+    public DeleteTimerAction(LazyBonesTimer timer, boolean forceDeletion) {
         this(timer);
         this.forceDeletion = forceDeletion;
     }
 
+    @Override
     boolean execute() {
         // snychronize this timer with vdr and check if the timers on the vdr haven't changed
         response = VDRConnection.send(new LSTT(timer.getID()));
@@ -81,9 +81,9 @@ public class DeleteTimerAction extends VDRAction {
             return false;
         }
         if (response instanceof R250) {
-            List<VDRTimer> timers = TimerParser.parse(response.getMessage());
-            VDRTimer vdrTimer = timers.get(0);
-            Timer timerFromVDR = new Timer(vdrTimer);
+            List<Timer> timers = TimerParser.parse(response.getMessage());
+            Timer vdrTimer = timers.get(0);
+            LazyBonesTimer timerFromVDR = new LazyBonesTimer(vdrTimer);
             if (!timerFromVDR.getUniqueKey().equals(timer.getUniqueKey())) {
                 response = new TimersOutOfSync();
                 return false;
@@ -91,7 +91,7 @@ public class DeleteTimerAction extends VDRAction {
         }
 
         // check if timer is recording
-        if (timer.hasState(Timer.RECORDING)) {
+        if (timer.hasState(LazyBonesTimer.RECORDING)) {
             if (!forceDeletion) {
                 int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getParent(),
                         LazyBones.getTranslation("recording_timer_delete", "This timer is currently recording! Do you really want to delete it?"), "",
@@ -104,7 +104,7 @@ public class DeleteTimerAction extends VDRAction {
 
             // we have to deactivate the timer before we
             // are able to delete it
-            timer.changeStateTo(Timer.ACTIVE, false);
+            timer.changeStateTo(LazyBonesTimer.ACTIVE, false);
             response = VDRConnection.send(new UPDT(timer));
             if (response == null || !(response instanceof R250)) {
                 return false;
@@ -120,6 +120,7 @@ public class DeleteTimerAction extends VDRAction {
         return true;
     }
 
+    @Override
     public Response getResponse() {
         return response;
     }

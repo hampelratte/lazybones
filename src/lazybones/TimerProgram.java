@@ -41,17 +41,17 @@ import devplugin.Date;
  */
 public class TimerProgram extends MutableProgram {
 
-    private Timer timer;
+    private LazyBonesTimer timer;
 
     public TimerProgram(Channel arg0, Date arg1, int arg2, int arg3) {
         super(arg0, arg1, arg2, arg3, false);
     }
 
-    public Timer getTimer() {
+    public LazyBonesTimer getTimer() {
         return timer;
     }
 
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer) {
         this.timer = timer;
     }
 }

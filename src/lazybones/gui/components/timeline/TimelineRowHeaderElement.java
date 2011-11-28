@@ -1,6 +1,5 @@
-/* $Id: TimelineRowHeaderElement.java,v 1.8 2011-04-20 12:09:13 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -40,15 +39,15 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import util.ui.ChannelLabel;
 import devplugin.Channel;
 
 public class TimelineRowHeaderElement extends JPanel {
 
-    private Timer timer;
+    private final LazyBonesTimer timer;
 
-    public TimelineRowHeaderElement(Timer timer) {
+    public TimelineRowHeaderElement(LazyBonesTimer timer) {
         this.timer = timer;
         initGUI();
     }
@@ -81,6 +80,7 @@ public class TimelineRowHeaderElement extends JPanel {
             this.borders = borders;
         }
 
+        @Override
         public Insets getBorderInsets(Component c) {
             int top = (borders & TOP) == TOP ? 1 : 0;
             int bottom = (borders & BOTTOM) == BOTTOM ? 1 : 0;
@@ -89,10 +89,12 @@ public class TimelineRowHeaderElement extends JPanel {
             return new Insets(top, left, bottom, right);
         }
 
+        @Override
         public boolean isBorderOpaque() {
             return true;
         }
 
+        @Override
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
             Insets i = getInsets();
             g.setColor(Color.GRAY);

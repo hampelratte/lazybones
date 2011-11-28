@@ -1,6 +1,5 @@
-/* $Id: Timer.java,v 1.20 2011-04-20 12:09:11 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,9 +35,9 @@ import java.util.List;
 
 import lazybones.utils.Period;
 
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 
-public class Timer extends VDRTimer {
+public class LazyBonesTimer extends Timer {
 
     public static final int NO_REASON = 0;
     public static final int NO_EPG = 1;
@@ -49,7 +48,7 @@ public class Timer extends VDRTimer {
     /**
      * The reason, why this Timer couldn't be assigned
      */
-    private int reason = Timer.NO_REASON;
+    private int reason = LazyBonesTimer.NO_REASON;
 
     /**
      * List of all TV-B programs assigned to this timer
@@ -59,12 +58,12 @@ public class Timer extends VDRTimer {
     /**
      * Contains all time periods, where this timer conflicts with other timers
      */
-    private List<Period> conflictPeriods = new ArrayList<Period>();
+    private final List<Period> conflictPeriods = new ArrayList<Period>();
 
-    public Timer() {
+    public LazyBonesTimer() {
     }
 
-    public Timer(VDRTimer timer) {
+    public LazyBonesTimer(Timer timer) {
         super.setID(timer.getID());
         super.setState(timer.getState());
         super.setChannelNumber(timer.getChannelNumber());
@@ -102,9 +101,10 @@ public class Timer extends VDRTimer {
         return tvBrowserProgIDs.size() > 0;
     }
 
+    @Override
     public Object clone() {
-        VDRTimer vdrtimer = (VDRTimer) super.clone();
-        Timer clone = new Timer(vdrtimer);
+        Timer vdrtimer = (Timer) super.clone();
+        LazyBonesTimer clone = new LazyBonesTimer(vdrtimer);
         clone.setTvBrowserProgIDs(getTvBrowserProgIDs());
         clone.setReason(getReason());
         return clone;
@@ -146,7 +146,7 @@ public class Timer extends VDRTimer {
      * @param timer
      * @return
      */
-    public boolean startsDuringTimer(Timer timer) {
+    public boolean startsDuringTimer(LazyBonesTimer timer) {
         if (this.getStartTime().compareTo(timer.getStartTime()) >= 0 && this.getStartTime().compareTo(timer.getEndTime()) <= 0) {
             return true;
         }
@@ -179,8 +179,8 @@ public class Timer extends VDRTimer {
      * 
      * @return This timer without time buffers
      */
-    public Timer getTimerWithoutBuffers() {
-        Timer timer = (Timer) this.clone();
+    public LazyBonesTimer getTimerWithoutBuffers() {
+        LazyBonesTimer timer = (LazyBonesTimer) this.clone();
         int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
         timer.getStartTime().add(Calendar.MINUTE, buffer_before);
         int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
