@@ -1,5 +1,4 @@
-/* $Id: RecordingDetailsPanel.java,v 1.2 2011-05-06 15:52:05 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -8,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -40,31 +39,36 @@ import java.text.DateFormat;
 import java.util.Locale;
 
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 
 import lazybones.LazyBones;
 import lazybones.RecordingManager;
+import lazybones.gui.RecordingTreeModel;
 
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.Stream;
+import org.hampelratte.svdrp.responses.highlevel.TreeNode;
 
-public class RecordingDetailsPanel extends JPanel implements ListSelectionListener {
+public class RecordingDetailsPanel extends JPanel implements TreeSelectionListener {
+
+    private static final long serialVersionUID = 1L;
 
     private Recording recording;
 
-    private JLabel title = new JLabel();
-    private JLabel time = new JLabel();
-    private DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
-    private JLabel shortTextLabel = new JLabel();
-    private ExpandToggleButton showStreamsToggle = new ExpandToggleButton();
-    private JLabel streamsLabelShort = new JLabel();
-    private JLabel streamsLabel = new JLabel();
-    private JTextArea desc = new JTextArea();
+    private final JLabel title = new JLabel();
+    private final JLabel time = new JLabel();
+    private final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
+    private final JLabel shortTextLabel = new JLabel();
+    private final ExpandToggleButton showStreamsToggle = new ExpandToggleButton();
+    private final JLabel streamsLabelShort = new JLabel();
+    private final JLabel streamsLabel = new JLabel();
+    private final JTextArea desc = new JTextArea();
 
     public RecordingDetailsPanel() {
         initGUI();
@@ -198,19 +202,30 @@ public class RecordingDetailsPanel extends JPanel implements ListSelectionListen
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
-        JList list = (JList) e.getSource();
-        Recording rec = (Recording) list.getSelectedValue();
-        if (rec == null) {
+    public void valueChanged(TreeSelectionEvent e) {
+        TreePath selected = e.getPath();
+        if (selected != null) {
+            TreeNode treeNode = (TreeNode) selected.getPathComponent(selected.getPathCount() - 1);
+            if (treeNode instanceof Recording) {
+                Recording rec = (Recording) treeNode;
+                RecordingManager.getInstance().loadInfo(rec);
+                setRecording(rec);
+                ((RecordingTreeModel) ((JTree) e.getSource()).getModel()).valueForPathChanged(selected, rec);
+            } else {
+                title.setText(null);
+                time.setText(null);
+                shortTextLabel.setText(null);
+                desc.setText(null);
+                recording = null;
+                adjustStreamLabelVisibility(showStreamsToggle.isSelected());
+            }
+        } else {
             title.setText(null);
             time.setText(null);
             shortTextLabel.setText(null);
             desc.setText(null);
             recording = null;
             adjustStreamLabelVisibility(showStreamsToggle.isSelected());
-        } else {
-            RecordingManager.getInstance().loadInfo(rec);
-            setRecording(rec);
         }
     }
 }
