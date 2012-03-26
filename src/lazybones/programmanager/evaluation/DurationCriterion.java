@@ -1,6 +1,5 @@
-/* $Id: DurationCriterion.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +30,7 @@ package lazybones.programmanager.evaluation;
 
 import java.util.concurrent.TimeUnit;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +46,12 @@ public class DurationCriterion extends AbstractCriterion {
 
     private static transient Logger logger = LoggerFactory.getLogger(DurationCriterion.class);
 
-    public int evaluate(Program prog, Timer timer) {
+    public int evaluate(Program prog, LazyBonesTimer timer) {
         // program duration in minutes
         int durationProg = prog.getLength();
 
         // timer duration in minutes
-        Timer bufferless = timer.getTimerWithoutBuffers();
+        LazyBonesTimer bufferless = timer.getTimerWithoutBuffers();
         long start = bufferless.getStartTime().getTimeInMillis();
         long end = bufferless.getEndTime().getTimeInMillis();
         long durationInMillis = end - start;

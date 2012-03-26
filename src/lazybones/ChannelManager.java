@@ -1,6 +1,5 @@
-/* $Id: ChannelManager.java,v 1.8 2011-05-06 13:09:57 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +44,6 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class ChannelManager {
 
     private static transient Logger logger = LoggerFactory.getLogger(ChannelManager.class);
@@ -56,7 +54,7 @@ public class ChannelManager {
 
     private List<Channel> channels = null;
 
-    private List<Channel> filteredChannels = new ArrayList<Channel>();
+    private final List<Channel> filteredChannels = new ArrayList<Channel>();
 
     public void update() {
         Response res = VDRConnection.send(new LSTC());
@@ -129,10 +127,10 @@ public class ChannelManager {
         ChannelManager.channelMapping = channelMapping;
     }
 
-    public devplugin.Channel getChannel(Timer timer) {
+    public devplugin.Channel getChannel(LazyBonesTimer timer) {
         devplugin.Channel chan = null;
         for (String channelID : channelMapping.keySet()) {
-            Channel channel = (Channel) ChannelManager.getChannelMapping().get(channelID);
+            Channel channel = ChannelManager.getChannelMapping().get(channelID);
             if (channel.getChannelNumber() == timer.getChannelNumber()) {
                 chan = getChannelById(channelID);
             }

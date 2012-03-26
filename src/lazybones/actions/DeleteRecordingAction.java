@@ -1,6 +1,5 @@
-/* $Id: DeleteRecordingAction.java,v 1.10 2011-04-20 12:09:13 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +31,8 @@ package lazybones.actions;
 import javax.swing.JOptionPane;
 
 import lazybones.LazyBones;
+import lazybones.LazyBonesTimer;
 import lazybones.RecordingManager;
-import lazybones.Timer;
 import lazybones.TimerManager;
 import lazybones.VDRCallback;
 import lazybones.VDRConnection;
@@ -44,7 +43,7 @@ import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 public class DeleteRecordingAction extends VDRAction {
 
-    private Recording recording;
+    private final Recording recording;
 
     public DeleteRecordingAction(Recording recording) {
         this(recording, null);
@@ -55,6 +54,7 @@ public class DeleteRecordingAction extends VDRAction {
         this.recording = recording;
     }
 
+    @Override
     boolean execute() {
         int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(),
                 LazyBones.getTranslation("recording_delete", "Do you really want to delete the recording {0}?", recording.getDisplayTitle()), "",
@@ -79,9 +79,10 @@ public class DeleteRecordingAction extends VDRAction {
                 String msg = response.getMessage();
                 String numberString = msg.substring(msg.lastIndexOf(" "));
                 int timerNumber = Integer.parseInt(numberString.trim());
-                Timer timer = TimerManager.getInstance().getTimer(timerNumber);
+                LazyBonesTimer timer = TimerManager.getInstance().getTimer(timerNumber);
 
                 VDRCallback callback = new VDRCallback() {
+                    @Override
                     public void receiveResponse(VDRAction cmd, Response response) {
                         /*
                          * The DeleteTimerAction finished, we can now check again, if we can delete the recording
@@ -120,6 +121,7 @@ public class DeleteRecordingAction extends VDRAction {
         return true;
     }
 
+    @Override
     public Response getResponse() {
         return response;
     }

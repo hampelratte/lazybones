@@ -1,6 +1,5 @@
-/* $Id: TimerSelectionDialog.java,v 1.13 2011-04-20 12:09:12 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -45,10 +44,10 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.TimerProgram;
 
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 import util.ui.Localizer;
 import util.ui.ProgramList;
@@ -62,27 +61,27 @@ import devplugin.Program;
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
  */
 public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
-    private JButton ok = new JButton();
+    private final JButton ok = new JButton();
 
-    private JButton cancel = new JButton();
+    private final JButton cancel = new JButton();
 
-    private DefaultListModel model = new DefaultListModel();
+    private final DefaultListModel model = new DefaultListModel();
 
-    private ProgramList list = new ProgramList(model);
+    private final ProgramList list = new ProgramList(model);
 
     private Program selectedProgram = null;
 
-    private LazyBones control;
+    private final LazyBones control;
 
     private JDialog dialog;
 
-    private Program[] programs;
+    private final Program[] programs;
 
-    private Program originalProgram;
+    private final Program originalProgram;
 
-    private Timer timerOptions;
+    private final LazyBonesTimer timerOptions;
 
-    public TimerSelectionDialog(Program[] programs, Timer timerOptions, Program prog) {
+    public TimerSelectionDialog(Program[] programs, LazyBonesTimer timerOptions, Program prog) {
         this.control = LazyBones.getInstance();
         this.programs = programs;
         this.timerOptions = timerOptions;
@@ -144,13 +143,14 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         dialog.setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
             int index = list.getSelectedIndex();
             if (index >= 0) {
                 selectedProgram = (Program) model.get(list.getSelectedIndex());
                 TimerProgram program = (TimerProgram) selectedProgram;
-                VDRTimer t = program.getTimer();
+                Timer t = program.getTimer();
                 t.setTitle(timerOptions.getTitle());
                 t.setDescription(timerOptions.getDescription());
                 t.setLifetime(timerOptions.getLifetime());
@@ -166,10 +166,12 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         dialog.dispose();
     }
 
+    @Override
     public void close() {
         dialog.dispose();
     }
 
+    @Override
     public JRootPane getRootPane() {
         return dialog.getRootPane();
     }

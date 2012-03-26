@@ -1,6 +1,5 @@
-/* $Id: TitleCriterion.java,v 1.4 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +28,7 @@
  */
 package lazybones.programmanager.evaluation;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.utils.Utilities;
 
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class TitleCriterion extends AbstractCriterion {
 
     private static transient Logger logger = LoggerFactory.getLogger(TitleCriterion.class);
 
-    public int evaluate(Program prog, Timer timer) {
+    public int evaluate(Program prog, LazyBonesTimer timer) {
         // calculate the precentage of common words
         int percentage = 0;
         int percentagePath = Utilities.percentageOfEquality(timer.getPath(), prog.getTitle());

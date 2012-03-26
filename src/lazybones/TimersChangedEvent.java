@@ -1,6 +1,5 @@
-/* $Id: TimersChangedEvent.java,v 1.4 2011-04-20 12:09:11 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -40,15 +39,15 @@ public class TimersChangedEvent {
 
     private int type = 0;
 
-    private List<Timer> timers = null;
+    private List<LazyBonesTimer> timers = null;
 
-    private Timer timer = null;
+    private LazyBonesTimer timer = null;
 
     /**
      * @param type
      * @param timer
      */
-    public TimersChangedEvent(int type, Timer timer) {
+    public TimersChangedEvent(int type, LazyBonesTimer timer) {
         super();
         this.type = type;
         this.timer = timer;
@@ -58,25 +57,25 @@ public class TimersChangedEvent {
      * @param type
      * @param timers
      */
-    public TimersChangedEvent(int type, List<Timer> timers) {
+    public TimersChangedEvent(int type, List<LazyBonesTimer> timers) {
         super();
         this.type = type;
         this.timers = timers;
     }
 
-    public Timer getTimer() {
+    public LazyBonesTimer getTimer() {
         return timer;
     }
 
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer) {
         this.timer = timer;
     }
 
-    public List<Timer> getTimers() {
+    public List<LazyBonesTimer> getTimers() {
         return timers;
     }
 
-    public void setTimers(List<Timer> timers) {
+    public void setTimers(List<LazyBonesTimer> timers) {
         this.timers = timers;
     }
 

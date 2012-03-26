@@ -46,34 +46,34 @@ import net.sf.nachocalendar.event.DateSelectionEvent;
 import net.sf.nachocalendar.event.DateSelectionListener;
 import net.sf.nachocalendar.model.DateSelectionModel;
 
-import org.hampelratte.svdrp.responses.highlevel.VDRTimer;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 public class DayChooser extends BrowsePanel implements ActionListener, DateSelectionListener {
 
     private static final long serialVersionUID = -2936338063641916673L;
 
-    private VDRTimer timer;
+    private Timer timer;
 
-    private JCheckBox monday = new JCheckBox(LazyBones.getTranslation("monday", "Monday"));
-    private JCheckBox tuesday = new JCheckBox(LazyBones.getTranslation("tuesday", "Tuesday"));
-    private JCheckBox wednesday = new JCheckBox(LazyBones.getTranslation("wednesday", "Wednesday"));
-    private JCheckBox thursday = new JCheckBox(LazyBones.getTranslation("thursday", "Thursday"));
-    private JCheckBox friday = new JCheckBox(LazyBones.getTranslation("friday", "Friday"));
-    private JCheckBox saturday = new JCheckBox(LazyBones.getTranslation("saturday", "Saturday"));
-    private JCheckBox sunday = new JCheckBox(LazyBones.getTranslation("sunday", "Sunday"));
+    private final JCheckBox monday = new JCheckBox(LazyBones.getTranslation("monday", "Monday"));
+    private final JCheckBox tuesday = new JCheckBox(LazyBones.getTranslation("tuesday", "Tuesday"));
+    private final JCheckBox wednesday = new JCheckBox(LazyBones.getTranslation("wednesday", "Wednesday"));
+    private final JCheckBox thursday = new JCheckBox(LazyBones.getTranslation("thursday", "Thursday"));
+    private final JCheckBox friday = new JCheckBox(LazyBones.getTranslation("friday", "Friday"));
+    private final JCheckBox saturday = new JCheckBox(LazyBones.getTranslation("saturday", "Saturday"));
+    private final JCheckBox sunday = new JCheckBox(LazyBones.getTranslation("sunday", "Sunday"));
 
-    private DatePanel cal = CalendarFactory.createDatePanel();
+    private final DatePanel cal = CalendarFactory.createDatePanel();
 
     public DayChooser() {
         initGUI();
     }
 
-    public DayChooser(VDRTimer timer) {
+    public DayChooser(Timer timer) {
         setTimer(timer);
         initGUI();
     }
 
-    public void setTimer(VDRTimer timer) {
+    public void setTimer(Timer timer) {
         this.timer = timer;
     }
 

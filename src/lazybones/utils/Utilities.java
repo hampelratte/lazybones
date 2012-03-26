@@ -1,6 +1,5 @@
-/* $Id: Utilities.java,v 1.8 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -8,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -42,13 +41,10 @@ import java.util.regex.Pattern;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 
-import lazybones.RecordingManager;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import lazybones.VDRConnection;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
@@ -56,8 +52,6 @@ import org.slf4j.LoggerFactory;
  *         Utility class with different functions
  */
 public class Utilities {
-	private static transient Logger logger = LoggerFactory.getLogger(Utilities.class);
-
     public static int percentageOfEquality(String s, String t) {
         // check if strings are empty
         if (s == null || t == null || s.length() == 0 || t.length() == 0) {
@@ -109,7 +103,7 @@ public class Utilities {
         int length = Math.max(s.length(), t.length());
 
         // calculate the percentage of equality
-        int percentage = 100 - (int) ((double) levenshteinDistance * 100 / (double) length);
+        int percentage = 100 - (int) ((double) levenshteinDistance * 100 / length);
         return percentage;
     }
 
@@ -218,9 +212,9 @@ public class Utilities {
                 && a.get(Calendar.YEAR) == b.get(Calendar.YEAR);
     }
 
-    public static List<StartStopEvent> createStartStopEventList(List<Timer> timers) {
+    public static List<StartStopEvent> createStartStopEventList(List<LazyBonesTimer> timers) {
         ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
-        for (Timer timer : timers) {
+        for (LazyBonesTimer timer : timers) {
             if (timer.isActive()) {
                 startStopEvents.add(new StartStopEvent(timer, true));
                 startStopEvents.add(new StartStopEvent(timer, false));
@@ -262,34 +256,34 @@ public class Utilities {
         }
         return null;
     }
-    
+
     /**
      * Pattern for remotetimers
      */
     private static Pattern remoteTimers = Pattern.compile(".*?<remotetimers>(.+?)</remotetimers>.*?", Pattern.DOTALL);
-    
+
     /**
      * Checks if the current user are allowed to see this timer or recording
      */
     public static boolean hasRemotetimerPermission(String desc) {
-    	boolean hasPermission = false;
-    	
-    	// check remotetimers
-    	if (desc != null) {
-    		Matcher m = remoteTimers.matcher(desc);
-    		if (m.matches()) {
-    			// check userid
-    			String userId = m.group(1);
-    			if ("0".equals(userId) || userId.equals(VDRConnection.clientUserId)) {
-    				hasPermission = true;
-    			}
-    		} else {
-    			hasPermission = true;
-    		}
-    	} else {            
-    		hasPermission = true;
-    	}
-    	
-    	return hasPermission;
+        boolean hasPermission = false;
+
+        // check remotetimers
+        if (desc != null) {
+            Matcher m = remoteTimers.matcher(desc);
+            if (m.matches()) {
+                // check userid
+                String userId = m.group(1);
+                if ("0".equals(userId) || userId.equals(VDRConnection.clientUserId)) {
+                    hasPermission = true;
+                }
+            } else {
+                hasPermission = true;
+            }
+        } else {
+            hasPermission = true;
+        }
+
+        return hasPermission;
     }
 }

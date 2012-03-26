@@ -95,7 +95,6 @@ public class VDRConnection {
             } else {
                 logger.trace("old connection");
             }
-            logger.debug("-->{}", cmd.getCommand());
 
             res = connection.send(cmd);
             lastTransmissionTime = System.currentTimeMillis();
@@ -109,7 +108,6 @@ public class VDRConnection {
                     timer.schedule(new ConnectionCloser(), 0, 100);
                 }
             }
-            logger.debug("<--{}", res.getMessage());
         } catch (Exception e1) {
             res = new ConnectionProblem();
             logger.error(res.getMessage(), e1);

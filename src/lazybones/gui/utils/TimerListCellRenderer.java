@@ -1,6 +1,5 @@
-/* $Id: TimerListCellRenderer.java,v 1.10 2011-04-20 12:09:11 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -46,20 +45,20 @@ import javax.swing.UIManager;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import devplugin.Channel;
 
 public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
 
-    private JLabel date = new JLabel();
-    private JLabel channel = new JLabel();
-    private JLabel time = new JLabel();
-    private JLabel title = new JLabel();
-    private JLabel recording = new JLabel();
+    private final JLabel date = new JLabel();
+    private final JLabel channel = new JLabel();
+    private final JLabel time = new JLabel();
+    private final JLabel title = new JLabel();
+    private final JLabel recording = new JLabel();
 
-    private Color background = Color.WHITE;
-    private Color altBackground = new Color(250, 250, 220);
-    private Color inactive = Color.LIGHT_GRAY;
+    private final Color background = Color.WHITE;
+    private final Color altBackground = new Color(250, 250, 220);
+    private final Color inactive = Color.LIGHT_GRAY;
 
     public TimerListCellRenderer() {
         initGUI();
@@ -103,6 +102,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         add(title, gbc);
     }
 
+    @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
@@ -120,8 +120,8 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
             recording.setForeground(UIManager.getColor("List.foreground"));
         }
 
-        if (value instanceof Timer) {
-            Timer timer = (Timer) value;
+        if (value instanceof LazyBonesTimer) {
+            LazyBonesTimer timer = (LazyBonesTimer) value;
 
             if (!timer.isActive()) {
                 time.setForeground(inactive);
@@ -143,8 +143,9 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
                 channel.setText(chan.getName());
             } else {
                 org.hampelratte.svdrp.responses.highlevel.Channel c = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-                if (c != null)
+                if (c != null) {
                     channel.setText(c.getName());
+                }
             }
 
             if (timer.isRecording()) {

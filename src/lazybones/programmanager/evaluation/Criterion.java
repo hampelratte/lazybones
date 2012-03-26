@@ -1,6 +1,5 @@
-/* $Id: Criterion.java,v 1.4 2011-04-20 12:09:14 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +28,7 @@
  */
 package lazybones.programmanager.evaluation;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import devplugin.Program;
 
 public interface Criterion {
@@ -45,6 +44,6 @@ public interface Criterion {
      * @param timer
      * @return a percentage of equality
      */
-    public int evaluate(Program prog, Timer timer);
+    public int evaluate(Program prog, LazyBonesTimer timer);
 
 }

@@ -1,6 +1,5 @@
-/* $Id: TimelineLayout.java,v 1.6 2011-04-20 12:09:13 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +37,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 
 public class TimelineLayout implements LayoutManager2 {
 
@@ -46,7 +45,7 @@ public class TimelineLayout implements LayoutManager2 {
 
     private int padding = 0;
 
-    private ArrayList<Component> components = new ArrayList<Component>();
+    private final ArrayList<Component> components = new ArrayList<Component>();
 
     public TimelineLayout() {
     }
@@ -60,29 +59,36 @@ public class TimelineLayout implements LayoutManager2 {
         this.padding = padding;
     }
 
+    @Override
     public void addLayoutComponent(Component comp, Object constraints) {
         components.add(comp);
     }
 
+    @Override
     public float getLayoutAlignmentX(Container target) {
         return 0;
     }
 
+    @Override
     public float getLayoutAlignmentY(Container target) {
         return 0;
     }
 
+    @Override
     public void invalidateLayout(Container target) {
     }
 
+    @Override
     public Dimension maximumLayoutSize(Container target) {
         return target.getMaximumSize();
     }
 
+    @Override
     public void addLayoutComponent(String name, Component comp) {
         components.add(comp);
     }
 
+    @Override
     public void layoutContainer(Container parent) {
         if (parent.isValid()) {
             return;
@@ -98,7 +104,7 @@ public class TimelineLayout implements LayoutManager2 {
         for (Component comp : components) {
             if (comp instanceof TimelineElement) {
                 TimelineElement te = (TimelineElement) comp;
-                Timer timer = te.getTimer();
+                LazyBonesTimer timer = te.getTimer();
                 Calendar currentDate = te.getCurrentDate();
                 Calendar nextDate = (Calendar) currentDate.clone();
                 nextDate.add(Calendar.DAY_OF_MONTH, 1);
@@ -144,6 +150,7 @@ public class TimelineLayout implements LayoutManager2 {
         parent.setSize(width, height);
     }
 
+    @Override
     public Dimension minimumLayoutSize(Container parent) {
         Dimension d = new Dimension();
         d.width = parent.getWidth();
@@ -157,6 +164,7 @@ public class TimelineLayout implements LayoutManager2 {
         return d;
     }
 
+    @Override
     public Dimension preferredLayoutSize(Container parent) {
         Dimension d = new Dimension();
         d.width = parent.getWidth();
@@ -170,6 +178,7 @@ public class TimelineLayout implements LayoutManager2 {
         return d;
     }
 
+    @Override
     public void removeLayoutComponent(Component comp) {
         components.remove(comp);
     }

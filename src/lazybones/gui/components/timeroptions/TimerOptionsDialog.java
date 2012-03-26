@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
 import lazybones.LazyBones;
-import lazybones.Timer;
+import lazybones.LazyBonesTimer;
 import util.ui.Localizer;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
@@ -55,27 +55,27 @@ import devplugin.Program;
  */
 public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
 
-    private JButton ok = new JButton();
+    private final JButton ok = new JButton();
 
-    private JButton cancel = new JButton();
+    private final JButton cancel = new JButton();
 
-    private LazyBones control;
+    private final LazyBones control;
 
     private JDialog dialog;
 
-    private TimerOptionsPanel top;
+    private final TimerOptionsPanel top;
 
     private JPanel panel;
 
     /**
      * The actual timer
      */
-    private Timer timer;
+    private LazyBonesTimer timer;
 
     /**
      * A clone of the timer containing the old settings
      */
-    private Timer oldTimer;
+    private LazyBonesTimer oldTimer;
 
     private Program program;
 
@@ -85,12 +85,12 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         NEW, UPDATE, VIEW
     }
 
-    public TimerOptionsDialog(Timer timer, Program prog, Mode mode) {
+    public TimerOptionsDialog(LazyBonesTimer timer, Program prog, Mode mode) {
         this.control = LazyBones.getInstance();
         top = new TimerOptionsPanel(timer, prog, mode);
 
         this.timer = timer;
-        this.oldTimer = (Timer) timer.clone();
+        this.oldTimer = (LazyBonesTimer) timer.clone();
         this.program = prog;
 
         initGUI();
@@ -150,6 +150,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         dialog.pack();
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
             timer = top.getTimer();
@@ -160,19 +161,19 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         }
     }
 
-    public Timer getTimer() {
+    public LazyBonesTimer getTimer() {
         return timer;
     }
 
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer) {
         this.timer = timer;
     }
 
-    public Timer getOldTimer() {
+    public LazyBonesTimer getOldTimer() {
         return oldTimer;
     }
 
-    public void setOldTimer(Timer oldTimer) {
+    public void setOldTimer(LazyBonesTimer oldTimer) {
         this.oldTimer = oldTimer;
     }
 
@@ -192,10 +193,12 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         this.accepted = accepted;
     }
 
+    @Override
     public void close() {
         dialog.dispose();
     }
 
+    @Override
     public JRootPane getRootPane() {
         return dialog.getRootPane();
     }
