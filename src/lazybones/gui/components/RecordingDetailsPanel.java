@@ -49,7 +49,6 @@ import javax.swing.tree.TreePath;
 
 import lazybones.LazyBones;
 import lazybones.RecordingManager;
-import lazybones.gui.RecordingTreeModel;
 
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.Stream;
@@ -210,7 +209,7 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
                 Recording rec = (Recording) treeNode;
                 RecordingManager.getInstance().loadInfo(rec);
                 setRecording(rec);
-                ((RecordingTreeModel) ((JTree) e.getSource()).getModel()).valueForPathChanged(selected, rec);
+                ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
             } else {
                 title.setText(null);
                 time.setText(null);

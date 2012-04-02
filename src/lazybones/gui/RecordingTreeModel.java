@@ -97,8 +97,12 @@ public class RecordingTreeModel implements TreeModel, Observer {
     }
 
     @Override
-    public void valueForPathChanged(TreePath path, Object newValue) {
-        throw new UnsupportedOperationException("This method is not implemented");
+    public void valueForPathChanged(TreePath tp, Object newValue) {
+        int index = getIndexOfChild(tp.getParentPath().getLastPathComponent(), newValue);
+        TreeModelEvent tme = new TreeModelEvent(this, tp.getParentPath(), new int[] { index }, new Object[] { newValue });
+        for (TreeModelListener tml : tmls) {
+            tml.treeNodesChanged(tme);
+        }
     }
 
     @Override
@@ -153,9 +157,12 @@ public class RecordingTreeModel implements TreeModel, Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        List<Recording> recordings = rm.getRecordings();
-        Folder tree = RecordingTreeBuilder.buildTree(recordings);
-        tree.sort(new AlphabeticalRecordingComparator());
-        setRecordings(tree);
+        if (arg instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<Recording> recordings = (List<Recording>) arg;
+            Folder tree = RecordingTreeBuilder.buildTree(recordings);
+            tree.sort(new AlphabeticalRecordingComparator());
+            setRecordings(tree);
+        }
     }
 }
