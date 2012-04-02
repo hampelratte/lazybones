@@ -1,5 +1,4 @@
-/* $Id: DataUploadPanel.java,v 1.5 2011-04-20 12:09:12 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -8,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -37,8 +36,8 @@ import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -60,15 +59,12 @@ import org.slf4j.LoggerFactory;
 import devplugin.Date;
 import devplugin.Program;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
- * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
- * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
+
 public class DataUploadPanel extends JPanel {
+
+    private static final long serialVersionUID = 1L;
     private JList list;
-    private DefaultListModel model = new DefaultListModel();
+    private final DefaultListModel model = new DefaultListModel();
     private JButton bUploadData;
 
     private static transient Logger logger = LoggerFactory.getLogger(DataUploadPanel.class);
@@ -165,10 +161,10 @@ public class DataUploadPanel extends JPanel {
             // T
             sb.append("T ").append(prog.getTitle().replaceAll("\n", "\\|")).append("\n");
 
-            // // D, if exists
-            // if(prog.getDescription() != null && !prog.getDescription().isEmpty()) {
-            // sb.append("D ").append(prog.getDescription().replaceAll("\n", "\\|")).append("\n");
-            // }
+            // D, if exists
+            if (prog.getDescription() != null && !prog.getDescription().isEmpty()) {
+                sb.append("D ").append(prog.getDescription().replaceAll("\n", "\\|")).append("\n");
+            }
 
             sb.append("e\n");
         }
