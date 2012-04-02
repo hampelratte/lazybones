@@ -51,11 +51,11 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
             if (value instanceof Recording) {
                 Recording recording = (Recording) value;
                 DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault());
-                title = df.format(recording.getStartTime().getTime()) + " - " + title;
-
+                title = "<html>" + df.format(recording.getStartTime().getTime()) + " - <b>" + title + "</b>";
                 if (recording.getShortText() != null && recording.getShortText().trim().length() > 0) {
                     title += " - " + recording.getShortText();
                 }
+                title += "</html>";
             }
         }
         Component renderer = super.getTreeCellRendererComponent(tree, title, sel, expanded, leaf, row, hasFocus);
