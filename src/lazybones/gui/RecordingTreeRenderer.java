@@ -132,10 +132,8 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
 
         if (selected) {
             g.setColor(getBackgroundSelectionColor());
-        } else {
-            g.setColor(getBackground());
+            g.fillRect(0, 0, getWidth(), getHeight());
         }
-        g.fillRect(0, 0, getWidth(), getHeight());
 
         super.paint(g);
 
