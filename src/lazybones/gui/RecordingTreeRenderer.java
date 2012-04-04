@@ -97,6 +97,7 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         if (value instanceof Recording) {
             Recording recording = (Recording) value;
             _renderer.setHorizontalTextPosition(JLabel.LEADING);
+            _renderer.setIconTextGap(10);
             if (recording.isNew()) {
                 if (recording.isCut()) {
                     _renderer.setIcon(iconBoth);
@@ -110,6 +111,7 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
             }
         } else {
             _renderer.setHorizontalTextPosition(JLabel.TRAILING);
+            _renderer.setIconTextGap(0);
         }
 
         if (tree.isShowing()) {
@@ -138,7 +140,7 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
             g.fillRect(0, 0, getWidth(), getHeight());
         } else {
             if (row % 2 != 0) {
-                g.setColor(new Color(240, 240, 240));
+                g.setColor(new Color(250, 250, 220));
                 g.fillRect(0, 0, (int) getPreferredSize().getWidth(), getHeight());
             }
         }
@@ -150,10 +152,10 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    @Override
-    public Color getBackgroundNonSelectionColor() {
-        return new Color(0xFFFFFFFF, true);
-    }
+    // @Override
+    // public Color getBackgroundNonSelectionColor() {
+    // return new Color(0xFFFFFFFF, true);
+    // }
 
     private void paintFocus(Graphics g, int x, int y, int w, int h) {
         Color bsColor = getBorderSelectionColor();
