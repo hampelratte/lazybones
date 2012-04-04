@@ -28,13 +28,25 @@
  */
 package lazybones.gui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
+import javax.swing.JViewport;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
+
+import lazybones.LazyBones;
 
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
@@ -43,8 +55,26 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
 
     private static final long serialVersionUID = 1L;
 
+    int lci = UIManager.getDefaults().getInt("Tree.leftChildIndent");
+    int rci = UIManager.getDefaults().getInt("Tree.rightChildIndent");
+    int rowHeight = UIManager.getDefaults().getInt("Tree.rowHeight");
+
+    private final Icon iconNew;
+    private final Icon iconCut;
+    private final Icon iconBoth;
+
+    protected boolean hasFocus = false;
+
+    public RecordingTreeRenderer() {
+        iconNew = LazyBones.getInstance().getIcon("lazybones/new.png");
+        iconCut = LazyBones.getInstance().getIcon("lazybones/edit-cut.png");
+        List<Icon> combined = Arrays.asList(new Icon[] { iconNew, iconCut });
+        iconBoth = new CombinedIcon(combined, 2);
+    }
+
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        this.hasFocus = hasFocus;
         String title = value.toString();
         if (value instanceof TreeNode) {
             title = ((TreeNode) value).getDisplayTitle();
@@ -60,65 +90,99 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         }
         Component renderer = super.getTreeCellRendererComponent(tree, title, sel, expanded, leaf, row, hasFocus);
 
+        JLabel _renderer = (JLabel) renderer;
         if (value instanceof Recording) {
-            ((JLabel) renderer).setIcon(null);
+            Recording recording = (Recording) value;
+            _renderer.setHorizontalTextPosition(JLabel.LEADING);
+            if (recording.isNew()) {
+                if (recording.isCut()) {
+                    _renderer.setIcon(iconBoth);
+                } else {
+                    _renderer.setIcon(iconNew);
+                }
+            } else if (recording.isCut()) {
+                _renderer.setIcon(iconCut);
+            } else {
+                _renderer.setIcon(null);
+            }
+        } else {
+            _renderer.setHorizontalTextPosition(JLabel.TRAILING);
+        }
 
-            // TODO find a good position / layout for the icons
-            // Recording recording = (Recording) value;
-            // renderer = new Decorator(recording, renderer);
+        if (tree.isShowing()) {
+            TreePath tp = tree.getPathForRow(row);
+            if (tp != null) {
+                int depth = tp.getPathCount();
+                JViewport viewPort = (JViewport) tree.getParent();
+                Dimension size = new Dimension(viewPort.getWidth() - 10 - (depth - 1) * (rci + lci), renderer.getY() * -1);
+                renderer.setPreferredSize(size);
+            }
         }
 
         return renderer;
     }
 
-    // private class Decorator extends JPanel {
-    //
-    // private static final long serialVersionUID = 1L;
-    // private static final int HGAP = 2;
-    // private final Recording recording;
-    // private final Component renderer;
-    //
-    // private JLabel cutIcon;
-    // private JLabel newIcon;
-    //
-    // public Decorator(Recording recording, Component renderer) {
-    // this.recording = recording;
-    // this.renderer = renderer;
-    // initGui();
-    // }
-    //
-    // private void initGui() {
-    // setLayout(new GridBagLayout());
-    // setOpaque(false);
-    // setToolTipText(recording.getDisplayTitle());
-    //
-    // newIcon = new JLabel();
-    // newIcon.setPreferredSize(new Dimension(16, 16));
-    // add(newIcon);
-    // if (recording.isNew()) {
-    // newIcon.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
-    // }
-    //
-    // cutIcon = new JLabel();
-    // cutIcon.setPreferredSize(new Dimension(16, 16));
-    // add(cutIcon);
-    // if (recording.isCut()) {
-    // cutIcon.setIcon(LazyBones.getInstance().getIcon("lazybones/edit-cut.png"));
-    // }
-    //
-    // add(renderer);
-    // }
-    //
-    // @Override
-    // public String getToolTipText(MouseEvent event) {
-    // int x = event.getPoint().x;
-    // if (newIcon.getIcon() != null && x > HGAP && x < HGAP + 16) {
-    // return LazyBones.getTranslation("new_recording", "New recording");
-    // } else if (cutIcon.getIcon() != null && x > HGAP * 2 + 16 && x < HGAP * 2 + 32) {
-    // return LazyBones.getTranslation("cut_recording", "Cut recording");
-    // } else {
-    // return super.getToolTipText(event);
-    // }
-    // }
-    // }
+    /*
+     * Overriden, since the DefaultTreeCellrenderer paints the selection box wrong, if the icons are painted behind the text (JLabel horizontal text position
+     * leading)
+     */
+    @Override
+    public void paint(Graphics g) {
+        super.hasFocus = false;
+
+        if (selected) {
+            g.setColor(getBackgroundSelectionColor());
+        } else {
+            g.setColor(getBackground());
+        }
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        super.paint(g);
+
+        if (this.hasFocus) {
+            paintFocus(g, 0, 0, getWidth(), getHeight());
+        }
+    }
+
+    private void paintFocus(Graphics g, int x, int y, int w, int h) {
+        Color bsColor = getBorderSelectionColor();
+
+        if (bsColor != null && selected) {
+            g.setColor(bsColor);
+            g.drawRect(x, y, w - 1, h - 1);
+        }
+    }
+
+    private class CombinedIcon implements Icon {
+        private List<Icon> icons = new ArrayList<Icon>();
+        private int hgap = 2;
+
+        public CombinedIcon(List<Icon> icons, int hgap) {
+            this.icons = icons;
+            this.hgap = hgap;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            for (int i = 0; i < icons.size(); i++) {
+                Icon icon = icons.get(i);
+                icon.paintIcon(c, g, x + (i * 16) + (i * hgap), y);
+            }
+        }
+
+        @Override
+        public int getIconWidth() {
+            // int width = 0;
+            // for (Icon icon : icons) {
+            // width += icon.getIconWidth();
+            // }
+            // width += (icons.size() - 1) * hgap;
+            return icons.size() * 16 + (icons.size() - 1) * hgap;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return 16;
+        }
+    }
 }

@@ -109,6 +109,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         recordingTree.setCellRenderer(new RecordingTreeRenderer());
         scrollPane = new JScrollPane(recordingTree);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        // recordingTree.setUI(new RecordingTreeUI());
         this.add(scrollPane, gbc);
         ToolTipManager.sharedInstance().registerComponent(recordingTree);
 
