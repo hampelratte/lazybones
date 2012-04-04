@@ -109,6 +109,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         recordingTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         // initialize out special tree renderer
+        recordingTree.setRowHeight(25);
         boolean renderBackground = UIManager.getDefaults().getBoolean("Tree.rendererFillBackground");
         UIManager.getDefaults().put("Tree.rendererFillBackground", false);
         recordingTree.setCellRenderer(new RecordingTreeRenderer());
