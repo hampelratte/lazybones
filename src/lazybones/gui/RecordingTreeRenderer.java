@@ -152,11 +152,6 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    // @Override
-    // public Color getBackgroundNonSelectionColor() {
-    // return new Color(0xFFFFFFFF, true);
-    // }
-
     private void paintFocus(Graphics g, int x, int y, int w, int h) {
         Color bsColor = getBorderSelectionColor();
 
