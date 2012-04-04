@@ -49,6 +49,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -77,7 +78,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
 
     private JScrollPane scrollPane = null;
     private final RecordingTreeModel recordingTreeModel = new RecordingTreeModel();
-    private final JTree recordingTree = new JTree(recordingTreeModel);
+    private final JTree recordingTree = new JTree();
 
     private final RecordingDetailsPanel recordingDetailsPanel = new RecordingDetailsPanel();
     private JButton buttonSync = null;
@@ -106,10 +107,16 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         gbc.insets = new java.awt.Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         recordingTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+        // initialize out special tree renderer
+        boolean renderBackground = UIManager.getDefaults().getBoolean("Tree.rendererFillBackground");
+        UIManager.getDefaults().put("Tree.rendererFillBackground", false);
         recordingTree.setCellRenderer(new RecordingTreeRenderer());
+        UIManager.getDefaults().put("Tree.rendererFillBackground", renderBackground);
+
+        recordingTree.setModel(recordingTreeModel);
         scrollPane = new JScrollPane(recordingTree);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
-        // recordingTree.setUI(new RecordingTreeUI());
         this.add(scrollPane, gbc);
         ToolTipManager.sharedInstance().registerComponent(recordingTree);
 

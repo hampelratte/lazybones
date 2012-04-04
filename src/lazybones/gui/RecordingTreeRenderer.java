@@ -64,6 +64,7 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
     private final Icon iconBoth;
 
     protected boolean hasFocus = false;
+    protected int row = 0;
 
     public RecordingTreeRenderer() {
         iconNew = LazyBones.getInstance().getIcon("lazybones/new.png");
@@ -75,6 +76,8 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         this.hasFocus = hasFocus;
+        this.row = row;
+
         String title = value.toString();
         if (value instanceof TreeNode) {
             title = ((TreeNode) value).getDisplayTitle();
@@ -133,6 +136,11 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         if (selected) {
             g.setColor(getBackgroundSelectionColor());
             g.fillRect(0, 0, getWidth(), getHeight());
+        } else {
+            if (row % 2 != 0) {
+                g.setColor(new Color(240, 240, 240));
+                g.fillRect(0, 0, (int) getPreferredSize().getWidth(), getHeight());
+            }
         }
 
         super.paint(g);
@@ -140,6 +148,11 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         if (this.hasFocus) {
             paintFocus(g, 0, 0, getWidth(), getHeight());
         }
+    }
+
+    @Override
+    public Color getBackgroundNonSelectionColor() {
+        return new Color(0xFFFFFFFF, true);
     }
 
     private void paintFocus(Graphics g, int x, int y, int w, int h) {
