@@ -26,10 +26,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.recordings;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -44,7 +44,8 @@ import lazybones.RecordingManager;
 import org.hampelratte.svdrp.responses.highlevel.Folder;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
-import org.hampelratte.svdrp.util.AlphabeticalRecordingComparator;
+import org.hampelratte.svdrp.sorting.RecordingAlphabeticalComparator;
+import org.hampelratte.svdrp.sorting.RecordingSortStrategy;
 import org.hampelratte.svdrp.util.RecordingTreeBuilder;
 
 public class RecordingTreeModel implements TreeModel, Observer {
@@ -55,16 +56,18 @@ public class RecordingTreeModel implements TreeModel, Observer {
 
     private final RecordingManager rm = RecordingManager.getInstance();
 
+    private Comparator<Recording> sortStrategy = new RecordingAlphabeticalComparator();
+
+    private boolean sortAscending = true;
+
     public RecordingTreeModel() {
         rm.addObserver(this);
-        Collections.sort(rm.getRecordings(), new AlphabeticalRecordingComparator());
+        sortBy(sortStrategy, sortAscending);
     }
 
     public void setRecordings(Folder root) {
         this.root = root;
-        for (TreeModelListener tml : tmls) {
-            tml.treeStructureChanged(new TreeModelEvent(this, new Object[] {root}));
-        }
+        sortBy(sortStrategy, sortAscending);
     }
 
     @Override
@@ -160,9 +163,19 @@ public class RecordingTreeModel implements TreeModel, Observer {
         if (arg instanceof List) {
             @SuppressWarnings("unchecked")
             List<Recording> recordings = (List<Recording>) arg;
-            Folder tree = RecordingTreeBuilder.buildTree(recordings);
-            tree.sort(new AlphabeticalRecordingComparator());
-            setRecordings(tree);
+            setRecordings(RecordingTreeBuilder.buildTree(recordings));
+        }
+    }
+
+    public void sortBy(Comparator<Recording> comparator, boolean ascending) {
+        this.sortStrategy = comparator;
+        this.sortAscending = ascending;
+
+        RecordingSortStrategy rss = new RecordingSortStrategy(comparator, ascending);
+        root = RecordingTreeBuilder.buildTree(rm.getRecordings(), rss);
+
+        for (TreeModelListener tml : tmls) {
+            tml.treeStructureChanged(new TreeModelEvent(this, new Object[] { root }));
         }
     }
 }

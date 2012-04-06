@@ -26,30 +26,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.recordings;
+
+import static lazybones.LazyBones.getTranslation;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -65,16 +76,23 @@ import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Folder;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
+import org.hampelratte.svdrp.sorting.RecordingAlphabeticalComparator;
+import org.hampelratte.svdrp.sorting.RecordingIsCutComparator;
+import org.hampelratte.svdrp.sorting.RecordingIsNewComparator;
+import org.hampelratte.svdrp.sorting.RecordingStarttimeComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import util.ui.Localizer;
 
-public class RecordingManagerPanel extends JPanel implements ActionListener {
+public class RecordingManagerPanel extends JPanel implements ActionListener, ItemListener {
 
     private static final long serialVersionUID = 1L;
 
     private static transient Logger logger = LoggerFactory.getLogger(RecordingManagerPanel.class);
+
+    private final JComboBox sortStrategySelector = new JComboBox();
+    private final JToggleButton orderSelector = new JToggleButton();
 
     private JScrollPane scrollPane = null;
     private final RecordingTreeModel recordingTreeModel = new RecordingTreeModel();
@@ -83,6 +101,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
     private final RecordingDetailsPanel recordingDetailsPanel = new RecordingDetailsPanel();
     private JButton buttonSync = null;
     private JButton buttonRemove = null;
+
+    private JButton expandAll = null;
+    private JButton collapseAll = null;
 
     private final JPopupMenu popup = new JPopupMenu();
 
@@ -100,13 +121,61 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
+        int y = 0;
+        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = y++;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0;
+        gbc.gridwidth = 2;
+        gbc.insets = new java.awt.Insets(0, 5, 0, 5);
+        JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        sortPanel.add(sortStrategySelector);
+        sortStrategySelector.addItem(new SortStrategy(new RecordingAlphabeticalComparator(), getTranslation("sort.alphabetical", "alphabetical")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingStarttimeComparator(), getTranslation("sort.chronological", "chronological")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingIsNewComparator(), getTranslation("sort.new_recordings", "new recordings")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingIsCutComparator(), getTranslation("sort.cut_recordings", "cut recordings")));
+        sortStrategySelector.addItemListener(this);
+        sortPanel.add(orderSelector);
+        orderSelector.setIcon(LazyBones.getInstance().getIcon("lazybones/sort_ascending.png"));
+        orderSelector.setSelectedIcon(LazyBones.getInstance().getIcon("lazybones/sort_descending.png"));
+        orderSelector.setToolTipText(getTranslation("sort.ascending", "ascending"));
+        orderSelector.setPreferredSize(new Dimension(26, 26));
+        orderSelector.addActionListener(this);
+
+        expandAll = new JButton(LazyBones.getInstance().getIcon("lazybones/list-add.png"));
+        expandAll.addActionListener(this);
+        expandAll.setPreferredSize(new Dimension(26, 26));
+        expandAll.setToolTipText(getTranslation("expand_all", "expand all"));
+        sortPanel.add(expandAll);
+        collapseAll = new JButton(LazyBones.getInstance().getIcon("lazybones/list-remove.png"));
+        collapseAll.addActionListener(this);
+        collapseAll.setPreferredSize(new Dimension(26, 26));
+        collapseAll.setToolTipText(getTranslation("collapse_all", "collapse all"));
+        sortPanel.add(collapseAll);
+
+        this.add(sortPanel, gbc);
+
         gbc.fill = java.awt.GridBagConstraints.BOTH;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = y++;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.insets = new java.awt.Insets(10, 10, 10, 10);
-        gbc.gridx = 0;
+        gbc.insets = new java.awt.Insets(0, 10, 10, 10);
+        gbc.gridwidth = 1;
         recordingTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        recordingTree.setRootVisible(true);
+        recordingTree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                TreeNode selected = (TreeNode) e.getPath().getLastPathComponent();
+                if (selected instanceof Recording) {
+                    buttonRemove.setEnabled(true);
+                } else {
+                    buttonRemove.setEnabled(false);
+                }
+            }
+        });
 
         // initialize out special tree renderer
         recordingTree.setRowHeight(25);
@@ -126,7 +195,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         gbc.weightx = .1;
         gbc.insets = new java.awt.Insets(10, 0, 10, 10);
         recordingTree.addTreeSelectionListener(recordingDetailsPanel);
-        recordingDetailsPanel.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
+        recordingDetailsPanel.setBorder(BorderFactory.createTitledBorder(getTranslation("details", "Details")));
         recordingDetailsPanel.setPreferredSize(new Dimension(300, 300));
         recordingDetailsPanel.setMinimumSize(new Dimension(300, 300));
         recordingDetailsPanel.setMaximumSize(new Dimension(300, 300));
@@ -134,9 +203,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
 
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = y++;
         gbc.weighty = 0;
-        buttonSync = new JButton(LazyBones.getTranslation("resync", "Synchronize"));
+        buttonSync = new JButton(getTranslation("resync", "Synchronize"));
         buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
         buttonSync.addActionListener(this);
         buttonSync.setActionCommand("SYNC");
@@ -144,7 +213,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
 
         gbc.insets = new java.awt.Insets(0, 0, 10, 10);
         gbc.gridx = 1;
-        buttonRemove = new JButton(LazyBones.getTranslation("delete_recording", "Delete Recording"));
+        buttonRemove = new JButton(getTranslation("delete_recording", "Delete Recording"));
         buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
         buttonRemove.addActionListener(this);
         buttonRemove.setActionCommand("DELETE");
@@ -174,45 +243,58 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
             Player.play(rec);
         } else if ("PLAY_ON_VDR".equals(e.getActionCommand()) && itemSelected) {
             RecordingManager.getInstance().playOnVdr(rec);
+        } else if (e.getSource() == orderSelector) {
+            SortStrategy strategy = (SortStrategy) sortStrategySelector.getSelectedItem();
+            boolean ascending = !orderSelector.isSelected();
+            recordingTreeModel.sortBy(strategy.getComparator(), ascending);
+            orderSelector.setToolTipText(ascending ? getTranslation("sort.ascending", "ascending") : getTranslation("sort.descending", "descending"));
+        } else if (e.getSource() == expandAll) {
+            expandAll(recordingTree, true);
+        } else if (e.getSource() == collapseAll) {
+            expandAll(recordingTree, false);
         }
     }
 
     private void deleteRecording(final Recording rec, final TreePath tp) {
-        recordingTree.setEnabled(false);
-        buttonRemove.setEnabled(false);
-        buttonSync.setEnabled(false);
-        final boolean hasFocus = recordingTree.hasFocus();
-        VDRCallback callback = new VDRCallback() {
-            @Override
-            public void receiveResponse(VDRAction cmd, Response response) {
-                if (!cmd.isSuccess()) {
-                    logger.error(cmd.getResponse().getMessage());
-                    recordingTree.setEnabled(true);
-                    buttonRemove.setEnabled(true);
-                    buttonSync.setEnabled(true);
-                    if (hasFocus) {
-                        recordingTree.requestFocus();
-                    }
-                } else {
-                    // RecordingManager.getInstance().getRecordings().remove(rec);
-                    // recordingTreeModel.remove(tp);
-
-                    RecordingManager.getInstance().synchronize(new Runnable() {
-                        @Override
-                        public void run() {
-                            recordingTree.setEnabled(true);
-                            buttonRemove.setEnabled(true);
-                            buttonSync.setEnabled(true);
-                            if (hasFocus) {
-                                recordingTree.requestFocus();
-                            }
+        if (tp.getLastPathComponent() instanceof Recording) {
+            scrollPane.setEnabled(false);
+            recordingTree.setEnabled(false);
+            buttonRemove.setEnabled(false);
+            buttonSync.setEnabled(false);
+            final boolean hasFocus = recordingTree.hasFocus();
+            VDRCallback callback = new VDRCallback() {
+                @Override
+                public void receiveResponse(VDRAction cmd, Response response) {
+                    if (!cmd.isSuccess()) {
+                        logger.error(cmd.getResponse().getMessage());
+                        recordingTree.setEnabled(true);
+                        buttonRemove.setEnabled(true);
+                        buttonSync.setEnabled(true);
+                        if (hasFocus) {
+                            recordingTree.requestFocus();
                         }
-                    });
+                    } else {
+                        // RecordingManager.getInstance().getRecordings().remove(rec);
+                        // recordingTreeModel.remove(tp);
+
+                        RecordingManager.getInstance().synchronize(new Runnable() {
+                            @Override
+                            public void run() {
+                                scrollPane.setEnabled(true);
+                                recordingTree.setEnabled(true);
+                                buttonRemove.setEnabled(true);
+                                buttonSync.setEnabled(true);
+                                if (hasFocus) {
+                                    recordingTree.requestFocus();
+                                }
+                            }
+                        });
+                    }
                 }
-            }
-        };
-        DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
-        dra.enqueue();
+            };
+            DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
+            dra.enqueue();
+        }
     }
 
     private void createRecordingDetailsDialog(Recording rec) {
@@ -230,23 +312,23 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
         menuDelete.addActionListener(this);
         menuDelete.setActionCommand("DELETE");
         menuDelete.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-delete", 16));
-        JMenuItem menuInfo = new JMenuItem(LazyBones.getTranslation("recording_info", "Show information"));
+        JMenuItem menuInfo = new JMenuItem(getTranslation("recording_info", "Show information"));
         menuInfo.addActionListener(this);
         menuInfo.setActionCommand("INFO");
         menuInfo.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-find", 16));
-        JMenu menuPlay = new JMenu(LazyBones.getTranslation("playback", "Playback"));
+        JMenu menuPlay = new JMenu(getTranslation("playback", "Playback"));
         menuPlay.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
-        JMenuItem menuPlayLocal = new JMenuItem(LazyBones.getTranslation("playback.local", "Play"));
+        JMenuItem menuPlayLocal = new JMenuItem(getTranslation("playback.local", "Play"));
         menuPlayLocal.addActionListener(this);
         menuPlayLocal.setActionCommand("PLAY");
         menuPlayLocal.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
-        JMenuItem menuPlayOnVdr = new JMenuItem(LazyBones.getTranslation("playback.vdr", "Play on VDR"));
+        JMenuItem menuPlayOnVdr = new JMenuItem(getTranslation("playback.vdr", "Play on VDR"));
         menuPlayOnVdr.addActionListener(this);
         menuPlayOnVdr.setActionCommand("PLAY_ON_VDR");
         menuPlayOnVdr.setIcon(LazyBones.getInstance().createImageIcon("actions", "media-playback-start", 16));
         menuPlay.add(menuPlayLocal);
         menuPlay.add(menuPlayOnVdr);
-        JMenuItem menuSync = new JMenuItem(LazyBones.getTranslation("resync", "Synchronize with VDR"));
+        JMenuItem menuSync = new JMenuItem(getTranslation("resync", "Synchronize with VDR"));
         menuSync.addActionListener(this);
         menuSync.setActionCommand("SYNC");
         menuSync.setIcon(LazyBones.getInstance().createImageIcon("actions", "view-refresh", 16));
@@ -267,14 +349,16 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
             }
 
             private void mayTriggerPopup(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    Point p = e.getPoint();
-                    int selectedRow = recordingTree.getRowForLocation(p.x, p.y);
-                    recordingTree.setSelectionRow(selectedRow);
-                    TreeNode treeNode = (TreeNode) recordingTree.getSelectionPath().getLastPathComponent();
-                    if (treeNode instanceof Recording) {
-                        popup.setLocation(e.getPoint());
-                        popup.show(e.getComponent(), e.getX(), e.getY());
+                if (recordingTree.isEnabled()) {
+                    if (e.isPopupTrigger()) {
+                        Point p = e.getPoint();
+                        int selectedRow = recordingTree.getRowForLocation(p.x, p.y);
+                        recordingTree.setSelectionRow(selectedRow);
+                        TreeNode treeNode = (TreeNode) recordingTree.getSelectionPath().getLastPathComponent();
+                        if (treeNode instanceof Recording) {
+                            popup.setLocation(e.getPoint());
+                            popup.show(e.getComponent(), e.getX(), e.getY());
+                        }
                     }
                 }
             }
@@ -287,7 +371,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
                     if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                         TreePath selected = recordingTree.getSelectionPath();
                         if (selected != null) {
-                            TreeNode treeNode = (TreeNode) selected.getPathComponent(selected.getPathCount() - 1);
+                            TreeNode treeNode = (TreeNode) selected.getLastPathComponent();
                             if (treeNode instanceof Folder) {
                                 logger.warn("Deletion of folders is not supported.");
                             } else {
@@ -299,5 +383,70 @@ public class RecordingManagerPanel extends JPanel implements ActionListener {
                 }
             }
         });
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            SortStrategy strategy = (SortStrategy) e.getItem();
+            boolean ascending = !orderSelector.isSelected();
+            recordingTreeModel.sortBy(strategy.getComparator(), ascending);
+        }
+    }
+
+    private class SortStrategy {
+        private final Comparator<Recording> comparator;
+        private final String description;
+
+        public SortStrategy(Comparator<Recording> comparator, String description) {
+            super();
+            this.comparator = comparator;
+            this.description = description;
+        }
+
+        public Comparator<Recording> getComparator() {
+            return comparator;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public String toString() {
+            return getDescription();
+        }
+    }
+
+    public void expandAll(JTree tree, boolean expand) {
+        TreeNode root = (TreeNode)tree.getModel().getRoot();
+
+        // Traverse tree from root
+        expandAll(tree, new TreePath(root), expand);
+
+        // reopen the root node, after collapse all
+        if (!expand) {
+            tree.expandPath(new TreePath(root));
+        }
+    }
+
+    private void expandAll(JTree tree, TreePath parent, boolean expand) {
+        // Traverse children
+        TreeNode node = (TreeNode) parent.getLastPathComponent();
+        if (node instanceof Folder) {
+            Iterator<TreeNode> iter = ((Folder)node).getChildren().iterator();
+            while (iter.hasNext()) {
+                TreeNode n = iter.next();
+                TreePath path = parent.pathByAddingChild(n);
+                expandAll(tree, path, expand);
+            }
+        }
+
+        // Expansion or collapse must be done bottom-up
+        if (expand) {
+            tree.expandPath(parent);
+        } else {
+            tree.collapsePath(parent);
+        }
     }
 }

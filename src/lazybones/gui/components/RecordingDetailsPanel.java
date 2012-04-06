@@ -38,11 +38,13 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.util.Locale;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -60,6 +62,7 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
 
     private Recording recording;
 
+    private final JLabel folder = new JLabel();
     private final JLabel title = new JLabel();
     private final JLabel time = new JLabel();
     private final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault());
@@ -98,6 +101,12 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
         gbc.gridy = y++;
         title.setFont(title.getFont().deriveFont(Font.BOLD));
         add(title, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = y++;
+        folder.setIcon((Icon) UIManager.getDefaults().get("FileView.directoryIcon"));
+        folder.setVisible(false);
+        add(folder, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = y++;
@@ -172,6 +181,8 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
     private void loadData() {
         title.setText(recording.getDisplayTitle());
         title.setToolTipText(title.getText());
+        folder.setText(recording.getFolder());
+        folder.setVisible(recording.getFolder() != null);
         time.setText(df.format(recording.getStartTime().getTime()));
         String shortText = (recording.getShortText() != null && recording.getShortText().length() > 0) ? recording.getShortText() : "";
         shortTextLabel.setText(shortText);

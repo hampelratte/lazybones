@@ -48,6 +48,8 @@ import javax.swing.event.ChangeListener;
 import lazybones.LazyBones;
 import lazybones.gui.components.ScreenshotPanel;
 import lazybones.gui.components.remotecontrol.RemoteControl;
+import lazybones.gui.recordings.RecordingManagerPanel;
+import lazybones.gui.timers.TimerManagerPanel;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
 

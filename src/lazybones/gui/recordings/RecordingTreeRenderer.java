@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.recordings;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -75,6 +75,8 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        // FIXME paint the row disabled, if the tree is disabled
+
         this.hasFocus = hasFocus;
         this.row = row;
 
@@ -94,6 +96,8 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         Component renderer = super.getTreeCellRendererComponent(tree, title, sel, expanded, leaf, row, hasFocus);
 
         JLabel _renderer = (JLabel) renderer;
+        _renderer.setEnabled(tree.isEnabled());
+
         if (value instanceof Recording) {
             Recording recording = (Recording) value;
             _renderer.setHorizontalTextPosition(JLabel.LEADING);
@@ -101,17 +105,21 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
             if (recording.isNew()) {
                 if (recording.isCut()) {
                     _renderer.setIcon(iconBoth);
+                    _renderer.setDisabledIcon(iconBoth);
                 } else {
                     _renderer.setIcon(iconNew);
+                    _renderer.setDisabledIcon(iconNew);
                 }
             } else if (recording.isCut()) {
                 _renderer.setIcon(iconCut);
+                _renderer.setDisabledIcon(iconCut);
             } else {
                 _renderer.setIcon(null);
+                _renderer.setDisabledIcon(null);
             }
         } else {
             _renderer.setHorizontalTextPosition(JLabel.TRAILING);
-            _renderer.setIconTextGap(0);
+            _renderer.setIconTextGap(5);
         }
 
         if (tree.isShowing()) {
