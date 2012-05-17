@@ -75,7 +75,6 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        // FIXME paint the row disabled, if the tree is disabled
 
         this.hasFocus = hasFocus;
         this.row = row;
@@ -96,6 +95,7 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
         Component renderer = super.getTreeCellRendererComponent(tree, title, sel, expanded, leaf, row, hasFocus);
 
         JLabel _renderer = (JLabel) renderer;
+        // FIXME paint the row disabled, if the tree is disabled
         _renderer.setEnabled(tree.isEnabled());
 
         if (value instanceof Recording) {
