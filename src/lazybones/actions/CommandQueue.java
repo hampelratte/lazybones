@@ -8,11 +8,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 
 public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements ListModel, Runnable {
 
+    private static final long serialVersionUID = 1L;
+
     private static CommandQueue instance;
 
     private static transient Logger logger = LoggerFactory.getLogger(CommandQueue.class);
@@ -75,6 +77,7 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
         return instance;
     }
 
+    @Override
     public void run() {
         running = true;
         while (true) {
@@ -114,10 +117,12 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
     // ######################### stuff for ListModel #######################################
     private Vector<ListDataListener> listDataListeners = new Vector<ListDataListener>();
 
+    @Override
     public void addListDataListener(ListDataListener l) {
         listDataListeners.add(l);
     }
 
+    @Override
     public Object getElementAt(int index) {
         int count = 0;
         for (Iterator<VDRAction> iter = iterator(); iter.hasNext(); count++) {
@@ -130,10 +135,12 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
         throw new NoSuchElementException("No element with index " + index);
     }
 
+    @Override
     public int getSize() {
         return size();
     }
 
+    @Override
     public void removeListDataListener(ListDataListener l) {
         listDataListeners.remove(l);
     }
