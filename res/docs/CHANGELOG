@@ -1,3 +1,9 @@
+Lazy Bones 0.7.0
+===============================================================================
+* New design for the recordings panel. Lazy Bones now uses a tree structure
+  to show the recordings. Furthermore there is a possibility to sort the 
+  recordings by different properties.
+
 Lazy Bones 0.6.8
 ===============================================================================
 * Fixed layout problem in the recordings details view
