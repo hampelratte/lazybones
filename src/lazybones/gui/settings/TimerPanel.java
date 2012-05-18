@@ -52,7 +52,7 @@ import javax.swing.SpinnerNumberModel;
 import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
-import lazybones.gui.utils.TitleMapping;
+import lazybones.TitleMapping;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used

@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui;
+package lazybones.gui.timers;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -58,7 +58,6 @@ import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.components.timeroptions.TimerOptionsPanel;
-import lazybones.gui.utils.TimerListCellRenderer;
 import lazybones.programmanager.ProgramManager;
 
 import org.slf4j.Logger;

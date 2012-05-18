@@ -1,6 +1,5 @@
-/* $Id: RecordingListCellRenderer.java,v 1.12 2011-05-06 13:09:58 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/* 
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones.gui.utils;
+package lazybones.gui.timers;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -35,7 +34,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.util.Locale;
 
@@ -45,22 +43,24 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
+import lazybones.ChannelManager;
 import lazybones.LazyBones;
+import lazybones.LazyBonesTimer;
+import devplugin.Channel;
 
-import org.hampelratte.svdrp.responses.highlevel.Recording;
+public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
 
-public class RecordingListCellRenderer extends JPanel implements ListCellRenderer {
+    private final JLabel date = new JLabel();
+    private final JLabel channel = new JLabel();
+    private final JLabel time = new JLabel();
+    private final JLabel title = new JLabel();
+    private final JLabel recording = new JLabel();
 
-    private JLabel date = new JLabel();
-    private JLabel newRec = new JLabel();
-    private JLabel cutRec = new JLabel();
-    private JLabel time = new JLabel();
-    private JLabel title = new JLabel();
+    private final Color background = Color.WHITE;
+    private final Color altBackground = new Color(250, 250, 220);
+    private final Color inactive = Color.LIGHT_GRAY;
 
-    private Color background = Color.WHITE;
-    private Color altBackground = new Color(250, 250, 220);
-
-    public RecordingListCellRenderer() {
+    public TimerListCellRenderer() {
         initGUI();
     }
 
@@ -68,13 +68,14 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         // set foreground color
         time.setForeground(Color.BLACK);
         title.setForeground(Color.BLACK);
-        newRec.setForeground(Color.BLACK);
-        cutRec.setForeground(Color.BLACK);
+        channel.setForeground(Color.BLACK);
         date.setForeground(Color.BLACK);
+        recording.setForeground(Color.BLACK);
 
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
         title.setFont(bold);
+        recording.setFont(recording.getFont().deriveFont(9.0f));
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -87,10 +88,10 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
         add(date, gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        add(newRec, gbc);
+        add(channel, gbc);
         gbc.gridx = 2;
         gbc.gridy = 0;
-        add(cutRec, gbc);
+        add(recording, gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(time, gbc);
@@ -105,70 +106,66 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
-            date.setForeground(UIManager.getColor("List.selectionForeground"));
             time.setForeground(UIManager.getColor("List.selectionForeground"));
             title.setForeground(UIManager.getColor("List.selectionForeground"));
+            channel.setForeground(UIManager.getColor("List.selectionForeground"));
+            date.setForeground(UIManager.getColor("List.selectionForeground"));
+            recording.setForeground(UIManager.getColor("List.selectionForeground"));
         } else {
             setBackground(index % 2 == 0 ? background : altBackground);
-            date.setForeground(UIManager.getColor("List.foreground"));
             time.setForeground(UIManager.getColor("List.foreground"));
             title.setForeground(UIManager.getColor("List.foreground"));
+            channel.setForeground(UIManager.getColor("List.foreground"));
+            date.setForeground(UIManager.getColor("List.foreground"));
+            recording.setForeground(UIManager.getColor("List.foreground"));
         }
 
-        if (value instanceof Recording) {
-            Recording rec = (Recording) value;
+        if (value instanceof LazyBonesTimer) {
+            LazyBonesTimer timer = (LazyBonesTimer) value;
+
+            if (!timer.isActive()) {
+                time.setForeground(inactive);
+                title.setForeground(inactive);
+                channel.setForeground(inactive);
+                date.setForeground(inactive);
+                recording.setForeground(inactive);
+            }
+
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
             DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
-            date.setText(df.format(rec.getStartTime().getTime()));
-            time.setText(tf.format(rec.getStartTime().getTime()));
+            date.setText(df.format(timer.getStartTime().getTime()));
+            time.setText(tf.format(timer.getStartTime().getTime()));
+            title.setText(timer.getDisplayTitle());
 
-            String recTitle = rec.getDisplayTitle();
-            StringBuilder sb = new StringBuilder(rec.getDisplayTitle());
-            if (rec.getShortText().length() > 0) {
-                sb.append(" - ");
-                sb.append(rec.getShortText());
-            }
-            recTitle = sb.toString();
-            title.setText(recTitle);
-
-            if (rec.isNew()) {
-                newRec.setIcon(LazyBones.getInstance().getIcon("lazybones/new.png"));
-                newRec.setVisible(true);
+            Channel chan = ChannelManager.getInstance().getChannel(timer);
+            if (chan != null) {
+                channel.setText(chan.getName());
             } else {
-                newRec.setIcon(null);
-                newRec.setVisible(false);
+                org.hampelratte.svdrp.responses.highlevel.Channel c = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+                if (c != null) {
+                    channel.setText(c.getName());
+                }
             }
 
-            if (rec.isCut()) {
-                cutRec.setIcon(LazyBones.getInstance().getIcon("lazybones/edit-cut.png"));
-                cutRec.setVisible(true);
+            if (timer.isRecording()) {
+                recording.setIcon(LazyBones.getInstance().getIcon("lazybones/capture.png"));
+                recording.setText(LazyBones.getTranslation("tooltip_recording", "Currently recording"));
             } else {
-                cutRec.setIcon(null);
-                cutRec.setVisible(false);
+                recording.setIcon(null);
+                recording.setText("");
             }
 
             setEnabled(list.isEnabled());
             date.setEnabled(list.isEnabled());
-            newRec.setEnabled(list.isEnabled());
-            cutRec.setEnabled(list.isEnabled());
+            channel.setEnabled(list.isEnabled());
             time.setEnabled(list.isEnabled());
             title.setEnabled(list.isEnabled());
+            recording.setEnabled(list.isEnabled());
 
             return this;
         } else {
             return new JLabel(value.toString());
-        }
-    }
-
-    @Override
-    public String getToolTipText(MouseEvent event) {
-        if (newRec.getBounds().contains(event.getPoint()) && newRec.isVisible()) {
-            return LazyBones.getTranslation("new_recording", "New recording");
-        } else if (cutRec.getBounds().contains(event.getPoint()) && cutRec.isVisible()) {
-            return LazyBones.getTranslation("cut_recording", "Cut recording");
-        } else {
-            return super.getToolTipText(event);
         }
     }
 }
