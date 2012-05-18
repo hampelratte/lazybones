@@ -7,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -175,7 +175,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public static Version getVersion() {
         // return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 68, 0, true);
+        return new Version(0, 70, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -466,7 +466,7 @@ public class LazyBones extends Plugin implements Observer {
                     if (prog != null) {
                         node.addProgram(prog);
                     } else { // can be null, if program time is near 00:00, because then
-                             // the wrong day is taken to ask tvb for the programm
+                        // the wrong day is taken to ask tvb for the programm
                         prog = ProgramManager.getInstance().getProgram(progID);
                         if (prog != null) {
                             node.addProgram(prog);
