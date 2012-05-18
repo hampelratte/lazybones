@@ -109,6 +109,17 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
     public RecordingManagerPanel() {
         initGUI();
+        loadSettings();
+    }
+
+    private void loadSettings() {
+        boolean ascending = Boolean.parseBoolean(LazyBones.getProperties().getProperty("recording.order.ascending", "true"));
+        int strategyIndex = Integer.parseInt(LazyBones.getProperties().getProperty("recording.order.strategy", "0"));
+        sortStrategySelector.setSelectedIndex(strategyIndex);
+        orderSelector.setSelected(!ascending);
+
+        SortStrategy strategy = (SortStrategy) sortStrategySelector.getSelectedItem();
+        recordingTreeModel.sortBy(strategy.getComparator(), ascending);
     }
 
     /**
@@ -248,6 +259,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             boolean ascending = !orderSelector.isSelected();
             recordingTreeModel.sortBy(strategy.getComparator(), ascending);
             orderSelector.setToolTipText(ascending ? getTranslation("sort.ascending", "ascending") : getTranslation("sort.descending", "descending"));
+            LazyBones.getProperties().setProperty("recording.order.ascending", Boolean.toString(ascending));
         } else if (e.getSource() == expandAll) {
             expandAll(recordingTree, true);
         } else if (e.getSource() == collapseAll) {
@@ -391,6 +403,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             SortStrategy strategy = (SortStrategy) e.getItem();
             boolean ascending = !orderSelector.isSelected();
             recordingTreeModel.sortBy(strategy.getComparator(), ascending);
+            LazyBones.getProperties().setProperty("recording.order.strategy", Integer.toString(sortStrategySelector.getSelectedIndex()));
         }
     }
 
