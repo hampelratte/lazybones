@@ -30,7 +30,6 @@ package lazybones.gui.recordings;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -41,10 +40,8 @@ import java.util.Locale;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.JViewport;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
 
 import lazybones.LazyBones;
 
@@ -122,15 +119,15 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
             _renderer.setIconTextGap(5);
         }
 
-        if (tree.isShowing()) {
-            TreePath tp = tree.getPathForRow(row);
-            if (tp != null) {
-                int depth = tp.getPathCount();
-                JViewport viewPort = (JViewport) tree.getParent();
-                Dimension size = new Dimension(viewPort.getWidth() - 10 - (depth - 1) * (rci + lci), renderer.getY() * -1);
-                renderer.setPreferredSize(size);
-            }
-        }
+        // if (tree.isShowing()) {
+        // TreePath tp = tree.getPathForRow(row);
+        // if (tp != null) {
+        // int depth = tp.getPathCount();
+        // JViewport viewPort = (JViewport) tree.getParent();
+        // Dimension size = new Dimension(viewPort.getWidth() - 10 - (depth - 1) * (rci + lci), renderer.getY() * -1);
+        // renderer.setPreferredSize(size);
+        // }
+        // }
 
         return renderer;
     }
