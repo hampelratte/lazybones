@@ -289,6 +289,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         if (mode == Mode.VIEW) { // set components to readonly
             cbActive.setEnabled(false);
             cbVps.setEnabled(false);
+            cbSeries.setEnabled(false);
             title.setEnabled(false);
             channels.setEnabled(false);
             day.setEnabled(false);
