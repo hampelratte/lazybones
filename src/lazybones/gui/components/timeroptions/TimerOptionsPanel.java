@@ -8,11 +8,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -30,9 +30,11 @@
 package lazybones.gui.components.timeroptions;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -119,15 +121,13 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
     private final JTextArea description = new JTextArea();
 
-    private final JLabel lActive = new JLabel(LazyBones.getTranslation("active", "Active"));
-
-    private final JCheckBox cbActive = new JCheckBox();
-
-    private final JLabel lVps = new JLabel(LazyBones.getTranslation("vps", "VPS"));
+    private final JCheckBox cbActive = new JCheckBox(LazyBones.getTranslation("active", "Active"));
 
     private final JLabel lVpsTimeHint = new JLabel(LazyBones.getTranslation("vpsTimeHint", "Starttime has been changed for VPS"));
 
-    private final JCheckBox cbVps = new JCheckBox();
+    private final JCheckBox cbVps = new JCheckBox(LazyBones.getTranslation("vps", "VPS"));
+
+    private final JCheckBox cbSeries = new JCheckBox(LazyBones.getTranslation("series", "Series"));
 
     /**
      * The actual timer
@@ -142,6 +142,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private Program prog;
 
     private final Mode mode;
+
+    private String originalTitel = "";
 
     public TimerOptionsPanel(LazyBonesTimer timer, Program prog, Mode mode) {
         this.mode = mode;
@@ -161,121 +163,120 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 0.3;
-        gbc.weighty = 0.1;
+        gbc.weighty = 0;
+
+        int row = 0;
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        add(createCheckboxGrid(), gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(lActive, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(lVps, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = row++;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
         add(lTitle, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = row++;
         add(lChannels, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = row++;
         add(lDay, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 5;
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
         add(lVpsTimeHint, gbc);
         lVpsTimeHint.setForeground(Color.RED);
+        lVpsTimeHint.setHorizontalAlignment(JLabel.TRAILING);
         lVpsTimeHint.setVisible(false);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = row++;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
         add(lStarttime, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = row++;
         add(lEndtime, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = row++;
         add(lPriority, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = row++;
         add(lLifetime, gbc);
 
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        add(lDescription, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        description.setRows(10);
+        description.setLineWrap(true);
+        description.setWrapStyleWord(true);
+        add(new JScrollPane(description), gbc);
+
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0.7;
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        row = 1;
+        gbc.gridy = row++;
+        add(title, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = row++;
         add(channels, gbc);
         devplugin.Channel[] c = ChannelList.getSubscribedChannels();
         for (int i = 0; i < c.length; i++) {
             channels.addItem(c[i]);
         }
 
-        gbc.gridx = 0;
-        gbc.gridy = 10;
-        add(lDescription, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 11;
-        gbc.gridwidth = 2;
-        gbc.weighty = 1.0;
-        description.setRows(10);
-        description.setLineWrap(true);
-        description.setWrapStyleWord(true);
-        add(new JScrollPane(description), gbc);
-
-        gbc.weighty = 0.1;
-        gbc.weightx = 1.0;
         gbc.gridx = 1;
-        gbc.gridy = 0;
-        add(cbActive, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        add(cbVps, gbc);
-        cbVps.addActionListener(this);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        add(title, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = row++;
         dayChooser = new DayChooser();
         day = new BrowseTextField(dayChooser);
         day.setEditable(false);
         add(day, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 6;
+        row++;
+        gbc.gridy = row++;
         spinnerStarttime = new JSpinner();
         spinnerStarttime.addChangeListener(this);
         add(spinnerStarttime, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridy = row++;
         spinnerEndtime = new JSpinner();
         spinnerEndtime.addChangeListener(this);
         add(spinnerEndtime, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = row++;
         add(priority, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 9;
+        gbc.gridy = row++;
         add(lifetime, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = row++;
         add(comboDesc, gbc);
         comboDesc.addItem("VDR");
         comboDesc.addItem("TV-Browser");
@@ -298,6 +299,20 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             comboDesc.setEnabled(false);
             description.setEnabled(false);
         }
+    }
+
+    private Component createCheckboxGrid() {
+        JPanel checkboxGrid = new JPanel(new GridLayout(1, 3));
+
+        checkboxGrid.add(cbActive);
+
+        cbVps.addActionListener(this);
+        checkboxGrid.add(cbVps);
+
+        cbSeries.addActionListener(this);
+        checkboxGrid.add(cbSeries);
+
+        return checkboxGrid;
     }
 
     public void setTimer(LazyBonesTimer timer) {
@@ -404,6 +419,13 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             lVpsTimeHint.setVisible(true);
             spinnerStarttime.setBorder(BorderFactory.createLineBorder(Color.RED));
             spinnerStarttime.repaint();
+        } else if (e.getSource() == cbSeries) {
+            if (cbSeries.isSelected()) {
+                originalTitel = title.getText();
+                title.setText("TITLE~EPISODE");
+            } else {
+                title.setText(originalTitel);
+            }
         }
     }
 
