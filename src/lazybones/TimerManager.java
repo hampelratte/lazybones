@@ -8,11 +8,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -113,10 +113,6 @@ public class TimerManager extends Observable {
         return instance;
     }
 
-    public void addTimer(LazyBonesTimer timer, boolean calculateRepeatingTimers) {
-        addTimer(timer, calculateRepeatingTimers, true);
-    }
-
     private void addTimer(LazyBonesTimer timer, boolean calculateRepeatingTimers, boolean notifyObservers) {
         if (!timer.isRepeating() || !calculateRepeatingTimers) {
             timerListLock.lock();
@@ -188,6 +184,14 @@ public class TimerManager extends Observable {
             addTimer(new LazyBonesTimer(timer), calculateRepeatingTimers, false);
         }
 
+        // try to mark programs
+        ProgramManager.getInstance().markPrograms();
+        List<LazyBonesTimer> notAssigned = TimerManager.getInstance().getNotAssignedTimers();
+        if (notAssigned.size() > 0) {
+            ProgramManager.getInstance().handleNotAssignedTimers();
+        }
+
+        // notify observers, that the timers have changed
         setChanged();
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
     }
@@ -458,8 +462,8 @@ public class TimerManager extends Observable {
             setChanged();
             notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
         } else { /*
-                  * something went wrong, we have no timers -> load the stored ones
-                  */
+         * something went wrong, we have no timers -> load the stored ones
+         */
             conLog.error(LazyBones.getTranslation("using_stored_timers", "Couldn't retrieve timers from VDR, using stored ones."));
 
             List<LazyBonesTimer> vdrtimers = getStoredTimers();
@@ -951,7 +955,7 @@ public class TimerManager extends Observable {
                 String progTitle = tm.getTitleMapping().getTvbTitle(timer.getTitle());
                 if (candidate.getTitle().equals(progTitle)) {
                     candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
-                    timer.addTvBrowserProgID(candidate.getID());
+                    timer.addTvBrowserProgID(candidate.getUniqueID());
                     logger.debug("Old mapping found for: {}", timer.toString());
                     return true;
                 }
