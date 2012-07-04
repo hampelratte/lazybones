@@ -1,6 +1,5 @@
-/* $Id: TimerOptionsPanel.java,v 1.19 2011-02-05 16:13:03 hampelratte Exp $
- * 
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
+/*
+ * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +41,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -60,12 +63,16 @@ import javax.swing.event.ChangeListener;
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.RecordingManager;
+import lazybones.TimerManager;
 import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
+import lazybones.gui.components.historycombobox.SuggestingJHistoryComboBox;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +136,10 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
     private final JCheckBox cbSeries = new JCheckBox(LazyBones.getTranslation("series", "Series"));
 
+    private final JLabel lDirectory = new JLabel(LazyBones.getTranslation("directory", "Directory"));
+
+    private SuggestingJHistoryComboBox comboDirectory;
+
     /**
      * The actual timer
      */
@@ -144,6 +155,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private final Mode mode;
 
     private String originalTitel = "";
+    private String originalPath = "";
 
     public TimerOptionsPanel(LazyBonesTimer timer, Program prog, Mode mode) {
         this.mode = mode;
@@ -180,6 +192,10 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridwidth = 1;
         gbc.insets = new Insets(5, 5, 5, 5);
         add(lTitle, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        add(lDirectory, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = row++;
@@ -239,6 +255,12 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridy = row++;
         add(title, gbc);
 
+        comboDirectory = new SuggestingJHistoryComboBox(Arrays.asList(""));
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 1;
+        gbc.gridy = row++;
+        add(comboDirectory, gbc);
+
         gbc.gridx = 1;
         gbc.gridy = row++;
         add(channels, gbc);
@@ -291,6 +313,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             cbVps.setEnabled(false);
             cbSeries.setEnabled(false);
             title.setEnabled(false);
+            comboDirectory.setEnabled(false);
             channels.setEnabled(false);
             day.setEnabled(false);
             spinnerStarttime.setEnabled(false);
@@ -379,7 +402,38 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             cbActive.setSelected(timer.isActive());
 
             // set timer title
-            title.setText(timer.getFile());
+            title.setText(timer.getTitle());
+
+            // set path
+            List<String> dirSuggestions = new ArrayList<String>();
+            // add directory suggestions from existing recordings
+            List<Recording> recordings = RecordingManager.getInstance().getRecordings();
+            if (recordings != null) { // if the user is fast enough, the recordings might not have been loaded
+                for (Recording recording : recordings) {
+                    // abuse Timer class to parse path and title
+                    Timer dummy = new Timer();
+                    dummy.setFile(recording.getTitle());
+                    if (!dummy.getPath().isEmpty()) {
+                        dirSuggestions.add(dummy.getPath());
+                    }
+                }
+            }
+            // add directory suggestions from upcoming timers
+            List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
+            for (LazyBonesTimer _timer : timers) {
+                if (!_timer.getPath().isEmpty()) {
+                    dirSuggestions.add(_timer.getPath());
+                }
+            }
+            Collections.sort(dirSuggestions);
+            Collections.reverse(dirSuggestions);
+            for (String suggestion : dirSuggestions) {
+                comboDirectory.addItem(suggestion);
+            }
+            comboDirectory.setText(timer.getPath().replace('~', '/'));
+
+            // if title is EPISODE and path is TITLE, this is a series
+            cbSeries.setSelected("TITLE".equals(timer.getPath()) && "EPISODE".equals(timer.getTitle()));
 
             day.setText(timer.getDayString());
 
@@ -423,9 +477,16 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         } else if (e.getSource() == cbSeries) {
             if (cbSeries.isSelected()) {
                 originalTitel = title.getText();
-                title.setText("TITLE~EPISODE");
+                originalPath = comboDirectory.getText();
+                title.setText("EPISODE");
+                comboDirectory.setText("TITLE");
             } else {
-                title.setText(originalTitel);
+                if (originalTitel.trim().isEmpty() && prog != null) {
+                    title.setText(prog.getTitle());
+                } else {
+                    title.setText(originalTitel);
+                }
+                comboDirectory.setText(originalPath);
             }
         }
     }
@@ -458,7 +519,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     }
 
     public LazyBonesTimer getTimer() {
-        timer.setFile(title.getText());
+        timer.setTitle(title.getText());
+        timer.setPath(comboDirectory.getText().trim().replace('/', '~'));
         Channel vdrc = null;
         Object selected = channels.getSelectedItem();
         if (selected instanceof devplugin.Channel) {
