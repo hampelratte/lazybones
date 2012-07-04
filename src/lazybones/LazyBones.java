@@ -505,17 +505,11 @@ public class LazyBones extends Plugin implements Observer {
     }
 
     @Override
-    public void update(Observable arg0, Object arg1) {
-        // mark all "timed" programs
-        ProgramManager.getInstance().markPrograms();
-
-        List<LazyBonesTimer> notAssigned = TimerManager.getInstance().getNotAssignedTimers();
-        if (notAssigned.size() > 0) {
-            ProgramManager.getInstance().handleNotAssignedTimers();
+    public void update(Observable observable, Object o) {
+        if (observable == TimerManager.getInstance()) {
+            // update the plugin tree
+            updateTree();
         }
-
-        // update the plugin tree
-        updateTree();
     }
 
     public void synchronize() {
