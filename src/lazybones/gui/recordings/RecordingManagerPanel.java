@@ -204,7 +204,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         // gbc.fill = java.awt.GridBagConstraints.VERTICAL;
         gbc.gridx = 1;
         gbc.weightx = .1;
-        gbc.insets = new java.awt.Insets(10, 0, 10, 10);
+        gbc.insets = new java.awt.Insets(0, 0, 10, 10);
         recordingTree.addTreeSelectionListener(recordingDetailsPanel);
         recordingDetailsPanel.setBorder(BorderFactory.createTitledBorder(getTranslation("details", "Details")));
         recordingDetailsPanel.setPreferredSize(new Dimension(300, 300));
