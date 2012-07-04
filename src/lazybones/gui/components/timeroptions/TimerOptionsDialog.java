@@ -135,7 +135,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         ok.addActionListener(this);
         cancel.addActionListener(this);
 
-        dialog.setSize(400, 600);
+        dialog.setSize(500, 600);
 
         // position lazy bones centered on tvb
         int parentWidth = LazyBones.getInstance().getParent().getWidth();
