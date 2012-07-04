@@ -7,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -36,6 +36,8 @@ import java.util.List;
 import lazybones.utils.Period;
 
 import org.hampelratte.svdrp.responses.highlevel.Timer;
+
+import devplugin.Program;
 
 public class LazyBonesTimer extends Timer {
 
@@ -168,10 +170,21 @@ public class LazyBonesTimer extends Timer {
     }
 
     public String getDisplayTitle() {
-        if (getPath() != null && getPath().length() > 0) {
-            return (getPath() + '/' + getTitle()).replace('~', '/');
+        if ("TITLE".equals(getPath()) && "EPISODE".equals(getTitle())) {
+            String displayTitle = "TITLE/EPISODE";
+            if (getTvBrowserProgIDs() != null && getTvBrowserProgIDs().size() > 0) {
+                Program prog = LazyBones.getPluginManager().getProgram(getTvBrowserProgIDs().get(0));
+                if (prog != null) {
+                    displayTitle += " (" + prog.getTitle() + ')';
+                }
+            }
+            return displayTitle;
         } else {
-            return getTitle();
+            if (getPath() != null && getPath().length() > 0) {
+                return (getPath() + '/' + getTitle()).replace('~', '/');
+            } else {
+                return getTitle();
+            }
         }
     }
 
