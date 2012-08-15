@@ -1,3 +1,10 @@
+Lazy Bones 0.8.0
+===============================================================================
+* Timer options dialog now has a checkbox to enable a series recording. If it
+  is checked, the title is set to EPISODE and the directory is set to TITLE.
+  The directory field suggests previous paths while typing in a path. Those 
+  suggestions are retrieved from upcoming timers and from the recordings.
+
 Lazy Bones 0.7.0
 ===============================================================================
 * New design for the recordings panel. Lazy Bones now uses a tree structure
