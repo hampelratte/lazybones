@@ -55,6 +55,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import lazybones.gui.MainDialog;
+import lazybones.gui.RecordingsCenterPanel;
+import lazybones.gui.TimelineCenterPanel;
+import lazybones.gui.TimersCenterPanel;
 import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
 import lazybones.logging.PopupHandler;
@@ -77,6 +80,8 @@ import devplugin.ActionMenu;
 import devplugin.ButtonAction;
 import devplugin.Marker;
 import devplugin.Plugin;
+import devplugin.PluginCenterPanel;
+import devplugin.PluginCenterPanelWrapper;
 import devplugin.PluginInfo;
 import devplugin.PluginTreeNode;
 import devplugin.Program;
@@ -86,7 +91,7 @@ import devplugin.Version;
 /**
  * A remote control plugin for VDR
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  * 
  */
 public class LazyBones extends Plugin implements Observer {
@@ -106,6 +111,8 @@ public class LazyBones extends Plugin implements Observer {
 
     public static final String TIMER_MENU_KEY = "TIMER_MENU_KEY";
 
+    private PluginCenterPanelWrapper wrapper;
+
     public static LazyBones getInstance() {
         return instance;
     }
@@ -113,6 +120,11 @@ public class LazyBones extends Plugin implements Observer {
     @Override
     public ActionMenu getContextMenuActions(final Program program) {
         return cmf.createActionMenu(program);
+    }
+
+    @Override
+    public PluginCenterPanelWrapper getPluginCenterPanelWrapper() {
+        return wrapper;
     }
 
     private ButtonAction buttonAction;
@@ -133,6 +145,11 @@ public class LazyBones extends Plugin implements Observer {
         buttonAction.setText(LazyBones.getTranslation("lazybones", "Lazy Bones"));
 
         return new ActionMenu(buttonAction);
+    }
+
+    @Override
+    public String getPluginCategory() {
+        return Plugin.REMOTE_CONTROL_SOFTWARE_CATEGORY;
     }
 
     /**
@@ -175,7 +192,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public static Version getVersion() {
         // return new Version(0,0,false,"cvs-2010-02-05");
-        return new Version(0, 80, 0, true);
+        return new Version(1, 0, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -355,6 +372,22 @@ public class LazyBones extends Plugin implements Observer {
 
     private void init() {
         instance = this;
+
+        wrapper = new PluginCenterPanelWrapper() {
+            //@formatter:off
+            PluginCenterPanel[] panels =  new PluginCenterPanel[] {
+                    new TimelineCenterPanel(),
+                    new TimersCenterPanel(),
+                    new RecordingsCenterPanel()/*,
+                    new RemoteControlCenterPanel()*/
+            };
+            //@formatter:on
+
+            @Override
+            public PluginCenterPanel[] getCenterPanels() {
+                return panels;
+            }
+        };
 
         // observe the timer list
         TimerManager.getInstance().addObserver(this);
