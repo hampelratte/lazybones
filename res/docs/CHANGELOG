@@ -1,3 +1,10 @@
+Lazy Bones 1.0.0
+===============================================================================
+* New default directory setting fpr timers.
+* Lazy Bones now provides three different tabs for the center panel.
+* Fixed a bug in svdrp4j, which caused rendering issues in the recordings 
+  panel.
+
 Lazy Bones 0.8.0
 ===============================================================================
 * Timer options dialog now has a checkbox to enable a series recording. If it
