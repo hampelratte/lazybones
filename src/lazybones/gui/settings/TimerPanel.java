@@ -1,5 +1,4 @@
-/* $Id: TimerPanel.java,v 1.9 2011-04-20 12:09:13 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -8,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -29,6 +28,12 @@
  */
 package lazybones.gui.settings;
 
+import static java.awt.GridBagConstraints.BOTH;
+import static java.awt.GridBagConstraints.HORIZONTAL;
+import static java.awt.GridBagConstraints.NONE;
+import static java.awt.GridBagConstraints.NORTHWEST;
+import static java.awt.GridBagConstraints.WEST;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -36,6 +41,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -53,14 +61,16 @@ import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.TitleMapping;
+import lazybones.gui.components.historycombobox.JHistoryComboBox;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
- * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
- * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.XStream;
+
 public class TimerPanel implements MouseListener, ActionListener {
+    private static transient Logger logger = LoggerFactory.getLogger(TimerPanel.class);
+
     private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");
 
     private final String ttBefore = LazyBones.getTranslation("before.tooltip", "Time buffer before program");
@@ -107,18 +117,33 @@ public class TimerPanel implements MouseListener, ActionListener {
 
     private JPopupMenu mappingPopup = new JPopupMenu();
 
+    private JLabel lDefaultDirectory;
+
+    private JHistoryComboBox cbDefaultDirectory;
+
     public TimerPanel() {
         initComponents();
     }
 
+    @SuppressWarnings("unchecked")
     private void initComponents() {
-        int int_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
-        int int_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
-        int int_prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
-        int int_lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
-        int int_numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
-        int descSourceTvb = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
-        boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+        Properties props = LazyBones.getProperties();
+        int int_before = Integer.parseInt(props.getProperty("timer.before"));
+        int int_after = Integer.parseInt(props.getProperty("timer.after"));
+        int int_prio = Integer.parseInt(props.getProperty("timer.prio"));
+        int int_lifetime = Integer.parseInt(props.getProperty("timer.lifetime"));
+        int int_numberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
+        int descSourceTvb = Integer.parseInt(props.getProperty("descSourceTvb"));
+        boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
+        List<String> defaultDirectoryHistory = new ArrayList<String>();
+
+        // load default directory history
+        XStream xstream = new XStream();
+        try {
+            defaultDirectoryHistory = (List<String>) xstream.fromXML(props.getProperty("default.directory.history"));
+        } catch (Exception e) {
+            logger.warn("Couldn't load history of default directories", e);
+        }
 
         before = new JSpinner();
         before.setValue(new Integer(int_before));
@@ -178,19 +203,22 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         cbVPS = new JCheckBox();
         cbVPS.setSelected(vpsDefault);
+
+        lDefaultDirectory = new JLabel(LazyBones.getTranslation("default_directory", "Default directory"));
+        cbDefaultDirectory = new JHistoryComboBox(defaultDirectoryHistory);
     }
 
     public JPanel getPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagLayout panelLayout = new GridBagLayout();
-        panelLayout.columnWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1 };
-        panelLayout.columnWidths = new int[] { 7, 7, 7, 7, 7 };
-        panelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1 };
-        panelLayout.rowHeights = new int[] { 7, 7, 7, 20, 7, 7, 29, 7 };
+        // panelLayout.columnWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1 };
+        // panelLayout.columnWidths = new int[] { 7, 7, 7, 7, 7 };
+        // panelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1 };
+        // panelLayout.rowHeights = new int[] { 7, 7, 7, 20, 7, 7, 29, 7 };
         panel.setLayout(panelLayout);
         panel.setPreferredSize(new java.awt.Dimension(1021, 672));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = WEST;
 
         // left column of spinners
         gbc.gridx = 0;
@@ -225,18 +253,37 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.insets = new Insets(5, 15, 30, 5);
-        panel.add(lNumberOfCards,
-                new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 30, 5), 0, 0));
+        gbc.insets = new Insets(5, 15, 5, 5);
+        panel.add(lVPS, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.insets = new Insets(15, 5, 30, 5);
-        panel.add(numberOfCards, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 30, 5), 0, 0));
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel.add(cbVPS, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.insets = new Insets(5, 15, 5, 5);
+        panel.add(lNumberOfCards, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel.add(numberOfCards, gbc);
+
+        // history combobox for the default directory
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.insets = new Insets(5, 15, 30, 5);
+        panel.add(lDefaultDirectory, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(5, 5, 30, 5);
+        gbc.gridwidth = 3;
+        panel.add(cbDefaultDirectory, gbc);
 
         // right column of spinners
         gbc.gridx = 2;
         gbc.gridy = 0;
+        gbc.gridwidth = 1;
         gbc.insets = new Insets(15, 50, 5, 5);
         panel.add(lPrio, gbc);
 
@@ -256,76 +303,60 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(lifetime, gbc);
 
         // mapping
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.insets = new Insets(5, 15, 5, 5);
-        panel.add(labMappings, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 5, 5), 0, 0));
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 4;
-        gbc.gridheight = 2;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(0, 15, 15, 5);
-        panel.add(mappingPane, new GridBagConstraints(0, 6, 4, 2, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0, 15, 15, 5), 0, 0));
+        panel.add(labMappings, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
+        panel.add(mappingPane, new GridBagConstraints(0, 7, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
 
         // buttons
-        gbc.gridx = 4;
-        gbc.gridy = 5;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.insets = new Insets(0, 5, 5, 15);
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(addRow, new GridBagConstraints(4, 6, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 15), 0,
-                0));
-
-        gbc.gridx = 4;
-        gbc.gridy = 6;
-        gbc.insets = new Insets(5, 5, 5, 15);
-        panel.add(delRow, new GridBagConstraints(4, 7, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 15), 0,
-                0));
-        panel.add(lVPS, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 15, 5, 5), 0, 0));
-        panel.add(cbVPS, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        panel.add(addRow, new GridBagConstraints(4, 7, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
+        panel.add(delRow, new GridBagConstraints(4, 8, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
 
         return panel;
     }
 
     public void saveSettings() {
-        LazyBones.getProperties().setProperty("timer.before", before.getValue().toString());
-        LazyBones.getProperties().setProperty("timer.after", after.getValue().toString());
-        LazyBones.getProperties().setProperty("timer.prio", prio.getValue().toString());
-        LazyBones.getProperties().setProperty("timer.lifetime", lifetime.getValue().toString());
-        LazyBones.getProperties().setProperty("numberOfCards", numberOfCards.getValue().toString());
-        LazyBones.getProperties().setProperty("descSourceTvb", Integer.toString(cbDescSource.getSelectedIndex()));
-        LazyBones.getProperties().setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
+        Properties props = LazyBones.getProperties();
+        props.setProperty("timer.before", before.getValue().toString());
+        props.setProperty("timer.after", after.getValue().toString());
+        props.setProperty("timer.prio", prio.getValue().toString());
+        props.setProperty("timer.lifetime", lifetime.getValue().toString());
+        props.setProperty("numberOfCards", numberOfCards.getValue().toString());
+        props.setProperty("descSourceTvb", Integer.toString(cbDescSource.getSelectedIndex()));
+        props.setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
+
+        // save default directory history
+        cbDefaultDirectory.addCurrentItemToHistory();
+        XStream xstream = new XStream();
+        props.setProperty("default.directory", cbDefaultDirectory.getText());
+        props.setProperty("default.directory.history", xstream.toXML(cbDefaultDirectory.getHistory()));
 
         ConflictFinder.getInstance().findConflicts();
         ConflictFinder.getInstance().handleConflicts();
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         if ((e.getSource() == mappingPane || e.getSource() == mappingTable) && e.getButton() == MouseEvent.BUTTON3) {
             mappingPopup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if ("ADD".equals(e.getActionCommand())) {
             TitleMapping mapping = TimerManager.getInstance().getTitleMapping();

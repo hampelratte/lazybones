@@ -79,6 +79,9 @@ import org.slf4j.LoggerFactory;
 
 import tvbrowser.core.ChannelList;
 import util.ui.Localizer;
+
+import com.thoughtworks.xstream.XStream;
+
 import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
@@ -429,6 +432,17 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             Collections.reverse(dirSuggestions);
             for (String suggestion : dirSuggestions) {
                 comboDirectory.addItem(suggestion);
+            }
+            // add suggestions from the default directory setting history
+            XStream xstream = new XStream();
+            try {
+                @SuppressWarnings("unchecked")
+                List<String> defaultDirectoryHistory = (List<String>) xstream.fromXML(LazyBones.getProperties().getProperty("default.directory.history"));
+                for (String dir : defaultDirectoryHistory) {
+                    comboDirectory.addItem(dir);
+                }
+            } catch (Exception e) {
+                logger.warn("Couldn't load history of default directories", e);
             }
             comboDirectory.setText(timer.getPath().replace('~', '/'));
 

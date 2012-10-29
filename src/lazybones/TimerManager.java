@@ -1,5 +1,4 @@
-/* $Id: TimerManager.java,v 1.52 2011-05-06 13:09:57 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -75,7 +74,7 @@ import devplugin.Program;
 /**
  * Class to manage all timers.
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
 public class TimerManager extends Observable {
 
@@ -619,6 +618,12 @@ public class TimerManager extends Observable {
                 }
 
                 timer.setFile(vdrEPG.getTitle());
+
+                // set the default directory, if it is configured in the settings
+                String defaultDirectory = LazyBones.getProperties().getProperty("default.directory");
+                if (defaultDirectory != null && !defaultDirectory.isEmpty()) {
+                    timer.setPath(defaultDirectory);
+                }
 
                 // set the description
                 String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
