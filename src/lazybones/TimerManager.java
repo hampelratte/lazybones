@@ -207,6 +207,7 @@ public class TimerManager extends Observable {
     public LazyBonesTimer getTimer(Program prog) {
         String progID = prog.getUniqueID();
         if (progID == null) {
+            logger.warn("Unique program ID is null. Unable to find a timer for this program");
             return null;
         }
 
@@ -748,12 +749,12 @@ public class TimerManager extends Observable {
     private void commitTimer(final LazyBonesTimer timer, LazyBonesTimer oldTimer, final Program prog, boolean update, boolean automatic) {
         int id = -1;
         if (prog != null) {
-            Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
-            if (o == null) {
+            Channel chan = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
+            if (chan == null) {
                 logger.error(LazyBones.getTranslation("no_channel_defined", "No channel defined", prog.toString()));
                 return;
             }
-            id = ((Channel) o).getChannelNumber();
+            id = chan.getChannelNumber();
         }
 
         if (update) {
@@ -919,6 +920,8 @@ public class TimerManager extends Observable {
         Program prog = null;
         if (timer.getTvBrowserProgIDs().size() > 0) {
             prog = ProgramManager.getInstance().getProgram(timer.getTvBrowserProgIDs().get(0));
+        } else {
+            logger.warn("Timer has no program IDs assigned.");
         }
         TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
         if (tod.isAccepted()) {
