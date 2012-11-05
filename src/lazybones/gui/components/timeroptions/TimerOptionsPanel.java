@@ -82,7 +82,6 @@ import util.ui.Localizer;
 
 import com.thoughtworks.xstream.XStream;
 
-import devplugin.Date;
 import devplugin.Plugin;
 import devplugin.Program;
 
@@ -557,8 +556,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         if (e.getStateChange() == ItemEvent.SELECTED) {
             String item = (String) e.getItem();
             if ("VDR".equals(item)) {
-                Date date = new Date(timer.getStartTime());
-                Program prog = Plugin.getPluginManager().getProgram(date, timer.getTvBrowserProgIDs().get(0));
+                Program prog = Plugin.getPluginManager().getProgram(timer.getTvBrowserProgIDs().get(0));
                 Calendar tmpCal = (Calendar) timer.getStartTime().clone();
                 tmpCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
                 tmpCal.set(Calendar.MINUTE, prog.getMinutes());
@@ -569,12 +567,11 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             } else if ("TV-Browser".equals(item)) {
-                Date date = new Date(timer.getTimerWithoutBuffers().getStartTime());
                 Program prog = null;
                 if (this.prog != null) {
                     prog = this.prog;
                 } else {
-                    prog = Plugin.getPluginManager().getProgram(date, timer.getTvBrowserProgIDs().get(0));
+                    prog = Plugin.getPluginManager().getProgram(timer.getTvBrowserProgIDs().get(0));
                 }
 
                 if (prog != null && prog.getDescription() != null) {

@@ -1,3 +1,8 @@
+Lazy Bones 1.0.1
+===============================================================================
+* Fixed a bug in the timer options dialog. The description could not be changed
+  in some cases.
+  
 Lazy Bones 1.0.0
 ===============================================================================
 * New default directory setting fpr timers.
