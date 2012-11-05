@@ -627,6 +627,7 @@ public class TimerManager extends Observable {
                 }
 
                 // set the description
+                timer.setDescription(vdrEPG.getDescription());
                 String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
                 String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
                 int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
