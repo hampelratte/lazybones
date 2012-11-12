@@ -50,8 +50,10 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 import lazybones.LazyBones;
-import lazybones.RecordingManager;
+import lazybones.VDRCallback;
+import lazybones.actions.GetRecordingDetailsAction;
 
+import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.Stream;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
@@ -212,15 +214,23 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
     }
 
     @Override
-    public void valueChanged(TreeSelectionEvent e) {
-        TreePath selected = e.getPath();
+    public void valueChanged(final TreeSelectionEvent e) {
+        final TreePath selected = e.getPath();
         if (selected != null) {
             TreeNode treeNode = (TreeNode) selected.getPathComponent(selected.getPathCount() - 1);
             if (treeNode instanceof Recording) {
-                Recording rec = (Recording) treeNode;
-                RecordingManager.getInstance().loadInfo(rec);
-                setRecording(rec);
-                ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
+                final Recording rec = (Recording) treeNode;
+                VDRCallback<GetRecordingDetailsAction> callback = new VDRCallback<GetRecordingDetailsAction>() {
+                    @Override
+                    public void receiveResponse(GetRecordingDetailsAction cmd, Response response) {
+                        if (cmd.isSuccess()) {
+                            setRecording(cmd.getRecording());
+                            ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
+                        }
+                    }
+                };
+                GetRecordingDetailsAction grda = new GetRecordingDetailsAction(rec, callback);
+                grda.enqueue();
             } else {
                 title.setText(null);
                 time.setText(null);

@@ -29,7 +29,6 @@
  */
 package lazybones;
 
-import java.awt.Cursor;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class to manage all recordings.
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
 public class RecordingManager extends Observable {
 
@@ -137,19 +136,19 @@ public class RecordingManager extends Observable {
         lstr.enqueue();
     }
 
-    public void loadInfo(Recording rec) {
-        LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        Response response = VDRConnection.send(new LSTR(rec.getNumber()));
-        if (response != null && response.getCode() == 215) {
-            // parse epg information
-            try {
-                new RecordingParser().parseRecording(rec, response.getMessage());
-            } catch (ParseException e) {
-                logger.error("Couldn't parse epg information", e);
-            }
-        }
-        LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
+    // public void loadInfo(Recording rec) {
+    // LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+    // Response response = VDRConnection.send(new LSTR(rec.getNumber()));
+    // if (response != null && response.getCode() == 215) {
+    // // parse epg information
+    // try {
+    // new RecordingParser().parseRecording(rec, response.getMessage());
+    // } catch (ParseException e) {
+    // logger.error("Couldn't parse epg information", e);
+    // }
+    // }
+    // LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    // }
 
     public void playOnVdr(Recording rec) {
         Response res = VDRConnection.send(new PLAY(rec.getNumber()));

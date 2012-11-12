@@ -69,6 +69,7 @@ import lazybones.Player;
 import lazybones.RecordingManager;
 import lazybones.VDRCallback;
 import lazybones.actions.DeleteRecordingAction;
+import lazybones.actions.GetRecordingDetailsAction;
 import lazybones.gui.components.RecordingDetailsPanel;
 
 import org.hampelratte.svdrp.Response;
@@ -309,13 +310,21 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
     }
 
     private void createRecordingDetailsDialog(Recording rec) {
-        final JDialog dialog = new JDialog();
-        RecordingManager.getInstance().loadInfo(rec);
-        dialog.getContentPane().add(new RecordingDetailsPanel(rec));
-        dialog.setSize(400, 300);
-        dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());
-        dialog.setVisible(true);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        VDRCallback<GetRecordingDetailsAction> callback = new VDRCallback<GetRecordingDetailsAction>() {
+            @Override
+            public void receiveResponse(GetRecordingDetailsAction cmd, Response response) {
+                if (cmd.isSuccess()) {
+                    final JDialog dialog = new JDialog();
+                    dialog.getContentPane().add(new RecordingDetailsPanel(cmd.getRecording()));
+                    dialog.setSize(400, 300);
+                    dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());
+                    dialog.setVisible(true);
+                    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                }
+            }
+        };
+        GetRecordingDetailsAction grda = new GetRecordingDetailsAction(rec, callback);
+        grda.enqueue();
     }
 
     private void createContextMenu() {
