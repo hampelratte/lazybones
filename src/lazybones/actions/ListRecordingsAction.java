@@ -1,5 +1,4 @@
-/* $Id: ListRecordingsAction.java,v 1.9 2011-05-06 13:09:57 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -8,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -42,7 +41,6 @@ import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class ListRecordingsAction extends VDRAction {
 
     private static transient Logger logger = LoggerFactory.getLogger(ListRecordingsAction.class);
@@ -50,10 +48,11 @@ public class ListRecordingsAction extends VDRAction {
 
     private List<Recording> recordings;
 
-    public ListRecordingsAction(VDRCallback callback) {
+    public ListRecordingsAction(VDRCallback<ListRecordingsAction> callback) {
         super(callback);
     }
 
+    @Override
     boolean execute() {
         response = VDRConnection.send(new LSTR());
 

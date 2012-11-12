@@ -28,6 +28,8 @@
  */
 package lazybones;
 
+import lazybones.actions.VDRAction;
+
 import org.hampelratte.svdrp.Response;
 
 /**
@@ -37,6 +39,6 @@ import org.hampelratte.svdrp.Response;
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  * 
  */
-public interface VDRCallback<T> {
+public interface VDRCallback<T extends VDRAction> {
     public void receiveResponse(T cmd, Response response);
 }

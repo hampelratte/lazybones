@@ -1,5 +1,4 @@
-/* $Id: DeleteTimerAction.java,v 1.8 2011-05-06 13:09:57 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -56,7 +55,7 @@ public class DeleteTimerAction extends VDRAction {
         this(timer, null);
     }
 
-    public DeleteTimerAction(LazyBonesTimer timer, VDRCallback callback) {
+    public DeleteTimerAction(LazyBonesTimer timer, VDRCallback<DeleteTimerAction> callback) {
         setCallback(callback);
         this.timer = timer;
     }
