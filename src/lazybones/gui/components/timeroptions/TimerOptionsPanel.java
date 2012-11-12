@@ -162,10 +162,13 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     public TimerOptionsPanel(LazyBonesTimer timer, Program prog, Mode mode) {
         this.mode = mode;
 
+        logger.debug("Creating timer options panel");
         initGUI();
 
         setProgram(prog);
         setTimer(timer);
+
+        logger.debug("Timer options panel ready");
     }
 
     public TimerOptionsPanel(Mode mode) {
@@ -342,6 +345,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     }
 
     public void setTimer(LazyBonesTimer timer) {
+        logger.debug("Updating gui with timer values");
         if (timer != null) {
             this.timer = timer;
             this.oldTimer = (LazyBonesTimer) timer.clone();

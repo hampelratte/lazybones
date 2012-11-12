@@ -207,21 +207,25 @@ public class TimerManager extends Observable {
     public LazyBonesTimer getTimer(Program prog) {
         String progID = prog.getUniqueID();
         if (progID == null) {
+            // this really should not happen
             logger.warn("Unique program ID is null. Unable to find a timer for this program");
             return null;
         }
 
-        Calendar cal = prog.getDate().getCalendar();
         timerListLock.lock();
         try {
             for (LazyBonesTimer timer : timers) {
                 List<String> tvBrowserProdIDs = timer.getTvBrowserProgIDs();
                 for (String curProgID : tvBrowserProdIDs) {
                     if (progID.equals(curProgID)) {
-                        LazyBonesTimer bufferless = timer.getTimerWithoutBuffers();
-                        if (tvBrowserProdIDs.size() == 1 || Utilities.sameDay(cal, bufferless.getStartTime())) {
-                            return timer;
-                        }
+                        return timer;
+
+                        // disabled, what is this condition for?
+                        // LazyBonesTimer bufferless = timer.getTimerWithoutBuffers();
+                        // Calendar cal = prog.getDate().getCalendar();
+                        // if (tvBrowserProdIDs.size() == 1 || Utilities.sameDay(cal, bufferless.getStartTime())) {
+                        // return timer;
+                        // }
                     }
                 }
             }
@@ -748,6 +752,7 @@ public class TimerManager extends Observable {
      *            Supresses all user interaction
      */
     private void commitTimer(final LazyBonesTimer timer, LazyBonesTimer oldTimer, final Program prog, boolean update, boolean automatic) {
+        logger.debug("Comitting timer to VDR");
         int id = -1;
         if (prog != null) {
             Channel chan = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
@@ -759,6 +764,7 @@ public class TimerManager extends Observable {
         }
 
         if (update) {
+            logger.debug("Timer exists and will be modified");
             VDRCallback callback = new VDRCallback() {
                 @Override
                 public void receiveResponse(VDRAction cmd, Response response) {
@@ -774,6 +780,7 @@ public class TimerManager extends Observable {
             mta.setCallback(callback);
             mta.enqueue();
         } else {
+            logger.debug("Creating a new timer");
             if (timer.getTitle() != null) {
                 int percentage;
                 if (timer.getPath() != null && timer.getPath() != "") {
@@ -918,15 +925,21 @@ public class TimerManager extends Observable {
     }
 
     public void editTimer(LazyBonesTimer timer) {
+        logger.debug("Looking up program for timer {}", timer);
         Program prog = null;
         if (timer.getTvBrowserProgIDs().size() > 0) {
+            logger.debug("Timer has {} assigned programs", timer.getTvBrowserProgIDs().size());
             prog = ProgramManager.getInstance().getProgram(timer.getTvBrowserProgIDs().get(0));
         } else {
             logger.warn("Timer has no program IDs assigned.");
         }
+        logger.debug("Creating timer options dialog");
         TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
         if (tod.isAccepted()) {
+            logger.debug("Timer options dialog has been accepted");
             commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), true, false);
+        } else {
+            logger.debug("Timer options dialog has been canceled");
         }
     }
 

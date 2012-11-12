@@ -340,7 +340,7 @@ public class ProgramManager {
             }
         }
 
-        // no doppelpacks, we can now valuate the programs with
+        // no doppelpacks, we can now evaluate the programs with
         // several criteria
         Result bestMatching = evaluator.evaluate(threeDayProgram, timer);
         if (bestMatching == null) {

@@ -1,5 +1,4 @@
-/* $Id: TimerOptionsDialog.java,v 1.8 2011-04-20 12:09:14 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -43,6 +42,10 @@ import javax.swing.JRootPane;
 
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import util.ui.Localizer;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
@@ -51,9 +54,11 @@ import devplugin.Program;
 /**
  * Shown, if a timer should be edited.
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
 public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
+
+    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsDialog.class);
 
     private final JButton ok = new JButton();
 
@@ -87,11 +92,14 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
 
     public TimerOptionsDialog(LazyBonesTimer timer, Program prog, Mode mode) {
         this.control = LazyBones.getInstance();
+
         top = new TimerOptionsPanel(timer, prog, mode);
 
         this.timer = timer;
         this.oldTimer = (LazyBonesTimer) timer.clone();
         this.program = prog;
+
+        logger.debug("Constructor finished. Initializing dialog GUI");
 
         initGUI();
     }
