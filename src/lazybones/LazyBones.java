@@ -596,6 +596,12 @@ public class LazyBones extends Plugin implements Observer {
         }
 
         public ActionMenu createActionMenu(final Program program) {
+            final Channel vdrChan = ChannelManager.getChannelMapping().get(program.getChannel().getId());
+            if (vdrChan == null) {
+                // selected channel is not mapped to VDR channel, so it does not make sense to show a menu at all
+                return null;
+            }
+
             Marker[] markers = program.getMarkerArr();
             boolean marked = false;
             for (int i = 0; i < markers.length; i++) {
