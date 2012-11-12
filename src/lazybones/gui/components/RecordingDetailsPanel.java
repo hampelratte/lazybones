@@ -57,10 +57,14 @@ import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.Stream;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RecordingDetailsPanel extends JPanel implements TreeSelectionListener {
 
     private static final long serialVersionUID = 1L;
+
+    private static transient Logger logger = LoggerFactory.getLogger(RecordingDetailsPanel.class);
 
     private Recording recording;
 
@@ -213,6 +217,15 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
         return content + ' ' + description + " (" + language + ")";
     }
 
+    private void clearDetailsPanel() {
+        title.setText(null);
+        time.setText(null);
+        shortTextLabel.setText(null);
+        desc.setText(null);
+        recording = null;
+        adjustStreamLabelVisibility(showStreamsToggle.isSelected());
+    }
+
     @Override
     public void valueChanged(final TreeSelectionEvent e) {
         final TreePath selected = e.getPath();
@@ -225,19 +238,19 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
                     public void receiveResponse(GetRecordingDetailsAction cmd, Response response) {
                         if (cmd.isSuccess()) {
                             setRecording(cmd.getRecording());
-                            ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
+                        } else {
+                            clearDetailsPanel();
+                            String mesg = LazyBones
+                                    .getTranslation("error_retrieve_recording_details", "Couldn't load recording details from VDR: {0}", response.getMessage());
+                            logger.error(mesg);
                         }
+                        ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
                     }
                 };
                 GetRecordingDetailsAction grda = new GetRecordingDetailsAction(rec, callback);
                 grda.enqueue();
             } else {
-                title.setText(null);
-                time.setText(null);
-                shortTextLabel.setText(null);
-                desc.setText(null);
-                recording = null;
-                adjustStreamLabelVisibility(showStreamsToggle.isSelected());
+                clearDetailsPanel();
             }
         } else {
             title.setText(null);

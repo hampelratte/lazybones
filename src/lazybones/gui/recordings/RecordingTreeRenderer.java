@@ -104,11 +104,14 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
             if (recording.isNew()) {
                 if (recording.isCut()) {
                     _renderer.setIcon(iconBoth);
+                    _renderer.setDisabledIcon(iconBoth);
                 } else {
                     _renderer.setIcon(iconNew);
+                    _renderer.setDisabledIcon(iconNew);
                 }
             } else if (recording.isCut()) {
                 _renderer.setIcon(iconCut);
+                _renderer.setDisabledIcon(iconCut);
             } else {
                 _renderer.setIcon(null);
                 _renderer.setDisabledIcon(null);
