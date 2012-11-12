@@ -69,7 +69,6 @@ import lazybones.Player;
 import lazybones.RecordingManager;
 import lazybones.VDRCallback;
 import lazybones.actions.DeleteRecordingAction;
-import lazybones.actions.VDRAction;
 import lazybones.gui.components.RecordingDetailsPanel;
 
 import org.hampelratte.svdrp.Response;
@@ -274,9 +273,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             buttonRemove.setEnabled(false);
             buttonSync.setEnabled(false);
             final boolean hasFocus = recordingTree.hasFocus();
-            VDRCallback callback = new VDRCallback() {
+            VDRCallback<DeleteRecordingAction> callback = new VDRCallback<DeleteRecordingAction>() {
                 @Override
-                public void receiveResponse(VDRAction cmd, Response response) {
+                public void receiveResponse(DeleteRecordingAction cmd, Response response) {
                     if (!cmd.isSuccess()) {
                         logger.error(cmd.getResponse().getMessage());
                         recordingTree.setEnabled(true);

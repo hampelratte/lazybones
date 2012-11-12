@@ -49,7 +49,7 @@ public class DeleteRecordingAction extends VDRAction {
         this(recording, null);
     }
 
-    public DeleteRecordingAction(Recording recording, VDRCallback callback) {
+    public DeleteRecordingAction(Recording recording, VDRCallback<?> callback) {
         super(callback);
         this.recording = recording;
     }
@@ -81,9 +81,9 @@ public class DeleteRecordingAction extends VDRAction {
                 int timerNumber = Integer.parseInt(numberString.trim());
                 LazyBonesTimer timer = TimerManager.getInstance().getTimer(timerNumber);
 
-                VDRCallback callback = new VDRCallback() {
+                VDRCallback<DeleteTimerAction> callback = new VDRCallback<DeleteTimerAction>() {
                     @Override
-                    public void receiveResponse(VDRAction cmd, Response response) {
+                    public void receiveResponse(DeleteTimerAction cmd, Response response) {
                         /*
                          * The DeleteTimerAction finished, we can now check again, if we can delete the recording
                          */

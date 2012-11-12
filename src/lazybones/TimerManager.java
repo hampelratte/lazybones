@@ -46,7 +46,6 @@ import javax.swing.JOptionPane;
 import lazybones.actions.CreateTimerAction;
 import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
-import lazybones.actions.VDRAction;
 import lazybones.actions.responses.ConnectionProblem;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.components.timeroptions.TimerOptionsPanel;
@@ -510,9 +509,9 @@ public class TimerManager extends Observable {
      *            a Runnable object, which is run after the delete process is finished
      */
     public void deleteTimer(final LazyBonesTimer timer, final Runnable callback) {
-        VDRCallback _callback = new VDRCallback() {
+        VDRCallback<DeleteTimerAction> _callback = new VDRCallback<DeleteTimerAction>() {
             @Override
-            public void receiveResponse(VDRAction cmd, Response response) {
+            public void receiveResponse(DeleteTimerAction cmd, Response response) {
                 if (!cmd.isSuccess()) {
                     logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn't delete timer:") + " " + cmd.getResponse().getMessage());
                 } else {
@@ -765,9 +764,9 @@ public class TimerManager extends Observable {
 
         if (update) {
             logger.debug("Timer exists and will be modified");
-            VDRCallback callback = new VDRCallback() {
+            VDRCallback<ModifyTimerAction> callback = new VDRCallback<ModifyTimerAction>() {
                 @Override
-                public void receiveResponse(VDRAction cmd, Response response) {
+                public void receiveResponse(ModifyTimerAction cmd, Response response) {
                     if (cmd.isSuccess()) {
                         TimerManager.getInstance().synchronize();
                     } else {
@@ -801,9 +800,9 @@ public class TimerManager extends Observable {
                     TimerManager tm = TimerManager.getInstance();
                     String timerTitle = tm.getTitleMapping().getVdrTitle(prog.getTitle());
                     if (timer.getTitle().equals(timerTitle)) {
-                        VDRCallback callback = new VDRCallback() {
+                        VDRCallback<CreateTimerAction> callback = new VDRCallback<CreateTimerAction>() {
                             @Override
-                            public void receiveResponse(VDRAction cmd, Response response) {
+                            public void receiveResponse(CreateTimerAction cmd, Response response) {
                                 if (cmd.isSuccess()) {
                                     timer.addTvBrowserProgID(prog.getUniqueID());
                                     replaceStoredTimer(timer);
@@ -906,9 +905,9 @@ public class TimerManager extends Observable {
     public void deleteTimer(final Program prog) {
         LazyBonesTimer timer = TimerManager.getInstance().getTimer(prog);
         logger.debug("Deleting timer {}", timer);
-        VDRCallback callback = new VDRCallback() {
+        VDRCallback<DeleteTimerAction> callback = new VDRCallback<DeleteTimerAction>() {
             @Override
-            public void receiveResponse(VDRAction cmd, Response response) {
+            public void receiveResponse(DeleteTimerAction cmd, Response response) {
                 if (cmd instanceof DeleteTimerAction) {
                     if (!cmd.isSuccess()) {
                         logger.error(LazyBones.getTranslation("couldnt_delete", "Couldn\'t delete timer:") + " " + cmd.getResponse().getMessage());

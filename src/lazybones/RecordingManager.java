@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Observable;
 
 import lazybones.actions.ListRecordingsAction;
-import lazybones.actions.VDRAction;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
@@ -103,11 +102,9 @@ public class RecordingManager extends Observable {
         logger.debug("Getting recordings from VDR");
 
         // fetch current recording list from vdr
-        VDRCallback _callback = new VDRCallback() {
+        VDRCallback<ListRecordingsAction> _callback = new VDRCallback<ListRecordingsAction>() {
             @Override
-            public void receiveResponse(VDRAction cmd, Response response) {
-                ListRecordingsAction lstr = (ListRecordingsAction) cmd;
-
+            public void receiveResponse(ListRecordingsAction lstr, Response response) {
                 if (lstr.isSuccess()) {
                     // clear recording list
                     recordings = lstr.getRecordings();
