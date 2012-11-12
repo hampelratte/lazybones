@@ -123,6 +123,11 @@ public class LazyBones extends Plugin implements Observer {
     }
 
     @Override
+    public ActionMenu getContextMenuActions(final devplugin.Channel channel) {
+        return cmf.createChannelActionMenu(channel);
+    }
+
+    @Override
     public PluginCenterPanelWrapper getPluginCenterPanelWrapper() {
         return wrapper;
     }
@@ -551,6 +556,45 @@ public class LazyBones extends Plugin implements Observer {
     }
 
     private class ContextMenuFactory {
+        public ActionMenu createChannelActionMenu(final devplugin.Channel chan) {
+            final Channel vdrChan = ChannelManager.getChannelMapping().get(chan.getId());
+            if (vdrChan == null) {
+                // selected channel is not mapped to VDR channel, so it does not make sense to show a menu at all
+                return null;
+            }
+
+            ActionMenu[] actions = new ActionMenu[2];
+            AbstractAction watch = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    Player.play(vdrChan.getChannelNumber());
+                }
+            };
+            watch.putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
+            watch.putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
+            actions[0] = new ActionMenu(watch);
+
+            AbstractAction switchToChan = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    // switch to channel
+                    logger.info("Switch to channel {}", vdrChan.getName());
+                    CHAN chan = new CHAN(Integer.toString(vdrChan.getChannelNumber()));
+                    Response resp = VDRConnection.send(chan);
+                    if (resp.getCode() != 250) {
+                        logger.error(LazyBones.getTranslation("couldnt_switch", "Couldn't switch to channel", resp.getMessage()));
+                    }
+                }
+            };
+            switchToChan.putValue(Action.NAME, LazyBones.getTranslation("switch_to", "Switch to this channel"));
+            switchToChan.putValue(Action.SMALL_ICON, createImageIcon("lazybones/remote-control.png"));
+            actions[1] = new ActionMenu(switchToChan);
+
+            String name = LazyBones.getTranslation("lazybones", "Lazy Bones");
+            ImageIcon icon = createImageIcon("lazybones/vdr16.png");
+            return new ActionMenu(name, icon, actions);
+        }
+
         public ActionMenu createActionMenu(final Program program) {
             Marker[] markers = program.getMarkerArr();
             boolean marked = false;
@@ -670,11 +714,13 @@ public class LazyBones extends Plugin implements Observer {
                     // switch to channel
                     devplugin.Channel tvbChan = program.getChannel();
                     Channel vdrChan = ChannelManager.getChannelMapping().get(tvbChan.getId());
-                    logger.info("Swtich to channel {} of program {}", vdrChan.getName(), program.getTitle());
-                    CHAN chan = new CHAN(Integer.toString(vdrChan.getChannelNumber()));
-                    Response resp = VDRConnection.send(chan);
-                    if (resp.getCode() != 250) {
-                        logger.error(LazyBones.getTranslation("couldnt_switch", "Couldn't switch to channel", resp.getMessage()));
+                    if (vdrChan != null) {
+                        logger.info("Swtich to channel {} of program {}", vdrChan.getName(), program.getTitle());
+                        CHAN chan = new CHAN(Integer.toString(vdrChan.getChannelNumber()));
+                        Response resp = VDRConnection.send(chan);
+                        if (resp.getCode() != 250) {
+                            logger.error(LazyBones.getTranslation("couldnt_switch", "Couldn't switch to channel", resp.getMessage()));
+                        }
                     }
                 }
             };
