@@ -3,10 +3,13 @@ Lazy Bones 1.0.1
 * Fixed a bug in the timer options dialog. The description could not be changed
   in some cases.
 * Fixed bug. Preset for timer description selection didn't work.
+* Added a context menu for channels.
+* Context menus are only shown, if the channel of the selected element is
+  mapped to a VDR channel.
   
 Lazy Bones 1.0.0
 ===============================================================================
-* New default directory setting fpr timers.
+* New default directory setting for timers.
 * Lazy Bones now provides three different tabs for the center panel.
 * Fixed a bug in svdrp4j, which caused rendering issues in the recordings 
   panel.
