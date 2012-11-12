@@ -320,6 +320,10 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
                     dialog.setLocation(LazyBones.getInstance().getMainDialog().getLocation());
                     dialog.setVisible(true);
                     dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                } else {
+                    String mesg = LazyBones.getTranslation("error_retrieve_recording_details", "Couldn't load recording details from VDR: {0}",
+                            response.getMessage());
+                    logger.error(mesg);
                 }
             }
         };
