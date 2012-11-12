@@ -37,6 +37,7 @@ import org.hampelratte.svdrp.Response;
  * 
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
+@SuppressWarnings("rawtypes")
 public abstract class VDRAction {
 
     protected boolean success;
@@ -97,6 +98,7 @@ public abstract class VDRAction {
     /**
      * Calls the VDRCallback after the execution of this action
      */
+    @SuppressWarnings("unchecked")
     protected void callback() {
         if (callback != null) {
             callback.receiveResponse(this, response);
