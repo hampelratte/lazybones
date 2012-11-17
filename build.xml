@@ -80,7 +80,7 @@
 		<delete dir="${build.dir}"/>
 	</target>
 
-	<target name="dist" depends="jar" description="Make distribution zip">
+	<target name="release" depends="checklist,jar" description="Make distribution zip">
 		<property name="dist-tmp.dir" value="${build.dir}/dist-tmp"/>
 		<mkdir dir="${dist-tmp.dir}"/>
 
@@ -102,6 +102,43 @@
 	             basedir="${dist-tmp.dir}"/>
 
 		<delete dir="${dist-tmp.dir}"/>
+	</target>
+
+	<target name="checklist" description="Checklist of things to do before releasing a version.">
+		<!-- Make sure the readme and website state the correct TVB dependency -->
+        <input message="Do readme and webiste state the correct TVB version?" validargs="y,n" addproperty="check.tvbversion" />
+        <condition property="do.abort">
+            <equals arg1="n" arg2="${check.tvbversion}" />
+        </condition>
+        <fail if="do.abort">Please edit the README / website.</fail>
+
+		<!-- Make sure the changelog has been updated -->
+        <input message="Is the changelog up to date?" validargs="y,n" addproperty="check.changelog" />
+        <condition property="do.abort">
+            <equals arg1="n" arg2="${check.changelog}" />
+        </condition>
+        <fail if="do.abort">Please edit the changelog.</fail>
+		
+		<!-- Make sure the plugin version number has been increased -->
+		<input message="Is the plugin version number correct?" validargs="y,n" addproperty="check.version" />
+		<condition property="do.abort">
+			<equals arg1="n" arg2="${check.version}" />
+		</condition>
+		<fail if="do.abort">Please change the version number.</fail>
+
+		<!-- Make sure all changes have been checked in -->
+		<input message="All code changes checked into the SCM?" validargs="y,n" addproperty="check.scm" />
+		<condition property="do.abort">
+			<equals arg1="n" arg2="${check.scm}" />
+		</condition>
+		<fail if="do.abort">Code has to be checked in.</fail>
+
+		<!-- Make sure the code has a tag in the SCM -->
+        <input message="Did you tag the current revision?" validargs="y,n" addproperty="check.scm.tag" />
+        <condition property="do.abort">
+            <equals arg1="n" arg2="${check.scm.tag}" />
+        </condition>
+        <fail if="do.abort">Please tag the revision.</fail>
 	</target>
 
 </project>
