@@ -1,5 +1,4 @@
-/* $Id: GeneralPanel.java,v 1.10 2011-04-20 12:09:13 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
@@ -11,7 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
@@ -54,12 +53,6 @@ import lazybones.LazyBones;
 import lazybones.VDRConnection;
 import lazybones.gui.DebugConsole;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
- * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
- * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
 public class GeneralPanel extends JPanel {
     private JLabel lHost;
     private JTextField host;
@@ -136,7 +129,6 @@ public class GeneralPanel extends JPanel {
                         SpinnerModel percentageModel = new SpinnerNumberModel(percentageThreshold, 0, 100, 1);
                         percentage = new JSpinner();
                         percentage.setModel(percentageModel);
-                        percentage.getEditor().setPreferredSize(new java.awt.Dimension(138, 18));
                         percentage.setToolTipText(LazyBones.getTranslation("percentageOfEquality.tooltip", "Percentage of equality of program titles"));
                     }
                     {
@@ -187,6 +179,7 @@ public class GeneralPanel extends JPanel {
                                     new Insets(5, 5, 5, 5), 0, 0));
                             bShowLog.setText(LazyBones.getTranslation("show_log", "Show log"));
                             bShowLog.addActionListener(new ActionListener() {
+                                @Override
                                 public void actionPerformed(ActionEvent evt) {
                                     DebugConsole dc = new DebugConsole();
                                     dc.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
