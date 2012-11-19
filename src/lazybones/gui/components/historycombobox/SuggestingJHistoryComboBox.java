@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTextField;
-import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyListener {
 
@@ -28,14 +30,12 @@ public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyL
         ((JTextComponent) getEditor().getEditorComponent()).setDocument(doc);
 
         // add DocumentFilter to trigger suggestion
-        JTextField editor = (JTextField) getEditor().getEditorComponent();
-        final AbstractDocument doc = (AbstractDocument) editor.getDocument();
         doc.setDocumentFilter(new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
                     throws BadLocationException {
                 super.insertString(fb, offset, string, attr);
-                if (doc.getLength() > 0) {
+                if (doc.getLength() > 0 && !doc.isConsumeEvents()) {
                     suggest();
                 }
             }
@@ -44,7 +44,7 @@ public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyL
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
                     throws BadLocationException {
                 super.replace(fb, offset, length, text, attrs);
-                if (doc.getLength() > 0) {
+                if (doc.getLength() > 0 && !doc.isConsumeEvents()) {
                     suggest();
                 }
             }
@@ -71,6 +71,7 @@ public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyL
         }
     }
 
+    Logger logger = LoggerFactory.getLogger(SuggestingJHistoryComboBox.class);
     private void suggest() {
         JTextField textField = (JTextField) getEditor().getEditorComponent();
         String text = textField.getText();
