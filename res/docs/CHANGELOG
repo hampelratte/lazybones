@@ -1,3 +1,8 @@
+Lazy Bones 1.0.2
+===============================================================================
+* Fixed event loop bug in SuggestingJHistoryComboBox, which occured in 
+  conjunction with the GTK+ LaF
+
 Lazy Bones 1.0.1
 ===============================================================================
 * Fixed a bug in the timer options dialog. The description could not be changed
