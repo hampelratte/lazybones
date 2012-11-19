@@ -108,8 +108,12 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JButton addRow;
 
     private JButton delRow;
+
     private JCheckBox cbVPS;
     private JLabel lVPS = new JLabel(LazyBones.getTranslation("vpsDefault", "VPS by default"));
+
+    private JCheckBox cbShowTimerConflicts;
+    private JLabel lShowTimerConflicts = new JLabel(LazyBones.getTranslation("showTimerConflicts", "Show note on timer conflicts"));
 
     private JLabel lDescSource;
 
@@ -135,6 +139,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_numberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
         int descSourceTvb = Integer.parseInt(props.getProperty("descSourceTvb"));
         boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
+        boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
         List<String> defaultDirectoryHistory = new ArrayList<String>();
 
         // load default directory history
@@ -204,6 +209,9 @@ public class TimerPanel implements MouseListener, ActionListener {
         cbVPS = new JCheckBox();
         cbVPS.setSelected(vpsDefault);
 
+        cbShowTimerConflicts = new JCheckBox();
+        cbShowTimerConflicts.setSelected(showTimerConflicts);
+
         lDefaultDirectory = new JLabel(LazyBones.getTranslation("default_directory", "Default directory"));
         cbDefaultDirectory = new JHistoryComboBox(defaultDirectoryHistory);
     }
@@ -263,6 +271,15 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.insets = new Insets(5, 15, 5, 5);
+        panel.add(lShowTimerConflicts, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel.add(cbShowTimerConflicts, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lNumberOfCards, gbc);
 
         gbc.gridx = 1;
@@ -271,7 +288,7 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         // history combobox for the default directory
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.insets = new Insets(5, 15, 30, 5);
         panel.add(lDefaultDirectory, gbc);
 
@@ -303,12 +320,12 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(lifetime, gbc);
 
         // mapping
-        panel.add(labMappings, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
-        panel.add(mappingPane, new GridBagConstraints(0, 7, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
+        panel.add(labMappings, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
+        panel.add(mappingPane, new GridBagConstraints(0, 8, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
 
         // buttons
-        panel.add(addRow, new GridBagConstraints(4, 7, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
-        panel.add(delRow, new GridBagConstraints(4, 8, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
+        panel.add(addRow, new GridBagConstraints(4, 8, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
+        panel.add(delRow, new GridBagConstraints(4, 9, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
 
         return panel;
     }
@@ -322,6 +339,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         props.setProperty("numberOfCards", numberOfCards.getValue().toString());
         props.setProperty("descSourceTvb", Integer.toString(cbDescSource.getSelectedIndex()));
         props.setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
+        props.setProperty("timer.conflicts.show", Boolean.toString(cbShowTimerConflicts.isSelected()));
 
         // save default directory history
         cbDefaultDirectory.addCurrentItemToHistory();

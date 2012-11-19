@@ -7,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -121,37 +121,40 @@ public class ConflictFinder implements Observer {
     }
 
     public void handleConflicts() {
-        logger.debug("Handling conflicts");
-        // check, if there are timer conflicts
-        if (getConflictCount() > 0) {
-            String msg = LazyBones.getTranslation("conflict_found", LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!",
-                    Integer.toString(ConflictFinder.getInstance().getConflictCount()));
+        boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
+        if (showTimerConflicts) {
+            logger.debug("Handling conflicts");
+            // check, if there are timer conflicts
+            if (getConflictCount() > 0) {
+                String msg = LazyBones.getTranslation("conflict_found", LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!",
+                        Integer.toString(ConflictFinder.getInstance().getConflictCount()));
 
-            LazyBones.getInstance().getMainDialog().setVisible(true);
-            LazyBones.getInstance().getMainDialog().showTimeline();
+                LazyBones.getInstance().getMainDialog().setVisible(true);
+                LazyBones.getInstance().getMainDialog().showTimeline();
 
-            // debug output
-            StringBuffer logMsg = new StringBuffer();
-            Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = ConflictFinder.getInstance().getConflicts();
-            for (ConflictingTimersSet<LazyBonesTimer> set : conflicts) {
-                logMsg.append("Conflict found: ");
-                for (LazyBonesTimer timer : set) {
-                    logMsg.append(timer.getTitle() + ", ");
+                // debug output
+                StringBuffer logMsg = new StringBuffer();
+                Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = ConflictFinder.getInstance().getConflicts();
+                for (ConflictingTimersSet<LazyBonesTimer> set : conflicts) {
+                    logMsg.append("Conflict found: ");
+                    for (LazyBonesTimer timer : set) {
+                        logMsg.append(timer.getTitle() + ", ");
+                    }
+                    logMsg.append(" Conflict start: " + DateFormat.getDateTimeInstance().format(set.getConflictStartTime().getTime()));
+                    logMsg.append(" Conflict end: " + DateFormat.getDateTimeInstance().format(set.getConflictEndTime().getTime()));
+                    logger.debug(logMsg.toString());
                 }
-                logMsg.append(" Conflict start: " + DateFormat.getDateTimeInstance().format(set.getConflictStartTime().getTime()));
-                logMsg.append(" Conflict end: " + DateFormat.getDateTimeInstance().format(set.getConflictEndTime().getTime()));
-                logger.debug(logMsg.toString());
+
+                // set timeline date to the date of one conflict
+                TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
+                ConflictingTimersSet<LazyBonesTimer> set = conflicts.iterator().next();
+                tp.setCalendar(set.getConflictStartTime());
+
+                popuplog.info(msg);
             }
 
-            // set timeline date to the date of one conflict
-            TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
-            ConflictingTimersSet<LazyBonesTimer> set = conflicts.iterator().next();
-            tp.setCalendar(set.getConflictStartTime());
-
-            popuplog.info(msg);
+            LazyBones.getInstance().getMainDialog().getTimelinePanel().repaint();
         }
-
-        LazyBones.getInstance().getMainDialog().getTimelinePanel().repaint();
     }
 
     public int getConflictCount() {
