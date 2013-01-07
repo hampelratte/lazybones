@@ -28,6 +28,11 @@
  */
 package lazybones.gui.components.timeroptions;
 
+import static lazybones.gui.settings.DescriptionSelectorItem.TIMER;
+import static lazybones.gui.settings.DescriptionSelectorItem.TVB_DESC;
+import static lazybones.gui.settings.DescriptionSelectorItem.TVB_PREFIX;
+import static lazybones.gui.settings.DescriptionSelectorItem.VDR;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -69,6 +74,8 @@ import lazybones.gui.components.daychooser.BrowseTextField;
 import lazybones.gui.components.daychooser.DayChooser;
 import lazybones.gui.components.historycombobox.SuggestingJHistoryComboBox;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
+import lazybones.gui.settings.DescriptionComboBoxModel;
+import lazybones.gui.settings.DescriptionSelectorItem;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -87,10 +94,6 @@ import devplugin.Program;
 
 public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener, WindowListener, ChangeListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
-
-    public static final int DESC_VDR = 0;
-    public static final int DESC_TVB = 1;
-    public static final int DESC_LONGEST = 2;
 
     private final JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
@@ -126,6 +129,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
     private final JLabel lDescription = new JLabel(LazyBones.getTranslation("description", "Description"));
 
+    private DescriptionComboBoxModel comboDescModel;
     private final JComboBox comboDesc = new JComboBox();
 
     private final JTextArea description = new JTextArea();
@@ -305,11 +309,9 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridx = 1;
         gbc.gridy = row++;
         add(comboDesc, gbc);
-        comboDesc.addItem("VDR");
-        comboDesc.addItem("TV-Browser");
-        if (mode == Mode.UPDATE || mode == Mode.VIEW) {
-            comboDesc.addItem("Timer");
-        }
+
+        comboDescModel = new DescriptionComboBoxModel(false, (mode == Mode.UPDATE || mode == Mode.VIEW));
+        comboDesc.setModel(comboDescModel);
         comboDesc.addItemListener(this);
         // comboDesc.setEnabled(!update);
 
@@ -371,37 +373,16 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             }
 
             // set the description
-            String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
-            String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
-            int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
-
             if (mode == Mode.UPDATE || mode == Mode.VIEW) {
                 description.setText(oldTimer.getDescription());
-                comboDesc.setSelectedIndex(2);
+                comboDescModel.setSelected(DescriptionSelectorItem.TIMER);
             } else {
-                switch (useTvbDescription) {
-                case DESC_VDR:
-                    description.setText(descVdr);
-                    comboDesc.setSelectedIndex(DESC_VDR);
-                    break;
-                case DESC_TVB:
-                    description.setText(descTvb);
-                    comboDesc.setSelectedIndex(DESC_TVB);
-                    break;
-                case DESC_LONGEST:
-                    if (descVdr.length() < descTvb.length()) {
-                        description.setText(descTvb);
-                        comboDesc.setSelectedIndex(DESC_TVB);
-                    } else {
-                        description.setText(descVdr);
-                        comboDesc.setSelectedIndex(DESC_VDR);
-                    }
-                    break;
-                default:
-                    description.setText(descVdr);
-                    comboDesc.setSelectedIndex(DESC_VDR);
-                    break;
-                }
+                String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
+                String selectedDescriptionId = LazyBones.getProperties().getProperty("descSourceTvb");
+                String descriptionText = TimerManager.createDescription(selectedDescriptionId, descVdr, prog);
+
+                description.setText(descriptionText);
+                comboDescModel.setSelected(selectedDescriptionId);
             }
 
             // set timer is active switch
@@ -558,8 +539,11 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            String item = (String) e.getItem();
-            if ("VDR".equals(item)) {
+            DescriptionSelectorItem selectedDescription = (DescriptionSelectorItem) e.getItem();
+
+            if (selectedDescription.getId().equals(TIMER)) {
+                description.setText(oldTimer.getDescription());
+            } else if (selectedDescription.getId().equals(VDR)) {
                 Program prog = Plugin.getPluginManager().getProgram(timer.getTvBrowserProgIDs().get(0));
                 Calendar tmpCal = (Calendar) timer.getStartTime().clone();
                 tmpCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
@@ -570,7 +554,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 String desc = tmp == null ? "" : tmp.getDescription();
                 description.setText(desc);
                 getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            } else if ("TV-Browser".equals(item)) {
+            } else if (selectedDescription.getId().equals(TVB_DESC)) {
                 Program prog = null;
                 if (this.prog != null) {
                     prog = this.prog;
@@ -580,12 +564,18 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
                 if (prog != null && prog.getDescription() != null) {
                     description.setText(prog.getDescription());
-                    description.append("\n\n" + prog.getChannel().getCopyrightNotice());
                 } else {
                     description.setText("");
                 }
-            } else if ("Timer".equals(item)) {
-                description.setText(oldTimer.getDescription());
+            } else if (selectedDescription.getId().startsWith(TVB_PREFIX)) {
+                Program prog = null;
+                if (this.prog != null) {
+                    prog = this.prog;
+                } else {
+                    prog = Plugin.getPluginManager().getProgram(timer.getTvBrowserProgIDs().get(0));
+                }
+                String desc = TimerManager.createDescription(selectedDescription.getId(), "", prog);
+                description.setText(desc);
             }
         }
     }

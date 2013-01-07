@@ -48,7 +48,7 @@ import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.responses.ConnectionProblem;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
-import lazybones.gui.components.timeroptions.TimerOptionsPanel;
+import lazybones.gui.settings.DescriptionSelectorItem;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
 import lazybones.programmanager.ProgramManager;
@@ -67,6 +67,8 @@ import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.paramhandler.ParamParser;
+import util.program.AbstractPluginProgramFormating;
 import devplugin.Date;
 import devplugin.Program;
 
@@ -632,26 +634,9 @@ public class TimerManager extends Observable {
                 // set the description
                 timer.setDescription(vdrEPG.getDescription());
                 String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
-                String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
-                int useTvbDescription = Integer.parseInt(LazyBones.getProperties().getProperty("descSourceTvb"));
-                switch (useTvbDescription) {
-                case TimerOptionsPanel.DESC_VDR:
-                    timer.setDescription(descVdr);
-                    break;
-                case TimerOptionsPanel.DESC_TVB:
-                    timer.setDescription(descTvb);
-                    break;
-                case TimerOptionsPanel.DESC_LONGEST:
-                    if (descVdr.length() < descTvb.length()) {
-                        timer.setDescription(descTvb);
-                    } else {
-                        timer.setDescription(descVdr);
-                    }
-                    break;
-                default:
-                    timer.setDescription(descVdr);
-                    break;
-                }
+                String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
+                String description = createDescription(descriptionSelectorItemId, descVdr, prog);
+                timer.setDescription(description);
             } else { // VDR has no EPG data
                 noEPGAvailable(prog, id, automatic);
                 return;
@@ -677,6 +662,45 @@ public class TimerManager extends Observable {
                 String msg = res != null ? res.getMessage() : "Reason unknown";
                 logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer\n: ") + " " + msg);
             }
+        }
+    }
+
+    /**
+     * Creates the description for a timer according to the setting in the configuration panel.
+     * 
+     * @param descVdr
+     *            The description provided by VDR
+     * @param prog
+     *            The program, which corresponds to this timer
+     * @return the description as String
+     */
+    public static String createDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
+        String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
+        if (descriptionSelectorItemId.equals(DescriptionSelectorItem.VDR)) {
+            return descVdr;
+        } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.TVB_DESC)) {
+            return descTvb;
+        } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.LONGEST)) {
+            if (descVdr.length() < descTvb.length()) {
+                return descTvb;
+            } else {
+                return descVdr;
+            }
+        } else if (descriptionSelectorItemId.startsWith(DescriptionSelectorItem.TVB_PREFIX)) {
+            String selectedFormat = descriptionSelectorItemId.substring(descriptionSelectorItemId.indexOf('_') + 1);
+            AbstractPluginProgramFormating[] formats = LazyBones.getPluginManager().getAvailableGlobalPuginProgramFormatings();
+            for (AbstractPluginProgramFormating format : formats) {
+                if(format.getId().equals(selectedFormat)) {
+                    ParamParser parser = new ParamParser();
+                    String desc = parser.analyse(format.getContentValue(), prog);
+                    return desc != null ? desc : descVdr;
+                }
+            }
+
+            // no format found
+            return descVdr;
+        } else {
+            return descVdr;
         }
     }
 

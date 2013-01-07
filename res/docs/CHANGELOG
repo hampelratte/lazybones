@@ -1,3 +1,10 @@
+Lazy Bones 1.1.0
+===============================================================================
+* Added configuration option to disable the timer conflict notification.
+* small GUI adjustments
+* The timer description can now be formatted with the TVB program formatting
+  mechanism.
+
 Lazy Bones 1.0.2
 ===============================================================================
 * Fixed event loop bug in SuggestingJHistoryComboBox, which occured in 

@@ -137,7 +137,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_prio = Integer.parseInt(props.getProperty("timer.prio"));
         int int_lifetime = Integer.parseInt(props.getProperty("timer.lifetime"));
         int int_numberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
-        int descSourceTvb = Integer.parseInt(props.getProperty("descSourceTvb"));
+        String descSourceTvb = props.getProperty("descSourceTvb");
         boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
         boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
         List<String> defaultDirectoryHistory = new ArrayList<String>();
@@ -201,10 +201,9 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         lDescSource = new JLabel(LazyBones.getTranslation("desc_source", "Use description from TV-Browser"));
         cbDescSource = new JComboBox();
-        cbDescSource.addItem("VDR");
-        cbDescSource.addItem("TV-Browser");
-        cbDescSource.addItem(LazyBones.getTranslation("timer_desc_longest", "longest description"));
-        cbDescSource.setSelectedIndex(descSourceTvb);
+        DescriptionComboBoxModel dcbm = new DescriptionComboBoxModel(true, false);
+        dcbm.setSelected(descSourceTvb);
+        cbDescSource.setModel(dcbm);
 
         cbVPS = new JCheckBox();
         cbVPS.setSelected(vpsDefault);
@@ -337,7 +336,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         props.setProperty("timer.prio", prio.getValue().toString());
         props.setProperty("timer.lifetime", lifetime.getValue().toString());
         props.setProperty("numberOfCards", numberOfCards.getValue().toString());
-        props.setProperty("descSourceTvb", Integer.toString(cbDescSource.getSelectedIndex()));
+        props.setProperty("descSourceTvb", ((DescriptionSelectorItem) cbDescSource.getSelectedItem()).getId());
         props.setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
         props.setProperty("timer.conflicts.show", Boolean.toString(cbShowTimerConflicts.isSelected()));
 
