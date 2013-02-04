@@ -2,8 +2,9 @@ Lazy Bones 1.1.0
 ===============================================================================
 * Added configuration option to disable the timer conflict notification.
 * small GUI adjustments
-* The timer description can now be formatted with the TVB program formatting
-  mechanism.
+* The timer description can now be formatted with the TVB plugin program 
+  formatting mechanism.
+* Fixed a charset encoding bug.
 
 Lazy Bones 1.0.2
 ===============================================================================
