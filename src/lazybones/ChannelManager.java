@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
  * 
@@ -7,11 +7,11 @@
  * 
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -39,7 +39,6 @@ import java.util.Map.Entry;
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTC;
 import org.hampelratte.svdrp.parsers.ChannelParser;
-import org.hampelratte.svdrp.responses.highlevel.BroadcastChannel;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,14 +60,6 @@ public class ChannelManager {
         if (res != null && res.getCode() == 250) {
             try {
                 channels = ChannelParser.parse(res.getMessage(), true);
-
-                // remove all non broadcast channels
-                for (Iterator<Channel> iter = channels.iterator(); iter.hasNext();) {
-                    Channel channel = iter.next();
-                    if (!(channel instanceof BroadcastChannel)) {
-                        iter.remove();
-                    }
-                }
             } catch (ParseException e) {
                 logger.error("Couldn't update channel list", e);
             }
