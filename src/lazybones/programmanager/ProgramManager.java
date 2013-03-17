@@ -237,9 +237,13 @@ public class ProgramManager {
                 String dateString = sdf.format(date);
                 String title = timer.getPath() + timer.getTitle();
                 Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+                String channelName = "unknown channel";
+                if (chan != null) {
+                    channelName = chan.getName();
+                }
                 String msg = LazyBones.getTranslation("message_programselect",
                         "I couldn\'t find a program, which matches the vdr timer\n<b>{0}</b> at <b>{1}</b> on <b>{2}</b>.\n"
-                                + "You may assign this timer to a program in the context menu.", title, dateString, chan.getName());
+                                + "You may assign this timer to a program in the context menu.", title, dateString, channelName);
                 popupLog.warn(msg);
                 break;
             case LazyBonesTimer.NO_EPG:
