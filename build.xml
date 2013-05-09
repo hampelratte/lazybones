@@ -105,6 +105,13 @@
 	</target>
 
 	<target name="checklist" description="Checklist of things to do before releasing a version.">
+		<!-- Make sure that the right java version is used for the build -->
+        <input message="Are you using the correct Java version?" validargs="y,n" addproperty="check.java.version" />
+        <condition property="do.abort">
+            <equals arg1="n" arg2="${check.java.version}" />
+        </condition>
+        <fail if="do.abort">Please change your PATH variable.</fail>
+		
 		<!-- Make sure the readme and website state the correct TVB dependency -->
         <input message="Do readme and webiste state the correct TVB version?" validargs="y,n" addproperty="check.tvbversion" />
         <condition property="do.abort">
