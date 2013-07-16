@@ -66,7 +66,7 @@ public class LazyBonesTimer extends Timer {
     }
 
     public LazyBonesTimer(Timer timer) {
-        super.setID(timer.getID());
+        super.setId(timer.getId());
         super.setState(timer.getState());
         super.setChannelNumber(timer.getChannelNumber());
         super.setDescription(timer.getDescription());
