@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class ScreenshotPanel extends JLabel {

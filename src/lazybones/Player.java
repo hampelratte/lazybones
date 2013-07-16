@@ -44,7 +44,7 @@ import devplugin.Program;
 /**
  * Starts a player to watch a channel via streamdev
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class Player {

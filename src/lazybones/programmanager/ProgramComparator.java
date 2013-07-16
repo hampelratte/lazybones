@@ -38,7 +38,7 @@ import devplugin.Program;
 /**
  * Compares two objects, which implement the interface Program
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class ProgramComparator implements Comparator<Program> {

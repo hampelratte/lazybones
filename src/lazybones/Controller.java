@@ -39,7 +39,7 @@ import java.awt.event.ActionListener;
 import org.hampelratte.svdrp.commands.HITK;
 
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class Controller implements ActionListener {

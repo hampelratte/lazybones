@@ -44,7 +44,7 @@ import lazybones.LazyBones;
 import util.ui.Localizer;
 
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class NavigationBlock extends JPanel {

@@ -44,7 +44,7 @@ import lazybones.LazyBonesTimer;
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  *         Utility class with different functions
  */

@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import lazybones.Controller;
 
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  * 
  */
 public class ColorButtonBlock extends JPanel {

@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
  */
 /**
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class RemoteControl extends JPanel implements ActionListener {

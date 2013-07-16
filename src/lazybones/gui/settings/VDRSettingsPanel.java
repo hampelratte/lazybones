@@ -45,7 +45,7 @@ import util.ui.Localizer;
 /**
  * The root container for the settings tabs
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net </a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  */
 public class VDRSettingsPanel implements devplugin.SettingsTab {
 

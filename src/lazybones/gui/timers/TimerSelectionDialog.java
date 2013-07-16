@@ -58,7 +58,7 @@ import devplugin.Program;
 /**
  * Shown, if a Program and a VDRTimer have totally different titles. The user has to choose the right program, then.
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
 public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
     private final JButton ok = new JButton();

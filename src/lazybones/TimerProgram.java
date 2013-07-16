@@ -36,7 +36,7 @@ import devplugin.Date;
 /**
  * A Program, which contains its' according timer
  * 
- * @author <a href="hampelratte@users.sf.net>hampelratte@users.sf.net</a>
+ * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  * 
  */
 public class TimerProgram extends MutableProgram {
