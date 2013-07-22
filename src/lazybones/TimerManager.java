@@ -479,15 +479,7 @@ public class TimerManager extends Observable {
             return;
         }
 
-        Calendar cal = GregorianCalendar.getInstance();
-        Date date = prog.getDate();
-        cal.set(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
-        cal.set(Calendar.MONTH, date.getMonth() - 1);
-        cal.set(Calendar.YEAR, date.getYear());
-        cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
-        cal.set(Calendar.MINUTE, prog.getMinutes());
-        cal.add(Calendar.MINUTE, prog.getLength() / 2);
-        long millis = cal.getTimeInMillis();
+        long middleOfProgramTimeInMillis = determineMiddleOfProgramTime(prog);
 
         Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
         if (o == null) {
@@ -495,7 +487,7 @@ public class TimerManager extends Observable {
             return;
         }
         int id = ((Channel) o).getChannelNumber();
-        Response res = VDRConnection.send(new LSTE(Integer.toString(id), "at " + Long.toString(millis / 1000)));
+        Response res = VDRConnection.send(new LSTE(Integer.toString(id), Long.toString(middleOfProgramTimeInMillis / 1000)));
 
         if (res != null && res.getCode() == 215) {
             List<EPGEntry> epgList = new EPGParser().parse(res.getMessage());
@@ -510,7 +502,8 @@ public class TimerManager extends Observable {
              */
             Version version = Connection.getVersion();
             boolean isOlderThan1_3 = version.getMajor() < 1 || (version.getMajor() == 1 && version.getMinor() < 3);
-            EPGEntry vdrEPG = isOlderThan1_3 ? Utilities.filterEPGDate(epgList, ((Channel) o).getName(), millis) : (EPGEntry) epgList.get(0);
+            EPGEntry vdrEPG = isOlderThan1_3 ? Utilities.filterEPGDate(epgList, ((Channel) o).getName(), middleOfProgramTimeInMillis) : (EPGEntry) epgList
+                    .get(0);
 
             LazyBonesTimer timer = new LazyBonesTimer();
             timer.setChannelNumber(id);
@@ -520,29 +513,9 @@ public class TimerManager extends Observable {
             int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
             timer.setLifetime(lifetime);
 
-            int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
-            int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
-
             if (vdrEPG != null) {
-                boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
 
-                // set start and end time
-                Calendar calStart = vdrEPG.getStartTime();
-                timer.setStartTime(calStart);
-                Calendar calEnd = vdrEPG.getEndTime();
-                timer.setEndTime(calEnd);
-
-                // if we have a vps timer, set the status to vps, otherwise
-                // add the buffers
-                if (vpsDefault) {
-                    timer.changeStateTo(Timer.VPS, true);
-                } else {
-                    // start the recording x min before the beginning of the program
-                    calStart.add(Calendar.MINUTE, -buffer_before);
-
-                    // stop the recording x min after the end of the program
-                    calEnd.add(Calendar.MINUTE, buffer_after);
-                }
+                setStartAndEndTime(vdrEPG, timer);
 
                 timer.setFile(vdrEPG.getTitle());
 
@@ -552,12 +525,7 @@ public class TimerManager extends Observable {
                     timer.setPath(defaultDirectory);
                 }
 
-                // set the description
-                timer.setDescription(vdrEPG.getDescription());
-                String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
-                String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
-                String description = createDescription(descriptionSelectorItemId, descVdr, prog);
-                timer.setDescription(description);
+                setTimerDescription(prog, vdrEPG, timer);
             } else { // VDR has no EPG data
                 noEPGAvailable(prog, id, automatic);
                 return;
@@ -586,6 +554,48 @@ public class TimerManager extends Observable {
         }
     }
 
+    private long determineMiddleOfProgramTime(Program prog) {
+        Calendar cal = GregorianCalendar.getInstance();
+        Date date = prog.getDate();
+        cal.set(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
+        cal.set(Calendar.MONTH, date.getMonth() - 1);
+        cal.set(Calendar.YEAR, date.getYear());
+        cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        cal.set(Calendar.MINUTE, prog.getMinutes());
+        cal.add(Calendar.MINUTE, prog.getLength() / 2);
+        return cal.getTimeInMillis();
+    }
+
+    private void setTimerDescription(Program prog, EPGEntry vdrEPG, LazyBonesTimer timer) {
+        timer.setDescription(vdrEPG.getDescription());
+        String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
+        String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
+        String description = createDescription(descriptionSelectorItemId, descVdr, prog);
+        timer.setDescription(description);
+    }
+
+    private void setStartAndEndTime(EPGEntry vdrEPG, LazyBonesTimer timer) {
+        // set start and end time
+        Calendar calStart = vdrEPG.getStartTime();
+        timer.setStartTime(calStart);
+        Calendar calEnd = vdrEPG.getEndTime();
+        timer.setEndTime(calEnd);
+
+        // if we have a vps timer, set the status to vps, otherwise add the recording time buffers
+        boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+        if (vpsDefault) {
+            timer.changeStateTo(Timer.VPS, true);
+        } else {
+            // start the recording x min before the beginning of the program
+            int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+            calStart.add(Calendar.MINUTE, -bufferBefore);
+
+            // stop the recording x min after the end of the program
+            int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+            calEnd.add(Calendar.MINUTE, bufferAfter);
+        }
+    }
+
     /**
      * Creates the description for a timer according to the setting in the configuration panel.
      *
@@ -611,7 +621,7 @@ public class TimerManager extends Observable {
             String selectedFormat = descriptionSelectorItemId.substring(descriptionSelectorItemId.indexOf('_') + 1);
             AbstractPluginProgramFormating[] formats = LazyBones.getPluginManager().getAvailableGlobalPuginProgramFormatings();
             for (AbstractPluginProgramFormating format : formats) {
-                if(format.getId().equals(selectedFormat)) {
+                if (format.getId().equals(selectedFormat)) {
                     ParamParser parser = new ParamParser();
                     String desc = parser.analyse(format.getContentValue(), prog);
                     return desc != null ? desc : descVdr;

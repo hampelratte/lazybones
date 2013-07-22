@@ -139,11 +139,8 @@ public class ProgramManager {
             // the timers list has changed while we were marking programs, let's start over
             logger.debug("Timers list has changed while marking programs. Beginning from scratch.");
 
-            // first remove all marks
-            Program[] markedPrograms = LazyBones.getPluginManager().getMarkedPrograms();
-            for (Program marked : markedPrograms) {
-                marked.unmark(LazyBones.getInstance());
-            }
+            // first remove all previously set marks
+            unmarkPrograms();
 
             // now mark all timers
             markPrograms();
@@ -162,7 +159,7 @@ public class ProgramManager {
 
     /**
      * Handles all timers, which couldn't be assigned automatically
-     * 
+     *
      */
     public void handleNotAssignedTimers() {
         if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
