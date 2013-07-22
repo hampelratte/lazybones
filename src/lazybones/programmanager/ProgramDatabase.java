@@ -139,9 +139,9 @@ public class ProgramDatabase {
 
     private static Iterator<Program> getChannelDayProgram(Date date, devplugin.Channel chan) {
         if (chan != null) {
-            return new EmptyChannelDayProgram();
-        } else {
             return LazyBones.getPluginManager().getChannelDayProgram(date, chan);
+        } else {
+            return new EmptyChannelDayProgram();
         }
     }
 
