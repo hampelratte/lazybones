@@ -327,7 +327,7 @@ public class LazyBones extends Plugin implements Observer {
         // load title mapping
         try {
             Map<String, String> titleMapping = (HashMap<String, String>) xstream.fromXML(props.getProperty("titleMapping"));
-            TimerManager.getInstance().setTitleMappingValues(titleMapping);
+            TimerManager.getInstance().getTitleMapping().setMappingFromMap(titleMapping);
         } catch (Exception e) {
             logger.warn("Couldn't load title mapping", e);
         }
@@ -469,7 +469,7 @@ public class LazyBones extends Plugin implements Observer {
         XStream xstream = new XStream();
         props.setProperty("channelMapping", xstream.toXML(ChannelManager.getChannelMapping()));
         props.setProperty("timers", xstream.toXML(TimerManager.getInstance().getTimers()));
-        props.setProperty("titleMapping", xstream.toXML(TimerManager.getInstance().getTitleMappingValues()));
+        props.setProperty("titleMapping", xstream.toXML(TimerManager.getInstance().getTitleMapping().getAsMap()));
         props.setProperty("channelList", xstream.toXML(ChannelManager.getInstance().getChannels()));
     }
 

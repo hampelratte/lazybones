@@ -34,7 +34,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
@@ -330,28 +329,8 @@ public class TimerManager extends Observable {
         storedTimers.add(timer);
     }
 
-    /**
-     *
-     * @see TimerManager#titleMapping
-     */
-    public Map<String, String> getTitleMappingValues() {
-        return titleMapping.getAsMap();
-    }
-
-    /**
-     *
-     * @see TimerManager#titleMapping
-     */
-    public void setTitleMappingValues(Map<String, String> titleMapping) {
-        this.titleMapping.setMappingFromMap(titleMapping);
-    }
-
     public TitleMapping getTitleMapping() {
         return this.titleMapping;
-    }
-
-    public void setTitleMapping(TitleMapping mapping) {
-        this.titleMapping = mapping;
     }
 
     /**
