@@ -31,7 +31,6 @@ package lazybones;
 import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -345,75 +344,6 @@ public class TimerManager extends Observable {
      */
     public void setTitleMappingValues(Map<String, String> titleMapping) {
         this.titleMapping.setMappingFromMap(titleMapping);
-    }
-
-    /**
-     * Returns the next day, on which a timer events starts or stops, after the given calendar
-     *
-     * @param currentDay
-     * @return the next day, on which a timer events starts or stops, after the given calendar
-     */
-    public Calendar getNextDayWithEvent(Calendar currentDay) {
-        List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
-        TreeSet<Calendar> events = new TreeSet<Calendar>();
-        for (Iterator<LazyBonesTimer> iter = timers.iterator(); iter.hasNext();) {
-            LazyBonesTimer timer = iter.next();
-            events.add(timer.getStartTime());
-            events.add(timer.getEndTime());
-        }
-
-        for (Iterator<Calendar> iter = events.iterator(); iter.hasNext();) {
-            Calendar event = iter.next();
-            if (!event.before(currentDay) & !Utilities.sameDay(event, currentDay)) {
-                return event;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @see #getNextDayWithEvent(Calendar)
-     * @param currentDay
-     * @return
-     */
-    public Calendar getPreviousDayWithEvent(Calendar currentDay) {
-        List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
-        TreeSet<Calendar> events = new TreeSet<Calendar>();
-        for (Iterator<LazyBonesTimer> iter = timers.iterator(); iter.hasNext();) {
-            LazyBonesTimer timer = iter.next();
-            events.add(timer.getStartTime());
-            events.add(timer.getEndTime());
-        }
-
-        ArrayList<Calendar> eventList = new ArrayList<Calendar>(events);
-        Collections.reverse(eventList);
-        for (Iterator<Calendar> iter = eventList.iterator(); iter.hasNext();) {
-            Calendar event = iter.next();
-            if (!event.after(currentDay) & !Utilities.sameDay(event, currentDay)) {
-                return event;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @see #getNextDayWithEvent(Calendar)
-     * @param currentDay
-     * @return
-     */
-    public boolean hasNextDayWithEvent(Calendar currentDay) {
-        return getNextDayWithEvent(currentDay) != null;
-    }
-
-    /**
-     * @see #getPreviousDayWithEvent(Calendar)
-     * @param currentDay
-     * @return
-     */
-    public boolean hasPreviousDayWithEvent(Calendar currentDay) {
-        return getPreviousDayWithEvent(currentDay) != null;
     }
 
     public TitleMapping getTitleMapping() {

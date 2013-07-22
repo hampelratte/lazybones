@@ -1,20 +1,20 @@
 /* $Id: TimelinePanel.java,v 1.10 2011-04-20 12:09:12 hampelratte Exp $
- * 
+ *
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -50,6 +50,7 @@ import javax.swing.JPanel;
 
 import lazybones.LazyBones;
 import lazybones.TimerManager;
+import lazybones.TimerSchedule;
 import lazybones.gui.components.timeline.Timeline;
 import lazybones.gui.components.timeline.TimelineWeekdayButton;
 import lazybones.utils.Utilities;
@@ -61,6 +62,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     private JButton prevDateButton;
     private Timeline timeline;
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
+    private TimerSchedule timerSchedule = new TimerSchedule();
 
     private TimelineWeekdayButton[] weekdayButtons = new TimelineWeekdayButton[7];
 
@@ -105,16 +107,17 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         timeline.getList().showTimersForCurrentDate(TimerManager.getInstance().getTimers());
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == nextDateButton) {
             Calendar currentDay = timeline.getList().getCalendar();
-            Calendar nextDay = TimerManager.getInstance().getNextDayWithEvent(currentDay);
+            Calendar nextDay = timerSchedule.getNextDayWithEvent(currentDay);
             if (nextDay != null) {
                 setCalendar(nextDay);
             }
         } else if (e.getSource() == prevDateButton) {
             Calendar currentDay = timeline.getList().getCalendar();
-            Calendar previousDay = TimerManager.getInstance().getPreviousDayWithEvent(currentDay);
+            Calendar previousDay = timerSchedule.getPreviousDayWithEvent(currentDay);
             if (previousDay != null) {
                 setCalendar(previousDay);
             }
@@ -132,9 +135,9 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
 
     private void enableDisableButtons() {
         Calendar cal = timeline.getList().getCalendar();
-        boolean enableNextButton = TimerManager.getInstance().hasNextDayWithEvent(cal);
+        boolean enableNextButton = timerSchedule.hasNextDayWithEvent(cal);
         nextDateButton.setEnabled(enableNextButton);
-        boolean enablePrevButton = TimerManager.getInstance().hasPreviousDayWithEvent(cal);
+        boolean enablePrevButton = timerSchedule.hasPreviousDayWithEvent(cal);
         prevDateButton.setEnabled(enablePrevButton);
 
         // weekday buttons
@@ -148,6 +151,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         }
     }
 
+    @Override
     public void update(Observable o, Object arg) {
         if (o == TimerManager.getInstance()) {
             enableDisableButtons();
