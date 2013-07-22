@@ -197,7 +197,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == buttonNew) {
-            TimerManager.getInstance().createTimer();
+            TimerManager.getInstance().createTimerFromScratch();
         } else if (e.getSource() == buttonEdit) {
             if (timerList.getSelectedIndex() >= 0) {
                 LazyBonesTimer timer = (LazyBonesTimer) timerList.getSelectedValue();

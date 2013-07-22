@@ -450,7 +450,7 @@ public class TimerManager extends Observable {
         dta.enqueue();
     }
 
-    public void createTimer() {
+    public void createTimerFromScratch() {
         LazyBonesTimer timer = new LazyBonesTimer();
         timer.setChannelNumber(1);
         Program prog = ProgramDatabase.getProgram(timer);
@@ -566,14 +566,6 @@ public class TimerManager extends Observable {
         return cal.getTimeInMillis();
     }
 
-    private void setTimerDescription(Program prog, EPGEntry vdrEPG, LazyBonesTimer timer) {
-        timer.setDescription(vdrEPG.getDescription());
-        String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
-        String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
-        String description = createDescription(descriptionSelectorItemId, descVdr, prog);
-        timer.setDescription(description);
-    }
-
     private void setStartAndEndTime(EPGEntry vdrEPG, LazyBonesTimer timer) {
         // set start and end time
         Calendar calStart = vdrEPG.getStartTime();
@@ -594,6 +586,14 @@ public class TimerManager extends Observable {
             int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
             calEnd.add(Calendar.MINUTE, bufferAfter);
         }
+    }
+
+    private void setTimerDescription(Program prog, EPGEntry vdrEPG, LazyBonesTimer timer) {
+        timer.setDescription(vdrEPG.getDescription());
+        String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
+        String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
+        String description = createDescription(descriptionSelectorItemId, descVdr, prog);
+        timer.setDescription(description);
     }
 
     /**
