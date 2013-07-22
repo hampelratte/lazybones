@@ -51,7 +51,7 @@ public class ModifyTimerAction extends VDRAction {
 
     @Override
     boolean execute() {
-        response = VDRConnection.send(new LSTT(oldTimer.getId()));
+        response = VDRConnection.send(new LSTT(oldTimer.getID()));
         if (response != null && response.getCode() == 250) {
             List<Timer> list = TimerParser.parse(response.getMessage());
             if (list.size() <= 0) {
@@ -61,7 +61,7 @@ public class ModifyTimerAction extends VDRAction {
 
             Timer vdrTimer = list.get(0);
             if (vdrTimer.getUniqueKey().equals(oldTimer.getUniqueKey())) {
-                response = VDRConnection.send(new MODT(oldTimer.getId(), newTimer));
+                response = VDRConnection.send(new MODT(oldTimer.getID(), newTimer));
                 if (response.getCode() == 250) {
                     return true;
                 } else {

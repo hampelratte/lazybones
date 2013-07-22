@@ -241,7 +241,7 @@ public class TimerManager extends Observable {
         timerListLock.lock();
         try {
             for (LazyBonesTimer timer : timers) {
-                if (timer.getId() == timerNumber) {
+                if (timer.getID() == timerNumber) {
                     return timer;
                 }
             }

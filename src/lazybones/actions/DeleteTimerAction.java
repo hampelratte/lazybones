@@ -75,7 +75,7 @@ public class DeleteTimerAction extends VDRAction {
     @Override
     boolean execute() {
         // snychronize this timer with vdr and check if the timers on the vdr haven't changed
-        response = VDRConnection.send(new LSTT(timer.getId()));
+        response = VDRConnection.send(new LSTT(timer.getID()));
         if (response == null || !(response instanceof R250)) {
             return false;
         }
