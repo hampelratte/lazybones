@@ -138,7 +138,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
             time.setText(tf.format(timer.getStartTime().getTime()));
             title.setText(timer.getDisplayTitle());
 
-            Channel chan = ChannelManager.getInstance().getChannel(timer);
+            Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
             if (chan != null) {
                 channel.setText(chan.getName());
             } else {

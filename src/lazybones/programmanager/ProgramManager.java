@@ -124,7 +124,7 @@ public class ProgramManager {
         // for every timer
         try {
             for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
-                devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
+                devplugin.Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
                 if (chan == null) {
                     timer.setReason(LazyBonesTimer.NO_CHANNEL);
 

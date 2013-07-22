@@ -118,29 +118,29 @@ public class ChannelManager {
         ChannelManager.channelMapping = channelMapping;
     }
 
-    public devplugin.Channel getChannel(LazyBonesTimer timer) {
+    public devplugin.Channel getTvbrowserChannel(LazyBonesTimer timer) {
         devplugin.Channel chan = null;
         for (String channelID : channelMapping.keySet()) {
             Channel channel = ChannelManager.getChannelMapping().get(channelID);
             if (channel.getChannelNumber() == timer.getChannelNumber()) {
-                chan = getChannelById(channelID);
+                chan = getTvbrowserChannelById(channelID);
             }
         }
         return chan;
     }
 
-    public devplugin.Channel getChannel(Channel chan) {
+    public devplugin.Channel getTvbrowserChannel(Channel chan) {
         devplugin.Channel tvbchan = null;
         for (Entry<String, Channel> entry : channelMapping.entrySet()) {
             Channel ctemp = entry.getValue();
             if (ctemp.getChannelNumber() == chan.getChannelNumber()) {
-                tvbchan = getChannelById(entry.getKey());
+                tvbchan = getTvbrowserChannelById(entry.getKey());
             }
         }
         return tvbchan;
     }
 
-    public devplugin.Channel getChannelById(String id) {
+    public devplugin.Channel getTvbrowserChannelById(String id) {
         devplugin.Channel[] channels = LazyBones.getPluginManager().getSubscribedChannels();
         for (int i = 0; i < channels.length; i++) {
             if (channels[i].getId().equals(id)) {

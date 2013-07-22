@@ -49,7 +49,7 @@ public class ProgramDatabase {
 
     public static Program getProgram(LazyBonesTimer timer) {
         // determine channel
-        devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
+        devplugin.Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
 
         // determine middle of the program
         long startTime = timer.getStartTime().getTimeInMillis();

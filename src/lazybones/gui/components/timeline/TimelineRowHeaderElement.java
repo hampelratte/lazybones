@@ -54,7 +54,7 @@ public class TimelineRowHeaderElement extends JPanel {
 
     private void initGUI() {
         setBorder(new TimelineRowHeaderElementBorder(TimelineRowHeaderElementBorder.TOP));
-        Channel tvbChannel = ChannelManager.getInstance().getChannel(timer);
+        Channel tvbChannel = ChannelManager.getInstance().getTvbrowserChannel(timer);
         if (tvbChannel != null) {
             ChannelLabel label = new ChannelLabel(tvbChannel);
             add(label);

@@ -31,6 +31,7 @@ package lazybones;
 import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -46,16 +47,13 @@ import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.responses.ConnectionProblem;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
-import lazybones.gui.settings.DescriptionSelectorItem;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
 import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Utilities;
 
-import org.hampelratte.svdrp.Connection;
 import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.Version;
 import org.hampelratte.svdrp.commands.LSTE;
 import org.hampelratte.svdrp.commands.LSTT;
 import org.hampelratte.svdrp.parsers.EPGParser;
@@ -66,8 +64,6 @@ import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.paramhandler.ParamParser;
-import util.program.AbstractPluginProgramFormating;
 import devplugin.Date;
 import devplugin.Program;
 
@@ -296,10 +292,11 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * Checks storedTimers, if this timer has been mapped to Program before
-     *
+     * Checks storedTimers, if this timer has been mapped to Program before. In case it has been mapped before, we return a list of all the program ids, this
+     * timer has been assigned to.
+     * 
      * @param timer
-     * @return the ProgramID or null
+     * @return a list of program ids
      */
     public List<String> hasBeenMappedBefore(LazyBonesTimer timer) {
         for (LazyBonesTimer storedTimer : storedTimers) {
@@ -313,7 +310,7 @@ public class TimerManager extends Observable {
                 }
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public void replaceStoredTimer(LazyBonesTimer timer) {
@@ -458,14 +455,14 @@ public class TimerManager extends Observable {
             return;
         }
 
-        long middleOfProgramTimeInMillis = determineMiddleOfProgramTime(prog);
-
-        Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
-        if (o == null) {
+        Channel c = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
+        if (c == null) {
             logger.error(LazyBones.getTranslation("no_channel_defined", "No channel defined", prog.toString()));
             return;
         }
-        int id = ((Channel) o).getChannelNumber();
+        int id = c.getChannelNumber();
+
+        long middleOfProgramTimeInMillis = determineMiddleOfProgramTime(prog);
         Response res = VDRConnection.send(new LSTE(Integer.toString(id), Long.toString(middleOfProgramTimeInMillis / 1000)));
 
         if (res != null && res.getCode() == 215) {
@@ -476,35 +473,16 @@ public class TimerManager extends Observable {
                 return;
             }
 
-            /*
-             * VDR 1.3 already returns the matching entry, for 1.2 we need to search for a match
-             */
-            Version version = Connection.getVersion();
-            boolean isOlderThan1_3 = version.getMajor() < 1 || (version.getMajor() == 1 && version.getMinor() < 3);
-            EPGEntry vdrEPG = isOlderThan1_3 ? Utilities.filterEPGDate(epgList, ((Channel) o).getName(), middleOfProgramTimeInMillis) : (EPGEntry) epgList
-                    .get(0);
+            EPGEntry vdrEPG = epgList.get(0);
 
             LazyBonesTimer timer = new LazyBonesTimer();
             timer.setChannelNumber(id);
             timer.addTvBrowserProgID(prog.getUniqueID());
-            int prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
-            timer.setPriority(prio);
-            int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
-            timer.setLifetime(lifetime);
 
             if (vdrEPG != null) {
-
                 setStartAndEndTime(vdrEPG, timer);
-
                 timer.setFile(vdrEPG.getTitle());
-
-                // set the default directory, if it is configured in the settings
-                String defaultDirectory = LazyBones.getProperties().getProperty("default.directory");
-                if (defaultDirectory != null && !defaultDirectory.isEmpty()) {
-                    timer.setPath(defaultDirectory);
-                }
-
-                setTimerDescription(prog, vdrEPG, timer);
+                timer.createTimerDescription(prog, vdrEPG);
             } else { // VDR has no EPG data
                 noEPGAvailable(prog, id, automatic);
                 return;
@@ -564,53 +542,6 @@ public class TimerManager extends Observable {
             // stop the recording x min after the end of the program
             int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
             calEnd.add(Calendar.MINUTE, bufferAfter);
-        }
-    }
-
-    private void setTimerDescription(Program prog, EPGEntry vdrEPG, LazyBonesTimer timer) {
-        timer.setDescription(vdrEPG.getDescription());
-        String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
-        String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
-        String description = createDescription(descriptionSelectorItemId, descVdr, prog);
-        timer.setDescription(description);
-    }
-
-    /**
-     * Creates the description for a timer according to the setting in the configuration panel.
-     *
-     * @param descVdr
-     *            The description provided by VDR
-     * @param prog
-     *            The program, which corresponds to this timer
-     * @return the description as String
-     */
-    public static String createDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
-        String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
-        if (descriptionSelectorItemId.equals(DescriptionSelectorItem.VDR)) {
-            return descVdr;
-        } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.TVB_DESC)) {
-            return descTvb;
-        } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.LONGEST)) {
-            if (descVdr.length() < descTvb.length()) {
-                return descTvb;
-            } else {
-                return descVdr;
-            }
-        } else if (descriptionSelectorItemId.startsWith(DescriptionSelectorItem.TVB_PREFIX)) {
-            String selectedFormat = descriptionSelectorItemId.substring(descriptionSelectorItemId.indexOf('_') + 1);
-            AbstractPluginProgramFormating[] formats = LazyBones.getPluginManager().getAvailableGlobalPuginProgramFormatings();
-            for (AbstractPluginProgramFormating format : formats) {
-                if (format.getId().equals(selectedFormat)) {
-                    ParamParser parser = new ParamParser();
-                    String desc = parser.analyse(format.getContentValue(), prog);
-                    return desc != null ? desc : descVdr;
-                }
-            }
-
-            // no format found
-            return descVdr;
-        } else {
-            return descVdr;
         }
     }
 
@@ -878,6 +809,27 @@ public class TimerManager extends Observable {
 
     public boolean lookUpTimer(LazyBonesTimer timer, Program candidate) {
         logger.debug("Looking in storedTimers for: {}", timer.toString());
+        boolean found = lookUpMappedTimer(timer);
+
+        if(!found) {
+            logger.debug("No mapping found for: {}", timer.toString());
+            if (candidate != null) {
+                logger.debug("Looking up old mappings");
+                TimerManager tm = TimerManager.getInstance();
+                String progTitle = tm.getTitleMapping().getTvbTitle(timer.getTitle());
+                if (candidate.getTitle().equals(progTitle)) {
+                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
+                    timer.addTvBrowserProgID(candidate.getUniqueID());
+                    logger.debug("Old mapping found for: {}", timer.toString());
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean lookUpMappedTimer(LazyBonesTimer timer) {
         List<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
         if (progIDs != null) { // we have a mapping of this timer to a program
             for (String progID : progIDs) {
@@ -886,7 +838,7 @@ public class TimerManager extends Observable {
                     timer.setReason(LazyBonesTimer.NO_PROGRAM);
                     return true;
                 } else {
-                    devplugin.Channel c = ChannelManager.getInstance().getChannel(timer);
+                    devplugin.Channel c = ChannelManager.getInstance().getTvbrowserChannel(timer);
                     if (c != null) {
                         Date date = new Date(timer.getStartTime());
                         Iterator<Program> iterator = LazyBones.getPluginManager().getChannelDayProgram(date, c);
@@ -902,21 +854,7 @@ public class TimerManager extends Observable {
                     }
                 }
             }
-        } else {
-            logger.debug("No mapping found for: {}", timer.toString());
-            if (candidate != null) {
-                logger.debug("Looking up old mappings");
-                TimerManager tm = TimerManager.getInstance();
-                String progTitle = tm.getTitleMapping().getTvbTitle(timer.getTitle());
-                if (candidate.getTitle().equals(progTitle)) {
-                    candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
-                    timer.addTvBrowserProgID(candidate.getUniqueID());
-                    logger.debug("Old mapping found for: {}", timer.toString());
-                    return true;
-                }
-            }
         }
-
         return false;
     }
 }

@@ -380,7 +380,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             } else {
                 String descVdr = timer.getDescription() == null ? "" : timer.getDescription();
                 String selectedDescriptionId = LazyBones.getProperties().getProperty("descSourceTvb");
-                String descriptionText = TimerManager.createDescription(selectedDescriptionId, descVdr, prog);
+                String descriptionText = LazyBonesTimer.createDescription(selectedDescriptionId, descVdr, prog);
 
                 description.setText(descriptionText);
                 comboDescModel.setSelected(selectedDescriptionId);
@@ -575,7 +575,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
                 } else {
                     prog = Plugin.getPluginManager().getProgram(timer.getTvBrowserProgIDs().get(0));
                 }
-                String desc = TimerManager.createDescription(selectedDescription.getId(), "", prog);
+                String desc = LazyBonesTimer.createDescription(selectedDescription.getId(), "", prog);
                 description.setText(desc);
             }
         }

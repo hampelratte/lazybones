@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,10 +33,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import lazybones.gui.settings.DescriptionSelectorItem;
 import lazybones.utils.Period;
 
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Timer;
 
+import util.paramhandler.ParamParser;
+import util.program.AbstractPluginProgramFormating;
 import devplugin.Program;
 
 public class LazyBonesTimer extends Timer {
@@ -63,6 +67,8 @@ public class LazyBonesTimer extends Timer {
     private final List<Period> conflictPeriods = new ArrayList<Period>();
 
     public LazyBonesTimer() {
+        setDefaultLifetimeAndPrio();
+        setConfiguredDefaultDirectory();
     }
 
     public LazyBonesTimer(Timer timer) {
@@ -83,9 +89,24 @@ public class LazyBonesTimer extends Timer {
         super.setTitle(timer.getTitle());
     }
 
+    private void setConfiguredDefaultDirectory() {
+        // set the default directory, if it is configured in the settings
+        String defaultDirectory = LazyBones.getProperties().getProperty("default.directory");
+        if (defaultDirectory != null && !defaultDirectory.isEmpty()) {
+            setPath(defaultDirectory);
+        }
+    }
+
+    private void setDefaultLifetimeAndPrio() {
+        int prio = Integer.parseInt(LazyBones.getProperties().getProperty("timer.prio"));
+        setPriority(prio);
+        int lifetime = Integer.parseInt(LazyBones.getProperties().getProperty("timer.lifetime"));
+        setLifetime(lifetime);
+    }
+
     /**
      * Returns the IDs of all TV-Browser programs, which are assigned to this timer
-     * 
+     *
      * @return List of IDs of all TV-Browser programs, which are assigned to this timer
      */
     public List<String> getTvBrowserProgIDs() {
@@ -121,7 +142,7 @@ public class LazyBonesTimer extends Timer {
 
     /**
      * Set the reason why this timer couldn't be assigned
-     * 
+     *
      * @param reason
      *            the reason why this timer couldn't be assigned
      * @see #NO_CHANNEL
@@ -135,7 +156,7 @@ public class LazyBonesTimer extends Timer {
     }
 
     /**
-     * 
+     *
      * @param id
      */
     public void addTvBrowserProgID(String id) {
@@ -144,7 +165,7 @@ public class LazyBonesTimer extends Timer {
 
     /**
      * Returns, if <code>this</code> starts between the start time and the end time of the given timer <code>timer</code>.
-     * 
+     *
      * @param timer
      * @return
      */
@@ -189,7 +210,7 @@ public class LazyBonesTimer extends Timer {
     }
 
     /**
-     * 
+     *
      * @return This timer without time buffers
      */
     public LazyBonesTimer getTimerWithoutBuffers() {
@@ -199,5 +220,56 @@ public class LazyBonesTimer extends Timer {
         int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
         timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
         return timer;
+    }
+
+    public void createTimerDescription(Program prog, EPGEntry vdrEPG) {
+        setDescription(vdrEPG.getDescription());
+        String descVdr = getDescription() == null ? "" : getDescription();
+        String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
+        String description = createDescription(descriptionSelectorItemId, descVdr, prog);
+        setDescription(description);
+    }
+
+    /**
+     * Creates the description for a timer according to the setting in the configuration panel.
+     *
+     * @param descVdr
+     *            The description provided by VDR
+     * @param prog
+     *            The program, which corresponds to this timer
+     * @return the description as String
+     */
+    public static String createDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
+        String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
+        if (descriptionSelectorItemId.equals(DescriptionSelectorItem.VDR)) {
+            return descVdr;
+        } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.TVB_DESC)) {
+            return descTvb;
+        } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.LONGEST)) {
+            if (descVdr.length() <= descTvb.length()) {
+                return descTvb;
+            } else {
+                return descVdr;
+            }
+        } else if (descriptionSelectorItemId.startsWith(DescriptionSelectorItem.TVB_PREFIX)) {
+            return createFormattedDescription(descriptionSelectorItemId, descVdr, prog);
+        } else {
+            return descVdr;
+        }
+    }
+
+    private static String createFormattedDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
+        String selectedFormat = descriptionSelectorItemId.substring(descriptionSelectorItemId.indexOf('_') + 1);
+        AbstractPluginProgramFormating[] formats = LazyBones.getPluginManager().getAvailableGlobalPuginProgramFormatings();
+        for (AbstractPluginProgramFormating format : formats) {
+            if (format.getId().equals(selectedFormat)) {
+                ParamParser parser = new ParamParser();
+                String desc = parser.analyse(format.getContentValue(), prog);
+                return desc != null ? desc : descVdr;
+            }
+        }
+
+        // no format found
+        return descVdr;
     }
 }

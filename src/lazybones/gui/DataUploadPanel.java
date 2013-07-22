@@ -78,7 +78,7 @@ public class DataUploadPanel extends JPanel {
         for (Entry<String, Channel> entry : ChannelManager.getChannelMapping().entrySet()) {
             String id = entry.getKey();
             Channel chan = entry.getValue();
-            devplugin.Channel tvbChan = ChannelManager.getInstance().getChannelById(id);
+            devplugin.Channel tvbChan = ChannelManager.getInstance().getTvbrowserChannelById(id);
             if (tvbChan != null) {
                 model.addElement(chan);
             }
@@ -123,7 +123,7 @@ public class DataUploadPanel extends JPanel {
         Object[] channels = list.getSelectedValues();
         for (Object object : channels) {
             Channel chan = (Channel) object;
-            devplugin.Channel tvbchan = ChannelManager.getInstance().getChannel(chan);
+            devplugin.Channel tvbchan = ChannelManager.getInstance().getTvbrowserChannel(chan);
             Set<Program> channelProgram = getChannelProgram(tvbchan);
             if (channelProgram.size() > 0) {
                 pute((DVBChannel) chan, channelProgram);

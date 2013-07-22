@@ -83,7 +83,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         sb.append("<b>");
         sb.append(title);
         sb.append("</b><br>");
-        Channel chan = ChannelManager.getInstance().getChannel(timer);
+        Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
         if (chan != null) {
             sb.append(chan.getName());
         } else {
