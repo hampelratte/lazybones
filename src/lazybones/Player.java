@@ -1,20 +1,19 @@
-/* $Id: Player.java,v 1.22 2011-04-20 12:09:11 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,9 +42,9 @@ import devplugin.Program;
 
 /**
  * Starts a player to watch a channel via streamdev
- * 
+ *
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
- * 
+ *
  */
 public class Player {
     private static PlayerThread playerThread;
@@ -130,8 +129,9 @@ public class Player {
     }
 
     public static void stop() {
-        if (playerThread != null)
+        if (playerThread != null) {
             playerThread.stopThread();
+        }
     }
 
     private static class PlayerThread extends Thread {
@@ -147,6 +147,7 @@ public class Player {
             start();
         }
 
+        @Override
         public void run() {
             running = true;
             Runtime rt = Runtime.getRuntime();
@@ -167,8 +168,9 @@ public class Player {
         }
 
         public void stopThread() {
-            if (p != null)
+            if (p != null) {
                 p.destroy();
+            }
         }
     }
 
@@ -181,6 +183,7 @@ public class Player {
             start();
         }
 
+        @Override
         public void run() {
             byte[] buffer = new byte[1024];
             int length = -1;

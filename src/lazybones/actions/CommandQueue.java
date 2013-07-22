@@ -1,5 +1,4 @@
-/* $Id: CommandQueue.java,v 1.6 2011-04-20 12:09:12 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

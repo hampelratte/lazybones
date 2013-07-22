@@ -1,5 +1,4 @@
-/* $Id: AbstractCriterion.java,v 1.3 2011-04-20 12:09:14 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

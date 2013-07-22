@@ -1,5 +1,4 @@
-/* $Id: DayChooser.java,v 1.6 2011-01-18 17:34:30 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

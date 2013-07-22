@@ -1,11 +1,10 @@
-/* $Id: RecordingManager.java,v 1.16 2011-05-06 13:09:57 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -14,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Class to manage all recordings.
- * 
+ *
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
 public class RecordingManager extends Observable {
@@ -93,7 +92,7 @@ public class RecordingManager extends Observable {
 
     /**
      * Fetches the recording list from vdr
-     * 
+     *
      * @param callback
      *            will be called after the synchronization has finished
      */

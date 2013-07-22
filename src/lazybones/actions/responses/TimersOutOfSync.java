@@ -1,5 +1,4 @@
-/* $Id: TimersOutOfSync.java,v 1.2 2011-01-18 13:13:56 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

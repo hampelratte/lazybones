@@ -1,5 +1,4 @@
-/* $Id: ChannelSet.java,v 1.4 2011-04-20 12:09:13 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

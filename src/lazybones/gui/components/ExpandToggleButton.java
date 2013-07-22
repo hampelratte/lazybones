@@ -1,5 +1,4 @@
-/* $Id: ExpandToggleButton.java,v 1.1 2011-05-06 15:52:05 hampelratte Exp $
- * 
+/*
  * Copyright (c), Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

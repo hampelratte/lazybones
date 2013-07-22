@@ -1,5 +1,4 @@
-/* $Id: ScreenshotPanel.java,v 1.12 2011-05-05 16:58:29 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

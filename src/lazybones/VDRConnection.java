@@ -1,11 +1,10 @@
-/* $Id: VDRConnection.java,v 1.27 2011-05-06 13:09:57 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -14,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
- * 
+ *
  */
 public class VDRConnection {
 
@@ -75,7 +74,7 @@ public class VDRConnection {
 
     /**
      * Sends a SVDRP command to VDR and returns a response object, which represents the vdr response
-     * 
+     *
      * @param cmd
      *            The SVDRP command to send
      * @return The SVDRP response or null, if the Command couldn't be sent
@@ -129,20 +128,20 @@ public class VDRConnection {
 
     /*
      * private class ConnectionTester implements Runnable {
-     * 
+     *
      * private int timeout; private ProgressMonitor pm; private boolean running = true;
-     * 
+     *
      * ConnectionTester(int timeout, ProgressMonitor pm) { this.timeout = timeout; this.pm = pm; }
-     * 
+     *
      * public boolean isRunning() { return running; }
-     * 
+     *
      * public void run() { running = true; for (int i = 0; i < timeout; i++) { pm.setProgress(i); pm.setNote( (timeout-i) + " Seconds übrig"); if
      * (pm.isCanceled()) { break; }
-     * 
+     *
      * try { Connection connection = new Connection(VDRConnection.host, VDRConnection.port, VDRConnection.timeout); Connection.DEBUG = true; Response resp =
      * connection.send(new STAT()); if (resp != null) { LOG.log("WOL-Process finished", Logger.CONNECTION, Logger.DEBUG); pm.close(); break; }
      * connection.close(); } catch (Exception e) { }
-     * 
+     *
      * try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); } } pm.close(); running = false; } }
      */
 }

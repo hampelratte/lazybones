@@ -1,5 +1,4 @@
-/* $Id: ModifyTimerAction.java,v 1.6 2011-05-06 13:09:57 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

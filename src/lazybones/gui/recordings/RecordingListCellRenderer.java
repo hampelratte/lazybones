@@ -1,5 +1,4 @@
-/* $Id: RecordingListCellRenderer.java,v 1.12 2011-05-06 13:09:58 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

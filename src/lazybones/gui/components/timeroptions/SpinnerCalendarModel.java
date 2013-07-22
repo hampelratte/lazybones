@@ -1,5 +1,4 @@
-/* $Id: SpinnerCalendarModel.java,v 1.2 2011-01-18 17:26:51 hampelratte Exp $
- * 
+/*
  * Copyright (c), Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

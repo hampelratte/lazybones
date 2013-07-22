@@ -1,5 +1,4 @@
-/* $Id: VolumeBlock.java,v 1.4 2011-04-20 12:09:11 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 

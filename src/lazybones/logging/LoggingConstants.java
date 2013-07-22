@@ -1,5 +1,4 @@
-/* $Id: LoggingConstants.java,v 1.2 2011-01-18 13:13:53 hampelratte Exp $
- * 
+/*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
  * 
