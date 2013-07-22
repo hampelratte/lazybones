@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -51,6 +51,7 @@ import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.settings.DescriptionSelectorItem;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
+import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Utilities;
 
@@ -74,7 +75,7 @@ import devplugin.Program;
 
 /**
  * Class to manage all timers.
- * 
+ *
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
 public class TimerManager extends Observable {
@@ -155,9 +156,9 @@ public class TimerManager extends Observable {
 
     /**
      * Removes this timer from the internal list. This will result in a disappearence of this timer in any GUI element.
-     * 
+     *
      * <string>Note!</strong>This method will not delete the timer on the VDR. To achieve that, use {@link #deleteTimer(Timer)}
-     * 
+     *
      * @param timer
      */
     public void removeTimer(LazyBonesTimer timer) {
@@ -197,7 +198,7 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * 
+     *
      * @param prog
      *            a devplugin.Program object
      * @return the timer for this program or null
@@ -237,7 +238,7 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * 
+     *
      * @param timerNumber
      *            The number of the timer
      * @return The timer with the specified number
@@ -258,7 +259,7 @@ public class TimerManager extends Observable {
 
     /**
      * Returns all timers, which couldn't be assigned to a program
-     * 
+     *
      * @return an ArrayList with Timer objects
      */
     public List<LazyBonesTimer> getNotAssignedTimers() {
@@ -278,7 +279,7 @@ public class TimerManager extends Observable {
 
     /**
      * For DEBUG only - print all timers to System.out
-     * 
+     *
      */
     public void printTimers() {
         System.out.println("########## Listing timers #################");
@@ -298,7 +299,7 @@ public class TimerManager extends Observable {
 
     /**
      * Checks storedTimers, if this timer has been mapped to Program before
-     * 
+     *
      * @param timer
      * @return the ProgramID or null
      */
@@ -331,7 +332,7 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * 
+     *
      * @see TimerManager#titleMapping
      */
     public Map<String, String> getTitleMappingValues() {
@@ -339,7 +340,7 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * 
+     *
      * @see TimerManager#titleMapping
      */
     public void setTitleMappingValues(Map<String, String> titleMapping) {
@@ -348,7 +349,7 @@ public class TimerManager extends Observable {
 
     /**
      * Returns the next day, on which a timer events starts or stops, after the given calendar
-     * 
+     *
      * @param currentDay
      * @return the next day, on which a timer events starts or stops, after the given calendar
      */
@@ -494,7 +495,7 @@ public class TimerManager extends Observable {
 
     /**
      * Deletes a timer on the VDR
-     * 
+     *
      * @param timer
      *            timer to delete
      */
@@ -504,7 +505,7 @@ public class TimerManager extends Observable {
 
     /**
      * Deletes a timer on the VDR
-     * 
+     *
      * @param timer
      *            timer to delete
      * @param callback
@@ -532,7 +533,7 @@ public class TimerManager extends Observable {
     public void createTimer() {
         LazyBonesTimer timer = new LazyBonesTimer();
         timer.setChannelNumber(1);
-        Program prog = ProgramManager.getInstance().getProgram(timer);
+        Program prog = ProgramDatabase.getProgram(timer);
 
         // in this situation it makes sense to show the timer options
         // so we override the user setting (hide options dialog)
@@ -544,7 +545,7 @@ public class TimerManager extends Observable {
 
     /**
      * Creates a new timer on the VDR
-     * 
+     *
      * @param prog
      *            the Program to create a timer for
      * @param automatic
@@ -667,7 +668,7 @@ public class TimerManager extends Observable {
 
     /**
      * Creates the description for a timer according to the setting in the configuration panel.
-     * 
+     *
      * @param descVdr
      *            The description provided by VDR
      * @param prog
@@ -705,7 +706,7 @@ public class TimerManager extends Observable {
     }
 
     /**
-     * 
+     *
      * @param prog
      *            Program to create a timer for
      * @param channelNumber
@@ -762,7 +763,7 @@ public class TimerManager extends Observable {
 
     /**
      * Commits a new or changed timer to VDR
-     * 
+     *
      * @param timer
      *            The new created / updated Timer
      * @param oldTimer
@@ -854,7 +855,7 @@ public class TimerManager extends Observable {
 
     /**
      * If a Program can't be assigned to a VDR-Program, this method shows a dialog to select the right VDR-Program
-     * 
+     *
      * @param prog
      *            the Program selected in TV-Browser
      * @param timerOptions
@@ -952,7 +953,7 @@ public class TimerManager extends Observable {
         Program prog = null;
         if (timer.getTvBrowserProgIDs().size() > 0) {
             logger.debug("Timer has {} assigned programs", timer.getTvBrowserProgIDs().size());
-            prog = ProgramManager.getInstance().getProgram(timer.getTvBrowserProgIDs().get(0));
+            prog = ProgramDatabase.getProgram(timer.getTvBrowserProgIDs().get(0));
         } else {
             logger.warn("Timer has no program IDs assigned.");
         }

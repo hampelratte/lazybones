@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.ConcurrentModificationException;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,41 +78,6 @@ public class ProgramManager {
         return instance;
     }
 
-    /**
-     * @param startTime
-     *            the startTime of the Program
-     * @param middleTime
-     *            the middleTime of the Program
-     * @param chan
-     *            the channel of the Program
-     * @return the Program or null
-     * 
-     *         startTime ist notwendig, weil getChannelDayProgram benutzt wird. Bsp.: start 23:30 ende 01:00 middleTime würde dann schon am nächsten tag liegen
-     *         (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt und das Program nicht findet
-     */
-    public Program getProgramAt(Calendar startTime, Calendar middleTime, devplugin.Channel chan) {
-        Iterator<Program> dayProgram = LazyBones.getPluginManager().getChannelDayProgram(new Date(startTime), chan);
-        while (dayProgram != null && dayProgram.hasNext()) {
-            Program prog = dayProgram.next();
-
-            Calendar progStart = GregorianCalendar.getInstance();
-            progStart.set(Calendar.YEAR, prog.getDate().getYear());
-            progStart.set(Calendar.MONTH, prog.getDate().getMonth() - 1);
-            progStart.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
-            progStart.set(Calendar.HOUR_OF_DAY, prog.getHours());
-            progStart.set(Calendar.MINUTE, prog.getMinutes());
-
-            Calendar progEnd = GregorianCalendar.getInstance();
-            progEnd.setTimeInMillis(progStart.getTimeInMillis());
-            progEnd.add(Calendar.MINUTE, prog.getLength());
-
-            if (middleTime.after(progStart) && middleTime.before(progEnd)) {
-                return prog;
-            }
-        }
-        return null;
-    }
-
     public LazyBonesTimer getTimerForTime(Calendar cal, devplugin.Channel chan) {
         long time_t = cal.getTimeInMillis() / 1000;
         Object o = ChannelManager.getChannelMapping().get(chan.getId());
@@ -141,42 +105,11 @@ public class ProgramManager {
         return null;
     }
 
-    public Program getProgram(LazyBonesTimer timer) {
-        // determine channel
-        devplugin.Channel chan = ChannelManager.getInstance().getChannel(timer);
-
-        if (chan == null) {
-            return null;
-        }
-
-        // determine middle of the program
-        long startTime = timer.getStartTime().getTimeInMillis();
-        long endTime = timer.getEndTime().getTimeInMillis();
-        long duration = endTime - startTime;
-        Calendar time = GregorianCalendar.getInstance();
-        long middleTime = startTime + duration / 2;
-        time.setTimeInMillis(middleTime);
-
-        return getProgramAt(timer.getStartTime(), time, chan);
-    }
-
-    /**
-     * 
-     * @param time
-     *            A Calendar object representing the day, the program is running at
-     * @param uniqueProgID
-     *            the unique program ID of the program
-     * @return {@link devplugin.PluginManager#getProgram(String)}
-     */
-    public Program getProgram(String uniqueProgID) {
-        return LazyBones.getPluginManager().getProgram(uniqueProgID);
-    }
-
     public JPopupMenu getContextMenuForTimer(LazyBonesTimer timer) {
         List<String> tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
         if (tvBrowserProgIds.size() > 0) {
-            Program prog = ProgramManager.getInstance().getProgram(tvBrowserProgIds.get(0));
+            Program prog = ProgramDatabase.getProgram(tvBrowserProgIds.get(0));
             popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
         } else {
             popup = LazyBones.getInstance().getSimpleContextMenu(timer);
@@ -219,7 +152,7 @@ public class ProgramManager {
 
     /**
      * Handles all timers, which couldn't be assigned automatically
-     * 
+     *
      */
     public void handleNotAssignedTimers() {
         if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
@@ -266,7 +199,7 @@ public class ProgramManager {
     }
 
     /**
-     * 
+     *
      * @param timer
      * @param chan
      */
@@ -279,7 +212,7 @@ public class ProgramManager {
 
         // get the day program of the day, the previous day and the next day
         Date date = new Date(year, month, day);
-        List<Program> threeDayProgram = getThreeDayProgram(date, chan);
+        List<Program> threeDayProgram = ProgramDatabase.getThreeDayProgram(date, chan);
 
         Iterator<Program> it = threeDayProgram.iterator();
         if (it == null) {
@@ -389,38 +322,10 @@ public class ProgramManager {
         List<String> progIDs = timer.getTvBrowserProgIDs();
         if (progIDs.size() > 0) {
             String firstProgID = progIDs.get(0);
-            Program prog = ProgramManager.getInstance().getProgram(firstProgID);
+            Program prog = ProgramDatabase.getProgram(firstProgID);
             if (prog != null) {
                 LazyBones.getPluginManager().handleProgramDoubleClick(prog);
             }
         }
-    }
-
-    /**
-     * Returns the day program of a day + the previous day's program + the next day's program
-     * 
-     * @param date
-     * @param chan
-     * @return
-     */
-    private List<Program> getThreeDayProgram(Date date, devplugin.Channel chan) {
-        List<Program> list = new ArrayList<Program>();
-
-        Iterator<Program> it = LazyBones.getPluginManager().getChannelDayProgram(date, chan);
-        while (it != null && it.hasNext()) {
-            list.add(it.next());
-        }
-
-        it = LazyBones.getPluginManager().getChannelDayProgram(date.addDays(1), chan);
-        while (it != null && it.hasNext()) {
-            list.add(it.next());
-        }
-
-        it = LazyBones.getPluginManager().getChannelDayProgram(date.addDays(-1), chan);
-        while (it != null && it.hasNext()) {
-            list.add(it.next());
-        }
-
-        return list;
     }
 }

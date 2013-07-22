@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -62,6 +62,7 @@ import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
 import lazybones.logging.PopupHandler;
 import lazybones.logging.SimpleFormatter;
+import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.Response;
@@ -90,9 +91,9 @@ import devplugin.Version;
 
 /**
  * A remote control plugin for VDR
- * 
+ *
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
- * 
+ *
  */
 public class LazyBones extends Plugin implements Observer {
 
@@ -159,7 +160,7 @@ public class LazyBones extends Plugin implements Observer {
 
     /**
      * Called by TimerSelectionDialog, if a VDR-Program has been selected
-     * 
+     *
      * @param selectedProgram
      */
     public void timerSelectionCallBack(Program selectedProgram, Program originalProgram) {
@@ -500,12 +501,12 @@ public class LazyBones extends Plugin implements Observer {
         for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
             if (timer.isAssigned()) {
                 for (String progID : timer.getTvBrowserProgIDs()) {
-                    Program prog = ProgramManager.getInstance().getProgram(progID);
+                    Program prog = ProgramDatabase.getProgram(progID);
                     if (prog != null) {
                         node.addProgram(prog);
                     } else { // can be null, if program time is near 00:00, because then
                         // the wrong day is taken to ask tvb for the programm
-                        prog = ProgramManager.getInstance().getProgram(progID);
+                        prog = ProgramDatabase.getProgram(progID);
                         if (prog != null) {
                             node.addProgram(prog);
                         }

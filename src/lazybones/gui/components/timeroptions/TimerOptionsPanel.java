@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -76,6 +76,7 @@ import lazybones.gui.components.historycombobox.SuggestingJHistoryComboBox;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.settings.DescriptionComboBoxModel;
 import lazybones.gui.settings.DescriptionSelectorItem;
+import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -359,7 +360,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             LazyBonesTimer tmp = timer.getTimerWithoutBuffers();
             Program prog = null;
             if (this.prog == null) {
-                prog = ProgramManager.getInstance().getProgram(tmp);
+                prog = ProgramDatabase.getProgram(tmp);
             } else {
                 prog = this.prog;
             }
