@@ -362,7 +362,7 @@ public class TimerManager extends Observable {
         LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
 
         // unmark all tvbrowser programs
-        unmarkPrograms();
+        ProgramManager.getInstance().unmarkPrograms();
 
         // clear timer list
         timerListLock.lock();
@@ -411,16 +411,6 @@ public class TimerManager extends Observable {
 
         LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
         LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
-    }
-
-    /**
-     * Unmarks all programs, which are marked by LazyBones
-     */
-    private void unmarkPrograms() {
-        Program[] markedPrograms = LazyBones.getPluginManager().getMarkedPrograms();
-        for (Program marked : markedPrograms) {
-            marked.unmark(LazyBones.getInstance());
-        }
     }
 
     /**

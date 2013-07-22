@@ -151,8 +151,18 @@ public class ProgramManager {
     }
 
     /**
+     * Unmarks all programs, which are marked by LazyBones
+     */
+    public void unmarkPrograms() {
+        Program[] markedPrograms = LazyBones.getPluginManager().getMarkedPrograms();
+        for (Program marked : markedPrograms) {
+            marked.unmark(LazyBones.getInstance());
+        }
+    }
+
+    /**
      * Handles all timers, which couldn't be assigned automatically
-     *
+     * 
      */
     public void handleNotAssignedTimers() {
         if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
