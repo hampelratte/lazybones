@@ -28,6 +28,7 @@
  */
 package lazybones.programmanager;
 
+import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,6 +57,7 @@ import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.programmouseevent.ProgramMouseEventHandler;
 import devplugin.Date;
 import devplugin.Program;
 
@@ -325,13 +327,13 @@ public class ProgramManager {
         // }
     }
 
-    public void handleTimerDoubleClick(LazyBonesTimer timer) {
+    public void handleTimerDoubleClick(LazyBonesTimer timer, MouseEvent e) {
         List<String> progIDs = timer.getTvBrowserProgIDs();
         if (progIDs.size() > 0) {
             String firstProgID = progIDs.get(0);
             Program prog = ProgramDatabase.getProgram(firstProgID);
             if (prog != null) {
-                LazyBones.getPluginManager().handleProgramDoubleClick(prog);
+                ProgramMouseEventHandler.handleProgramClick(prog, LazyBones.getInstance(), false, e);
             }
         }
     }
