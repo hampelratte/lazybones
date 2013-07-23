@@ -463,7 +463,7 @@ public class TimerManager extends Observable {
         int id = c.getChannelNumber();
 
         long middleOfProgramTimeInMillis = determineMiddleOfProgramTime(prog);
-        Response res = VDRConnection.send(new LSTE(Integer.toString(id), Long.toString(middleOfProgramTimeInMillis / 1000)));
+        Response res = VDRConnection.send(new LSTE(id, middleOfProgramTimeInMillis / 1000));
 
         if (res != null && res.getCode() == 215) {
             List<EPGEntry> epgList = new EPGParser().parse(res.getMessage());
