@@ -223,67 +223,9 @@ public class ProgramManager {
         Date date = new Date(year, month, day);
         List<Program> threeDayProgram = ProgramDatabase.getThreeDayProgram(date, chan);
 
-        Iterator<Program> it = threeDayProgram.iterator();
-        if (it == null) {
-            if (!timer.isRepeating()) {
-                timer.setReason(LazyBonesTimer.NO_EPG);
-            }
+        boolean doppelpackFound = markDoppelpackTimer(timer, threeDayProgram);
+        if (doppelpackFound) {
             return;
-        }
-
-        // contains programs, which start and stop between the start and the stop time
-        // of the timer and could be part of a Doppelpack
-        List<Program> doppelPack = new ArrayList<Program>();
-
-        // iterate over all programs and
-        // compare start and end time to collect doppelpack candidates
-        while (it.hasNext()) {
-            Program prog = it.next();
-
-            // get prog start and end
-            Calendar progStartCal = prog.getDate().getCalendar();
-            progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
-            progStartCal.set(Calendar.MINUTE, prog.getMinutes());
-            progStartCal.set(Calendar.SECOND, 0);
-            Calendar progEndCal = (Calendar) progStartCal.clone();
-            progEndCal.add(Calendar.MINUTE, prog.getLength());
-
-            // collect doppelpack candidates
-            // use timer with buffers
-            if (progStartCal.after(timer.getStartTime()) && progEndCal.before(timer.getEndTime())) {
-                doppelPack.add(prog);
-            }
-        }
-
-        if (doppelPack.size() > 1) {
-            timer.setReason(LazyBonesTimer.NOT_FOUND);
-            ArrayList<String> list = new ArrayList<String>();
-            String doppelpackTitle = null;
-            for (int i = 0; i < doppelPack.size(); i++) {
-                Program prog = doppelPack.get(i);
-                String title = prog.getTitle();
-                if (i < doppelPack.size() - 1) {
-                    Program next = doppelPack.get(i + 1);
-                    if (title.equals(next.getTitle())) {
-                        logger.debug("Doppelpack found: {}", title);
-                        timer.setReason(LazyBonesTimer.NO_REASON);
-                        doppelpackTitle = title;
-                    } else {
-                        list.add(title);
-                    }
-                }
-            }
-
-            // mark all doppelpack programs
-            if (doppelpackTitle != null) {
-                for (Program prog : doppelPack) {
-                    if (prog.getTitle().equals(doppelpackTitle)) {
-                        prog.mark(LazyBones.getInstance());
-                        timer.addTvBrowserProgID(prog.getUniqueID());
-                    }
-                }
-                return;
-            }
         }
 
         // no doppelpacks, we can now evaluate the programs with
@@ -296,8 +238,7 @@ public class ProgramManager {
         }
 
         logger.debug("Best matching program for timer \"{}\" is \"{}\" with a percentage of {}", new Object[] { timer.getTitle(),
-                bestMatching.getProgram().getTitle(),
-                bestMatching.getPercentage() });
+                bestMatching.getProgram().getTitle(), bestMatching.getPercentage() });
         int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
         // if the percentage of equality is higher than the config value
         // percentageThreshold, mark this program
@@ -313,6 +254,82 @@ public class ProgramManager {
                 timer.setReason(LazyBonesTimer.NOT_FOUND);
             }
         }
+    }
+
+    private boolean markDoppelpackTimer(LazyBonesTimer timer, List<Program> threeDayProgram) {
+        Iterator<Program> it = threeDayProgram.iterator();
+        if (it == null) {
+            if (!timer.isRepeating()) {
+                timer.setReason(LazyBonesTimer.NO_EPG);
+            }
+            return false;
+        }
+
+        List<Program> doppelpackCandidates = collectDoppelpackCandidates(timer, it);
+
+        boolean doppelpackFound = false;
+        if (doppelpackCandidates.size() > 1) {
+            timer.setReason(LazyBonesTimer.NOT_FOUND);
+            String doppelpackTitle = null;
+            for (int i = 0; i < doppelpackCandidates.size(); i++) {
+                Program prog = doppelpackCandidates.get(i);
+                String title = prog.getTitle();
+                while (i < doppelpackCandidates.size() - 1) {
+                    Program next = doppelpackCandidates.get(i + 1);
+                    if (title.equals(next.getTitle())) {
+                        logger.debug("Doppelpack found: {}", title);
+                        doppelpackFound = true;
+                        doppelpackTitle = title;
+                        timer.setReason(LazyBonesTimer.NO_REASON);
+                    }
+                    i++;
+                }
+            }
+
+            // mark all doppelpack programs
+            if (doppelpackTitle != null) {
+                for (Program prog : doppelpackCandidates) {
+                    if (prog.getTitle().equals(doppelpackTitle)) {
+                        prog.mark(LazyBones.getInstance());
+                        timer.addTvBrowserProgID(prog.getUniqueID());
+                    }
+                }
+            }
+        }
+
+        return doppelpackFound;
+    }
+
+    private List<Program> collectDoppelpackCandidates(LazyBonesTimer timer, Iterator<Program> it) {
+        // contains programs, which start and stop between the start and the stop time
+        // of the timer and could be part of a Doppelpack
+        List<Program> doppelPack = new ArrayList<Program>();
+
+        // iterate over all programs and
+        // compare start and end time to collect doppelpack candidates
+        while (it.hasNext()) {
+            Program prog = it.next();
+
+            // get prog start and end
+            Calendar progStartCal = createStarttimeCalendar(prog);
+            Calendar progEndCal = (Calendar) progStartCal.clone();
+            progEndCal.add(Calendar.MINUTE, prog.getLength());
+
+            // collect doppelpack candidates
+            // use timer with buffers
+            if (progStartCal.after(timer.getStartTime()) && progEndCal.before(timer.getEndTime())) {
+                doppelPack.add(prog);
+            }
+        }
+        return doppelPack;
+    }
+
+    private Calendar createStarttimeCalendar(Program prog) {
+        Calendar progStartCal = prog.getDate().getCalendar();
+        progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        progStartCal.set(Calendar.MINUTE, prog.getMinutes());
+        progStartCal.set(Calendar.SECOND, 0);
+        return progStartCal;
     }
 
     public void assignTimerToProgram(Program prog, LazyBonesTimer timer) {
