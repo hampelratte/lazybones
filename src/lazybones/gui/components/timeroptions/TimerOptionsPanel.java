@@ -66,6 +66,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lazybones.ChannelManager;
+import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.RecordingManager;
@@ -360,7 +361,11 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
             LazyBonesTimer tmp = timer.getTimerWithoutBuffers();
             Program prog = null;
             if (this.prog == null) {
-                prog = ProgramDatabase.getProgram(tmp);
+                try {
+                    prog = ProgramDatabase.getProgram(tmp);
+                } catch (ChannelNotFoundException e) {
+                    // fail silently
+                }
             } else {
                 prog = this.prog;
             }

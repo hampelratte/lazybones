@@ -53,6 +53,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
@@ -197,7 +198,11 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == buttonNew) {
-            TimerManager.getInstance().createTimerFromScratch();
+            try {
+                TimerManager.getInstance().createTimerFromScratch();
+            } catch (ChannelNotFoundException ex) {
+                logger.error("An error occured", ex);
+            }
         } else if (e.getSource() == buttonEdit) {
             if (timerList.getSelectedIndex() >= 0) {
                 LazyBonesTimer timer = (LazyBonesTimer) timerList.getSelectedValue();

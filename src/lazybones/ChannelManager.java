@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -118,7 +118,7 @@ public class ChannelManager {
         ChannelManager.channelMapping = channelMapping;
     }
 
-    public devplugin.Channel getTvbrowserChannel(LazyBonesTimer timer) {
+    public devplugin.Channel getTvbrowserChannel(LazyBonesTimer timer) throws ChannelNotFoundException {
         devplugin.Channel chan = null;
         for (String channelID : channelMapping.keySet()) {
             Channel channel = ChannelManager.getChannelMapping().get(channelID);
@@ -126,10 +126,15 @@ public class ChannelManager {
                 chan = getTvbrowserChannelById(channelID);
             }
         }
-        return chan;
+
+        if (chan == null) {
+            throw new ChannelNotFoundException();
+        } else {
+            return chan;
+        }
     }
 
-    public devplugin.Channel getTvbrowserChannel(Channel chan) {
+    public devplugin.Channel getTvbrowserChannel(Channel chan) throws ChannelNotFoundException {
         devplugin.Channel tvbchan = null;
         for (Entry<String, Channel> entry : channelMapping.entrySet()) {
             Channel ctemp = entry.getValue();
@@ -137,7 +142,12 @@ public class ChannelManager {
                 tvbchan = getTvbrowserChannelById(entry.getKey());
             }
         }
-        return tvbchan;
+
+        if (tvbchan == null) {
+            throw new ChannelNotFoundException();
+        } else {
+            return tvbchan;
+        }
     }
 
     public devplugin.Channel getTvbrowserChannelById(String id) {
@@ -148,5 +158,9 @@ public class ChannelManager {
             }
         }
         return null;
+    }
+
+    public static class ChannelNotFoundException extends Exception {
+
     }
 }

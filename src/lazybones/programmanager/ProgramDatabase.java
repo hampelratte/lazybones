@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import lazybones.ChannelManager;
+import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import devplugin.Date;
@@ -47,7 +48,7 @@ import devplugin.Program;
  */
 public class ProgramDatabase {
 
-    public static Program getProgram(LazyBonesTimer timer) {
+    public static Program getProgram(LazyBonesTimer timer) throws ChannelNotFoundException {
         // determine channel
         devplugin.Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
 
@@ -111,6 +112,18 @@ public class ProgramDatabase {
      */
     public static Program getProgram(String uniqueProgID) {
         return LazyBones.getPluginManager().getProgram(uniqueProgID);
+    }
+
+    public static List<Program> getProgramAroundTimer(LazyBonesTimer timer) throws ChannelNotFoundException {
+        devplugin.Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
+
+        // create a clone of the timer and subtract the recording buffers
+        LazyBonesTimer bufferLessTimer = timer.getTimerWithoutBuffers();
+        int day = bufferLessTimer.getStartTime().get(Calendar.DAY_OF_MONTH);
+        int month = bufferLessTimer.getStartTime().get(Calendar.MONTH) + 1;
+        int year = bufferLessTimer.getStartTime().get(Calendar.YEAR);
+        Date date = new Date(year, month, day);
+        return ProgramDatabase.getThreeDayProgram(date, chan);
     }
 
     /**

@@ -42,6 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
+import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.actions.CreateTimerAction;
 import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
@@ -294,7 +295,7 @@ public class TimerManager extends Observable {
     /**
      * Checks storedTimers, if this timer has been mapped to Program before. In case it has been mapped before, we return a list of all the program ids, this
      * timer has been assigned to.
-     * 
+     *
      * @param timer
      * @return a list of program ids
      */
@@ -426,7 +427,7 @@ public class TimerManager extends Observable {
         dta.enqueue();
     }
 
-    public void createTimerFromScratch() {
+    public void createTimerFromScratch() throws ChannelNotFoundException {
         LazyBonesTimer timer = new LazyBonesTimer();
         timer.setChannelNumber(1);
         Program prog = ProgramDatabase.getProgram(timer);
@@ -838,8 +839,8 @@ public class TimerManager extends Observable {
                     timer.setReason(LazyBonesTimer.NO_PROGRAM);
                     return true;
                 } else {
-                    devplugin.Channel c = ChannelManager.getInstance().getTvbrowserChannel(timer);
-                    if (c != null) {
+                    try {
+                        devplugin.Channel c = ChannelManager.getInstance().getTvbrowserChannel(timer);
                         Date date = new Date(timer.getStartTime());
                         Iterator<Program> iterator = LazyBones.getPluginManager().getChannelDayProgram(date, c);
                         while (iterator != null && iterator.hasNext()) {
@@ -851,7 +852,10 @@ public class TimerManager extends Observable {
                                 return true;
                             }
                         }
+                    } catch (ChannelNotFoundException e) {
+                        // fail silently
                     }
+
                 }
             }
         }

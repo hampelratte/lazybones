@@ -48,6 +48,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
+import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBonesTimer;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Period;
@@ -83,10 +84,11 @@ public class TimelineElement extends JComponent implements MouseListener {
         sb.append("<b>");
         sb.append(title);
         sb.append("</b><br>");
-        Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
-        if (chan != null) {
+        Channel chan;
+        try {
+            chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
             sb.append(chan.getName());
-        } else {
+        } catch (ChannelNotFoundException e) {
             sb.append(timer.getChannelNumber());
         }
         sb.append(' ');

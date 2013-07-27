@@ -30,7 +30,6 @@ package lazybones.programmanager;
 
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -39,12 +38,14 @@ import java.util.List;
 import javax.swing.JPopupMenu;
 
 import lazybones.ChannelManager;
+import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.VDRConnection;
 import lazybones.logging.LoggingConstants;
 import lazybones.logging.PopupHandler;
+import lazybones.programmanager.evaluation.DoppelpackDetector;
 import lazybones.programmanager.evaluation.Evaluator;
 import lazybones.programmanager.evaluation.Result;
 
@@ -58,7 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import util.programmouseevent.ProgramMouseEventHandler;
-import devplugin.Date;
 import devplugin.Program;
 
 public class ProgramManager {
@@ -112,7 +112,7 @@ public class ProgramManager {
         JPopupMenu popup;
         if (tvBrowserProgIds.size() > 0) {
             Program prog = ProgramDatabase.getProgram(tvBrowserProgIds.get(0));
-            popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
+            popup = LazyBones.getPluginManager().createPluginContextMenu(prog, LazyBones.getInstance());
         } else {
             popup = LazyBones.getInstance().getSimpleContextMenu(timer);
         }
@@ -126,16 +126,7 @@ public class ProgramManager {
         // for every timer
         try {
             for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
-                devplugin.Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
-                if (chan == null) {
-                    timer.setReason(LazyBonesTimer.NO_CHANNEL);
-
-                    // we couldn't find a channel for this timer, continue with the
-                    // next timer
-                    continue;
-                }
-
-                markSingularTimer(timer, chan);
+                markSingularTimer(timer);
             }
         } catch (ConcurrentModificationException e) {
             // the timers list has changed while we were marking programs, let's start over
@@ -212,18 +203,18 @@ public class ProgramManager {
      * @param timer
      * @param chan
      */
-    private void markSingularTimer(LazyBonesTimer timer, devplugin.Channel chan) {
-        // create a clone of the timer and subtract the recording buffers
-        LazyBonesTimer bufferLessTimer = timer.getTimerWithoutBuffers();
-        int day = bufferLessTimer.getStartTime().get(Calendar.DAY_OF_MONTH);
-        int month = bufferLessTimer.getStartTime().get(Calendar.MONTH) + 1;
-        int year = bufferLessTimer.getStartTime().get(Calendar.YEAR);
-
+    private void markSingularTimer(LazyBonesTimer timer) {
         // get the day program of the day, the previous day and the next day
-        Date date = new Date(year, month, day);
-        List<Program> threeDayProgram = ProgramDatabase.getThreeDayProgram(date, chan);
+        List<Program> threeDayProgram;
+        try {
+            threeDayProgram = ProgramDatabase.getProgramAroundTimer(timer);
+        } catch (ChannelNotFoundException e) {
+            timer.setReason(LazyBonesTimer.NO_CHANNEL);
+            return;
+        }
 
-        boolean doppelpackFound = markDoppelpackTimer(timer, threeDayProgram);
+        // Mark doppelpack timers. If we found a doppelpack, we can stop at this point
+        boolean doppelpackFound = new DoppelpackDetector(threeDayProgram).markDoppelpackTimer(timer);
         if (doppelpackFound) {
             return;
         }
@@ -254,82 +245,6 @@ public class ProgramManager {
                 timer.setReason(LazyBonesTimer.NOT_FOUND);
             }
         }
-    }
-
-    private boolean markDoppelpackTimer(LazyBonesTimer timer, List<Program> threeDayProgram) {
-        Iterator<Program> it = threeDayProgram.iterator();
-        if (it == null) {
-            if (!timer.isRepeating()) {
-                timer.setReason(LazyBonesTimer.NO_EPG);
-            }
-            return false;
-        }
-
-        List<Program> doppelpackCandidates = collectDoppelpackCandidates(timer, it);
-
-        boolean doppelpackFound = false;
-        if (doppelpackCandidates.size() > 1) {
-            timer.setReason(LazyBonesTimer.NOT_FOUND);
-            String doppelpackTitle = null;
-            for (int i = 0; i < doppelpackCandidates.size(); i++) {
-                Program prog = doppelpackCandidates.get(i);
-                String title = prog.getTitle();
-                while (i < doppelpackCandidates.size() - 1) {
-                    Program next = doppelpackCandidates.get(i + 1);
-                    if (title.equals(next.getTitle())) {
-                        logger.debug("Doppelpack found: {}", title);
-                        doppelpackFound = true;
-                        doppelpackTitle = title;
-                        timer.setReason(LazyBonesTimer.NO_REASON);
-                    }
-                    i++;
-                }
-            }
-
-            // mark all doppelpack programs
-            if (doppelpackTitle != null) {
-                for (Program prog : doppelpackCandidates) {
-                    if (prog.getTitle().equals(doppelpackTitle)) {
-                        prog.mark(LazyBones.getInstance());
-                        timer.addTvBrowserProgID(prog.getUniqueID());
-                    }
-                }
-            }
-        }
-
-        return doppelpackFound;
-    }
-
-    private List<Program> collectDoppelpackCandidates(LazyBonesTimer timer, Iterator<Program> it) {
-        // contains programs, which start and stop between the start and the stop time
-        // of the timer and could be part of a Doppelpack
-        List<Program> doppelPack = new ArrayList<Program>();
-
-        // iterate over all programs and
-        // compare start and end time to collect doppelpack candidates
-        while (it.hasNext()) {
-            Program prog = it.next();
-
-            // get prog start and end
-            Calendar progStartCal = createStarttimeCalendar(prog);
-            Calendar progEndCal = (Calendar) progStartCal.clone();
-            progEndCal.add(Calendar.MINUTE, prog.getLength());
-
-            // collect doppelpack candidates
-            // use timer with buffers
-            if (progStartCal.after(timer.getStartTime()) && progEndCal.before(timer.getEndTime())) {
-                doppelPack.add(prog);
-            }
-        }
-        return doppelPack;
-    }
-
-    private Calendar createStarttimeCalendar(Program prog) {
-        Calendar progStartCal = prog.getDate().getCalendar();
-        progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
-        progStartCal.set(Calendar.MINUTE, prog.getMinutes());
-        progStartCal.set(Calendar.SECOND, 0);
-        return progStartCal;
     }
 
     public void assignTimerToProgram(Program prog, LazyBonesTimer timer) {
