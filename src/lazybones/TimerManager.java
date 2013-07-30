@@ -78,6 +78,8 @@ public class TimerManager extends Observable {
     private static transient Logger logger = LoggerFactory.getLogger(TimerManager.class);
     private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
 
+    private static final int UNKNOWN = -1;
+
     private static TimerManager instance;
 
     /**
@@ -520,7 +522,13 @@ public class TimerManager extends Observable {
         cal.set(Calendar.YEAR, date.getYear());
         cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
         cal.set(Calendar.MINUTE, prog.getMinutes());
-        cal.add(Calendar.MINUTE, prog.getLength() / 2);
+        if (prog.getLength() == UNKNOWN) {
+            // if the length is unknown, we add 5 minutes to the starttime, so that we still get the right program,
+            // if the vdr start time differs from the tvbrowser start time
+            cal.add(Calendar.MINUTE, 5);
+        } else {
+            cal.add(Calendar.MINUTE, prog.getLength() / 2);
+        }
         return cal.getTimeInMillis();
     }
 
