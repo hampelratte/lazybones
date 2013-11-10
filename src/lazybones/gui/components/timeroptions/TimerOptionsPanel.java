@@ -189,7 +189,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.gridheight = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0.3;
+        gbc.weightx = 0;
         gbc.weighty = 0;
 
         int row = 0;
@@ -260,7 +260,8 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0.7;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
         gbc.gridx = 1;
         row = 1;
         gbc.gridy = row++;
