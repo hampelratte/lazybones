@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,6 +28,7 @@
  */
 package lazybones.gui.settings.channelpanel.dnd;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.DefaultListModel;
@@ -46,20 +47,21 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
     @Override
     protected ChannelSet<Channel> exportChannels(JComponent c) {
         ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
-        JList list = (JList) c;
-        indices = list.getSelectedIndices();
-        Object[] values = list.getSelectedValues();
-        for (int i = 0; i < values.length; i++) {
-            channelSet.add((Channel) values[i]);
-        }
 
+        @SuppressWarnings("unchecked")
+        JList<Channel> list = (JList<Channel>) c;
+
+        indices = list.getSelectedIndices();
+        List<Channel> channels = list.getSelectedValuesList();
+        channelSet.addAll(channels);
         return channelSet;
     }
 
     @Override
     protected void importChannels(JComponent c, ChannelSet<Channel> set) {
-        JList target = (JList) c;
-        DefaultListModel listModel = (DefaultListModel) target.getModel();
+        @SuppressWarnings("unchecked")
+        JList<Channel> target = (JList<Channel>) c;
+        DefaultListModel<Channel> listModel = (DefaultListModel<Channel>) target.getModel();
         int index = target.getSelectedIndex();
 
         // Prevent the user from dropping data back on itself.
@@ -91,8 +93,9 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
     @Override
     protected void cleanup(JComponent c, boolean remove) {
         if (remove && indices != null) {
-            JList source = (JList) c;
-            DefaultListModel model = (DefaultListModel) source.getModel();
+            @SuppressWarnings("unchecked")
+            JList<Channel> source = (JList<Channel>) c;
+            DefaultListModel<Channel> model = (DefaultListModel<Channel>) source.getModel();
             // If we are moving items around in the same list, we
             // need to adjust the indices accordingly, since those
             // after the insertion point have moved.

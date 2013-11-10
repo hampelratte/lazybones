@@ -74,7 +74,7 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
     private final boolean AUTOSCROLL = true;
 
     private SimpleFormatter formatter = new SimpleFormatter();
-    private JComboBox comboLevel;
+    private JComboBox<Level> comboLevel;
 
     // gui
     private JScrollPane scrollpane;
@@ -162,8 +162,9 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
         scrollbar = scrollpane.getVerticalScrollBar();
         getContentPane().add(scrollpane, BorderLayout.CENTER);
         {
-            ComboBoxModel comboLevelModel = new DefaultComboBoxModel(new Level[] { Level.FINEST, Level.FINE, Level.INFO, Level.WARNING, Level.SEVERE });
-            comboLevel = new JComboBox();
+            ComboBoxModel<Level> comboLevelModel = new DefaultComboBoxModel<Level>(new Level[] { Level.FINEST, Level.FINE, Level.INFO, Level.WARNING,
+                    Level.SEVERE });
+            comboLevel = new JComboBox<Level>();
             getContentPane().add(comboLevel, BorderLayout.SOUTH);
             comboLevel.setModel(comboLevelModel);
             comboLevel.addItemListener(new ItemListener() {

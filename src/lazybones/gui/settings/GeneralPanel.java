@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -73,7 +73,7 @@ public class GeneralPanel extends JPanel {
     private JLabel lFuzzyness;
     private JPanel expertsPanel;
     private JLabel lCharset;
-    private JComboBox charset;
+    private JComboBox<String> charset;
     private JLabel lTimeout;
     private JSpinner timeout;
     private JLabel lPort;
@@ -207,8 +207,8 @@ public class GeneralPanel extends JPanel {
                     expertsPanelLayout.columnWidths = new int[] { 7, 7 };
                 }
                 {
-                    ComboBoxModel charsetModel = new DefaultComboBoxModel(new Object[] { "ISO-8859-1", "ISO-8859-15", "UTF-8" });
-                    charset = new JComboBox();
+                    ComboBoxModel<String> charsetModel = new DefaultComboBoxModel<String>(new String[] { "ISO-8859-1", "ISO-8859-15", "UTF-8" });
+                    charset = new JComboBox<String>();
                     mainPanel.add(charset, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5,
                             5, 5, 5), 0, 0));
                     charset.setModel(charsetModel);

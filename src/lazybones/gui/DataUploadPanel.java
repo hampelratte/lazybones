@@ -36,6 +36,7 @@ import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -64,8 +65,8 @@ import devplugin.Program;
 public class DataUploadPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private JList list;
-    private final DefaultListModel model = new DefaultListModel();
+    private JList<Channel> list;
+    private final DefaultListModel<Channel> model = new DefaultListModel<Channel>();
     private JButton bUploadData;
 
     private static transient Logger logger = LoggerFactory.getLogger(DataUploadPanel.class);
@@ -97,7 +98,7 @@ public class DataUploadPanel extends JPanel {
                 thisLayout.columnWidths = new int[] { 7 };
                 this.setLayout(thisLayout);
                 {
-                    list = new JList();
+                    list = new JList<Channel>();
                     this.add(new JScrollPane(list), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
                             new Insets(5, 5, 5, 5), 0, 0));
                     list.setModel(model);
@@ -121,9 +122,8 @@ public class DataUploadPanel extends JPanel {
     }
 
     private void uploadData() {
-        Object[] channels = list.getSelectedValues();
-        for (Object object : channels) {
-            Channel chan = (Channel) object;
+        List<Channel> channels = list.getSelectedValuesList();
+        for (Channel chan : channels) {
             devplugin.Channel tvbchan = null;
             try {
                 tvbchan = ChannelManager.getInstance().getTvbrowserChannel(chan);

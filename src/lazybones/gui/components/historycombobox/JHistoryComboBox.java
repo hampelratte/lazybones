@@ -39,7 +39,7 @@ import javax.swing.JComboBox;
  * @author henni
  *
  */
-public class JHistoryComboBox extends JComboBox implements ActionListener {
+public class JHistoryComboBox extends JComboBox<String> implements ActionListener {
 
     protected ComboBoxHistory model;
 

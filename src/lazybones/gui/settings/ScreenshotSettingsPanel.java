@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -55,7 +55,7 @@ import lazybones.LazyBones;
 public class ScreenshotSettingsPanel implements ItemListener {
     private String lMethod = LazyBones.getTranslation("method", "Method");
 
-    private JComboBox method = new JComboBox();
+    private JComboBox<String> method = new JComboBox<String>();
 
     private CardLayout cardLayout = new CardLayout();
 
@@ -122,7 +122,7 @@ public class ScreenshotSettingsPanel implements ItemListener {
         method.addItemListener(this);
         String m = LazyBones.getProperties().getProperty("preview.method");
         for (int i = 0; i < method.getItemCount(); i++) {
-            String item = (String) method.getItemAt(i);
+            String item = method.getItemAt(i);
             if (m.equals(item)) {
                 method.setSelectedIndex(i);
                 break;
@@ -162,6 +162,7 @@ public class ScreenshotSettingsPanel implements ItemListener {
         LazyBones.getProperties().setProperty("preview.method", method.getSelectedItem().toString());
     }
 
+    @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             cardLayout.show(cardsContainer, e.getItem().toString());

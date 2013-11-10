@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -80,7 +80,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
     private static LogMessageDialog instance;
 
-    public JList list;
+    public JList<LogRecord> list;
     public LogMessageListModel model;
     private JSplitPane splitPane;
     private JScrollPane listScrollpane;
@@ -109,6 +109,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
         JButton okButton = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
         okButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 close();
             }
@@ -118,6 +119,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent we) {
                 logger.info("Window closing {}", we);
                 close();
@@ -128,6 +130,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
 
+    @Override
     public synchronized void close() {
         setVisible(false);
         model.clear();
@@ -168,7 +171,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
     private JScrollPane getListScrollpane() {
         if (listScrollpane == null) {
-            list = new JList();
+            list = new JList<LogRecord>();
             list.addListSelectionListener(this);
             model = new LogMessageListModel();
             list.setModel(model);
@@ -196,7 +199,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         return taDetails;
     }
 
-    private class LogListCellRenderer extends JLabel implements ListCellRenderer {
+    private class LogListCellRenderer extends JLabel implements ListCellRenderer<LogRecord> {
 
         private Color altColor = new Color(250, 250, 220);
 
@@ -204,8 +207,8 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
             setOpaque(true);
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean hasFocus) {
-            LogRecord log = (LogRecord) value;
+        @Override
+        public Component getListCellRendererComponent(JList<? extends LogRecord> list, LogRecord log, int index, boolean selected, boolean hasFocus) {
             StringBuilder sb = new StringBuilder("<html>");
             sb.append(log.getMessage().replaceAll("\n", "<br>"));
             sb.append("</html>");
@@ -222,20 +225,20 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
             return this;
         }
-
     }
 
     private SimpleFormatter formatter = new SimpleFormatter();
 
+    @Override
     public void valueChanged(ListSelectionEvent e) {
-        LogRecord log = (LogRecord) list.getSelectedValue();
+        LogRecord log = list.getSelectedValue();
         if (log != null) {
             taDetails.setText(formatter.format(log));
             taDetails.setCaretPosition(0);
         }
     }
 
-    private class LogMessageListModel extends AbstractListModel {
+    private class LogMessageListModel extends AbstractListModel<LogRecord> {
 
         private List<LogRecord> messages = new ArrayList<LogRecord>();
 
@@ -266,7 +269,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public LogRecord getElementAt(int index) {
             return messages.get(index);
         }
     }

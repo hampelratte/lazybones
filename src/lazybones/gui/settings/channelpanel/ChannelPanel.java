@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -82,7 +82,7 @@ public class ChannelPanel implements ActionListener {
 
     private JScrollPane listScrollpane;
 
-    private JList list = new JList();
+    private JList<Channel> list = new JList<Channel>();
 
     private JTable table = new JTable();
 
@@ -103,6 +103,7 @@ public class ChannelPanel implements ActionListener {
 
         Object[] headers = { "TV-Browser", "VDR" };
         tableModel = new DefaultTableModel(new Object[][] {}, headers) {
+            @Override
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
@@ -122,7 +123,7 @@ public class ChannelPanel implements ActionListener {
         table.setTransferHandler(new TableTransferHandler(list));
 
         list.setCellRenderer(new ChannelListCellrenderer());
-        list.setModel(new DefaultListModel());
+        list.setModel(new DefaultListModel<Channel>());
         list.setDragEnabled(true);
         list.setTransferHandler(new ListTransferHandler());
 
@@ -219,6 +220,7 @@ public class ChannelPanel implements ActionListener {
         return panel;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == refresh) {
             refreshChannelList();
@@ -259,8 +261,8 @@ public class ChannelPanel implements ActionListener {
             for (int i = 0; i < rows.length; i++) {
                 Object channel = table.getValueAt(rows[i], 1);
                 if (channel != null) {
-                    DefaultListModel model = (DefaultListModel) list.getModel();
-                    model.addElement(channel);
+                    DefaultListModel<Channel> model = (DefaultListModel<Channel>) list.getModel();
+                    model.addElement((Channel) channel);
                     table.setValueAt(null, rows[i], 1);
                 }
             }
@@ -278,9 +280,9 @@ public class ChannelPanel implements ActionListener {
                 }
 
                 Object tableValue = table.getValueAt(row, 1);
-                DefaultListModel model = (DefaultListModel) list.getModel();
+                DefaultListModel<Channel> model = (DefaultListModel<Channel>) list.getModel();
                 if (tableValue != null) {
-                    model.addElement(tableValue);
+                    model.addElement((Channel) tableValue);
                 }
                 table.setValueAt(model.getElementAt(rows[i]), row, 1);
                 model.remove(rows[i]);
@@ -294,7 +296,7 @@ public class ChannelPanel implements ActionListener {
         LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
 
         try {
-            DefaultListModel model = (DefaultListModel) list.getModel();
+            DefaultListModel<Channel> model = (DefaultListModel<Channel>) list.getModel();
             model.clear();
             ChannelManager.getInstance().update();
             List<Channel> vdrchans = ChannelManager.getInstance().getFilteredChannels();
@@ -380,10 +382,9 @@ public class ChannelPanel implements ActionListener {
             String tvbChan = ((devplugin.Channel) tvbc).getName();
             tvbChan = tvbChan.toLowerCase();
 
-            DefaultListModel listModel = (DefaultListModel) this.list.getModel();
+            DefaultListModel<Channel> listModel = (DefaultListModel<Channel>) this.list.getModel();
             for (int j = 0; j < listModel.getSize(); j++) {
-                Object o = listModel.getElementAt(j);
-                Channel chan = (Channel) o;
+                Channel chan = listModel.getElementAt(j);
                 String vdrChan = chan.getName();
                 vdrChan = vdrChan.toLowerCase();
                 int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
@@ -415,6 +416,7 @@ public class ChannelPanel implements ActionListener {
             this.channel = channel;
         }
 
+        @Override
         public int compareTo(Container c) {
             if (c.getPercent() == percent) {
                 return 0;
@@ -433,6 +435,7 @@ public class ChannelPanel implements ActionListener {
             return index;
         }
 
+        @Override
         public String toString() {
             return percent + "% " + index + " " + channel.toString();
         }

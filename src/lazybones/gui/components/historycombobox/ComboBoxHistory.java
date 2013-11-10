@@ -35,7 +35,7 @@ import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 
-public class ComboBoxHistory extends DefaultComboBoxModel implements Iterable<String> {
+public class ComboBoxHistory extends DefaultComboBoxModel<String> implements Iterable<String> {
 
     private int maxSize = 10;
 
@@ -49,20 +49,18 @@ public class ComboBoxHistory extends DefaultComboBoxModel implements Iterable<St
      * Adds or moves an element to the top of the history
      */
     @Override
-    public void addElement(Object o) {
-        String newEntry = (String)o;
-
+    public void addElement(String newEntry) {
         // if history contains this object already, delete it,
         // so that it looks like a move to the top
         for (int i = 0; i < getSize(); i++) {
-            String oldEntry = (String) getElementAt(i);
+            String oldEntry = getElementAt(i);
             if(oldEntry.equals(newEntry)) {
                 removeElementAt(i);
             }
         }
 
         // insert element at the top
-        insertElementAt(o, 0);
+        insertElementAt(newEntry, 0);
 
         // remove an element, if the history gets too large
         if(getSize()> maxSize) {
@@ -70,7 +68,7 @@ public class ComboBoxHistory extends DefaultComboBoxModel implements Iterable<St
         }
 
         // set selected item to the one just added
-        setSelectedItem(o);
+        setSelectedItem(newEntry);
 
         fireHistoryChanged();
     }

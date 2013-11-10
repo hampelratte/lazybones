@@ -49,7 +49,7 @@ import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import devplugin.Channel;
 
-public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
+public class TimerListCellRenderer extends JPanel implements ListCellRenderer<LazyBonesTimer> {
 
     private final JLabel date = new JLabel();
     private final JLabel channel = new JLabel();
@@ -104,7 +104,8 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
     }
 
     @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList<? extends LazyBonesTimer> list, LazyBonesTimer value, int index, boolean isSelected,
+            boolean cellHasFocus) {
         if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));
             time.setForeground(UIManager.getColor("List.selectionForeground"));
@@ -122,7 +123,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer {
         }
 
         if (value instanceof LazyBonesTimer) {
-            LazyBonesTimer timer = (LazyBonesTimer) value;
+            LazyBonesTimer timer = value;
 
             if (!timer.isActive()) {
                 time.setForeground(inactive);

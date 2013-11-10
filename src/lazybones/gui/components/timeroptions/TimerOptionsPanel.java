@@ -99,7 +99,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
 
     private final JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
-    private final JComboBox channels = new JComboBox();
+    private final JComboBox<Object> channels = new JComboBox<Object>();
 
     private final JLabel lDay = new JLabel(LazyBones.getTranslation("day", "Day"));
 
@@ -132,7 +132,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private final JLabel lDescription = new JLabel(LazyBones.getTranslation("description", "Description"));
 
     private DescriptionComboBoxModel comboDescModel;
-    private final JComboBox comboDesc = new JComboBox();
+    private final JComboBox<DescriptionSelectorItem> comboDesc = new JComboBox<DescriptionSelectorItem>();
 
     private final JTextArea description = new JTextArea();
 

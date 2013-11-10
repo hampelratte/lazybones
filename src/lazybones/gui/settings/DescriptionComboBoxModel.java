@@ -39,7 +39,7 @@ import javax.swing.DefaultComboBoxModel;
 import lazybones.LazyBones;
 import util.program.AbstractPluginProgramFormating;
 
-public class DescriptionComboBoxModel extends DefaultComboBoxModel {
+public class DescriptionComboBoxModel extends DefaultComboBoxModel<DescriptionSelectorItem> {
 
     public DescriptionComboBoxModel(boolean addLongestElement, boolean addTimerElement) {
         addElement(new DescriptionSelectorItem(VDR, "VDR"));
@@ -61,7 +61,7 @@ public class DescriptionComboBoxModel extends DefaultComboBoxModel {
 
     public void setSelected(String id) {
         for (int i = 0; i < getSize(); i++) {
-            DescriptionSelectorItem desc = (DescriptionSelectorItem) getElementAt(i);
+            DescriptionSelectorItem desc = getElementAt(i);
             if (desc.getId().equals(id)) {
                 setSelectedItem(desc);
             }

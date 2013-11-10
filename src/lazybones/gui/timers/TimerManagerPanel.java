@@ -69,7 +69,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
 
     private JScrollPane scrollPane = null;
-    private final JList timerList = new JList(new TimerListAdapter());
+    private final JList<LazyBonesTimer> timerList = new JList<LazyBonesTimer>(new TimerListAdapter());
     private JButton buttonNew = null;
     private JButton buttonEdit = null;
     private JButton buttonSync = null;
@@ -172,7 +172,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
             private void mayTriggerPopup(MouseEvent e) {
                 int index = timerList.locationToIndex(e.getPoint());
-                LazyBonesTimer timer = (LazyBonesTimer) timerList.getModel().getElementAt(index);
+                LazyBonesTimer timer = timerList.getModel().getElementAt(index);
                 if (e.isPopupTrigger()) {
                     JPopupMenu popup = ProgramManager.getInstance().getContextMenuForTimer(timer);
                     popup.setLocation(e.getPoint());
@@ -186,7 +186,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-                    LazyBonesTimer timer = (LazyBonesTimer) timerList.getSelectedValue();
+                    LazyBonesTimer timer = timerList.getSelectedValue();
                     if (timer != null) {
                         deleteTimer(timer);
                     }
@@ -205,7 +205,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
             }
         } else if (e.getSource() == buttonEdit) {
             if (timerList.getSelectedIndex() >= 0) {
-                LazyBonesTimer timer = (LazyBonesTimer) timerList.getSelectedValue();
+                LazyBonesTimer timer = timerList.getSelectedValue();
                 try {
                     TimerManager.getInstance().editTimer(timer);
                 } catch (Exception ex) {
@@ -214,7 +214,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
             }
         } else if (e.getSource() == buttonRemove) {
             if (timerList.getSelectedIndex() >= 0) {
-                LazyBonesTimer timer = (LazyBonesTimer) timerList.getSelectedValue();
+                LazyBonesTimer timer = timerList.getSelectedValue();
                 deleteTimer(timer);
             }
         } else if (e.getSource() == buttonSync) {
@@ -246,7 +246,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        LazyBonesTimer timer = (LazyBonesTimer) timerList.getSelectedValue();
+        LazyBonesTimer timer = timerList.getSelectedValue();
         top.setTimer(timer);
     }
 
@@ -257,7 +257,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         }
     }
 
-    private class TimerListAdapter extends AbstractListModel implements Observer {
+    private class TimerListAdapter extends AbstractListModel<LazyBonesTimer> implements Observer {
 
         private final TimerManager tm = TimerManager.getInstance();
 
@@ -272,7 +272,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public LazyBonesTimer getElementAt(int index) {
             return tm.getTimers().get(index);
         }
 
