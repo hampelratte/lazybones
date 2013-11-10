@@ -28,6 +28,9 @@
  */
 package lazybones;
 
+import static org.hampelratte.svdrp.responses.highlevel.Timer.ENABLED;
+import static org.hampelratte.svdrp.responses.highlevel.Timer.VPS;
+
 import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -542,7 +545,7 @@ public class TimerManager extends Observable {
         // if we have a vps timer, set the status to vps, otherwise add the recording time buffers
         boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
         if (vpsDefault) {
-            timer.changeStateTo(Timer.VPS, true);
+            timer.changeStateTo(VPS, ENABLED);
         } else {
             // start the recording x min before the beginning of the program
             int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
