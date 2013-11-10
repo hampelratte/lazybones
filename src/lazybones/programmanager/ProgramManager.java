@@ -112,7 +112,7 @@ public class ProgramManager {
         JPopupMenu popup;
         if (tvBrowserProgIds.size() > 0) {
             Program prog = ProgramDatabase.getProgram(tvBrowserProgIds.get(0));
-            popup = LazyBones.getPluginManager().createPluginContextMenu(prog, LazyBones.getInstance());
+            popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
         } else {
             popup = LazyBones.getInstance().getSimpleContextMenu(timer);
         }
