@@ -210,7 +210,7 @@ public class TimerManager extends Observable {
         String progID = prog.getUniqueID();
         if (progID == null) {
             // this really should not happen
-            logger.warn("Unique program ID is null. Unable to find a timer for this program");
+            logger.warn("Unique program ID is null. Unable to find a timer for this program [" + prog.toString() + "]");
             return null;
         }
 
