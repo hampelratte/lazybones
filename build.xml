@@ -64,6 +64,7 @@
 		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
+			<!--<jvmarg value="-verbose:class"/>-->
 		</java>
 	</target>
 
