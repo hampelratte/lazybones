@@ -70,6 +70,7 @@ import lazybones.RecordingManager;
 import lazybones.VDRCallback;
 import lazybones.actions.DeleteRecordingAction;
 import lazybones.actions.GetRecordingDetailsAction;
+import lazybones.gui.components.HintTextField;
 import lazybones.gui.components.RecordingDetailsPanel;
 
 import org.hampelratte.svdrp.Response;
@@ -106,6 +107,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
     private JButton collapseAll = null;
 
     private final JPopupMenu popup = new JPopupMenu();
+
+    private HintTextField filter = new HintTextField(getTranslation("search", "Search"));
 
     public RecordingManagerPanel() {
         initGUI();
@@ -164,6 +167,23 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         collapseAll.setPreferredSize(new Dimension(26, 26));
         collapseAll.setToolTipText(getTranslation("collapse_all", "collapse all"));
         sortPanel.add(collapseAll);
+
+        filter.setPreferredSize(new Dimension(250, 26));
+        sortPanel.add(filter);
+        filter.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String query = filter.getText();
+                recordingTreeModel.filter(query);
+
+                if (query.trim().isEmpty()) {
+                    expandAll(recordingTree, false);
+                    recordingTree.expandPath(new TreePath(recordingTreeModel.getRoot()));
+                } else {
+                    expandAll(recordingTree, true);
+                }
+            }
+        });
 
         this.add(sortPanel, gbc);
 
