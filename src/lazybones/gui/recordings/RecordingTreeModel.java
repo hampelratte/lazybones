@@ -61,6 +61,8 @@ public class RecordingTreeModel implements TreeModel, Observer {
 
     private boolean sortAscending = true;
 
+    private String filter = "";
+
     public RecordingTreeModel() {
         rm.addObserver(this);
         sortBy(sortStrategy, sortAscending);
@@ -165,6 +167,8 @@ public class RecordingTreeModel implements TreeModel, Observer {
             @SuppressWarnings("unchecked")
             List<Recording> recordings = (List<Recording>) arg;
             setRecordings(RecordingTreeBuilder.buildTree(recordings));
+
+            filter(filter);
         }
     }
 
@@ -175,12 +179,16 @@ public class RecordingTreeModel implements TreeModel, Observer {
         RecordingSortStrategy rss = new RecordingSortStrategy(comparator, ascending);
         root = RecordingTreeBuilder.buildTree(rm.getRecordings(), rss);
 
+        filter(filter);
+
         for (TreeModelListener tml : tmls) {
             tml.treeStructureChanged(new TreeModelEvent(this, new Object[] { root }));
         }
     }
 
     public void filter(String filter) {
+        this.filter = filter;
+
         RecordingSortStrategy rss = new RecordingSortStrategy(this.sortStrategy, this.sortAscending);
         root = RecordingTreeBuilder.buildTree(rm.getRecordings(), rss);
 
