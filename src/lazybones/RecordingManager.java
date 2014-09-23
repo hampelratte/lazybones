@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import javax.swing.SwingUtilities;
+
 import lazybones.actions.ListRecordingsAction;
 
 import org.hampelratte.svdrp.Response;
@@ -124,7 +126,12 @@ public class RecordingManager extends Observable {
                 }
 
                 setChanged();
-                notifyObservers(recordings);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyObservers(recordings);
+                    }
+                });
 
                 if (callback != null) {
                     callback.run();
