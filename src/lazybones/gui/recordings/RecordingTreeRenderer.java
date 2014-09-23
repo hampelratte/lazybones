@@ -1,31 +1,3 @@
-/*
- * Copyright (c) Henrik Niehaus & Lazy Bones development team
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
 package lazybones.gui.recordings;
 
 import java.awt.Color;
@@ -40,131 +12,107 @@ import java.util.Locale;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
 
 import lazybones.LazyBones;
 
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
 
-public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
-
-    private static final long serialVersionUID = 1L;
-
-    int lci = UIManager.getDefaults().getInt("Tree.leftChildIndent");
-    int rci = UIManager.getDefaults().getInt("Tree.rightChildIndent");
-    int rowHeight = UIManager.getDefaults().getInt("Tree.rowHeight");
+public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
 
     private final Icon iconNew;
     private final Icon iconCut;
     private final Icon iconBoth;
-
-    protected boolean hasFocus = false;
-    protected int row = 0;
+    private final Icon iconClosed;
+    private final Icon iconOpened;
 
     public RecordingTreeRenderer() {
         iconNew = LazyBones.getInstance().getIcon("lazybones/new.png");
         iconCut = LazyBones.getInstance().getIcon("lazybones/edit-cut.png");
         List<Icon> combined = Arrays.asList(new Icon[] { iconNew, iconCut });
         iconBoth = new CombinedIcon(combined, 2);
+        iconClosed = UIManager.getIcon("Tree.closedIcon");
+        iconOpened = UIManager.getIcon("Tree.openIcon");
+
+        setOpaque(true);
     }
 
     @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        setIcon(value, expanded);
+        setColors(selected, row);
+        String title = covertToString(value);
+        setText(title);
+        setEnabled(tree.isEnabled());
+        return this;
+    }
 
-        this.hasFocus = hasFocus;
-        this.row = row;
-
-        String title = value.toString();
-        if (value instanceof TreeNode) {
-            title = ((TreeNode) value).getDisplayTitle();
-            if (value instanceof Recording) {
-                Recording recording = (Recording) value;
-                DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault());
-                title = "<html>" + df.format(recording.getStartTime().getTime()) + " - <b>" + title + "</b>";
-                if (recording.getShortText() != null && recording.getShortText().trim().length() > 0) {
-                    title += " - " + recording.getShortText();
-                }
-                title += "</html>";
+    private void setColors(boolean selected, int row) {
+        if (selected) {
+            setBackground(UIManager.getColor("Tree.selectionBackground"));
+            setForeground(UIManager.getColor("Tree.selectionForeground"));
+        } else {
+            setForeground(UIManager.getColor("Tree.textForeground"));
+            if (row % 2 != 0) {
+                setBackground(new Color(250, 250, 220));
+            } else {
+                setBackground(UIManager.getColor("Tree.textBackground"));
             }
         }
-        Component renderer = super.getTreeCellRendererComponent(tree, title, sel, expanded, leaf, row, hasFocus);
+    }
 
-        JLabel _renderer = (JLabel) renderer;
-        _renderer.setEnabled(tree.isEnabled());
-        UIDefaults defaults = UIManager.getDefaults();
-        _renderer.setForeground(tree.isEnabled() ? defaults.getColor("Label.foreground") : defaults.getColor("Label.disabledForeground"));
+    private String covertToString(Object value) {
+        String title = "";
+        if (value != null) {
+            title = value.toString();
+            if (value instanceof TreeNode) {
+                title = ((TreeNode) value).getDisplayTitle();
+                if (value instanceof Recording) {
+                    Recording recording = (Recording) value;
+                    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault());
+                    title = "<html>" + df.format(recording.getStartTime().getTime()) + " - <b>" + title + "</b>";
+                    if (recording.getShortText() != null && recording.getShortText().trim().length() > 0) {
+                        title += " - " + recording.getShortText();
+                    }
+                    title += "</html>";
+                }
+            }
+        }
+        return title;
+    }
 
+    private void setIcon(Object value, boolean expanded) {
         if (value instanceof Recording) {
             Recording recording = (Recording) value;
-            _renderer.setHorizontalTextPosition(JLabel.LEADING);
-            _renderer.setIconTextGap(10);
+            setHorizontalTextPosition(JLabel.LEADING);
+            setIconTextGap(10);
             if (recording.isNew()) {
                 if (recording.isCut()) {
-                    _renderer.setIcon(iconBoth);
-                    _renderer.setDisabledIcon(iconBoth);
+                    setIcon(iconBoth);
+                    setDisabledIcon(iconBoth);
                 } else {
-                    _renderer.setIcon(iconNew);
-                    _renderer.setDisabledIcon(iconNew);
+                    setIcon(iconNew);
+                    setDisabledIcon(iconNew);
                 }
             } else if (recording.isCut()) {
-                _renderer.setIcon(iconCut);
-                _renderer.setDisabledIcon(iconCut);
+                setIcon(iconCut);
+                setDisabledIcon(iconCut);
             } else {
-                _renderer.setIcon(null);
-                _renderer.setDisabledIcon(null);
+                setIcon(null);
+                setDisabledIcon(null);
             }
         } else {
-            _renderer.setHorizontalTextPosition(JLabel.TRAILING);
-            _renderer.setIconTextGap(5);
-        }
-
-        // if (tree.isShowing()) {
-        // TreePath tp = tree.getPathForRow(row);
-        // if (tp != null) {
-        // int depth = tp.getPathCount();
-        // JViewport viewPort = (JViewport) tree.getParent();
-        // Dimension size = new Dimension(viewPort.getWidth() - 10 - (depth - 1) * (rci + lci), renderer.getY() * -1);
-        // renderer.setPreferredSize(size);
-        // }
-        // }
-
-        return renderer;
-    }
-
-    /*
-     * Overriden, since the DefaultTreeCellrenderer paints the selection box wrong, if the icons are painted behind the text (JLabel horizontal text position
-     * leading)
-     */
-    @Override
-    public void paint(Graphics g) {
-        super.hasFocus = false;
-
-        if (selected) {
-            g.setColor(getBackgroundSelectionColor());
-            g.fillRect(0, 0, getWidth(), getHeight());
-        } else {
-            if (row % 2 != 0) {
-                g.setColor(new Color(250, 250, 220));
-                g.fillRect(0, 0, (int) getPreferredSize().getWidth(), getHeight());
+            setHorizontalTextPosition(JLabel.TRAILING);
+            setIconTextGap(5);
+            if (expanded) {
+                setIcon(iconOpened);
+                setDisabledIcon(iconOpened);
+            } else {
+                setIcon(iconClosed);
+                setDisabledIcon(iconClosed);
             }
-        }
-
-        super.paint(g);
-
-        if (this.hasFocus) {
-            paintFocus(g, 0, 0, getWidth(), getHeight());
-        }
-    }
-
-    private void paintFocus(Graphics g, int x, int y, int w, int h) {
-        Color bsColor = getBorderSelectionColor();
-
-        if (bsColor != null && selected) {
-            g.setColor(bsColor);
-            g.drawRect(x, y, w - 1, h - 1);
         }
     }
 
@@ -187,11 +135,6 @@ public class RecordingTreeRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public int getIconWidth() {
-            // int width = 0;
-            // for (Icon icon : icons) {
-            // width += icon.getIconWidth();
-            // }
-            // width += (icons.size() - 1) * hgap;
             return icons.size() * 16 + (icons.size() - 1) * hgap;
         }
 

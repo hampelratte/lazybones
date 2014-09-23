@@ -58,7 +58,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -208,13 +207,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             }
         });
 
-        // initialize out special tree renderer
         recordingTree.setRowHeight(25);
-        boolean renderBackground = UIManager.getDefaults().getBoolean("Tree.rendererFillBackground");
-        UIManager.getDefaults().put("Tree.rendererFillBackground", false);
         recordingTree.setCellRenderer(new RecordingTreeRenderer());
-        UIManager.getDefaults().put("Tree.rendererFillBackground", renderBackground);
-
         recordingTree.setModel(recordingTreeModel);
         scrollPane = new JScrollPane(recordingTree);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
