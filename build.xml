@@ -21,7 +21,7 @@
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
 
-		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true">
+		<javac srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true" source="1.6" target="1.6">
 			<classpath>
 				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
