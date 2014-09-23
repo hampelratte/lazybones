@@ -4,6 +4,7 @@ Lazy Bones 1.2.1
 * Some internal refactoring
 * Improved detection of doppelpack timers
 * Added search to recordings panel
+* Fixed rendering bugs in the recordings tree
 
 Lazy Bones 1.2.0
 ===============================================================================
