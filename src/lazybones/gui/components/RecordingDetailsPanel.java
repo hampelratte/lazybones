@@ -28,7 +28,6 @@
  */
 package lazybones.gui.components;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -156,7 +155,6 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
         desc.setWrapStyleWord(true);
         desc.setLineWrap(true);
         desc.setEditable(false);
-        desc.setBackground(Color.WHITE);
         add(new JScrollPane(desc), gbc);
 
         adjustStreamLabelVisibility(showStreamsToggle.isSelected());
