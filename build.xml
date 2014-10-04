@@ -55,6 +55,7 @@
 		</copy>
 		<copy todir="${classes.dir}">
 			<fileset dir="${license.dir}" includes="**/*.*" />
+			<fileset dir="${res.dir}/html" includes="**/*.*" />
 		</copy>
 		<jar destfile="${jar.file}" basedir="${classes.dir}">
 		</jar>
