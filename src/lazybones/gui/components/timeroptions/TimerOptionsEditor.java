@@ -94,8 +94,8 @@ import com.thoughtworks.xstream.XStream;
 import devplugin.Plugin;
 import devplugin.Program;
 
-public class TimerOptionsPanel extends JPanel implements ActionListener, ItemListener, WindowListener, ChangeListener {
-    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsPanel.class);
+public class TimerOptionsEditor extends JPanel implements ActionListener, ItemListener, WindowListener, ChangeListener {
+    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsEditor.class);
 
     private final JLabel lChannels = new JLabel(Localizer.getLocalization(Localizer.I18N_CHANNEL));
 
@@ -165,7 +165,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
     private String originalTitel = "";
     private String originalPath = "";
 
-    public TimerOptionsPanel(LazyBonesTimer timer, Program prog, Mode mode) {
+    public TimerOptionsEditor(LazyBonesTimer timer, Program prog, Mode mode) {
         this.mode = mode;
 
         logger.debug("Creating timer options panel");
@@ -177,7 +177,7 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         logger.debug("Timer options panel ready");
     }
 
-    public TimerOptionsPanel(Mode mode) {
+    public TimerOptionsEditor(Mode mode) {
         this.mode = mode;
         initGUI();
     }
@@ -193,9 +193,9 @@ public class TimerOptionsPanel extends JPanel implements ActionListener, ItemLis
         gbc.weighty = 0;
 
         int row = 0;
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = row++;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 1;
         add(createCheckboxGrid(), gbc);
 
         gbc.gridx = 0;

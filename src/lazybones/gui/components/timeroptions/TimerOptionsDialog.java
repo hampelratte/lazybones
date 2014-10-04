@@ -68,7 +68,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
 
     private JDialog dialog;
 
-    private final TimerOptionsPanel top;
+    private final TimerOptionsEditor top;
 
     private JPanel panel;
 
@@ -93,7 +93,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
     public TimerOptionsDialog(LazyBonesTimer timer, Program prog, Mode mode) {
         this.control = LazyBones.getInstance();
 
-        top = new TimerOptionsPanel(timer, prog, mode);
+        top = new TimerOptionsEditor(timer, prog, mode);
 
         this.timer = timer;
         this.oldTimer = (LazyBonesTimer) timer.clone();
