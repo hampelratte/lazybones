@@ -57,8 +57,8 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
     private final JLabel title = new JLabel();
     private final JLabel recording = new JLabel();
 
-    private final Color background = Color.WHITE;
-    private final Color altBackground = new Color(250, 250, 220);
+    private final Color background = UIManager.getColor("List.background");
+    private final Color altBackground = UIManager.getColor("Panel.background");
     private final Color inactive = Color.LIGHT_GRAY;
 
     public TimerListCellRenderer() {
@@ -66,13 +66,6 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
     }
 
     private void initGUI() {
-        // set foreground color
-        time.setForeground(Color.BLACK);
-        title.setForeground(Color.BLACK);
-        channel.setForeground(Color.BLACK);
-        date.setForeground(Color.BLACK);
-        recording.setForeground(Color.BLACK);
-
         Font bold = time.getFont().deriveFont(Font.BOLD);
         time.setFont(bold);
         title.setFont(bold);

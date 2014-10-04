@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,6 +39,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
@@ -51,9 +52,14 @@ public class TimelineList extends JPanel implements Observer {
     private int rowHeight = 40;
     private int padding = 0;
 
+    private Color background;
+    private Color rowBackground;
+    private Color rowBackgroundAlt;
+    private Color lineColor;
+
     public TimelineList(int rowHeight, int padding) {
         setCalendar(calendar);
-        setBackground(Color.WHITE);
+        setBackground(background);
         this.rowHeight = rowHeight;
         this.padding = padding;
         setLayout(new TimelineLayout(rowHeight, padding));
@@ -142,14 +148,13 @@ public class TimelineList extends JPanel implements Observer {
         super.paintComponent(g);
 
         // paint row background
-        Color altColor = new Color(250, 250, 220);
         for (int i = 0; i < getComponentCount(); i++) {
-            g.setColor(i % 2 == 0 ? Color.WHITE : altColor);
+            g.setColor(i % 2 == 0 ? rowBackground : rowBackgroundAlt);
             g.fillRect(0, i * (rowHeight + padding), getWidth(), (rowHeight + padding));
         }
 
         // paint vertical lines
-        g.setColor(Color.LIGHT_GRAY);
+        g.setColor(lineColor);
         double pixelsPerHour = (double) (getWidth() - 1) / (double) 24;
         for (int i = 0; i < 25; i++) {
             g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), getHeight());
@@ -174,7 +179,7 @@ public class TimelineList extends JPanel implements Observer {
 
     /**
      * Returns, if the day of the given calendar is today
-     * 
+     *
      * @param cal
      */
     private boolean isToday(Calendar cal) {
@@ -253,5 +258,14 @@ public class TimelineList extends JPanel implements Observer {
         Dimension d = super.getPreferredSize();
         d.height = (rowHeight + padding) * getRowCount();
         return d;
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        background = UIManager.getColor("List.background");
+        lineColor = UIManager.getColor("Panel.background").darker();
+        rowBackground = UIManager.getColor("List.background");
+        rowBackgroundAlt = UIManager.getColor("Panel.background");
     }
 }

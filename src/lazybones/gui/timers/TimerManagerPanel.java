@@ -28,15 +28,14 @@
  */
 package lazybones.gui.timers;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Observable;
@@ -49,7 +48,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -57,24 +60,25 @@ import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
-import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
-import lazybones.gui.components.timeroptions.TimerOptionsPanel;
+import lazybones.gui.components.timeroptions.TimerOptionsView;
 import lazybones.programmanager.ProgramManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimerManagerPanel extends JPanel implements ActionListener, ListSelectionListener {
+public class TimerManagerPanel extends JPanel implements ActionListener, ListSelectionListener, ListDataListener {
 
     private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
 
     private JScrollPane scrollPane = null;
     private final JList<LazyBonesTimer> timerList = new JList<LazyBonesTimer>(new TimerListAdapter());
+    private JToolBar buttonBar = null;
     private JButton buttonNew = null;
     private JButton buttonEdit = null;
     private JButton buttonSync = null;
     private JButton buttonRemove = null;
-    private final TimerOptionsPanel top = new TimerOptionsPanel(Mode.VIEW);
+    // private final TimerOptionsEditor timerOptionsView = new TimerOptionsEditor(Mode.VIEW);
+    private final TimerOptionsView timerOptionsView = new TimerOptionsView();
 
     public TimerManagerPanel() {
         initGUI();
@@ -88,81 +92,42 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.fill = java.awt.GridBagConstraints.BOTH;
+        // add toolbar
+        gbc.fill = java.awt.GridBagConstraints.NONE;
+        gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.insets = new java.awt.Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        buttonBar = createButtonBar();
+        this.add(buttonBar, gbc);
+
+        // add timer list
+        gbc.fill = java.awt.GridBagConstraints.BOTH;
+        gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 2;
-        gbc.insets = new java.awt.Insets(10, 10, 10, 10);
+        gbc.insets = new java.awt.Insets(0, 10, 10, 10);
         gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         timerList.setCellRenderer(new TimerListCellRenderer());
         timerList.addListSelectionListener(this);
+        timerList.getModel().addListDataListener(this);
         scrollPane = new JScrollPane(timerList);
         this.add(scrollPane, gbc);
 
-        gbc.gridwidth = 2;
+        // add timer details view
         gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.gridheight = 2;
         gbc.insets = new java.awt.Insets(10, 0, 10, 10);
-        top.setBorder(BorderFactory.createTitledBorder(LazyBones.getTranslation("details", "Details")));
-        top.setPreferredSize(new Dimension(300, 300));
-        top.setMinimumSize(new Dimension(300, 300));
-        top.setMaximumSize(new Dimension(300, 300));
-        this.add(top, gbc);
+        timerOptionsView.setEnabled(false);
+        this.add(timerOptionsView, gbc);
 
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.1;
-        gbc.insets = new java.awt.Insets(0, 10, 0, 10);
-        gbc.gridx = 0;
-        gbc.gridwidth = 1;
-        buttonSync = new JButton();
-        buttonSync.setText(LazyBones.getTranslation("resync", "Synchronize"));
-        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
-        buttonSync.addActionListener(this);
-        this.add(buttonSync, gbc);
-
-        gbc.insets = new java.awt.Insets(0, 0, 0, 10);
-        gbc.gridx = 1;
-        buttonNew = new JButton();
-        buttonNew.setText(LazyBones.getTranslation("new_timer", "New Timer"));
-        buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 16));
-        buttonNew.addActionListener(this);
-        this.add(buttonNew, gbc);
-
-        gbc.insets = new java.awt.Insets(0, 0, 0, 0);
-        gbc.gridx = 2;
-        buttonEdit = new JButton();
-        buttonEdit.setText(LazyBones.getTranslation("edit", "Edit Timer"));
-        buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
-        buttonEdit.addActionListener(this);
-        this.add(buttonEdit, gbc);
-
-        gbc.insets = new java.awt.Insets(0, 10, 0, 10);
-        gbc.gridx = 3;
-        buttonRemove = new JButton();
-        buttonRemove.setText(LazyBones.getTranslation("dont_capture", "Delete Timer"));
-        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
-        buttonRemove.addActionListener(this);
-        this.add(buttonRemove, gbc);
-
-        timerList.addMouseListener(new MouseListener() {
+        timerList.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 mayTriggerPopup(e);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
             }
 
             @Override
@@ -182,6 +147,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
                 }
             }
         });
+
         timerList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -193,6 +159,42 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
                 }
             }
         });
+    }
+
+    private JToolBar createButtonBar() {
+        JToolBar buttonBar = new JToolBar();
+        buttonBar.setBorder(BorderFactory.createEmptyBorder());
+        buttonBar.setRollover(true);
+        buttonBar.setFloatable(false);
+
+        buttonSync = new JButton();
+        buttonSync.setToolTipText(LazyBones.getTranslation("resync", "Synchronize"));
+        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
+        buttonSync.addActionListener(this);
+        buttonBar.add(buttonSync);
+
+        buttonNew = new JButton();
+        buttonNew.setToolTipText(LazyBones.getTranslation("new_timer", "New Timer"));
+        buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 16));
+        buttonNew.addActionListener(this);
+        buttonBar.add(buttonNew);
+
+        buttonBar.addSeparator();
+
+        buttonEdit = new JButton();
+        buttonEdit.setToolTipText(LazyBones.getTranslation("edit", "Edit Timer"));
+        buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
+        buttonEdit.addActionListener(this);
+        buttonEdit.setEnabled(false);
+        buttonBar.add(buttonEdit);
+
+        buttonRemove = new JButton();
+        buttonRemove.setToolTipText(LazyBones.getTranslation("dont_capture", "Delete Timer"));
+        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
+        buttonRemove.addActionListener(this);
+        buttonRemove.setEnabled(false);
+        buttonBar.add(buttonRemove);
+        return buttonBar;
     }
 
     @Override
@@ -232,22 +234,44 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         TimerManager.getInstance().deleteTimer(timer, new Runnable() {
             @Override
             public void run() {
-                timerList.setEnabled(true);
-                buttonNew.setEnabled(true);
-                buttonEdit.setEnabled(true);
-                buttonSync.setEnabled(true);
-                buttonRemove.setEnabled(true);
-                if (requestFocus) {
-                    timerList.requestFocus();
-                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerList.setEnabled(true);
+                        buttonSync.setEnabled(true);
+                        buttonNew.setEnabled(true);
+                        if (requestFocus) {
+                            timerList.requestFocus();
+                        }
+                    }
+                });
             }
         });
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        LazyBonesTimer timer = timerList.getSelectedValue();
-        top.setTimer(timer);
+        updateGuiState();
+    }
+
+    private synchronized void updateGuiState() {
+        try {
+            int selectedIndex = timerList.getSelectedIndex();
+
+            if (selectedIndex >= 0 && timerList.getModel().getSize() - 1 >= selectedIndex) {
+                LazyBonesTimer timer = timerList.getModel().getElementAt(selectedIndex);
+                timerOptionsView.setTimer(timer);
+                buttonEdit.setEnabled(true);
+                buttonRemove.setEnabled(true);
+            } else {
+                timerOptionsView.reset();
+                buttonEdit.setEnabled(false);
+                buttonRemove.setEnabled(false);
+            }
+        } catch (RuntimeException t) {
+            logger.error(t.getMessage(), t);
+            throw t;
+        }
     }
 
     private class TimerComparator implements Comparator<LazyBonesTimer> {
@@ -286,5 +310,20 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         protected void fireContentsChanged(Object source, int start, int end) {
             super.fireContentsChanged(source, start, end);
         }
+    }
+
+    @Override
+    public void intervalAdded(ListDataEvent e) {
+        updateGuiState();
+    }
+
+    @Override
+    public void intervalRemoved(ListDataEvent e) {
+        updateGuiState();
+    }
+
+    @Override
+    public void contentsChanged(ListDataEvent e) {
+        updateGuiState();
     }
 }

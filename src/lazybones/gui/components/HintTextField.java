@@ -33,14 +33,15 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 public class HintTextField extends JTextField implements FocusListener {
 
     private final String hint;
     private boolean showingHint;
 
-    private Color hintColor = Color.LIGHT_GRAY;
-    private Color textColor = Color.BLACK;
+    private Color hintColor;
+    private Color textColor;
 
     public HintTextField(final String hint) {
         super(hint);
@@ -72,5 +73,12 @@ public class HintTextField extends JTextField implements FocusListener {
     @Override
     public String getText() {
         return showingHint ? "" : super.getText();
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        textColor = UIManager.getColor("TextField.foreground");
+        hintColor = UIManager.getColor("TextField.inactiveForeground");
     }
 }

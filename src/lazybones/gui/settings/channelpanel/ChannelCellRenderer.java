@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,8 +42,9 @@ import util.ui.ChannelLabel;
 
 public class ChannelCellRenderer extends DefaultTableCellRenderer {
 
-    private Color uneven = new Color(240, 240, 240);
+    private Color uneven;
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (column == 0) {
             if (!(value instanceof devplugin.Channel)) {
@@ -113,5 +114,11 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
         }
 
         return this;
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        uneven = UIManager.getColor("Panel.background");
     }
 }

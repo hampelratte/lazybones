@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,6 +43,9 @@ public class TimelineHeader extends JComponent {
 
     public final static int HEIGHT = 20;
 
+    private Color lineColor;
+    private Color textColor;
+
     public TimelineHeader() {
         setPreferredSize(new Dimension(getWidth(), HEIGHT));
     }
@@ -68,19 +71,26 @@ public class TimelineHeader extends JComponent {
 
         double pixelsPerHour = (double) (w - 1) / (double) 24;
 
-        g.setColor(Color.GRAY);
+        g.setColor(lineColor);
         g.drawLine(0, h - 1, w - 1, h - 1); // draw the bottom border
         for (int i = 0; i < 25; i++) {
-            g.setColor(Color.GRAY);
+            g.setColor(lineColor);
             g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), h);
             if (i < 24) {
                 int hourWidth = fm.stringWidth(Integer.toString(i));
                 int hourHeight = fm.getHeight();
                 int x = (int) (i * pixelsPerHour) + ((int) pixelsPerHour - hourWidth) / 2 - 2;
                 int y = (h - hourHeight) / 2;
-                g.setColor(UIManager.getColor("Label.foreground"));
+                g.setColor(textColor);
                 g.drawString(Integer.toString(i), x, y + 9);
             }
         }
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        lineColor = UIManager.getColor("Panel.background").darker();
+        textColor = UIManager.getColor("Label.foreground");
     }
 }

@@ -1,6 +1,5 @@
 package lazybones.gui.recordings;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.text.DateFormat;
@@ -55,11 +54,7 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
             setForeground(UIManager.getColor("Tree.selectionForeground"));
         } else {
             setForeground(UIManager.getColor("Tree.textForeground"));
-            if (row % 2 != 0) {
-                setBackground(new Color(250, 250, 220));
-            } else {
-                setBackground(UIManager.getColor("Tree.textBackground"));
-            }
+            setBackground(UIManager.getColor("Tree.textBackground"));
         }
     }
 

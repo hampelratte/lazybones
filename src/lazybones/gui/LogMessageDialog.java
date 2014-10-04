@@ -200,8 +200,10 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
     }
 
     private class LogListCellRenderer extends JLabel implements ListCellRenderer<LogRecord> {
-
-        private Color altColor = new Color(250, 250, 220);
+        private Color background = UIManager.getColor("List.background");
+        private Color backgroundAlt = UIManager.getColor("Panel.background");
+        private Color textColor = UIManager.getColor("List.foreground");
+        private Color textColorSelected = UIManager.getColor("List.selectionForeground");
 
         public LogListCellRenderer() {
             setOpaque(true);
@@ -215,15 +217,26 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
             setText(sb.toString());
             setIcon(icons.get(log.getLevel()));
-            setForeground(Color.BLACK);
+            setForeground(textColor);
 
             if (selected) {
+                setForeground(textColorSelected);
                 setBackground(UIManager.getColor("List.selectionBackground"));
             } else {
-                setBackground(index % 2 == 0 ? Color.WHITE : altColor);
+                setForeground(textColor);
+                setBackground(index % 2 == 0 ? background : backgroundAlt);
             }
 
             return this;
+        }
+
+        @Override
+        public void updateUI() {
+            super.updateUI();
+            background = UIManager.getColor("List.background");
+            backgroundAlt = UIManager.getColor("Panel.background");
+            textColor = UIManager.getColor("List.foreground");
+            textColorSelected = UIManager.getColor("List.selectionForeground");
         }
     }
 

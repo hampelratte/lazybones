@@ -36,6 +36,7 @@ import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
@@ -53,6 +54,8 @@ public class TimelineRowHeaderElement extends JPanel {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(TimelineRowHeaderElement.class);
 
     private final LazyBonesTimer timer;
+
+    private Color borderColor;
 
     public TimelineRowHeaderElement(LazyBonesTimer timer) {
         this.timer = timer;
@@ -106,7 +109,7 @@ public class TimelineRowHeaderElement extends JPanel {
         @Override
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
             Insets i = getInsets();
-            g.setColor(Color.GRAY);
+            g.setColor(borderColor);
             if (i.top == 1) {
                 g.drawLine(0, 0, width, 0);
             }
@@ -120,5 +123,12 @@ public class TimelineRowHeaderElement extends JPanel {
                 g.drawLine(width - 1, 0, width - 1, height - 0);
             }
         }
+
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        borderColor = UIManager.getColor("Panel.background").darker();
     }
 }
