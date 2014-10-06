@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,6 +28,9 @@
  */
 package lazybones.gui.components.timeline;
 
+import static lazybones.gui.components.timeline.Timeline.PADDING;
+import static lazybones.gui.components.timeline.Timeline.ROW_HEIGHT;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -37,27 +40,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 
 public class TimelineLayout implements LayoutManager2 {
 
-    private int rowHeight = 50;
-
-    private int padding = 0;
-
     private final ArrayList<Component> components = new ArrayList<Component>();
-
-    public TimelineLayout() {
-    }
-
-    public TimelineLayout(int rowHeight) {
-        this.rowHeight = rowHeight;
-    }
-
-    public TimelineLayout(int rowHeight, int padding) {
-        this(rowHeight);
-        this.padding = padding;
-    }
 
     @Override
     public void addLayoutComponent(Component comp, Object constraints) {
@@ -94,6 +82,7 @@ public class TimelineLayout implements LayoutManager2 {
             return;
         }
 
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         int width = parent instanceof TimelineRowHeader ? 0 : parent.getParent().getWidth();
         int height = parent.getHeight();
 
@@ -105,21 +94,22 @@ public class TimelineLayout implements LayoutManager2 {
             if (comp instanceof TimelineElement) {
                 TimelineElement te = (TimelineElement) comp;
                 LazyBonesTimer timer = te.getTimer();
+
+                int startPos = calculateStartPosition(pixelsPerMinute, timer);
+                int endPos = calculateEndPosition(pixelsPerMinute, timer);
+
                 Calendar currentDate = te.getCurrentDate();
-                Calendar nextDate = (Calendar) currentDate.clone();
-                nextDate.add(Calendar.DAY_OF_MONTH, 1);
-                int startMinute = timer.getStartTime().get(Calendar.MINUTE);
-                startMinute += timer.getStartTime().get(Calendar.HOUR_OF_DAY) * 60;
-                int startPos = (int) (startMinute * pixelsPerMinute);
-                int endMinute = timer.getEndTime().get(Calendar.MINUTE);
-                endMinute += timer.getEndTime().get(Calendar.HOUR_OF_DAY) * 60;
-                int endPos = (int) (endMinute * pixelsPerMinute);
-                if (timer.getStartTime().before(currentDate)) {
+                Calendar selectedDayAtStartHour = (Calendar) currentDate.clone();
+                selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
+                Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
+                dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
+                if (timer.getStartTime().before(selectedDayAtStartHour)) {
                     startPos = 0;
                 }
-                if (timer.getEndTime().after(nextDate)) {
+                if (timer.getEndTime().after(dayAfterAtStartHour)) {
                     endPos = width;
                 }
+
                 int length = endPos - startPos;
                 Integer channelRow = channelRowMap.get(timer.getChannelNumber());
                 int row = rowCount;
@@ -130,11 +120,11 @@ public class TimelineLayout implements LayoutManager2 {
                     row = channelRow.intValue();
                 }
 
-                te.setLocation(startPos, (rowHeight + padding) * row);
-                te.setSize(length, rowHeight);
+                te.setLocation(startPos, (ROW_HEIGHT + PADDING) * row);
+                te.setSize(length, ROW_HEIGHT);
             } else if (comp instanceof TimelineRowHeaderElement) {
                 comp.setSize(comp.getPreferredSize());
-                comp.setLocation(0, (rowHeight + padding) * rowCount);
+                comp.setLocation(0, (ROW_HEIGHT + PADDING) * rowCount);
                 rowCount++;
                 if (comp.getWidth() > width) {
                     width = comp.getWidth();
@@ -150,6 +140,34 @@ public class TimelineLayout implements LayoutManager2 {
         parent.setSize(width, height);
     }
 
+    private int calculateEndPosition(double pixelsPerMinute, LazyBonesTimer timer) {
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        int minute = timer.getEndTime().get(Calendar.MINUTE);
+        int hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
+        if (hour >= startHour) {
+            hour -= startHour;
+        } else {
+            hour += (24 - startHour);
+        }
+        int minuteOfDay = hour * 60 + minute;
+        int endPos = (int) (minuteOfDay * pixelsPerMinute);
+        return endPos;
+    }
+
+    private int calculateStartPosition(double pixelsPerMinute, LazyBonesTimer timer) {
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        int minute = timer.getStartTime().get(Calendar.MINUTE);
+        int hour = timer.getStartTime().get(Calendar.HOUR_OF_DAY);
+        if (hour >= startHour) {
+            hour -= startHour;
+        } else {
+            hour += (24 - startHour);
+        }
+        int minuteOfDay = hour * 60 + minute;
+        int startPos = (int) (minuteOfDay * pixelsPerMinute);
+        return startPos;
+    }
+
     @Override
     public Dimension minimumLayoutSize(Container parent) {
         Dimension d = new Dimension();
@@ -159,7 +177,7 @@ public class TimelineLayout implements LayoutManager2 {
             if (comp.getWidth() > d.width) {
                 d.width = comp.getWidth();
             }
-            d.height += rowHeight + padding;
+            d.height += ROW_HEIGHT + PADDING;
         }
         return d;
     }
@@ -173,7 +191,7 @@ public class TimelineLayout implements LayoutManager2 {
             if (comp.getWidth() > d.width) {
                 d.width = comp.getWidth();
             }
-            d.height += rowHeight + padding;
+            d.height += ROW_HEIGHT + PADDING;
         }
         return d;
     }

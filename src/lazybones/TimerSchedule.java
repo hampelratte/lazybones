@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import lazybones.utils.Utilities;
-
 public class TimerSchedule {
     /**
      * Returns the next day, on which a timer event starts or stops, after the given calendar
@@ -46,11 +44,20 @@ public class TimerSchedule {
      * @return the next day, on which a timer event starts or stops, after the given calendar
      */
     public Calendar getNextDayWithEvent(Calendar currentDay) {
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        Calendar dayAfterAtStartHour = (Calendar) currentDay.clone();
+        dayAfterAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
+        dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
+
         Set<Calendar> events = createEventSet();
         for (Iterator<Calendar> iter = events.iterator(); iter.hasNext();) {
             Calendar event = iter.next();
-            if (!event.before(currentDay) & !Utilities.sameDay(event, currentDay)) {
-                return event;
+            if (event.after(dayAfterAtStartHour)) {
+                Calendar day = (Calendar) event.clone();
+                if (day.get(Calendar.HOUR_OF_DAY) < startHour) {
+                    day.add(Calendar.DAY_OF_MONTH, -1);
+                }
+                return day;
             }
         }
 
@@ -63,13 +70,21 @@ public class TimerSchedule {
      * @return
      */
     public Calendar getPreviousDayWithEvent(Calendar currentDay) {
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        Calendar selectedDayAtStartHour = (Calendar) currentDay.clone();
+        selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
+
         Set<Calendar> events = createEventSet();
         ArrayList<Calendar> eventList = new ArrayList<Calendar>(events);
         Collections.reverse(eventList);
         for (Iterator<Calendar> iter = eventList.iterator(); iter.hasNext();) {
             Calendar event = iter.next();
-            if (!event.after(currentDay) & !Utilities.sameDay(event, currentDay)) {
-                return event;
+            if (event.before(selectedDayAtStartHour)) {
+                Calendar day = (Calendar) event.clone();
+                if (day.get(Calendar.HOUR_OF_DAY) < startHour) {
+                    day.add(Calendar.DAY_OF_MONTH, -1);
+                }
+                return day;
             }
         }
 

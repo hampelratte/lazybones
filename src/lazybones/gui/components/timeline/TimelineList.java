@@ -28,6 +28,9 @@
  */
 package lazybones.gui.components.timeline;
 
+import static lazybones.gui.components.timeline.Timeline.PADDING;
+import static lazybones.gui.components.timeline.Timeline.ROW_HEIGHT;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -41,6 +44,7 @@ import java.util.Observer;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.TimersChangedEvent;
@@ -49,20 +53,17 @@ public class TimelineList extends JPanel implements Observer {
     private final List<LazyBonesTimer> data = new ArrayList<LazyBonesTimer>();
     private final List<TimelineListener> listeners = new ArrayList<TimelineListener>();
     private Calendar calendar = new GregorianCalendar();
-    private int rowHeight = 40;
-    private int padding = 0;
 
     private Color background;
     private Color rowBackground;
     private Color rowBackgroundAlt;
     private Color lineColor;
 
-    public TimelineList(int rowHeight, int padding) {
+    public TimelineList() {
         setCalendar(calendar);
         setBackground(background);
-        this.rowHeight = rowHeight;
-        this.padding = padding;
-        setLayout(new TimelineLayout(rowHeight, padding));
+
+        setLayout(new TimelineLayout());
         TimerManager.getInstance().addObserver(this);
 
         Thread repainter = new Thread() {
@@ -148,15 +149,20 @@ public class TimelineList extends JPanel implements Observer {
         super.paintComponent(g);
 
         // paint row background
-        for (int i = 0; i < getComponentCount(); i++) {
+        for (int i = 0; i < getComponentCount() - 1; i++) {
             g.setColor(i % 2 == 0 ? rowBackground : rowBackgroundAlt);
-            g.fillRect(0, i * (rowHeight + padding), getWidth(), (rowHeight + padding));
+            g.fillRect(0, i * (ROW_HEIGHT + PADDING), getWidth(), (ROW_HEIGHT + PADDING));
         }
 
         // paint vertical lines
-        g.setColor(lineColor);
         double pixelsPerHour = (double) (getWidth() - 1) / (double) 24;
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         for (int i = 0; i < 25; i++) {
+            if (i == (24 - startHour)) {
+                g.setColor(Color.BLUE);
+            } else {
+                g.setColor(lineColor);
+            }
             g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), getHeight());
         }
     }
@@ -166,13 +172,20 @@ public class TimelineList extends JPanel implements Observer {
         super.paintChildren(g);
 
         // paint current time line
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         Calendar currentTime = Calendar.getInstance();
         if (isToday(getCalendar())) { // are we showing the current day ?
             g.setColor(new Color(255, 0, 0, 128));
             double pixelsPerMinute = (double) (getWidth() - 1) / (double) (24 * 60);
             int minute = currentTime.get(Calendar.MINUTE);
-            minute += currentTime.get(Calendar.HOUR_OF_DAY) * 60;
-            int position = (int) (minute * pixelsPerMinute);
+            int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+            if (hour >= startHour) {
+                hour -= startHour;
+            } else {
+                hour += (24 - startHour);
+            }
+            int minuteOfDay = hour * 60 + minute;
+            int position = (int) (minuteOfDay * pixelsPerMinute);
             g.drawLine(position, 0, position, getHeight());
         }
     }
@@ -184,8 +197,10 @@ public class TimelineList extends JPanel implements Observer {
      */
     private boolean isToday(Calendar cal) {
         Calendar today = Calendar.getInstance();
-        if (today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR) && today.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
-                && today.get(Calendar.YEAR) == cal.get(Calendar.YEAR)) {
+        if (today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
+                && today.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
+                && today.get(Calendar.YEAR) == cal.get(Calendar.YEAR))
+        {
             return true;
         }
 
@@ -234,11 +249,15 @@ public class TimelineList extends JPanel implements Observer {
     }
 
     private boolean runsOnCurrentDate(LazyBonesTimer timer) {
-        Calendar nextDate = (Calendar) getCalendar().clone();
-        nextDate.add(Calendar.DAY_OF_MONTH, 1);
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        Calendar selectedDayAtStartHour = (Calendar) getCalendar().clone();
+        selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
 
-        if (timer.getStartTime().after(getCalendar()) & timer.getStartTime().before(nextDate) || timer.getEndTime().after(getCalendar())
-                & timer.getEndTime().before(nextDate)) {
+        Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
+        dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
+
+        if (timer.getStartTime().after(selectedDayAtStartHour) & timer.getStartTime().before(dayAfterAtStartHour)
+                || timer.getEndTime().after(selectedDayAtStartHour) & timer.getEndTime().before(dayAfterAtStartHour)) {
             return true;
         }
 
@@ -256,7 +275,7 @@ public class TimelineList extends JPanel implements Observer {
     @Override
     public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();
-        d.height = (rowHeight + padding) * getRowCount();
+        d.height = (ROW_HEIGHT + PADDING) * getRowCount();
         return d;
     }
 

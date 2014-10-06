@@ -49,6 +49,7 @@ import javax.swing.border.Border;
 
 import lazybones.ChannelManager;
 import lazybones.ChannelManager.ChannelNotFoundException;
+import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Period;
@@ -58,6 +59,8 @@ import devplugin.Channel;
 public class TimelineElement extends JComponent implements MouseListener {
     private LazyBonesTimer timer;
     private Calendar currentDate;
+    private Calendar timelineStart;
+    private Calendar timelineEnd;
     private final DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
     public final static Color COLOR_ACTIVE = UIManager.getColor("List.selectionBackground");
@@ -68,8 +71,8 @@ public class TimelineElement extends JComponent implements MouseListener {
 
     public TimelineElement(LazyBonesTimer timer, Calendar currentDate) {
         this.timer = timer;
-        this.currentDate = currentDate;
         this.addMouseListener(this);
+        setCurrentDate(currentDate);
 
         // set tooltip
         setToolTipText(createToolTipText(timer));
@@ -118,6 +121,12 @@ public class TimelineElement extends JComponent implements MouseListener {
 
     public void setCurrentDate(Calendar currentDate) {
         this.currentDate = currentDate;
+
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        timelineStart = (Calendar) currentDate.clone();
+        timelineStart.set(Calendar.HOUR_OF_DAY, startHour);
+        timelineEnd = (Calendar) timelineStart.clone();
+        timelineEnd.add(Calendar.DAY_OF_MONTH, 1);
     }
 
     @Override
@@ -166,25 +175,18 @@ public class TimelineElement extends JComponent implements MouseListener {
                 Calendar conflictEnd = (Calendar) period.getEndTime().clone();
                 Calendar timerStart = (Calendar) timer.getStartTime().clone();
                 Calendar timerEnd = (Calendar) timer.getEndTime().clone();
-                if (!Utilities.sameDay(conflictStart, currentDate)) {
-                    conflictStart.set(Calendar.HOUR_OF_DAY, 0);
-                    conflictStart.set(Calendar.MINUTE, 0);
-                    conflictStart.add(Calendar.DAY_OF_MONTH, 1);
+
+                if (conflictStart.before(timelineStart)) {
+                    conflictStart.setTime(timelineStart.getTime());
                 }
-                if (!Utilities.sameDay(conflictEnd, currentDate)) {
-                    conflictEnd.set(Calendar.HOUR_OF_DAY, 23);
-                    conflictEnd.set(Calendar.MINUTE, 59);
-                    conflictEnd.add(Calendar.DAY_OF_MONTH, -1);
+                if (conflictEnd.after(timelineEnd)) {
+                    conflictEnd.setTime(timelineEnd.getTime());
                 }
-                if (!Utilities.sameDay(timerStart, currentDate)) {
-                    timerStart.set(Calendar.HOUR_OF_DAY, 0);
-                    timerStart.set(Calendar.MINUTE, 0);
-                    timerStart.add(Calendar.DAY_OF_MONTH, 1);
+                if (timerStart.before(timelineStart)) {
+                    timerStart.setTime(timelineStart.getTime());
                 }
-                if (!Utilities.sameDay(timerEnd, currentDate)) {
-                    timerEnd.set(Calendar.HOUR_OF_DAY, 23);
-                    timerEnd.set(Calendar.MINUTE, 59);
-                    timerEnd.add(Calendar.DAY_OF_MONTH, -1);
+                if (timerEnd.after(timelineEnd)) {
+                    timerEnd.setTime(timelineEnd.getTime());
                 }
 
                 long durationMinutes = Utilities.getDiffInMinutes(timerStart, timerEnd);

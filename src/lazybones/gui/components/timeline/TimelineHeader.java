@@ -39,6 +39,8 @@ import java.awt.RenderingHints;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 
+import lazybones.LazyBones;
+
 public class TimelineHeader extends JComponent {
 
     public final static int HEIGHT = 20;
@@ -70,20 +72,20 @@ public class TimelineHeader extends JComponent {
         FontMetrics fm = g.getFontMetrics(font);
 
         double pixelsPerHour = (double) (w - 1) / (double) 24;
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
 
         g.setColor(lineColor);
         g.drawLine(0, h - 1, w - 1, h - 1); // draw the bottom border
         for (int i = 0; i < 25; i++) {
+            int hour = (i + startHour) % 24;
             g.setColor(lineColor);
             g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), h);
-            if (i < 24) {
-                int hourWidth = fm.stringWidth(Integer.toString(i));
-                int hourHeight = fm.getHeight();
-                int x = (int) (i * pixelsPerHour) + ((int) pixelsPerHour - hourWidth) / 2 - 2;
-                int y = (h - hourHeight) / 2;
-                g.setColor(textColor);
-                g.drawString(Integer.toString(i), x, y + 9);
-            }
+            int hourWidth = fm.stringWidth(Integer.toString(hour));
+            int hourHeight = fm.getHeight();
+            int x = (int) (i * pixelsPerHour) + ((int) pixelsPerHour - hourWidth) / 2 - 2;
+            int y = (h - hourHeight) / 2;
+            g.setColor(textColor);
+            g.drawString(Integer.toString(hour), x, y + 9);
         }
     }
 
