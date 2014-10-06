@@ -1,7 +1,15 @@
-Lazy Bones 1.2.2
+Lazy Bones 1.3.0
 ===============================================================================
 * Improved usage of colors to better support different Look & Feels
 * Prettified the timer details view
+* Added configuration option to set the start hour of the timeline. Since a 
+  normal day does not start a 0 and end at 23:59 for most of the people, it 
+  makes sence to let it start at e.g. 5 and and end at 4:59. This way we have
+  less timers, which span over two days. Also most of timers are nearer to
+  the center of the screen.
+* Added a clear line to the timeline, which marks midnight
+* Added labels to the left and right of the midnight marker to make clear,
+  which days are shown
 
 Lazy Bones 1.2.1
 ===============================================================================
