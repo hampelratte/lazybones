@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,6 +29,7 @@
 package lazybones;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -122,6 +123,7 @@ public class ConflictFinder implements Observer {
 
     public void handleConflicts() {
         boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
+        int timelineStartHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         if (showTimerConflicts) {
             logger.debug("Handling conflicts");
             // check, if there are timer conflicts
@@ -148,7 +150,11 @@ public class ConflictFinder implements Observer {
                 // set timeline date to the date of one conflict
                 TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
                 ConflictingTimersSet<LazyBonesTimer> set = conflicts.iterator().next();
-                tp.setCalendar(set.getConflictStartTime());
+                Calendar startTime = (Calendar) set.getConflictStartTime().clone();
+                if (startTime.get(Calendar.HOUR_OF_DAY) < timelineStartHour) {
+                    startTime.add(Calendar.HOUR_OF_DAY, -1);
+                }
+                tp.setCalendar(startTime);
 
                 popuplog.info(msg);
             }
