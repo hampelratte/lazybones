@@ -33,13 +33,20 @@ import static lazybones.gui.components.timeline.Timeline.ROW_HEIGHT;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -54,10 +61,15 @@ public class TimelineList extends JPanel implements Observer {
     private final List<TimelineListener> listeners = new ArrayList<TimelineListener>();
     private Calendar calendar = new GregorianCalendar();
 
+    private int rowCount = 0;
+
     private Color background;
     private Color rowBackground;
     private Color rowBackgroundAlt;
     private Color lineColor;
+    private Color textColor;
+    private Color overlayTextColor;
+    private Color midnightLineColor;
 
     public TimelineList() {
         setCalendar(calendar);
@@ -83,7 +95,7 @@ public class TimelineList extends JPanel implements Observer {
     }
 
     public int getRowCount() {
-        return data.size();
+        return rowCount;
     }
 
     public void addTimer(LazyBonesTimer timer) {
@@ -122,6 +134,12 @@ public class TimelineList extends JPanel implements Observer {
             add(te);
         }
 
+        Set<Integer> channelNumbers = new HashSet<>();
+        for (LazyBonesTimer timer : data) {
+            channelNumbers.add(timer.getChannelNumber());
+        }
+        rowCount = channelNumbers.size();
+
         for (TimelineListener l : listeners) {
             l.timelineChanged(data);
         }
@@ -149,7 +167,7 @@ public class TimelineList extends JPanel implements Observer {
         super.paintComponent(g);
 
         // paint row background
-        for (int i = 0; i < getComponentCount() - 1; i++) {
+        for (int i = 0; i < getRowCount(); i++) {
             g.setColor(i % 2 == 0 ? rowBackground : rowBackgroundAlt);
             g.fillRect(0, i * (ROW_HEIGHT + PADDING), getWidth(), (ROW_HEIGHT + PADDING));
         }
@@ -159,12 +177,53 @@ public class TimelineList extends JPanel implements Observer {
         int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         for (int i = 0; i < 25; i++) {
             if (i == (24 - startHour)) {
-                g.setColor(Color.BLUE);
+                g.setColor(midnightLineColor);
+                g.drawLine((int) (i * pixelsPerHour) + 1, 0, (int) (i * pixelsPerHour) + 1, getHeight());
             } else {
                 g.setColor(lineColor);
             }
             g.drawLine((int) (i * pixelsPerHour), 0, (int) (i * pixelsPerHour), getHeight());
         }
+
+        // paint day string around midnight to clarify on which day a timer runs
+        paintDayOverlay(g, startHour, pixelsPerHour);
+    }
+
+    private void paintDayOverlay(Graphics g, int startHour, double pixelsPerHour) {
+        // enable font anti aliasing
+        Graphics2D g2d = (Graphics2D) g;
+        // storing original anitalising flag
+        Object state = g2d.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+        if (state != RenderingHints.VALUE_TEXT_ANTIALIAS_ON) {
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
+
+        Calendar selectedDay = getCalendar();
+        Calendar nextDay = (Calendar) getCalendar().clone();
+        nextDay.add(Calendar.DAY_OF_MONTH, 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        String selectedDayName = sdf.format(selectedDay.getTime());
+        String nextDayName = sdf.format(nextDay.getTime());
+
+        double positionOfMidnight = (24 - startHour) * pixelsPerHour;
+
+        int fontSize = 24;
+        Font font = new Font("SansSerif", Font.BOLD, fontSize);
+        FontMetrics fm = g.getFontMetrics(font);
+        int selectedDayNameWidth = fm.stringWidth(selectedDayName);
+        // int nextDayNameWidth = fm.stringWidth(nextDayName);
+
+        g.setColor(overlayTextColor);
+        g.setFont(font);
+
+        int x = (int) (positionOfMidnight - selectedDayNameWidth - 20);
+        int y = (ROW_HEIGHT + PADDING) * getRowCount();
+        g.drawString(selectedDayName, x, y + ROW_HEIGHT);
+
+        x = (int) (positionOfMidnight + 20);
+        g.drawString(nextDayName, x, y + ROW_HEIGHT);
+
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, state);
     }
 
     @Override
@@ -286,5 +345,8 @@ public class TimelineList extends JPanel implements Observer {
         lineColor = UIManager.getColor("Panel.background").darker();
         rowBackground = UIManager.getColor("List.background");
         rowBackgroundAlt = UIManager.getColor("Panel.background");
+        textColor = UIManager.getColor("Label.foreground");
+        overlayTextColor = new Color(textColor.getRed(), textColor.getGreen(), textColor.getBlue(), 51); // text color with 20% opacity
+        midnightLineColor = textColor;
     }
 }
