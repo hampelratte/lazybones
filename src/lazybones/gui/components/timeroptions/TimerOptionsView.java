@@ -32,11 +32,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 
+import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -52,7 +54,6 @@ import org.slf4j.LoggerFactory;
 
 import devplugin.Program;
 
-// TODO irgendwo kommt noch ein weißer rahmen her
 public class TimerOptionsView extends JPanel {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsView.class);
 
@@ -82,6 +83,7 @@ public class TimerOptionsView extends JPanel {
         htmlPane = new JEditorPane();
         htmlPane.setEditable(false);
         htmlPane.setContentType("text/html");
+        htmlPane.setBorder(BorderFactory.createEmptyBorder());
 
         scrollPane = new JScrollPane(htmlPane);
         scrollPane.setPreferredSize(new Dimension(300, 300));
@@ -89,6 +91,7 @@ public class TimerOptionsView extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.weightx = 1;
         gbc.weighty = 1;
 

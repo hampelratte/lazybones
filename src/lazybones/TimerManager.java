@@ -644,9 +644,8 @@ public class TimerManager extends Observable {
             VDRCallback<ModifyTimerAction> callback = new VDRCallback<ModifyTimerAction>() {
                 @Override
                 public void receiveResponse(ModifyTimerAction cmd, Response response) {
-                    if (cmd.isSuccess()) {
-                        TimerManager.getInstance().synchronize();
-                    } else {
+                    TimerManager.getInstance().synchronize();
+                    if (!cmd.isSuccess()) {
                         String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
                         logger.error(mesg);
                     }

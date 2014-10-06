@@ -523,6 +523,10 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         }
     }
 
+    public LazyBonesTimer getOldTimer() {
+        return oldTimer;
+    }
+
     public LazyBonesTimer getTimer() {
         timer.setTitle(title.getText());
         timer.setPath(comboDirectory.getText().trim().replace('/', '~'));

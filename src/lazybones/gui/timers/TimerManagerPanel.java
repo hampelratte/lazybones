@@ -28,6 +28,8 @@
  */
 package lazybones.gui.timers;
 
+import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -60,9 +62,15 @@ import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
+import lazybones.VDRCallback;
+import lazybones.actions.ModifyTimerAction;
+import lazybones.actions.VDRAction;
+import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
+import lazybones.gui.components.timeroptions.TimerOptionsEditor;
 import lazybones.gui.components.timeroptions.TimerOptionsView;
 import lazybones.programmanager.ProgramManager;
 
+import org.hampelratte.svdrp.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +85,12 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     private JButton buttonEdit = null;
     private JButton buttonSync = null;
     private JButton buttonRemove = null;
-    // private final TimerOptionsEditor timerOptionsView = new TimerOptionsEditor(Mode.VIEW);
+    private JButton buttonSave = null;
+    private JButton buttonCancel = null;
+
+    private final CardLayout timerOptionsLayout = new CardLayout();
+    private final JPanel timerOptionsPanel = new JPanel(timerOptionsLayout);
+    private final TimerOptionsEditor timerOptionsEditor = new TimerOptionsEditor(Mode.UPDATE);
     private final TimerOptionsView timerOptionsView = new TimerOptionsView();
 
     public TimerManagerPanel() {
@@ -104,8 +117,8 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         // add timer list
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
         gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -115,14 +128,17 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         scrollPane = new JScrollPane(timerList);
         this.add(scrollPane, gbc);
 
-        // add timer details view
+        // add cardlayout for timer details view and timer editor
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.weightx = 1;
         gbc.gridheight = 2;
-        gbc.insets = new java.awt.Insets(10, 0, 10, 10);
+        gbc.insets = new java.awt.Insets(10, 0, 5, 10);
+        this.add(timerOptionsPanel, gbc);
         timerOptionsView.setEnabled(false);
-        this.add(timerOptionsView, gbc);
+        timerOptionsPanel.add(timerOptionsView, "VIEW");
+        timerOptionsPanel.setPreferredSize(new Dimension(200, 800));
+        timerOptionsPanel.add(timerOptionsEditor, "EDITOR");
 
         timerList.addMouseListener(new MouseAdapter() {
             @Override
@@ -181,6 +197,20 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
         buttonBar.addSeparator();
 
+        buttonSave = new JButton();
+        buttonSave.setToolTipText(LazyBones.getTranslation("save", "Update Timer"));
+        buttonSave.setIcon(LazyBones.getInstance().createImageIcon("action", "document-save", 16));
+        buttonSave.addActionListener(this);
+        buttonSave.setVisible(false);
+        buttonBar.add(buttonSave);
+
+        buttonCancel = new JButton();
+        buttonCancel.setToolTipText(LazyBones.getTranslation("cancel", "Cancel editing"));
+        buttonCancel.setIcon(LazyBones.getInstance().createImageIcon("action", "process-stop", 16));
+        buttonCancel.addActionListener(this);
+        buttonCancel.setVisible(false);
+        buttonBar.add(buttonCancel);
+
         buttonEdit = new JButton();
         buttonEdit.setToolTipText(LazyBones.getTranslation("edit", "Edit Timer"));
         buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
@@ -201,6 +231,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == buttonNew) {
             try {
+                cancelEditing();
                 TimerManager.getInstance().createTimerFromScratch();
             } catch (ChannelNotFoundException ex) {
                 logger.error("An error occured", ex);
@@ -208,20 +239,58 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         } else if (e.getSource() == buttonEdit) {
             if (timerList.getSelectedIndex() >= 0) {
                 LazyBonesTimer timer = timerList.getSelectedValue();
-                try {
-                    TimerManager.getInstance().editTimer(timer);
-                } catch (Exception ex) {
-                    logger.error("An error occured", ex);
-                }
+                timerOptionsEditor.setTimer(timer);
+                startEditing();
             }
         } else if (e.getSource() == buttonRemove) {
             if (timerList.getSelectedIndex() >= 0) {
                 LazyBonesTimer timer = timerList.getSelectedValue();
                 deleteTimer(timer);
+                cancelEditing();
             }
         } else if (e.getSource() == buttonSync) {
+            cancelEditing();
             TimerManager.getInstance().synchronize();
+        } else if (e.getSource() == buttonCancel) {
+            cancelEditing();
+            TimerManager.getInstance().synchronize();
+        } else if (e.getSource() == buttonSave) {
+            LazyBonesTimer oldTimer = timerOptionsEditor.getOldTimer();
+            LazyBonesTimer changedTimer = timerOptionsEditor.getTimer();
+            ModifyTimerAction mta = new ModifyTimerAction(changedTimer, oldTimer);
+            mta.setCallback(new VDRCallback<VDRAction>() {
+                @Override
+                public void receiveResponse(VDRAction cmd, Response response) {
+                    cancelEditing();
+                    TimerManager.getInstance().synchronize();
+                    if (!cmd.isSuccess()) {
+                        String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
+                        logger.error(mesg);
+                    }
+                }
+            });
+            mta.enqueue();
         }
+    }
+
+    private void startEditing() {
+        timerOptionsLayout.show(timerOptionsPanel, "EDITOR");
+        buttonSave.setVisible(true);
+        buttonCancel.setVisible(true);
+        buttonEdit.setVisible(false);
+        buttonSync.setEnabled(false);
+        buttonNew.setEnabled(false);
+        buttonRemove.setEnabled(false);
+    }
+
+    private void cancelEditing() {
+        buttonSave.setVisible(false);
+        buttonCancel.setVisible(false);
+        buttonEdit.setVisible(true);
+        buttonSync.setEnabled(true);
+        buttonNew.setEnabled(true);
+        buttonRemove.setEnabled(true);
+        timerOptionsLayout.show(timerOptionsPanel, "VIEW");
     }
 
     private void deleteTimer(LazyBonesTimer timer) {
@@ -256,6 +325,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
     private synchronized void updateGuiState() {
         try {
+            cancelEditing();
             int selectedIndex = timerList.getSelectedIndex();
 
             if (selectedIndex >= 0 && timerList.getModel().getSize() - 1 >= selectedIndex) {
