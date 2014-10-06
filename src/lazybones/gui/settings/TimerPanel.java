@@ -93,6 +93,10 @@ public class TimerPanel implements MouseListener, ActionListener {
 
     private JSpinner lifetime;
 
+    private JLabel lTimelineStartHour = new JLabel(LazyBones.getTranslation("timelineStartHour", "Timeline starts at time of day"));
+
+    private JSpinner timelineStartHour;
+
     private JLabel lNumberOfCards = new JLabel(LazyBones.getTranslation("numberOfCards", "Number of DVB cards"));
 
     private JSpinner numberOfCards;
@@ -137,6 +141,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_prio = Integer.parseInt(props.getProperty("timer.prio"));
         int int_lifetime = Integer.parseInt(props.getProperty("timer.lifetime"));
         int int_numberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
+        int int_timelineStartHour = Integer.parseInt(props.getProperty("timelineStartHour"));
         String descSourceTvb = props.getProperty("descSourceTvb");
         boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
         boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
@@ -176,6 +181,10 @@ public class TimerPanel implements MouseListener, ActionListener {
         numberOfCards = new JSpinner();
         ((JSpinner.DefaultEditor) numberOfCards.getEditor()).getTextField().setColumns(2);
         numberOfCards.setModel(new SpinnerNumberModel(int_numberOfCards, 1, 10, 1));
+
+        timelineStartHour = new JSpinner();
+        ((JSpinner.DefaultEditor) timelineStartHour.getEditor()).getTextField().setColumns(2);
+        timelineStartHour.setModel(new SpinnerNumberModel(int_timelineStartHour, 0, 23, 1));
 
         labMappings = new JLabel(lMappings);
         mappingTable = new JTable(TimerManager.getInstance().getTitleMapping());
@@ -285,9 +294,18 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(numberOfCards, gbc);
 
-        // history combobox for the default directory
         gbc.gridx = 0;
         gbc.gridy = 6;
+        gbc.insets = new Insets(5, 15, 5, 5);
+        panel.add(lTimelineStartHour, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel.add(timelineStartHour, gbc);
+
+        // history combobox for the default directory
+        gbc.gridx = 0;
+        gbc.gridy = 7;
         gbc.insets = new Insets(5, 15, 30, 5);
         panel.add(lDefaultDirectory, gbc);
 
@@ -319,12 +337,12 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(lifetime, gbc);
 
         // mapping
-        panel.add(labMappings, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
-        panel.add(mappingPane, new GridBagConstraints(0, 8, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
+        panel.add(labMappings, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
+        panel.add(mappingPane, new GridBagConstraints(0, 9, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
 
         // buttons
-        panel.add(addRow, new GridBagConstraints(4, 8, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
-        panel.add(delRow, new GridBagConstraints(4, 9, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
+        panel.add(addRow, new GridBagConstraints(4, 9, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
+        panel.add(delRow, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
 
         return panel;
     }
@@ -336,9 +354,11 @@ public class TimerPanel implements MouseListener, ActionListener {
         props.setProperty("timer.prio", prio.getValue().toString());
         props.setProperty("timer.lifetime", lifetime.getValue().toString());
         props.setProperty("numberOfCards", numberOfCards.getValue().toString());
+        props.setProperty("timelineStartHour", timelineStartHour.getValue().toString());
         props.setProperty("descSourceTvb", ((DescriptionSelectorItem) cbDescSource.getSelectedItem()).getId());
         props.setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
         props.setProperty("timer.conflicts.show", Boolean.toString(cbShowTimerConflicts.isSelected()));
+
 
         // save default directory history
         cbDefaultDirectory.addCurrentItemToHistory();
