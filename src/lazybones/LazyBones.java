@@ -311,6 +311,10 @@ public class LazyBones extends Plugin implements Observer {
         maxChannelNumber = maxChannelNumber == null ? "0" : maxChannelNumber;
         props.setProperty("maxChannelNumber", maxChannelNumber);
 
+        String timelineStartHour = props.getProperty("timelineStartHour");
+        timelineStartHour = timelineStartHour == null ? "5" : timelineStartHour;
+        props.setProperty("timelineStartHour", timelineStartHour);
+
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
