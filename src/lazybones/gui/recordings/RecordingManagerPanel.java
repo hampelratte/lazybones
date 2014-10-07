@@ -31,7 +31,6 @@ package lazybones.gui.recordings;
 import static lazybones.LazyBones.getTranslation;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -56,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
@@ -141,50 +141,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         gbc.weightx = 1.0;
         gbc.weighty = 0;
         gbc.gridwidth = 2;
-        gbc.insets = new java.awt.Insets(0, 5, 0, 5);
-        JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        sortPanel.add(sortStrategySelector);
-        sortStrategySelector.addItem(new SortStrategy(new RecordingAlphabeticalComparator(), getTranslation("sort.alphabetical", "alphabetical")));
-        sortStrategySelector.addItem(new SortStrategy(new RecordingStarttimeComparator(), getTranslation("sort.chronological", "chronological")));
-        sortStrategySelector.addItem(new SortStrategy(new RecordingIsNewComparator(), getTranslation("sort.new_recordings", "new recordings")));
-        sortStrategySelector.addItem(new SortStrategy(new RecordingIsCutComparator(), getTranslation("sort.cut_recordings", "cut recordings")));
-        sortStrategySelector.addItemListener(this);
-        sortPanel.add(orderSelector);
-        orderSelector.setIcon(LazyBones.getInstance().getIcon("lazybones/sort_ascending.png"));
-        orderSelector.setSelectedIcon(LazyBones.getInstance().getIcon("lazybones/sort_descending.png"));
-        orderSelector.setToolTipText(getTranslation("sort.ascending", "ascending"));
-        orderSelector.setPreferredSize(new Dimension(26, 26));
-        orderSelector.addActionListener(this);
-
-        expandAll = new JButton(LazyBones.getInstance().getIcon("lazybones/list-add.png"));
-        expandAll.addActionListener(this);
-        expandAll.setPreferredSize(new Dimension(26, 26));
-        expandAll.setToolTipText(getTranslation("expand_all", "expand all"));
-        sortPanel.add(expandAll);
-        collapseAll = new JButton(LazyBones.getInstance().getIcon("lazybones/list-remove.png"));
-        collapseAll.addActionListener(this);
-        collapseAll.setPreferredSize(new Dimension(26, 26));
-        collapseAll.setToolTipText(getTranslation("collapse_all", "collapse all"));
-        sortPanel.add(collapseAll);
-
-        filter.setPreferredSize(new Dimension(250, 26));
-        sortPanel.add(filter);
-        filter.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String query = filter.getText();
-                recordingTreeModel.filter(query);
-
-                if (query.trim().isEmpty()) {
-                    expandAll(recordingTree, false);
-                    recordingTree.expandPath(new TreePath(recordingTreeModel.getRoot()));
-                } else {
-                    expandAll(recordingTree, true);
-                }
-            }
-        });
-
-        this.add(sortPanel, gbc);
+        gbc.insets = new java.awt.Insets(5, 10, 5, 10);
+        this.add(createToolbar(), gbc);
 
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.gridx = 0;
@@ -199,7 +157,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 TreeNode selected = (TreeNode) e.getPath().getLastPathComponent();
-                if (selected instanceof Recording) {
+                TreePath newSelectionPath = e.getNewLeadSelectionPath();
+                if (newSelectionPath != null && selected instanceof Recording) {
                     buttonRemove.setEnabled(true);
                 } else {
                     buttonRemove.setEnabled(false);
@@ -225,24 +184,77 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         recordingDetailsPanel.setMinimumSize(new Dimension(300, 300));
         recordingDetailsPanel.setMaximumSize(new Dimension(300, 300));
         this.add(recordingDetailsPanel, gbc);
+    }
 
-        gbc.insets = new java.awt.Insets(0, 10, 10, 10);
-        gbc.gridx = 0;
-        gbc.gridy = y++;
-        gbc.weighty = 0;
-        buttonSync = new JButton(getTranslation("resync", "Synchronize"));
-        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
+    private JToolBar createToolbar() {
+        JToolBar toolBar = new JToolBar();
+        toolBar.setBorder(BorderFactory.createEmptyBorder());
+        toolBar.setRollover(true);
+        toolBar.setFloatable(false);
+
+        buttonSync = new JButton();
+        buttonSync.setToolTipText(getTranslation("resync", "Synchronize"));
+        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 22));
         buttonSync.addActionListener(this);
         buttonSync.setActionCommand("SYNC");
-        this.add(buttonSync, gbc);
+        toolBar.add(buttonSync);
 
-        gbc.insets = new java.awt.Insets(0, 0, 10, 10);
-        gbc.gridx = 1;
-        buttonRemove = new JButton(getTranslation("delete_recording", "Delete Recording"));
-        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
+        buttonRemove = new JButton();
+        buttonRemove.setToolTipText(getTranslation("delete_recording", "Delete Recording"));
+        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 22));
         buttonRemove.addActionListener(this);
         buttonRemove.setActionCommand("DELETE");
-        this.add(buttonRemove, gbc);
+        buttonRemove.setEnabled(false);
+        toolBar.add(buttonRemove);
+        toolBar.addSeparator();
+
+        sortStrategySelector.addItem(new SortStrategy(new RecordingAlphabeticalComparator(), getTranslation("sort.alphabetical", "alphabetical")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingStarttimeComparator(), getTranslation("sort.chronological", "chronological")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingIsNewComparator(), getTranslation("sort.new_recordings", "new recordings")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingIsCutComparator(), getTranslation("sort.cut_recordings", "cut recordings")));
+        sortStrategySelector.addItemListener(this);
+        sortStrategySelector.setPreferredSize(new Dimension(250, 26));
+        sortStrategySelector.setMaximumSize(new Dimension(250, 26));
+        toolBar.add(sortStrategySelector);
+        toolBar.addSeparator(new Dimension(2, 0));
+
+        orderSelector.setIcon(LazyBones.getInstance().getIcon("lazybones/sort_ascending.png"));
+        orderSelector.setSelectedIcon(LazyBones.getInstance().getIcon("lazybones/sort_descending.png"));
+        orderSelector.setToolTipText(getTranslation("sort.ascending", "ascending"));
+        orderSelector.addActionListener(this);
+        toolBar.add(orderSelector);
+        toolBar.addSeparator();
+
+        expandAll = new JButton(LazyBones.getInstance().getIcon("lazybones/list-add.png"));
+        expandAll.addActionListener(this);
+        expandAll.setToolTipText(getTranslation("expand_all", "expand all"));
+        toolBar.add(expandAll);
+
+        collapseAll = new JButton(LazyBones.getInstance().getIcon("lazybones/list-remove.png"));
+        collapseAll.addActionListener(this);
+        collapseAll.setToolTipText(getTranslation("collapse_all", "collapse all"));
+        toolBar.add(collapseAll);
+        toolBar.addSeparator();
+
+        filter.setPreferredSize(new Dimension(250, 26));
+        filter.setMaximumSize(new Dimension(250, 26));
+        toolBar.add(filter);
+        filter.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String query = filter.getText();
+                recordingTreeModel.filter(query);
+
+                if (query.trim().isEmpty()) {
+                    expandAll(recordingTree, false);
+                    recordingTree.expandPath(new TreePath(recordingTreeModel.getRoot()));
+                } else {
+                    expandAll(recordingTree, true);
+                }
+            }
+        });
+
+        return toolBar;
     }
 
     @Override
