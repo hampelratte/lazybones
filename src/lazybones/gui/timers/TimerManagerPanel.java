@@ -185,13 +185,13 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
         buttonSync = new JButton();
         buttonSync.setToolTipText(LazyBones.getTranslation("resync", "Synchronize"));
-        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 16));
+        buttonSync.setIcon(LazyBones.getInstance().createImageIcon("action", "view-refresh", 22));
         buttonSync.addActionListener(this);
         buttonBar.add(buttonSync);
 
         buttonNew = new JButton();
         buttonNew.setToolTipText(LazyBones.getTranslation("new_timer", "New Timer"));
-        buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 16));
+        buttonNew.setIcon(LazyBones.getInstance().createImageIcon("action", "document-new", 22));
         buttonNew.addActionListener(this);
         buttonBar.add(buttonNew);
 
@@ -199,28 +199,28 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
         buttonSave = new JButton();
         buttonSave.setToolTipText(LazyBones.getTranslation("save", "Update Timer"));
-        buttonSave.setIcon(LazyBones.getInstance().createImageIcon("action", "document-save", 16));
+        buttonSave.setIcon(LazyBones.getInstance().createImageIcon("action", "document-save", 22));
         buttonSave.addActionListener(this);
         buttonSave.setVisible(false);
         buttonBar.add(buttonSave);
 
         buttonCancel = new JButton();
         buttonCancel.setToolTipText(LazyBones.getTranslation("cancel", "Cancel editing"));
-        buttonCancel.setIcon(LazyBones.getInstance().createImageIcon("action", "process-stop", 16));
+        buttonCancel.setIcon(LazyBones.getInstance().createImageIcon("action", "process-stop", 22));
         buttonCancel.addActionListener(this);
         buttonCancel.setVisible(false);
         buttonBar.add(buttonCancel);
 
         buttonEdit = new JButton();
         buttonEdit.setToolTipText(LazyBones.getTranslation("edit", "Edit Timer"));
-        buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
+        buttonEdit.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 22));
         buttonEdit.addActionListener(this);
         buttonEdit.setEnabled(false);
         buttonBar.add(buttonEdit);
 
         buttonRemove = new JButton();
         buttonRemove.setToolTipText(LazyBones.getTranslation("dont_capture", "Delete Timer"));
-        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 16));
+        buttonRemove.setIcon(LazyBones.getInstance().createImageIcon("action", "edit-delete", 22));
         buttonRemove.addActionListener(this);
         buttonRemove.setEnabled(false);
         buttonBar.add(buttonRemove);
