@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Insets;
 
 import javax.swing.JLabel;
@@ -64,6 +65,7 @@ public class TimelineRowHeaderElement extends JPanel {
 
     private void initGUI() {
         setBorder(new TimelineRowHeaderElementBorder(TimelineRowHeaderElementBorder.TOP));
+        setLayout(new GridLayout());
         Channel tvbChannel;
         try {
             tvbChannel = ChannelManager.getInstance().getTvbrowserChannel(timer);

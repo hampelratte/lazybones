@@ -124,7 +124,8 @@ public class TimelineLayout implements LayoutManager2 {
                 te.setSize(length, ROW_HEIGHT);
             } else if (comp instanceof TimelineRowHeaderElement) {
                 comp.setSize(comp.getPreferredSize());
-                comp.setLocation(0, (ROW_HEIGHT + PADDING) * rowCount);
+                comp.setSize(comp.getWidth() + 16, ROW_HEIGHT);
+                comp.setLocation(8, (ROW_HEIGHT + PADDING) * rowCount);
                 rowCount++;
                 if (comp.getWidth() > width) {
                     width = comp.getWidth();
