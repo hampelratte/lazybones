@@ -1,0 +1,43 @@
+html {
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    font-family: sans-serif;
+    font-size: 12pt;
+    padding: 8px;
+    color: {textColor};
+    background-color: {backgroundColor};
+}
+
+ul {
+    padding: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 10px;
+}
+
+.label {
+    color: {textInactiveColor};
+    font-weight: bold;
+}
+
+.value {
+    color: {textColor};
+    width: 100%;
+}
+
+.title {
+    font-size: 130%;
+    font-weight: bold;
+}
+
+tr.separator {
+    padding: 0px;
+    margin: 0px;
+    margin-top: 6px;  
+    border-top-style: dotted;
+    border-top-width: 1px; 
+    border-top-color: {textInactiveColor};
+}

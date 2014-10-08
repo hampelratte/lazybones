@@ -1,49 +1,61 @@
 <html>
 <head>
 	<style type="text/css">
-	    html {
-	        padding: 0px;
-	        margin: 0px;
-	    }
-	
-		body {
-		    font-family: sans-serif;
-		    font-size: 12pt;
-		    padding: 8px;
-		    color: {color};
-		    background-color: {backgroundColor};
-		}
-		
-		h1 {
-		    font-size: 130%;
-		}
-		
-		h2 {
-            font-size: 120%;
-        }
-        
-		h3 {
-            font-size: 110%;
-        }
-        
-        hr {
-            border-style: dotted;
-            border-color: grey;
-            border-width: 1px;
-        }
+	    {style}
 	</style>
 </head>
 
 <body>
-    <h1>{title}</h1>
-    <h2>{channel} - {startDate}&nbsp;&nbsp;&nbsp;{startTime} - {endTime}</h2>
-    <hr>
-    <p>{description}</p>
-    <br>
-    <hr>
-    <p>{i18n_directory}: {directory}</p>
-    <p>{i18n_lifetime}: {lifetime}</p>
-    <p>{i18n_priority}: {priority}</p>
-    <p>{i18n_streams}: {streams}</p>
+    <table style="width: 100%; margin: 0px; padding: 0px">
+    <tr>
+        <td class="title" colspan="2">{title}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_channel}</td>
+        <td class="value">{channel}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_date}</td>
+        <td class="value">{startDate}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_start}</td>
+        <td class="value">{startTime}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_stop}</td>
+        <td class="value">{endTime}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_directory}</td>
+        <td class="value">{directory}</td>
+    </tr>
+    <tr class="separator"></tr>
+    <tr>
+        <td class="label" valign="top">{i18n_shortText}</td>
+        <td class="value">{shortText}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_description}</td>
+        <td class="value">{description}</td>
+    </tr>
+    <tr class="separator"></tr>
+    <tr>
+        <td class="label" valign="top">{i18n_status}</td>
+        <td class="value">{status}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_lifetime}</td>
+        <td class="value">{lifetime}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_priority}</td>
+        <td class="value">{priority}</td>
+    </tr>
+    <tr>
+        <td class="label" valign="top">{i18n_streams}</td>
+        <td class="value" valign="top">{streams}</td>
+    </tr>
+    </table>
 </body>
 </html>
