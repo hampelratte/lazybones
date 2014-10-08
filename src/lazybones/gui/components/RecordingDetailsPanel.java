@@ -28,23 +28,10 @@
  */
 package lazybones.gui.components;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -60,7 +47,7 @@ import org.hampelratte.svdrp.responses.highlevel.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RecordingDetailsPanel extends JPanel implements TreeSelectionListener {
+public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,19 +55,14 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
 
     private Recording recording;
 
-    private JScrollPane scrollPane;
-    private JEditorPane htmlPane;
-
-    private String recordingDetailsTemplate;
-
-    public RecordingDetailsPanel() {
-        initGUI();
+    public RecordingDetailsPanel(Recording recording) {
+        super("recording_details.html");
+        this.recording = recording;
+        updateHtmlPane();
     }
 
-    public RecordingDetailsPanel(Recording recording) {
-        this.recording = recording;
-        initGUI();
-        updateHtmlPane();
+    public RecordingDetailsPanel() {
+        this(null);
     }
 
     public void setRecording(Recording recording) {
@@ -88,39 +70,12 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
         updateHtmlPane();
     }
 
-    private void initGUI() {
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        htmlPane = new JEditorPane();
-        htmlPane.setEditable(false);
-        htmlPane.setContentType("text/html");
-        htmlPane.setBorder(BorderFactory.createEmptyBorder());
-
-        scrollPane = new JScrollPane(htmlPane);
-        scrollPane.setMinimumSize(new Dimension(50, 50));
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 5, 5, 0);
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-
-        add(scrollPane, gbc);
-    }
-
-    private void updateHtmlPane() {
-        try {
-            String template = getRecordingDetailsTemplate();
-            template = replaceTags(template);
-            htmlPane.setText(template);
-            htmlPane.setCaretPosition(0);
-        } catch (Exception e) {
-            htmlPane.setText("Couldn't load template for recording details:\n" + e.getLocalizedMessage());
+    @Override
+    public String replaceTags(String template) {
+        if (recording == null) {
+            return "";
         }
-    }
 
-    private String replaceTags(String template) {
         template = template.replaceAll("\\{title\\}", recording.getDisplayTitle());
 
         String channel = recording.getChannelName();
@@ -130,32 +85,27 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
         template = template.replaceAll("\\{startDate\\}", dateFormat.format(recording.getStartTime().getTime()));
         template = template.replaceAll("\\{startTime\\}", timeFormat.format(recording.getStartTime().getTime()));
         template = template.replaceAll("\\{endTime\\}", timeFormat.format(recording.getEndTime().getTime()));
+        template = template.replaceAll("\\{shortText\\}", recording.getShortText());
         template = template.replaceAll("\\{description\\}", recording.getDescription().replaceAll("\n", "<br>"));
-        template = template.replaceAll("\\{i18n_directory\\}", LazyBones.getTranslation("directory", "Directory"));
+        template = template.replaceAll("\\{status\\}", createStatusString());
         template = template.replaceAll("\\{directory\\}", recording.getFolder());
-        template = template.replaceAll("\\{i18n_lifetime\\}", LazyBones.getTranslation("lifetime", "Lifetime"));
         template = template.replaceAll("\\{lifetime\\}", Integer.toString(recording.getLifetime()));
-        template = template.replaceAll("\\{i18n_priority\\}", LazyBones.getTranslation("priority", "Priority"));
         template = template.replaceAll("\\{priority\\}", Integer.toString(recording.getPriority()));
-        template = template.replaceAll("\\{i18n_streams\\}", LazyBones.getTranslation("streams", "Streams"));
         template = template.replaceAll("\\{streams\\}", createStreamsString());
-        template = template.replaceAll("\\{color\\}", toHexString(UIManager.getColor("TextArea.foreground")));
-        template = template.replaceAll("\\{backgroundColor\\}", toHexString(UIManager.getColor("TextArea.background")));
         return template;
     }
 
-    private String toHexString(Color c) {
-        StringBuilder sb = new StringBuilder("#");
-        sb.append(toHex(c.getRed()));
-        sb.append(toHex(c.getGreen()));
-        sb.append(toHex(c.getBlue()));
-        sb.append(toHex(c.getAlpha()));
-        return sb.toString();
-    }
+    private String createStatusString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(recording.isCut() ? LazyBones.getTranslation("cut", "cut") : LazyBones.getTranslation("uncut", "uncut"));
 
-    private String toHex(int i) {
-        String hex = Integer.toString(i, 16);
-        return hex.length() == 2 ? hex : "0" + hex;
+        if (recording.isNew()) {
+            sb.insert(0, ' ');
+            sb.insert(0, LazyBones.getTranslation("and", "and"));
+            sb.insert(0, ' ');
+            sb.insert(0, LazyBones.getTranslation("new", "new"));
+        }
+        return sb.toString().trim();
     }
 
     private String createStreamsString() {
@@ -213,45 +163,6 @@ public class RecordingDetailsPanel extends JPanel implements TreeSelectionListen
             }
         } else {
             reset();
-        }
-    }
-
-    public void reset() {
-        htmlPane.setText("<html><head></head><body></body></html>");
-    }
-
-    private String getRecordingDetailsTemplate() throws IOException {
-        if (recordingDetailsTemplate != null) {
-            return recordingDetailsTemplate;
-        }
-
-        InputStream in = null;
-        ByteArrayOutputStream bos = null;
-        try {
-            in = RecordingDetailsPanel.class.getClassLoader().getResourceAsStream("recording_details.html");
-            bos = new ByteArrayOutputStream();
-            int length = 0;
-            byte[] buffer = new byte[1024];
-            while ((length = in.read(buffer)) > 0) {
-                bos.write(buffer, 0, length);
-            }
-            recordingDetailsTemplate = new String(bos.toByteArray());
-            return recordingDetailsTemplate;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    logger.error("Couldn't close input stream for recording details template", e);
-                }
-            }
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (Exception e) {
-                    logger.error("Couldn't close stream", e);
-                }
-            }
         }
     }
 }

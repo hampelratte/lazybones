@@ -151,7 +151,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         gbc.weighty = 1;
         gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
-        recordingTree.setPreferredSize(new Dimension(300, 800));
         recordingTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recordingTree.setRootVisible(true);
         recordingTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -172,6 +171,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         recordingTree.setModel(recordingTreeModel);
         scrollPane = new JScrollPane(recordingTree);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        scrollPane.setPreferredSize(new Dimension(300, 800));
         this.add(scrollPane, gbc);
         ToolTipManager.sharedInstance().registerComponent(recordingTree);
 

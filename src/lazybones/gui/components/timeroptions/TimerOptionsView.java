@@ -28,35 +28,18 @@
  */
 package lazybones.gui.components.timeroptions;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
-
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.gui.components.AbstractDetailsPanel;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import devplugin.Program;
 
-public class TimerOptionsView extends JPanel {
-    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsView.class);
-
+public class TimerOptionsView extends AbstractDetailsPanel {
     /**
      * The timer to show in the view
      */
@@ -67,48 +50,12 @@ public class TimerOptionsView extends JPanel {
      */
     private Program prog;
 
-    private JScrollPane scrollPane;
-    private JEditorPane htmlPane;
-
-    private String timerDetailsTemplate;
-
     public TimerOptionsView() {
-        initGUI();
+        super("timer_details.html");
     }
 
-    private void initGUI() {
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        htmlPane = new JEditorPane();
-        htmlPane.setEditable(false);
-        htmlPane.setContentType("text/html");
-        htmlPane.setBorder(BorderFactory.createEmptyBorder());
-
-        scrollPane = new JScrollPane(htmlPane);
-        scrollPane.setMinimumSize(new Dimension(50, 50));
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 5, 5, 0);
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-
-        add(scrollPane, gbc);
-    }
-
-    private void updateHtmlPane() {
-        try {
-            String template = getTimerDetailsTemplate();
-            template = replaceTags(template);
-            htmlPane.setText(template);
-            htmlPane.setCaretPosition(0);
-        } catch (Exception e) {
-            htmlPane.setText("Couldn't load template for timer details:\n" + e.getLocalizedMessage());
-        }
-    }
-
-    private String replaceTags(String template) {
+    @Override
+    public String replaceTags(String template) {
         template = template.replaceAll("\\{title\\}", timer.getDisplayTitle());
 
         String channel = "";
@@ -120,73 +67,44 @@ public class TimerOptionsView extends JPanel {
         }
         template = template.replaceAll("\\{channel\\}", channel);
         DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        template = template.replaceAll("\\{startDate\\}", dateFormat.format(timer.getStartTime().getTime()));
+        template = template.replaceAll("\\{startDate\\}", createDateString());
         template = template.replaceAll("\\{startTime\\}", timeFormat.format(timer.getStartTime().getTime()));
         template = template.replaceAll("\\{endTime\\}", timeFormat.format(timer.getEndTime().getTime()));
         template = template.replaceAll("\\{description\\}", timer.getDescription().replaceAll("\n", "<br>"));
-        template = template.replaceAll("\\{i18n_directory\\}", LazyBones.getTranslation("directory", "Directory"));
         template = template.replaceAll("\\{directory\\}", timer.getPath());
-        template = template.replaceAll("\\{i18n_lifetime\\}", LazyBones.getTranslation("lifetime", "Lifetime"));
         template = template.replaceAll("\\{lifetime\\}", Integer.toString(timer.getLifetime()));
-        template = template.replaceAll("\\{i18n_priority\\}", LazyBones.getTranslation("priority", "Priority"));
         template = template.replaceAll("\\{priority\\}", Integer.toString(timer.getPriority()));
-        template = template.replaceAll("\\{color\\}", toHexString(UIManager.getColor("TextArea.foreground")));
-        template = template.replaceAll("\\{backgroundColor\\}", toHexString(UIManager.getColor("TextArea.background")));
         return template;
     }
 
-    private String toHexString(Color c) {
-        StringBuilder sb = new StringBuilder("#");
-        sb.append(toHex(c.getRed()));
-        sb.append(toHex(c.getGreen()));
-        sb.append(toHex(c.getBlue()));
-        sb.append(toHex(c.getAlpha()));
-        return sb.toString();
-    }
+    private String createDateString() {
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+        StringBuilder dateString = new StringBuilder();
+        if (timer.isRepeating()) {
+            if (timer.isSetForWeekdays(0, 1, 2, 3, 4, 5, 6)) {
+                dateString.append(LazyBones.getTranslation("daily", "daily")).append(' ');
+            } else if (timer.isSetForWeekdays(0, 1, 2, 3, 4)) {
+                dateString.append(LazyBones.getTranslation("onWorkdays", "on workdays")).append(' ');
+            } else if (timer.isSetForWeekdays(5, 6)) {
+                dateString.append(LazyBones.getTranslation("atTheWeekend", "at the weekend")).append(' ');
+            } else {
+                dateString.append(timer.getRepeatingDays()[0] ? LazyBones.getTranslation("onMondays", "on Mondays") : "").append(' ');
+                dateString.append(timer.getRepeatingDays()[1] ? LazyBones.getTranslation("onTuesdays", "on Tuesdays") : "").append(' ');
+                dateString.append(timer.getRepeatingDays()[2] ? LazyBones.getTranslation("onWednesdays", "on Wednesdays") : "").append(' ');
+                dateString.append(timer.getRepeatingDays()[3] ? LazyBones.getTranslation("onThursdays", "on Thursdays") : "").append(' ');
+                dateString.append(timer.getRepeatingDays()[4] ? LazyBones.getTranslation("onFridays", "on Fridays") : "").append(' ');
+                dateString.append(timer.getRepeatingDays()[5] ? LazyBones.getTranslation("onSaturdays", "on Saturdays") : "").append(' ');
+                dateString.append(timer.getRepeatingDays()[6] ? LazyBones.getTranslation("onSundays", "on Sundays") : "").append(' ');
+            }
 
-    private String toHex(int i) {
-        String hex = Integer.toString(i, 16);
-        return hex.length() == 2 ? hex : "0" + hex;
-    }
-
-    private String getTimerDetailsTemplate() throws IOException {
-        if (timerDetailsTemplate != null) {
-            return timerDetailsTemplate;
+            if (timer.hasFirstTime()) {
+                dateString.append("ab dem ");
+                dateString.append(dateFormat.format(timer.getFirstTime().getTime()));
+            }
+        } else {
+            dateString.append(dateFormat.format(timer.getStartTime().getTime()));
         }
-
-        InputStream in = null;
-        ByteArrayOutputStream bos = null;
-        try {
-            in = TimerOptionsView.class.getClassLoader().getResourceAsStream("timer_details.html");
-            bos = new ByteArrayOutputStream();
-            int length = 0;
-            byte[] buffer = new byte[1024];
-            while ((length = in.read(buffer)) > 0) {
-                bos.write(buffer, 0, length);
-            }
-            timerDetailsTemplate = new String(bos.toByteArray());
-            return timerDetailsTemplate;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    logger.error("Couldn't close input stream for timer details template", e);
-                }
-            }
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (Exception e) {
-                    logger.error("Couldn't close stream", e);
-                }
-            }
-        }
-    }
-
-    public LazyBonesTimer getTimer() {
-        return timer;
+        return dateString.toString();
     }
 
     public void setTimer(LazyBonesTimer timer) {
@@ -194,17 +112,8 @@ public class TimerOptionsView extends JPanel {
         updateHtmlPane();
     }
 
-    public Program getProgram() {
-        return prog;
-    }
-
     public void setProgram(Program prog) {
         this.prog = prog;
         updateHtmlPane();
     }
-
-    public void reset() {
-        htmlPane.setText("");
-    }
-
 }
