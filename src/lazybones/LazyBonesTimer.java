@@ -272,4 +272,12 @@ public class LazyBonesTimer extends Timer {
         // no format found
         return descVdr;
     }
+
+    public boolean isSetForWeekdays(int... days) {
+        boolean setForTheDays = true;
+        for (int i = 0; i < days.length; i++) {
+            setForTheDays = setForTheDays & getRepeatingDays()[days[i]];
+        }
+        return setForTheDays;
+    }
 }
