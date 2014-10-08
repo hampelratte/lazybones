@@ -86,12 +86,11 @@ public class TimerOptionsView extends JPanel {
         htmlPane.setBorder(BorderFactory.createEmptyBorder());
 
         scrollPane = new JScrollPane(htmlPane);
-        scrollPane.setPreferredSize(new Dimension(300, 300));
         scrollPane.setMinimumSize(new Dimension(50, 50));
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(0, 5, 5, 0);
         gbc.weightx = 1;
         gbc.weighty = 1;
 

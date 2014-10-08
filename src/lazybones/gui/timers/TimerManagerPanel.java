@@ -109,6 +109,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         gbc.fill = java.awt.GridBagConstraints.NONE;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 2;
         gbc.insets = new java.awt.Insets(5, 10, 5, 10);
         gbc.anchor = GridBagConstraints.WEST;
         buttonBar = createButtonBar();
@@ -116,29 +117,32 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
         // add timer list
         gbc.fill = java.awt.GridBagConstraints.BOTH;
+        gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 1;
         gbc.weighty = 1;
+        gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
-        gbc.gridx = 0;
         timerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         timerList.setCellRenderer(new TimerListCellRenderer());
         timerList.addListSelectionListener(this);
         timerList.getModel().addListDataListener(this);
         scrollPane = new JScrollPane(timerList);
+        scrollPane.setPreferredSize(new Dimension(300, 0));
+        scrollPane.setMinimumSize(new Dimension(200, 0));
         this.add(scrollPane, gbc);
 
         // add cardlayout for timer details view and timer editor
-        gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         gbc.weightx = 1;
-        gbc.gridheight = 2;
-        gbc.insets = new java.awt.Insets(10, 0, 5, 10);
-        this.add(timerOptionsPanel, gbc);
+        gbc.insets = new java.awt.Insets(0, 0, 5, 10);
         timerOptionsView.setEnabled(false);
         timerOptionsPanel.add(timerOptionsView, "VIEW");
-        timerOptionsPanel.setPreferredSize(new Dimension(200, 800));
         timerOptionsPanel.add(timerOptionsEditor, "EDITOR");
+        timerOptionsEditor.setPreferredSize(new Dimension(300, 0));
+        timerOptionsPanel.setPreferredSize(new Dimension(300, 0));
+        this.add(timerOptionsPanel, gbc);
 
         timerList.addMouseListener(new MouseAdapter() {
             @Override

@@ -147,10 +147,11 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.gridx = 0;
         gbc.gridy = y++;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.insets = new java.awt.Insets(0, 10, 10, 10);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         gbc.gridwidth = 1;
+        gbc.insets = new java.awt.Insets(0, 10, 10, 10);
+        recordingTree.setPreferredSize(new Dimension(300, 800));
         recordingTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recordingTree.setRootVisible(true);
         recordingTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -174,15 +175,12 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         this.add(scrollPane, gbc);
         ToolTipManager.sharedInstance().registerComponent(recordingTree);
 
-        // gbc.fill = java.awt.GridBagConstraints.VERTICAL;
         gbc.gridx = 1;
-        gbc.weightx = .1;
-        gbc.insets = new java.awt.Insets(0, 0, 10, 10);
+        gbc.gridy = 1;
+        gbc.gridheight = 1;
+        gbc.insets = new java.awt.Insets(0, 0, 5, 10);
         recordingTree.addTreeSelectionListener(recordingDetailsPanel);
-        recordingDetailsPanel.setBorder(BorderFactory.createTitledBorder(getTranslation("details", "Details")));
-        recordingDetailsPanel.setPreferredSize(new Dimension(300, 300));
-        recordingDetailsPanel.setMinimumSize(new Dimension(300, 300));
-        recordingDetailsPanel.setMaximumSize(new Dimension(300, 300));
+        recordingDetailsPanel.setPreferredSize(new Dimension(300, 800));
         this.add(recordingDetailsPanel, gbc);
     }
 
