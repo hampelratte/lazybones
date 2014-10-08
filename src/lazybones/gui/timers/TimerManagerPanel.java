@@ -119,7 +119,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.weightx = 1;
+        gbc.weightx = 0.33;
         gbc.weighty = 1;
         gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
@@ -135,7 +135,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         // add cardlayout for timer details view and timer editor
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.weightx = 1;
+        gbc.weightx = 0.66;
         gbc.insets = new java.awt.Insets(0, 0, 5, 10);
         timerOptionsView.setEnabled(false);
         timerOptionsPanel.add(timerOptionsView, "VIEW");
