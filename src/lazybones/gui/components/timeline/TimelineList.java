@@ -233,7 +233,11 @@ public class TimelineList extends JPanel implements Observer {
         // paint current time line
         int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         Calendar currentTime = Calendar.getInstance();
-        if (isToday(getCalendar())) { // are we showing the current day ?
+        // currentTime.set(Calendar.HOUR_OF_DAY, 1);
+        // currentTime.set(Calendar.MINUTE, 23);
+        // currentTime.add(Calendar.DAY_OF_MONTH, 1);
+
+        if (isOnCurrentDate(currentTime)) { // are we showing the current day ?
             g.setColor(new Color(255, 0, 0, 128));
             double pixelsPerMinute = (double) (getWidth() - 1) / (double) (24 * 60);
             int minute = currentTime.get(Calendar.MINUTE);
@@ -249,21 +253,15 @@ public class TimelineList extends JPanel implements Observer {
         }
     }
 
-    /**
-     * Returns, if the day of the given calendar is today
-     *
-     * @param cal
-     */
-    private boolean isToday(Calendar cal) {
-        Calendar today = Calendar.getInstance();
-        if (today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
-                && today.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
-                && today.get(Calendar.YEAR) == cal.get(Calendar.YEAR))
-        {
-            return true;
-        }
+    private boolean isOnCurrentDate(Calendar time) {
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        Calendar selectedDayAtStartHour = (Calendar) getCalendar().clone();
+        selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
 
-        return false;
+        Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
+        dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
+
+        return (time.after(selectedDayAtStartHour) & time.before(dayAfterAtStartHour));
     }
 
     public void showTimersForCurrentDate(List<LazyBonesTimer> timers) {
