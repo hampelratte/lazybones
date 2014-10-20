@@ -354,6 +354,9 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         if (timer != null) {
             this.timer = timer;
             this.oldTimer = (LazyBonesTimer) timer.clone();
+            lVpsTimeHint.setVisible(false);
+            spinnerStarttime.setBorder(spinnerEndtime.getBorder());
+            spinnerStarttime.repaint();
 
             // we have to remove the buffers again, to get the right start date
             // example: start time is 00.00 h with time buffers we have 23.45
@@ -364,6 +367,7 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             if (this.prog == null) {
                 try {
                     prog = ProgramDatabase.getProgram(tmp);
+                    this.prog = prog;
                 } catch (ChannelNotFoundException e) {
                     // fail silently
                 }
