@@ -1,3 +1,7 @@
+Lazy Bones 1.3.1
+===============================================================================
+* Fixed bug with the warning, which is shown, when VPS is activated for a timer
+
 Lazy Bones 1.3.0
 ===============================================================================
 * Improved usage of colors to better support different Look & Feels
