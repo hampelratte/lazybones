@@ -285,7 +285,7 @@ public class LazyBones extends Plugin implements Observer {
         switchBefore = switchBefore == null ? "false" : switchBefore;
         props.setProperty("switchBefore", switchBefore);
         String recordingURL = props.getProperty("recording.url");
-        recordingURL = recordingURL == null ? "http://<host>:3001/rec/<recording_number>" : recordingURL;
+        recordingURL = recordingURL == null ? "http://<host>:3000/TS/<recording_number>.rec.ts" : recordingURL;
         props.setProperty("recording.url", recordingURL);
 
         String logConnectionErrors = props.getProperty("logConnectionErrors");
