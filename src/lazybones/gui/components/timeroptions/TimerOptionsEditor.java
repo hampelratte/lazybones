@@ -353,6 +353,7 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         logger.debug("Updating gui with timer values");
         if (timer != null) {
             this.timer = timer;
+            this.prog = null;
             this.oldTimer = (LazyBonesTimer) timer.clone();
             lVpsTimeHint.setVisible(false);
             spinnerStarttime.setBorder(spinnerEndtime.getBorder());
@@ -364,15 +365,11 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             // the date of the day before.
             LazyBonesTimer tmp = timer.getTimerWithoutBuffers();
             Program prog = null;
-            if (this.prog == null) {
-                try {
-                    prog = ProgramDatabase.getProgram(tmp);
-                    this.prog = prog;
-                } catch (ChannelNotFoundException e) {
-                    // fail silently
-                }
-            } else {
-                prog = this.prog;
+            try {
+                prog = ProgramDatabase.getProgram(tmp);
+                this.prog = prog;
+            } catch (ChannelNotFoundException e) {
+                // fail silently
             }
 
             if (prog != null) {
