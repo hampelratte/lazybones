@@ -1,3 +1,8 @@
+Lazy Bones 1.3.2
+===============================================================================
+* Fixed bug in timer editor. It showed the wrong channel.
+* Improved setting of the start time, when switching between VPS on / off
+
 Lazy Bones 1.3.1
 ===============================================================================
 * Fixed bug with the warning, which is shown, when VPS is activated for a timer
