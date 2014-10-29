@@ -165,13 +165,12 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
     private String originalTitel = "";
     private String originalPath = "";
 
-    public TimerOptionsEditor(LazyBonesTimer timer, Program prog, Mode mode) {
+    public TimerOptionsEditor(LazyBonesTimer timer, Mode mode) {
         this.mode = mode;
 
         logger.debug("Creating timer options panel");
         initGUI();
 
-        setProgram(prog);
         setTimer(timer);
 
         logger.debug("Timer options panel ready");
@@ -469,10 +468,6 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         }
     }
 
-    public void setProgram(Program prog) {
-        this.prog = prog;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == cbVps) {
@@ -515,11 +510,24 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
                 logger.warn("No programm found to determine the VPS time");
             }
         } else {
-            if (oldTimer != null) {
+            if (oldTimer != null && !oldTimer.hasState(Timer.VPS)) {
                 // set the timer to the previous startTime
-                spinnerStarttimeModel.setValue(oldTimer.getStartTime().clone());
+                Calendar startTime = (Calendar) oldTimer.getStartTime().clone();
+                spinnerStarttimeModel.setValue(startTime);
                 day.setText(Integer.toString(oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH)));
-                timer.getStartTime().set(Calendar.DAY_OF_MONTH, oldTimer.getStartTime().get(Calendar.DAY_OF_MONTH));
+                timer.setStartTime(startTime);
+            } else {
+                if (prog != null) {
+                    Calendar calStart = prog.getDate().getCalendar();
+                    calStart.set(Calendar.HOUR_OF_DAY, prog.getHours());
+                    calStart.set(Calendar.MINUTE, prog.getMinutes());
+                    // start the recording x min before the beginning of the program
+                    int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+                    calStart.add(Calendar.MINUTE, -bufferBefore);
+
+                    timer.setStartTime(calStart);
+                    spinnerStarttimeModel.setValue(timer.getStartTime());
+                }
             }
         }
     }

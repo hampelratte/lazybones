@@ -93,7 +93,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
     public TimerOptionsDialog(LazyBonesTimer timer, Program prog, Mode mode) {
         this.control = LazyBones.getInstance();
 
-        top = new TimerOptionsEditor(timer, prog, mode);
+        top = new TimerOptionsEditor(timer, mode);
 
         this.timer = timer;
         this.oldTimer = (LazyBonesTimer) timer.clone();
