@@ -34,6 +34,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,10 +53,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
+import lazybones.gui.components.HintTextField;
 import lazybones.gui.settings.channelpanel.dnd.ListTransferHandler;
 import lazybones.gui.settings.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
@@ -82,7 +87,10 @@ public class ChannelPanel implements ActionListener {
 
     private JScrollPane listScrollpane;
 
-    private JList<Channel> list = new JList<Channel>();
+    private FilterListModel listModel = new FilterListModel();
+    private JList<Channel> list = new JList<Channel>(listModel);
+
+    private HintTextField channelFilterTextfield = new HintTextField(LazyBones.getTranslation("filter_channels", "Filter channels"));
 
     private JTable table = new JTable();
 
@@ -123,17 +131,19 @@ public class ChannelPanel implements ActionListener {
         table.setTransferHandler(new TableTransferHandler(list));
 
         list.setCellRenderer(new ChannelListCellrenderer());
-        list.setModel(new DefaultListModel<Channel>());
         list.setDragEnabled(true);
         list.setTransferHandler(new ListTransferHandler());
 
         tableScrollpane = new JScrollPane(table);
         listScrollpane = new JScrollPane(list);
 
+        MinMaxChannelListener minMaxListener = new MinMaxChannelListener();
         String minChannel = LazyBones.getProperties().getProperty("minChannelNumber");
         minChannelNumber.setValue(new Integer(minChannel));
+        minChannelNumber.addChangeListener(minMaxListener);
         String maxChannel = LazyBones.getProperties().getProperty("maxChannelNumber");
         maxChannelNumber.setValue(new Integer(maxChannel));
+        maxChannelNumber.addChangeListener(minMaxListener);
 
         refresh.addActionListener(this);
         autoAssign.addActionListener(this);
@@ -141,6 +151,7 @@ public class ChannelPanel implements ActionListener {
         down.addActionListener(this);
         assign.addActionListener(this);
         remove.addActionListener(this);
+        channelFilterTextfield.addKeyListener(new ChannelFilterKeyAdapter());
     }
 
     public JPanel getPanel() {
@@ -154,18 +165,22 @@ public class ChannelPanel implements ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
-        gbc.gridheight = 2;
+        gbc.gridheight = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         panel.add(tableScrollpane, gbc);
 
-        // list
+        // channel filter
         gbc.gridx = 4;
-        gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 1.0;
+        gbc.weighty = 0;
+        panel.add(channelFilterTextfield, gbc);
+
+        // list
+        gbc.gridy = 1;
+        gbc.weighty = 1;
         panel.add(listScrollpane, gbc);
 
         // channel interval spinner
@@ -175,7 +190,7 @@ public class ChannelPanel implements ActionListener {
         channelInterval.add(new JLabel("-"));
         channelInterval.add(maxChannelNumber);
         gbc.gridx = 4;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(0, 0, 0, 0);
         panel.add(channelInterval, gbc);
@@ -187,13 +202,14 @@ public class ChannelPanel implements ActionListener {
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.gridheight = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(assignButtonPanel, gbc);
 
         // autoAssign
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
         gbc.gridheight = 1;
@@ -201,19 +217,19 @@ public class ChannelPanel implements ActionListener {
 
         // up
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         panel.add(up, gbc);
 
         // down
         gbc.gridx = 2;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         panel.add(down, gbc);
 
         // refresh
         gbc.gridx = 4;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(refresh, gbc);
 
@@ -294,19 +310,20 @@ public class ChannelPanel implements ActionListener {
         // set min and max channel number
         LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
         LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
+        listModel.setMinChannel((int) minChannelNumber.getValue());
+        listModel.setMaxChannel((int) maxChannelNumber.getValue());
 
         try {
-            DefaultListModel<Channel> model = (DefaultListModel<Channel>) list.getModel();
-            model.clear();
+            listModel.clear();
             ChannelManager.getInstance().update();
-            List<Channel> vdrchans = ChannelManager.getInstance().getFilteredChannels();
+            List<Channel> vdrchans = ChannelManager.getInstance().getChannels();
             if (vdrchans != null) {
                 // add vdrchannels to channel list
                 for (Iterator<Channel> iter = vdrchans.iterator(); iter.hasNext();) {
                     Channel chan = iter.next();
                     int index = getChannelIndex(chan);
                     if (index == -1) {
-                        model.addElement(chan);
+                        listModel.addElement(chan);
                     }
                 }
             }
@@ -403,6 +420,27 @@ public class ChannelPanel implements ActionListener {
                 listModel.removeElement(c.getChannel());
             }
         }
+    }
+
+    private class ChannelFilterKeyAdapter extends KeyAdapter {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            super.keyReleased(e);
+            listModel.setFilter(channelFilterTextfield.getText());
+        }
+    }
+
+    private class MinMaxChannelListener implements ChangeListener {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            int value = (int) ((JSpinner) e.getSource()).getValue();
+            if (e.getSource() == minChannelNumber) {
+                listModel.setMinChannel(value);
+            } else if (e.getSource() == maxChannelNumber) {
+                listModel.setMaxChannel(value);
+            }
+        }
+
     }
 
     private class Container implements Comparable<Container> {

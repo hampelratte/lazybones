@@ -1,6 +1,9 @@
 Lazy Bones 1.3.3
 ===============================================================================
 * Changed default port for SVDRP to 6419
+* Added textfield to channel configuration in the settings dialog to filter
+  the channel list.
+
 
 Lazy Bones 1.3.2
 ===============================================================================
