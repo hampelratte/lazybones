@@ -29,7 +29,6 @@
 package lazybones;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -53,8 +52,6 @@ public class ChannelManager {
 
     private List<Channel> channels = null;
 
-    private final List<Channel> filteredChannels = new ArrayList<Channel>();
-
     public void update() {
         Response res = VDRConnection.send(new LSTC());
         if (res != null && res.getCode() == 250) {
@@ -71,20 +68,6 @@ public class ChannelManager {
             instance = new ChannelManager();
         }
         return instance;
-    }
-
-    public List<Channel> getFilteredChannels() {
-        filteredChannels.clear();
-        int min = Integer.parseInt(LazyBones.getProperties().getProperty("minChannelNumber"));
-        int max = Integer.parseInt(LazyBones.getProperties().getProperty("maxChannelNumber"));
-
-        for (Channel chan : channels) {
-            if (chan.getChannelNumber() >= min && (chan.getChannelNumber() <= max || max == 0)) {
-                filteredChannels.add(chan);
-            }
-        }
-
-        return filteredChannels;
     }
 
     public List<Channel> getChannels() {
