@@ -241,7 +241,7 @@ public class LazyBones extends Plugin implements Observer {
         streamtype = streamtype == null ? "TS" : streamtype;
         props.setProperty("streamtype", streamtype);
         String port = props.getProperty("port");
-        port = port == null ? "2001" : port;
+        port = port == null ? "6419" : port;
         props.setProperty("port", port);
         String timeout = props.getProperty("timeout");
         timeout = timeout == null ? "500" : timeout;
