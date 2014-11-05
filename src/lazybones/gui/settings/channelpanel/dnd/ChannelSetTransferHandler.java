@@ -36,7 +36,11 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
+import lazybones.LazyBones;
+
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ChannelSetTransferHandler extends TransferHandler {
 
@@ -44,7 +48,9 @@ public abstract class ChannelSetTransferHandler extends TransferHandler {
 
     protected abstract void importChannels(JComponent c, ChannelSet<Channel> set);
 
-    protected abstract void cleanup(JComponent c, boolean remove);
+    protected abstract void cleanup(JComponent c, Transferable data, boolean remove);
+
+    private static transient Logger logger = LoggerFactory.getLogger(LazyBones.class);
 
     @Override
     protected Transferable createTransferable(JComponent c) {
@@ -65,7 +71,9 @@ public abstract class ChannelSetTransferHandler extends TransferHandler {
                 importChannels(c, set);
                 return true;
             } catch (UnsupportedFlavorException ufe) {
+                logger.error("Data not suitable for drag and drop", ufe);
             } catch (IOException ioe) {
+                logger.error("Error during drag and drop", ioe);
             }
         }
 
@@ -74,7 +82,7 @@ public abstract class ChannelSetTransferHandler extends TransferHandler {
 
     @Override
     protected void exportDone(JComponent c, Transferable data, int action) {
-        cleanup(c, action == MOVE);
+        cleanup(c, data, action == MOVE);
     }
 
     @Override

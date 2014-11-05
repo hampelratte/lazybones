@@ -28,32 +28,33 @@
  */
 package lazybones.gui.settings.channelpanel.dnd;
 
+import java.awt.datatransfer.Transferable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 
+import lazybones.gui.settings.channelpanel.FilterListModel;
+
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListTransferHandler extends ChannelSetTransferHandler {
-    private int[] indices = null;
-    private int addIndex = -1; // Location where items were added
-    private int addCount = 0; // Number of items added.
+    private static final transient Logger LOGGER = LoggerFactory.getLogger(ListTransferHandler.class);
 
     private Set<Channel> overwrittenChannels;
 
     @Override
     protected ChannelSet<Channel> exportChannels(JComponent c) {
-        ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
-
         @SuppressWarnings("unchecked")
         JList<Channel> list = (JList<Channel>) c;
-
-        indices = list.getSelectedIndices();
         List<Channel> channels = list.getSelectedValuesList();
+        ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
         channelSet.addAll(channels);
+
         return channelSet;
     }
 
@@ -61,69 +62,36 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
     protected void importChannels(JComponent c, ChannelSet<Channel> set) {
         @SuppressWarnings("unchecked")
         JList<Channel> target = (JList<Channel>) c;
-        DefaultListModel<Channel> listModel = (DefaultListModel<Channel>) target.getModel();
-        int index = target.getSelectedIndex();
-
-        // Prevent the user from dropping data back on itself.
-        // For example, if the user is moving items #4,#5,#6 and #7 and
-        // attempts to insert the items after item #5, this would
-        // be problematic when removing the original items.
-        // So this is not allowed.
-        if (indices != null && index >= indices[0] - 1 && index <= indices[indices.length - 1]) {
-            indices = null;
-            return;
-        }
-
-        int max = listModel.getSize();
-        if (index < 0) {
-            index = max;
-        } else {
-            index++;
-            if (index > max) {
-                index = max;
-            }
-        }
-        addIndex = index;
-        addCount = set.size();
+        FilterListModel listModel = (FilterListModel) target.getModel();
         for (Channel chan : set) {
-            listModel.add(index++, chan);
+            listModel.addElement(chan);
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected void cleanup(JComponent c, boolean remove) {
-        if (remove && indices != null) {
-            @SuppressWarnings("unchecked")
-            JList<Channel> source = (JList<Channel>) c;
-            DefaultListModel<Channel> model = (DefaultListModel<Channel>) source.getModel();
-            // If we are moving items around in the same list, we
-            // need to adjust the indices accordingly, since those
-            // after the insertion point have moved.
-            if (addCount > 0) {
-                for (int i = 0; i < indices.length; i++) {
-                    if (indices[i] > addIndex) {
-                        indices[i] += addCount;
-                    }
-                }
+    protected void cleanup(JComponent c, Transferable data, boolean remove) {
+        LOGGER.debug("Cleanup in list");
+        JList<Channel> list = (JList<Channel>) c;
+        FilterListModel listModel = (FilterListModel) list.getModel();
+        try {
+            ChannelSet<Channel> set = (ChannelSet<Channel>) data.getTransferData(ChannelSet.FLAVOR);
+            for (Channel channel : set) {
+                listModel.removeElement(channel);
             }
-            for (int i = indices.length - 1; i >= 0; i--) {
-                model.remove(indices[i]);
-            }
-
-            // add channels to this list, which have been replaced in the table
-            if (overwrittenChannels != null) {
-                for (Channel chan : overwrittenChannels) {
-                    model.add(indices[0], chan);
-                }
-                overwrittenChannels = null;
-            }
+        } catch (Exception e) {
+            LOGGER.error("Couldn't delete channels from drag source (list)", e);
         }
-        indices = null;
-        addCount = 0;
-        addIndex = -1;
+
+        for (Iterator<Channel> iterator = overwrittenChannels.iterator(); iterator.hasNext();) {
+            Channel chan = iterator.next();
+            listModel.addElement(chan);
+            iterator.remove();
+        }
     }
 
     public void setOverwrittenChannels(Set<Channel> overwrittenChannels) {
         this.overwrittenChannels = overwrittenChannels;
     }
+
 }

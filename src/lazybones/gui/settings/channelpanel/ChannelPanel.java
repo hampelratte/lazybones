@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -277,8 +276,7 @@ public class ChannelPanel implements ActionListener {
             for (int i = 0; i < rows.length; i++) {
                 Object channel = table.getValueAt(rows[i], 1);
                 if (channel != null) {
-                    DefaultListModel<Channel> model = (DefaultListModel<Channel>) list.getModel();
-                    model.addElement((Channel) channel);
+                    listModel.addElement((Channel) channel);
                     table.setValueAt(null, rows[i], 1);
                 }
             }
@@ -296,12 +294,11 @@ public class ChannelPanel implements ActionListener {
                 }
 
                 Object tableValue = table.getValueAt(row, 1);
-                DefaultListModel<Channel> model = (DefaultListModel<Channel>) list.getModel();
                 if (tableValue != null) {
-                    model.addElement((Channel) tableValue);
+                    listModel.addElement((Channel) tableValue);
                 }
-                table.setValueAt(model.getElementAt(rows[i]), row, 1);
-                model.remove(rows[i]);
+                table.setValueAt(listModel.getElementAt(rows[i]), row, 1);
+                listModel.removeElement(listModel.getElementAt(rows[i]));
             }
         }
     }
@@ -399,7 +396,6 @@ public class ChannelPanel implements ActionListener {
             String tvbChan = ((devplugin.Channel) tvbc).getName();
             tvbChan = tvbChan.toLowerCase();
 
-            DefaultListModel<Channel> listModel = (DefaultListModel<Channel>) this.list.getModel();
             for (int j = 0; j < listModel.getSize(); j++) {
                 Channel chan = listModel.getElementAt(j);
                 String vdrChan = chan.getName();

@@ -28,6 +28,7 @@
  */
 package lazybones.gui.settings.channelpanel.dnd;
 
+import java.awt.datatransfer.Transferable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -101,7 +102,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
     }
 
     @Override
-    protected void cleanup(JComponent c, boolean remove) {
+    protected void cleanup(JComponent c, Transferable data, boolean remove) {
         JTable source = (JTable) c;
         if (remove && rows != null) {
             DefaultTableModel model = (DefaultTableModel) source.getModel();
