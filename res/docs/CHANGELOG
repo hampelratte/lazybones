@@ -1,3 +1,7 @@
+Lazy Bones 1.3.3
+===============================================================================
+* Changed default port for SVDRP to 6419
+
 Lazy Bones 1.3.2
 ===============================================================================
 * Fixed bug in timer editor. It showed the wrong channel.
