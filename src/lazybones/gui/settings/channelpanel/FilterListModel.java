@@ -89,6 +89,6 @@ public class FilterListModel implements ListModel<Channel> {
     }
 
     private boolean filterMatches(Channel chan) {
-        return chan.getName().toLowerCase().contains(filter.toLowerCase());
+        return chan.getName().toLowerCase().contains(filter.toLowerCase()) || Integer.toString(chan.getChannelNumber()).contains(filter);
     }
 }
