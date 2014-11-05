@@ -85,22 +85,7 @@ public class FilterListModel implements ListModel<Channel> {
 
     public void addElement(Channel chan) {
         data.add(chan);
-
-        if (filter == null || filter.isEmpty()) {
-            addToFilteredList(chan);
-        } else {
-            if (filterMatches(chan)) {
-                addToFilteredList(chan);
-            }
-        }
-    }
-
-    private void addToFilteredList(Channel chan) {
-        filteredData.add(chan);
-        for (ListDataListener l : listeners) {
-            int lastIndex = filteredData.size() - 1;
-            l.contentsChanged(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, lastIndex, lastIndex));
-        }
+        filter();
     }
 
     private boolean filterMatches(Channel chan) {
