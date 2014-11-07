@@ -102,6 +102,7 @@ public class VDRConnection {
                 }
             }
         } catch (Exception e1) {
+            connection = null; // set connection to null, so that the next request will establish a new one
             res = new ConnectionProblem();
             logger.error(res.getMessage(), e1);
         }
@@ -115,10 +116,10 @@ public class VDRConnection {
             if (connection != null && (System.currentTimeMillis() - lastTransmissionTime) > CONNECTION_KEEP_ALIVE) {
                 logger.debug("Closing connection");
                 try {
-                    connection.close();
-                    connection = null;
                     timer.cancel();
                     timer = null;
+                    connection.close();
+                    connection = null;
                 } catch (IOException e) {
                     logger.error("Couldn't close connection", e);
                 }

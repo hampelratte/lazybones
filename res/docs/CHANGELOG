@@ -3,6 +3,8 @@ Lazy Bones 1.3.3
 * Changed default port for SVDRP to 6419
 * Added textfield to channel configuration in the settings dialog to filter
   the channel list.
+* Added the disk usage of the VDR to the toolbar of the recordings panel.
+* Improved handling of broken network connections
 
 
 Lazy Bones 1.3.2
