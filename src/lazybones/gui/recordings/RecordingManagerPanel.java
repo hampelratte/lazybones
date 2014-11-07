@@ -44,8 +44,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -53,6 +56,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -73,6 +77,7 @@ import lazybones.gui.components.HintTextField;
 import lazybones.gui.components.RecordingDetailsPanel;
 
 import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.responses.highlevel.DiskStatus;
 import org.hampelratte.svdrp.responses.highlevel.Folder;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
@@ -96,7 +101,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
     private JScrollPane scrollPane = null;
     private final RecordingTreeModel recordingTreeModel = new RecordingTreeModel();
-    private final JTree recordingTree = new JTree();
+    private final JTree recordingTree = new JTree(recordingTreeModel);
 
     private final RecordingDetailsPanel recordingDetailsPanel = new RecordingDetailsPanel();
     private JButton buttonSync = null;
@@ -108,6 +113,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
     private final JPopupMenu popup = new JPopupMenu();
 
     private HintTextField filter = new HintTextField(getTranslation("search", "Search"));
+    private JProgressBar diskUsageProgressBar = new JProgressBar();
 
     public RecordingManagerPanel() {
         initGUI();
@@ -126,7 +132,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
     /**
      * This method initializes the GUI
-     *
      */
     private void initGUI() {
         createContextMenu();
@@ -168,7 +173,6 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
         recordingTree.setRowHeight(25);
         recordingTree.setCellRenderer(new RecordingTreeRenderer());
-        recordingTree.setModel(recordingTreeModel);
         scrollPane = new JScrollPane(recordingTree);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         scrollPane.setPreferredSize(new Dimension(300, 800));
@@ -253,6 +257,29 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             }
         });
 
+        toolBar.addSeparator();
+        toolBar.add(Box.createHorizontalGlue());
+        toolBar.add(diskUsageProgressBar);
+        diskUsageProgressBar.setPreferredSize(new Dimension(250, 26));
+        diskUsageProgressBar.setMaximumSize(new Dimension(250, 26));
+        diskUsageProgressBar.setMinimum(0);
+        diskUsageProgressBar.setMaximum(100);
+        RecordingManager.getInstance().addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                if (arg instanceof DiskStatus) {
+                    try {
+                        DiskStatus diskStatus = RecordingManager.getInstance().getDiskStatus();
+                        diskUsageProgressBar.setValue(diskStatus.getUsage());
+                        diskUsageProgressBar.setStringPainted(true);
+                        diskUsageProgressBar.setString(diskStatus.toString());
+                        diskUsageProgressBar.setToolTipText(diskStatus.toString());
+                    } catch (Throwable t) {
+                        logger.error("Couldn't determine disk usage", t);
+                    }
+                }
+            }
+        });
         return toolBar;
     }
 

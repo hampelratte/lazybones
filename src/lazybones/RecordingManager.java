@@ -36,11 +36,13 @@ import java.util.Observable;
 import javax.swing.SwingUtilities;
 
 import lazybones.actions.ListRecordingsAction;
+import lazybones.actions.StatDiskAction;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.commands.PLAY;
 import org.hampelratte.svdrp.parsers.RecordingParser;
+import org.hampelratte.svdrp.responses.highlevel.DiskStatus;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,11 @@ public class RecordingManager extends Observable {
      * Stores all recordings as Recording objects
      */
     private List<Recording> recordings;
+
+    /**
+     * Contains stats about the disk usage of the VDR
+     */
+    private DiskStatus diskStatus;
 
     private RecordingManager() {
         recordings = new ArrayList<Recording>();
@@ -86,6 +93,13 @@ public class RecordingManager extends Observable {
     }
 
     /**
+     * @return disk usage stats like total space, free space and usage in percent
+     */
+    public DiskStatus getDiskStatus() {
+        return diskStatus;
+    }
+
+    /**
      * Fetches the recording list from vdr
      */
     public synchronized void synchronize() {
@@ -100,6 +114,23 @@ public class RecordingManager extends Observable {
      */
     public synchronized void synchronize(final Runnable callback) {
         logger.debug("Getting recordings from VDR");
+
+        // fetch the disk usage stats
+        VDRCallback<StatDiskAction> sdaCallback = new VDRCallback<StatDiskAction>() {
+            @Override
+            public void receiveResponse(StatDiskAction cmd, Response response) {
+                diskStatus = cmd.getDiskStatus();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        setChanged();
+                        notifyObservers(diskStatus);
+                    }
+                });
+            }
+        };
+        StatDiskAction sda = new StatDiskAction(sdaCallback);
+        sda.enqueue();
 
         // fetch current recording list from vdr
         VDRCallback<ListRecordingsAction> _callback = new VDRCallback<ListRecordingsAction>() {
@@ -125,10 +156,10 @@ public class RecordingManager extends Observable {
                     }
                 }
 
-                setChanged();
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        setChanged();
                         notifyObservers(recordings);
                     }
                 });
