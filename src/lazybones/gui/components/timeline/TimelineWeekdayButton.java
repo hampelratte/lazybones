@@ -60,8 +60,10 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private final SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
     private final SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
-    public TimelineWeekdayButton(Calendar day) {
-        TimerManager.getInstance().addObserver(this);
+    private TimerManager timerManager;
+
+    public TimelineWeekdayButton(TimerManager timerManager, Calendar day) {
+        this.timerManager = timerManager;
         setDay(day);
     }
 
@@ -78,7 +80,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private void updateIndicators() {
         timerCount = 0;
         conflictCount = 0;
-        List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
+        List<LazyBonesTimer> timers = timerManager.getTimers();
         for (LazyBonesTimer timer : timers) {
             if (timerRunsOnThisDay(timer)) {
                 timerCount++;

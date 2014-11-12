@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,13 +37,14 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import lazybones.LazyBones;
+import lazybones.TimerManager;
 import lazybones.gui.settings.channelpanel.ChannelPanel;
 import util.ui.ImageUtilities;
 import util.ui.Localizer;
 
 /**
  * The root container for the settings tabs
- * 
+ *
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  */
 public class VDRSettingsPanel implements devplugin.SettingsTab {
@@ -60,6 +61,13 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
 
     private ScreenshotSettingsPanel previewPanel;
 
+    private TimerManager timerManager;
+
+    public VDRSettingsPanel(TimerManager timerManager) {
+        this.timerManager = timerManager;
+    }
+
+    @Override
     public JPanel createSettingsPanel() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
@@ -74,7 +82,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
             playerPanel = new PlayerPanel();
             tabbedPane.addTab(LazyBones.getTranslation("player", "Player"), playerPanel.getPanel());
 
-            timerPanel = new TimerPanel();
+            timerPanel = new TimerPanel(timerManager);
             tabbedPane.addTab(LazyBones.getTranslation("timers", "Timers"), timerPanel.getPanel());
 
             previewPanel = new ScreenshotSettingsPanel();
@@ -87,6 +95,7 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
         return p;
     }
 
+    @Override
     public void saveSettings() {
         channelPanel.saveSettings();
         generalPanel.saveSettings();
@@ -95,10 +104,12 @@ public class VDRSettingsPanel implements devplugin.SettingsTab {
         previewPanel.saveSettings();
     }
 
+    @Override
     public Icon getIcon() {
         return new ImageIcon(ImageUtilities.createImageFromJar("lazybones/vdr16.png", VDRSettingsPanel.class));
     }
 
+    @Override
     public String getTitle() {
         return "Lazy Bones";
     }

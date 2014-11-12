@@ -32,6 +32,7 @@ import static org.hampelratte.svdrp.responses.highlevel.Timer.ENABLED;
 import static org.hampelratte.svdrp.responses.highlevel.Timer.VPS;
 
 import java.awt.Cursor;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -53,6 +54,7 @@ import lazybones.actions.responses.ConnectionProblem;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
+import lazybones.logging.PopupHandler;
 import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Utilities;
@@ -80,10 +82,10 @@ public class TimerManager extends Observable {
 
     private static transient Logger logger = LoggerFactory.getLogger(TimerManager.class);
     private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
+    private static transient Logger epgLog = LoggerFactory.getLogger(LoggingConstants.EPG_LOGGER);
+    private static transient Logger popupLog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
 
     private static final int UNKNOWN = -1;
-
-    private static TimerManager instance;
 
     /**
      * Stores all timers as Timer objects
@@ -103,15 +105,13 @@ public class TimerManager extends Observable {
     private final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
     private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 
-    private TimerManager() {
-        timers = new ArrayList<LazyBonesTimer>();
-    }
+    private ConflictFinder conflictFinder;
 
-    public synchronized static TimerManager getInstance() {
-        if (instance == null) {
-            instance = new TimerManager();
-        }
-        return instance;
+    private RecordingManager recordingManager;
+
+    public TimerManager() {
+        timers = new ArrayList<LazyBonesTimer>();
+        conflictFinder = new ConflictFinder(this);
     }
 
     private void addTimer(LazyBonesTimer timer, boolean calculateRepeatingTimers, boolean notifyObservers) {
@@ -186,10 +186,10 @@ public class TimerManager extends Observable {
         }
 
         // try to mark programs
-        ProgramManager.getInstance().markPrograms();
-        List<LazyBonesTimer> notAssigned = TimerManager.getInstance().getNotAssignedTimers();
+        ProgramManager.getInstance().markPrograms(timers);
+        List<LazyBonesTimer> notAssigned = getNotAssignedTimers();
         if (notAssigned.size() > 0) {
-            ProgramManager.getInstance().handleNotAssignedTimers();
+            handleNotAssignedTimers();
         }
 
         // notify observers, that the timers have changed
@@ -372,7 +372,7 @@ public class TimerManager extends Observable {
                 }
             }
             if (updateRecordings) {
-                RecordingManager.getInstance().synchronize();
+                recordingManager.synchronize();
             }
         } else if (res != null && res.getCode() == 550) {
             // no timers are defined, do nothing
@@ -389,7 +389,8 @@ public class TimerManager extends Observable {
         }
 
         // handle conflicts, if some have been detected
-        ConflictFinder.getInstance().handleConflicts();
+        conflictFinder.findConflicts();
+        conflictFinder.handleConflicts();
 
         LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
         LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);
@@ -497,7 +498,7 @@ public class TimerManager extends Observable {
             boolean showOptionsDialog = !automatic && Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
 
             if (showOptionsDialog) {
-                TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.NEW);
+                TimerOptionsDialog tod = new TimerOptionsDialog(this, recordingManager, timer, prog, TimerOptionsDialog.Mode.NEW);
                 if (tod.isAccepted()) {
                     commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), false, false);
                 }
@@ -605,7 +606,7 @@ public class TimerManager extends Observable {
             if (automatic) {
                 commitTimer(newTimer, null, prog, false, true);
             } else {
-                TimerOptionsDialog tod = new TimerOptionsDialog(newTimer, prog, TimerOptionsDialog.Mode.NEW);
+                TimerOptionsDialog tod = new TimerOptionsDialog(this, recordingManager, newTimer, prog, TimerOptionsDialog.Mode.NEW);
                 if (tod.isAccepted()) {
                     commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), false, false);
                 }
@@ -644,7 +645,7 @@ public class TimerManager extends Observable {
             VDRCallback<ModifyTimerAction> callback = new VDRCallback<ModifyTimerAction>() {
                 @Override
                 public void receiveResponse(ModifyTimerAction cmd, Response response) {
-                    TimerManager.getInstance().synchronize();
+                    TimerManager.this.synchronize();
                     if (!cmd.isSuccess()) {
                         String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
                         logger.error(mesg);
@@ -668,13 +669,12 @@ public class TimerManager extends Observable {
                 }
                 int threshold = Integer.parseInt(LazyBones.getProperties().getProperty("percentageThreshold"));
                 if (percentage > threshold) {
-                    CreateTimerAction cta = new CreateTimerAction(timer);
+                    CreateTimerAction cta = new CreateTimerAction(this, timer);
                     cta.enqueue();
                 } else {
                     logger.debug("Looking in title mapping for timer {}", timer);
                     // lookup in mapping history
-                    TimerManager tm = TimerManager.getInstance();
-                    String timerTitle = tm.getTitleMapping().getVdrTitle(prog.getTitle());
+                    String timerTitle = getTitleMapping().getVdrTitle(prog.getTitle());
                     if (timer.getTitle().equals(timerTitle)) {
                         VDRCallback<CreateTimerAction> callback = new VDRCallback<CreateTimerAction>() {
                             @Override
@@ -685,7 +685,7 @@ public class TimerManager extends Observable {
                                 }
                             }
                         };
-                        CreateTimerAction cta = new CreateTimerAction(timer);
+                        CreateTimerAction cta = new CreateTimerAction(this, timer);
                         cta.setCallback(callback);
                         cta.enqueue();
                     } else { // no mapping found -> ask the user
@@ -779,7 +779,7 @@ public class TimerManager extends Observable {
     }
 
     public void deleteTimer(final Program prog) {
-        LazyBonesTimer timer = TimerManager.getInstance().getTimer(prog);
+        LazyBonesTimer timer = getTimer(prog);
         logger.debug("Deleting timer {}", timer);
         VDRCallback<DeleteTimerAction> callback = new VDRCallback<DeleteTimerAction>() {
             @Override
@@ -791,7 +791,7 @@ public class TimerManager extends Observable {
                     }
 
                     prog.unmark(LazyBones.getInstance());
-                    TimerManager.getInstance().synchronize();
+                    synchronize();
                 }
             }
         };
@@ -809,7 +809,7 @@ public class TimerManager extends Observable {
             logger.warn("Timer has no program IDs assigned.");
         }
         logger.debug("Creating timer options dialog");
-        TimerOptionsDialog tod = new TimerOptionsDialog(timer, prog, TimerOptionsDialog.Mode.UPDATE);
+        TimerOptionsDialog tod = new TimerOptionsDialog(this, recordingManager, timer, prog, TimerOptionsDialog.Mode.UPDATE);
         if (tod.isAccepted()) {
             logger.debug("Timer options dialog has been accepted");
             commitTimer(tod.getTimer(), tod.getOldTimer(), tod.getProgram(), true, false);
@@ -826,8 +826,7 @@ public class TimerManager extends Observable {
             logger.debug("No mapping found for: {}", timer.toString());
             if (candidate != null) {
                 logger.debug("Looking up old mappings");
-                TimerManager tm = TimerManager.getInstance();
-                String progTitle = tm.getTitleMapping().getTvbTitle(timer.getTitle());
+                String progTitle = getTitleMapping().getTvbTitle(timer.getTitle());
                 if (candidate.getTitle().equals(progTitle)) {
                     candidate.mark(LazyBones.getInstance()); // wieso mark hier drin? lookup hört sich nicht danach an
                     timer.addTvBrowserProgID(candidate.getUniqueID());
@@ -841,7 +840,7 @@ public class TimerManager extends Observable {
     }
 
     private boolean lookUpMappedTimer(LazyBonesTimer timer) {
-        List<String> progIDs = TimerManager.getInstance().hasBeenMappedBefore(timer);
+        List<String> progIDs = hasBeenMappedBefore(timer);
         if (progIDs != null) { // we have a mapping of this timer to a program
             for (String progID : progIDs) {
                 if (progID.equals("NO_PROGRAM")) {
@@ -870,5 +869,61 @@ public class TimerManager extends Observable {
             }
         }
         return false;
+    }
+
+    /**
+     * Handles all timers, which couldn't be assigned automatically
+     *
+     */
+    public void handleNotAssignedTimers() {
+        if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
+            return;
+        }
+        Iterator<LazyBonesTimer> iterator = getNotAssignedTimers().iterator();
+        logger.debug("Not assigned timers: {}", getNotAssignedTimers().size());
+        while (iterator.hasNext()) {
+            LazyBonesTimer timer = iterator.next();
+            switch (timer.getReason()) {
+            case LazyBonesTimer.NOT_FOUND:
+                // show message
+                java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+                String dateString = sdf.format(date);
+                String title = timer.getPath() + timer.getTitle();
+                Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+                String channelName = "unknown channel";
+                if (chan != null) {
+                    channelName = chan.getName();
+                }
+                String msg = LazyBones.getTranslation("message_programselect",
+                        "I couldn\'t find a program, which matches the vdr timer\n<b>{0}</b> at <b>{1}</b> on <b>{2}</b>.\n"
+                                + "You may assign this timer to a program in the context menu.", title, dateString, channelName);
+                popupLog.warn(msg);
+                break;
+            case LazyBonesTimer.NO_EPG:
+                logger.warn("Couldn't assign timer: ", timer);
+                String mesg = LazyBones.getTranslation("noEPGdataTVB",
+                        "<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>", timer.toString());
+                epgLog.error(mesg);
+                break;
+            case LazyBonesTimer.NO_CHANNEL:
+                mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString());
+                epgLog.error(mesg);
+                break;
+            case LazyBonesTimer.NO_PROGRAM:
+                // do nothing
+                break;
+            default:
+                logger.debug("Not assigned timer: {}", timer);
+            }
+        }
+    }
+
+    public RecordingManager getRecordingManager() {
+        return recordingManager;
+    }
+
+    public void setRecordingManager(RecordingManager recordingManager) {
+        this.recordingManager = recordingManager;
     }
 }

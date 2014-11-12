@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,14 +43,16 @@ import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 public class DeleteRecordingAction extends VDRAction {
 
+    private RecordingManager recordingManager;
     private final Recording recording;
 
-    public DeleteRecordingAction(Recording recording) {
-        this(recording, null);
+    public DeleteRecordingAction(RecordingManager recordingManager, Recording recording) {
+        this(recordingManager, recording, null);
     }
 
-    public DeleteRecordingAction(Recording recording, VDRCallback<?> callback) {
+    public DeleteRecordingAction(RecordingManager recordingManager, Recording recording, VDRCallback<?> callback) {
         super(callback);
+        this.recordingManager = recordingManager;
         this.recording = recording;
     }
 
@@ -79,7 +81,8 @@ public class DeleteRecordingAction extends VDRAction {
                 String msg = response.getMessage();
                 String numberString = msg.substring(msg.lastIndexOf(" "));
                 int timerNumber = Integer.parseInt(numberString.trim());
-                LazyBonesTimer timer = TimerManager.getInstance().getTimer(timerNumber);
+                TimerManager timerManager = recordingManager.getTimerManager();
+                LazyBonesTimer timer = timerManager.getTimer(timerNumber);
 
                 VDRCallback<DeleteTimerAction> callback = new VDRCallback<DeleteTimerAction>() {
                     @Override
@@ -104,7 +107,7 @@ public class DeleteRecordingAction extends VDRAction {
                         }
 
                         success = true;
-                        TimerManager.getInstance().synchronize();
+                        recordingManager.synchronize();
                         callback();
                     }
                 };
@@ -117,7 +120,7 @@ public class DeleteRecordingAction extends VDRAction {
         }
 
         // update recording list
-        RecordingManager.getInstance().synchronize();
+        recordingManager.synchronize();
         return true;
     }
 

@@ -57,7 +57,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 
-import lazybones.ConflictFinder;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.TitleMapping;
@@ -129,7 +128,10 @@ public class TimerPanel implements MouseListener, ActionListener {
 
     private JHistoryComboBox cbDefaultDirectory;
 
-    public TimerPanel() {
+    private TimerManager timerManager;
+
+    public TimerPanel(TimerManager timerManager) {
+        this.timerManager = timerManager;
         initComponents();
     }
 
@@ -187,7 +189,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         timelineStartHour.setModel(new SpinnerNumberModel(int_timelineStartHour, 0, 23, 1));
 
         labMappings = new JLabel(lMappings);
-        mappingTable = new JTable(TimerManager.getInstance().getTitleMapping());
+        mappingTable = new JTable(timerManager.getTitleMapping());
         mappingPane = new JScrollPane(mappingTable);
         mappingTable.addMouseListener(this);
         mappingPane.addMouseListener(this);
@@ -366,8 +368,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         props.setProperty("default.directory", cbDefaultDirectory.getText());
         props.setProperty("default.directory.history", xstream.toXML(cbDefaultDirectory.getHistory()));
 
-        ConflictFinder.getInstance().findConflicts();
-        ConflictFinder.getInstance().handleConflicts();
+        LazyBones.getInstance().synchronize();
     }
 
     @Override
@@ -396,10 +397,10 @@ public class TimerPanel implements MouseListener, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if ("ADD".equals(e.getActionCommand())) {
-            TitleMapping mapping = TimerManager.getInstance().getTitleMapping();
+            TitleMapping mapping = timerManager.getTitleMapping();
             mapping.put("", "");
         } else if ("DEL".equals(e.getActionCommand())) {
-            TitleMapping mapping = TimerManager.getInstance().getTitleMapping();
+            TitleMapping mapping = timerManager.getTitleMapping();
             int[] indices = mappingTable.getSelectedRows();
             for (int i = indices.length - 1; i >= 0; i--) {
                 mapping.removeRow(indices[i]);

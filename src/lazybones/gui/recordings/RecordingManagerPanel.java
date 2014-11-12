@@ -101,8 +101,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
     private final JToggleButton orderSelector = new JToggleButton();
 
     private JScrollPane scrollPane = null;
-    private final RecordingTreeModel recordingTreeModel = new RecordingTreeModel();
-    private final JTree recordingTree = new JTree(recordingTreeModel);
+    private RecordingTreeModel recordingTreeModel;
+    private final JTree recordingTree = new JTree();
 
     private final RecordingDetailsPanel recordingDetailsPanel = new RecordingDetailsPanel();
     private JButton buttonSync = null;
@@ -116,7 +116,10 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
     private HintTextField filter = new HintTextField(getTranslation("search", "Search"));
     private JProgressBar diskUsageProgressBar = new JProgressBar();
 
-    public RecordingManagerPanel() {
+    private RecordingManager recordingManager;
+
+    public RecordingManagerPanel(RecordingManager recordingManager) {
+        this.recordingManager = recordingManager;
         initGUI();
         loadSettings();
     }
@@ -157,6 +160,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         gbc.weighty = 1;
         gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(0, 10, 10, 10);
+        recordingTreeModel = new RecordingTreeModel(recordingManager);
+        recordingTree.setModel(recordingTreeModel);
         recordingTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         recordingTree.setRootVisible(true);
         recordingTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -265,12 +270,12 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         diskUsageProgressBar.setMaximumSize(new Dimension(250, 26));
         diskUsageProgressBar.setMinimum(0);
         diskUsageProgressBar.setMaximum(100);
-        RecordingManager.getInstance().addObserver(new Observer() {
+        recordingManager.addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
                 if (arg instanceof DiskStatus) {
                     try {
-                        DiskStatus diskStatus = RecordingManager.getInstance().getDiskStatus();
+                        DiskStatus diskStatus = recordingManager.getDiskStatus();
                         diskUsageProgressBar.setValue(diskStatus.getUsage());
                         diskUsageProgressBar.setStringPainted(true);
                         diskUsageProgressBar.setString(diskStatus.toString());
@@ -312,11 +317,11 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         } else if ("INFO".equals(e.getActionCommand()) && itemSelected) {
             createRecordingDetailsDialog(rec);
         } else if ("SYNC".equals(e.getActionCommand())) {
-            RecordingManager.getInstance().synchronize();
+            recordingManager.synchronize();
         } else if ("PLAY".equals(e.getActionCommand()) && itemSelected) {
             Player.play(rec);
         } else if ("PLAY_ON_VDR".equals(e.getActionCommand()) && itemSelected) {
-            RecordingManager.getInstance().playOnVdr(rec);
+            recordingManager.playOnVdr(rec);
         } else if (e.getSource() == orderSelector) {
             SortStrategy strategy = (SortStrategy) sortStrategySelector.getSelectedItem();
             boolean ascending = !orderSelector.isSelected();
@@ -352,7 +357,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
                         // RecordingManager.getInstance().getRecordings().remove(rec);
                         // recordingTreeModel.remove(tp);
 
-                        RecordingManager.getInstance().synchronize(new Runnable() {
+                        recordingManager.synchronize(new Runnable() {
                             @Override
                             public void run() {
                                 scrollPane.setEnabled(true);
@@ -367,7 +372,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
                     }
                 }
             };
-            DeleteRecordingAction dra = new DeleteRecordingAction(rec, callback);
+            DeleteRecordingAction dra = new DeleteRecordingAction(recordingManager, rec, callback);
             dra.enqueue();
         }
     }

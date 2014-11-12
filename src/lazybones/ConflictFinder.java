@@ -53,21 +53,14 @@ public class ConflictFinder implements Observer {
     private static transient Logger popuplog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
     private static transient Logger logger = LoggerFactory.getLogger(ConflictFinder.class);
 
-    private static ConflictFinder instance;
     private final Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = new HashSet<ConflictingTimersSet<LazyBonesTimer>>();
     private final HashMap<Integer, Integer> transponderUse = new HashMap<Integer, Integer>();
     private final HashSet<LazyBonesTimer> runningEvents = new HashSet<LazyBonesTimer>();
+    private final TimerManager timerManager;
 
-    private ConflictFinder() {
-        TimerManager.getInstance().addObserver(this);
-        findConflicts();
-    }
-
-    public static ConflictFinder getInstance() {
-        if (instance == null) {
-            instance = new ConflictFinder();
-        }
-        return instance;
+    public ConflictFinder(TimerManager timerManager) {
+        this.timerManager = timerManager;
+        timerManager.addObserver(this);
     }
 
     private void reset() {
@@ -76,7 +69,7 @@ public class ConflictFinder implements Observer {
         runningEvents.clear();
 
         // reset timer conflict times
-        for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
+        for (LazyBonesTimer timer : timerManager.getTimers()) {
             timer.getConflictPeriods().clear();
         }
     }
@@ -89,7 +82,7 @@ public class ConflictFinder implements Observer {
 
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
         logger.debug("Number of cards: {}", numberOfCards);
-        List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
+        List<LazyBonesTimer> timers = timerManager.getTimers();
         List<StartStopEvent> startStopEvents = Utilities.createStartStopEventList(timers);
 
         // run over startStopEvents
@@ -129,14 +122,14 @@ public class ConflictFinder implements Observer {
             // check, if there are timer conflicts
             if (getConflictCount() > 0) {
                 String msg = LazyBones.getTranslation("conflict_found", LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!",
-                        Integer.toString(ConflictFinder.getInstance().getConflictCount()));
+                        Integer.toString(getConflictCount()));
 
                 LazyBones.getInstance().getMainDialog().setVisible(true);
                 LazyBones.getInstance().getMainDialog().showTimeline();
 
                 // debug output
                 StringBuffer logMsg = new StringBuffer();
-                Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = ConflictFinder.getInstance().getConflicts();
+                Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = getConflicts();
                 for (ConflictingTimersSet<LazyBonesTimer> set : conflicts) {
                     logMsg.append("Conflict found: ");
                     for (LazyBonesTimer timer : set) {

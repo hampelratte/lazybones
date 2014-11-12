@@ -55,7 +55,7 @@ public class RecordingTreeModel implements TreeModel, Observer {
 
     private final List<TreeModelListener> tmls = new ArrayList<TreeModelListener>();
 
-    private final RecordingManager rm = RecordingManager.getInstance();
+    private final RecordingManager rm;
 
     private Comparator<Recording> sortStrategy = new RecordingAlphabeticalComparator();
 
@@ -63,7 +63,8 @@ public class RecordingTreeModel implements TreeModel, Observer {
 
     private String filter = "";
 
-    public RecordingTreeModel() {
+    public RecordingTreeModel(RecordingManager recordingManager) {
+        this.rm = recordingManager;
         rm.addObserver(this);
         sortBy(sortStrategy, sortAscending);
     }

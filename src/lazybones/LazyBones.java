@@ -114,6 +114,16 @@ public class LazyBones extends Plugin implements Observer {
 
     private PluginCenterPanelWrapper wrapper;
 
+    private final TimerManager timerManager;
+    private final RecordingManager recordingManager;
+
+    public LazyBones() {
+        timerManager = new TimerManager();
+        recordingManager = new RecordingManager();
+        timerManager.setRecordingManager(recordingManager);
+        recordingManager.setTimerManager(timerManager);
+    }
+
     public static LazyBones getInstance() {
         return instance;
     }
@@ -174,13 +184,13 @@ public class LazyBones extends Plugin implements Observer {
         t.getEndTime().add(Calendar.MINUTE, buffer_after);
         Response response = VDRConnection.send(new NEWT(t));
         if (response.getCode() == 250) {
-            TimerManager.getInstance().assignProgramToTimer(selectedProgram, t);
+            timerManager.assignProgramToTimer(selectedProgram, t);
         } else {
             logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:") + " " + response.getMessage());
         }
 
         logger.debug("Storing {}-{} in tvb2vdr", originalProgram.getTitle(), t.getTitle());
-        TimerManager.getInstance().getTitleMapping().put(originalProgram.getTitle(), t.getTitle());
+        timerManager.getTitleMapping().put(originalProgram.getTitle(), t.getTitle());
     }
 
     @Override
@@ -203,14 +213,14 @@ public class LazyBones extends Plugin implements Observer {
 
     public MainDialog getMainDialog() {
         if (mainDialog == null) {
-            mainDialog = new MainDialog(getParent(), LazyBones.getTranslation("lazybones", "Lazy Bones"), false);
+            mainDialog = new MainDialog(getParent(), timerManager, recordingManager);
         }
         return mainDialog;
     }
 
     @Override
     public devplugin.SettingsTab getSettingsTab() {
-        return new VDRSettingsPanel();
+        return new VDRSettingsPanel(timerManager);
     }
 
     @Override
@@ -331,7 +341,7 @@ public class LazyBones extends Plugin implements Observer {
         // load title mapping
         try {
             Map<String, String> titleMapping = (HashMap<String, String>) xstream.fromXML(props.getProperty("titleMapping"));
-            TimerManager.getInstance().getTitleMapping().setMappingFromMap(titleMapping);
+            timerManager.getTitleMapping().setMappingFromMap(titleMapping);
         } catch (Exception e) {
             logger.warn("Couldn't load title mapping", e);
         }
@@ -347,7 +357,7 @@ public class LazyBones extends Plugin implements Observer {
         // load timers
         try {
             List<LazyBonesTimer> timers = (ArrayList<LazyBonesTimer>) xstream.fromXML(props.getProperty("timers"));
-            TimerManager.getInstance().setStoredTimers(timers);
+            timerManager.setStoredTimers(timers);
         } catch (Exception e) {
             logger.warn("Couldn't load timers", e);
         }
@@ -362,7 +372,7 @@ public class LazyBones extends Plugin implements Observer {
 
         // remove outdated timers
         Calendar today = GregorianCalendar.getInstance();
-        for (Iterator<LazyBonesTimer> iter = TimerManager.getInstance().getStoredTimers().iterator(); iter.hasNext();) {
+        for (Iterator<LazyBonesTimer> iter = timerManager.getStoredTimers().iterator(); iter.hasNext();) {
             LazyBonesTimer timer = iter.next();
             if (timer.getEndTime().before(today) & !timer.isRepeating()) {
                 iter.remove();
@@ -386,9 +396,9 @@ public class LazyBones extends Plugin implements Observer {
         wrapper = new PluginCenterPanelWrapper() {
             //@formatter:off
             PluginCenterPanel[] panels =  new PluginCenterPanel[] {
-                    new TimelineCenterPanel(),
-                    new TimersCenterPanel(),
-                    new RecordingsCenterPanel()/*,
+                    new TimelineCenterPanel(timerManager),
+                    new TimersCenterPanel(timerManager, recordingManager),
+                    new RecordingsCenterPanel(recordingManager)/*,
                     new RemoteControlCenterPanel()*/
             };
             //@formatter:on
@@ -400,7 +410,7 @@ public class LazyBones extends Plugin implements Observer {
         };
 
         // observe the timer list
-        TimerManager.getInstance().addObserver(this);
+        timerManager.addObserver(this);
 
         // initialize logging
         initLogging();
@@ -472,8 +482,8 @@ public class LazyBones extends Plugin implements Observer {
     private void storeData() {
         XStream xstream = new XStream();
         props.setProperty("channelMapping", xstream.toXML(ChannelManager.getChannelMapping()));
-        props.setProperty("timers", xstream.toXML(TimerManager.getInstance().getTimers()));
-        props.setProperty("titleMapping", xstream.toXML(TimerManager.getInstance().getTitleMapping().getAsMap()));
+        props.setProperty("timers", xstream.toXML(timerManager.getTimers()));
+        props.setProperty("titleMapping", xstream.toXML(timerManager.getTitleMapping().getAsMap()));
         props.setProperty("channelList", xstream.toXML(ChannelManager.getInstance().getChannels()));
     }
 
@@ -487,7 +497,7 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public void handleTvDataUpdateFinished() {
-        ProgramManager.getInstance().markPrograms();
+        ProgramManager.getInstance().markPrograms(timerManager.getTimers());
     }
 
     public Frame getParent() {
@@ -502,7 +512,7 @@ public class LazyBones extends Plugin implements Observer {
         node.removeAllActions();
         node.removeAllChildren();
 
-        for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
+        for (LazyBonesTimer timer : timerManager.getTimers()) {
             if (timer.isAssigned()) {
                 for (String progID : timer.getTvBrowserProgIDs()) {
                     Program prog = ProgramDatabase.getProgram(progID);
@@ -549,15 +559,15 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if (observable == TimerManager.getInstance()) {
+        if (observable == timerManager) {
             // update the plugin tree
             updateTree();
         }
     }
 
     public void synchronize() {
-        TimerManager.getInstance().synchronize();
-        RecordingManager.getInstance().synchronize();
+        timerManager.synchronize();
+        recordingManager.synchronize();
     }
 
     private class ContextMenuFactory {
@@ -616,7 +626,7 @@ public class LazyBones extends Plugin implements Observer {
                 }
             }
 
-            boolean notAssignedTimersExist = TimerManager.getInstance().getNotAssignedTimers().size() > 0;
+            boolean notAssignedTimersExist = timerManager.getNotAssignedTimers().size() > 0;
 
             int size = 4;
 
@@ -632,7 +642,7 @@ public class LazyBones extends Plugin implements Observer {
                 AbstractAction action1 = new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
-                        TimerManager.getInstance().deleteTimer(program);
+                        timerManager.deleteTimer(program);
                     }
                 };
                 action1.putValue(Action.NAME, LazyBones.getTranslation("dont_capture", "Delete timer"));
@@ -643,9 +653,9 @@ public class LazyBones extends Plugin implements Observer {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
                         logger.info("Looking up timer for {}", program);
-                        LazyBonesTimer timer = TimerManager.getInstance().getTimer(program);
+                        LazyBonesTimer timer = timerManager.getTimer(program);
                         logger.info("Found timer {}", timer);
-                        TimerManager.getInstance().editTimer(timer);
+                        timerManager.editTimer(timer);
                     }
                 };
                 action2.putValue(Action.NAME, LazyBones.getTranslation("edit", "Edit Timer"));
@@ -667,7 +677,7 @@ public class LazyBones extends Plugin implements Observer {
                 AbstractAction action1 = new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
-                        TimerManager.getInstance().createTimer(program, false);
+                        timerManager.createTimer(program, false);
                     }
                 };
                 action1.putValue(Action.NAME, LazyBones.getTranslation("capture", "Capture with VDR"));
@@ -687,15 +697,15 @@ public class LazyBones extends Plugin implements Observer {
                 if (notAssignedTimersExist) {
                     // AbstractAction action3 = new AbstractAction() {public void actionPerformed(ActionEvent evt) {}};
                     // action3.putValue(Plugin.DISABLED_ON_TASK_MENU, true);
-                    Action[] timers = new Action[TimerManager.getInstance().getNotAssignedTimers().size()];
-                    List<LazyBonesTimer> timerList = TimerManager.getInstance().getNotAssignedTimers();
+                    Action[] timers = new Action[timerManager.getNotAssignedTimers().size()];
+                    List<LazyBonesTimer> timerList = timerManager.getNotAssignedTimers();
                     for (int i = 0; i < timers.length; i++) {
                         final LazyBonesTimer timer = timerList.get(i);
                         timers[i] = new AbstractAction() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 ProgramManager.getInstance().assignTimerToProgram(program, timer);
-                                TimerManager.getInstance().assignProgramToTimer(program, timer);
+                                timerManager.assignProgramToTimer(program, timer);
                                 updateTree();
                             }
                         };
@@ -753,7 +763,7 @@ public class LazyBones extends Plugin implements Observer {
                 delItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        TimerManager.getInstance().deleteTimer(timer);
+                        timerManager.deleteTimer(timer);
                     }
 
                 });
@@ -762,7 +772,7 @@ public class LazyBones extends Plugin implements Observer {
                 editItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        TimerManager.getInstance().editTimer(timer);
+                        timerManager.editTimer(timer);
                     }
 
                 });
@@ -811,7 +821,7 @@ public class LazyBones extends Plugin implements Observer {
             // create timers for all programs
             for (int i = 0; i < programArr.length; i++) {
                 Program prog = programArr[i];
-                TimerManager.getInstance().createTimer(prog, true);
+                timerManager.createTimer(prog, true);
             }
 
             // restore old properties
@@ -827,7 +837,7 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public int getMarkPriorityForProgram(Program p) {
-        LazyBonesTimer timer = TimerManager.getInstance().getTimer(p);
+        LazyBonesTimer timer = timerManager.getTimer(p);
         if (timer != null) {
             if (!timer.isActive()) {
                 return Program.LOWER_MEDIUM_MARK_PRIORITY;
@@ -843,7 +853,7 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public Icon[] getProgramTableIcons(Program program) {
-        LazyBonesTimer timer = TimerManager.getInstance().getTimer(program);
+        LazyBonesTimer timer = timerManager.getTimer(program);
         if (timer != null) {
             if (timer.hasState(Timer.VPS)) {
                 Icon[] icons = new ImageIcon[1];

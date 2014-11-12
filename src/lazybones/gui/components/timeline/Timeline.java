@@ -35,6 +35,8 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import lazybones.TimerManager;
+
 public class Timeline extends JPanel {
 
     static final int ROW_HEIGHT = 40;
@@ -43,13 +45,13 @@ public class Timeline extends JPanel {
     private TimelineList list = null;
     private JScrollPane scrollPane = new JScrollPane();
 
-    public Timeline() {
+    public Timeline(TimerManager timerManager) {
         setLayout(new BorderLayout());
-        initGUI();
+        initGUI(timerManager);
     }
 
-    private void initGUI() {
-        list = new TimelineList();
+    private void initGUI(TimerManager timerManager) {
+        list = new TimelineList(timerManager);
 
         TimelineRowHeader rowHeader = new TimelineRowHeader(list);
         scrollPane.setRowHeaderView(rowHeader);

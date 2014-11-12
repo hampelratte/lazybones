@@ -42,6 +42,8 @@ import javax.swing.JRootPane;
 
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.RecordingManager;
+import lazybones.TimerManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,10 +92,10 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         NEW, UPDATE, VIEW
     }
 
-    public TimerOptionsDialog(LazyBonesTimer timer, Program prog, Mode mode) {
+    public TimerOptionsDialog(TimerManager timerManager, RecordingManager recordingManager, LazyBonesTimer timer, Program prog, Mode mode) {
         this.control = LazyBones.getInstance();
 
-        top = new TimerOptionsEditor(timer, mode);
+        top = new TimerOptionsEditor(timerManager, recordingManager, timer, mode);
 
         this.timer = timer;
         this.oldTimer = (LazyBonesTimer) timer.clone();

@@ -56,8 +56,6 @@ public class RecordingManager extends Observable {
 
     private static transient Logger logger = LoggerFactory.getLogger(RecordingManager.class);
 
-    private static RecordingManager instance;
-
     /**
      * Stores all recordings as Recording objects
      */
@@ -68,15 +66,10 @@ public class RecordingManager extends Observable {
      */
     private DiskStatus diskStatus;
 
-    private RecordingManager() {
-        recordings = new ArrayList<Recording>();
-    }
+    private TimerManager timerManager;
 
-    public synchronized static RecordingManager getInstance() {
-        if (instance == null) {
-            instance = new RecordingManager();
-        }
-        return instance;
+    public RecordingManager() {
+        recordings = new ArrayList<Recording>();
     }
 
     public void removeAll() {
@@ -192,5 +185,13 @@ public class RecordingManager extends Observable {
         if (res.getCode() != 250) {
             logger.error(res.getMessage());
         }
+    }
+
+    public TimerManager getTimerManager() {
+        return timerManager;
+    }
+
+    public void setTimerManager(TimerManager timerManager) {
+        this.timerManager = timerManager;
     }
 }

@@ -29,10 +29,8 @@
 package lazybones.programmanager;
 
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.ConcurrentModificationException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JPopupMenu;
@@ -41,10 +39,7 @@ import lazybones.ChannelManager;
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
-import lazybones.TimerManager;
 import lazybones.VDRConnection;
-import lazybones.logging.LoggingConstants;
-import lazybones.logging.PopupHandler;
 import lazybones.programmanager.evaluation.DoppelpackDetector;
 import lazybones.programmanager.evaluation.Evaluator;
 import lazybones.programmanager.evaluation.Result;
@@ -63,8 +58,6 @@ import devplugin.Program;
 
 public class ProgramManager {
     private static transient Logger logger = LoggerFactory.getLogger(ProgramManager.class);
-    private static transient Logger epgLog = LoggerFactory.getLogger(LoggingConstants.EPG_LOGGER);
-    private static transient Logger popupLog = LoggerFactory.getLogger(PopupHandler.KEYWORD);
 
     private static ProgramManager instance;
 
@@ -122,10 +115,10 @@ public class ProgramManager {
     /**
      * Called to mark all Programs
      */
-    public void markPrograms() {
+    public void markPrograms(List<LazyBonesTimer> timers) {
         // for every timer
         try {
-            for (LazyBonesTimer timer : TimerManager.getInstance().getTimers()) {
+            for (LazyBonesTimer timer : timers) {
                 markSingularTimer(timer);
             }
         } catch (ConcurrentModificationException e) {
@@ -136,7 +129,7 @@ public class ProgramManager {
             unmarkPrograms();
 
             // now mark all timers
-            markPrograms();
+            markPrograms(timers);
         }
     }
 
@@ -150,53 +143,7 @@ public class ProgramManager {
         }
     }
 
-    /**
-     * Handles all timers, which couldn't be assigned automatically
-     *
-     */
-    public void handleNotAssignedTimers() {
-        if (Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("supressMatchDialog"))) {
-            return;
-        }
-        Iterator<LazyBonesTimer> iterator = TimerManager.getInstance().getNotAssignedTimers().iterator();
-        logger.debug("Not assigned timers: {}", +TimerManager.getInstance().getNotAssignedTimers().size());
-        while (iterator.hasNext()) {
-            LazyBonesTimer timer = iterator.next();
-            switch (timer.getReason()) {
-            case LazyBonesTimer.NOT_FOUND:
-                // show message
-                java.util.Date date = new java.util.Date(timer.getStartTime().getTimeInMillis());
-                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-                String dateString = sdf.format(date);
-                String title = timer.getPath() + timer.getTitle();
-                Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-                String channelName = "unknown channel";
-                if (chan != null) {
-                    channelName = chan.getName();
-                }
-                String msg = LazyBones.getTranslation("message_programselect",
-                        "I couldn\'t find a program, which matches the vdr timer\n<b>{0}</b> at <b>{1}</b> on <b>{2}</b>.\n"
-                                + "You may assign this timer to a program in the context menu.", title, dateString, channelName);
-                popupLog.warn(msg);
-                break;
-            case LazyBonesTimer.NO_EPG:
-                logger.warn("Couldn't assign timer: ", timer);
-                String mesg = LazyBones.getTranslation("noEPGdataTVB",
-                        "<html>TV-Browser has no EPG-data the timer {0}.<br>Please update your EPG-data!</html>", timer.toString());
-                epgLog.error(mesg);
-                break;
-            case LazyBonesTimer.NO_CHANNEL:
-                mesg = LazyBones.getTranslation("no_channel_defined", "No channel defined", timer.toString());
-                epgLog.error(mesg);
-                break;
-            case LazyBonesTimer.NO_PROGRAM:
-                // do nothing
-                break;
-            default:
-                logger.debug("Not assigned timer: {}", timer);
-            }
-        }
-    }
+
 
     /**
      *
@@ -236,14 +183,15 @@ public class ProgramManager {
         if (bestMatching.getPercentage() >= threshold) {
             assignTimerToProgram(bestMatching.getProgram(), timer);
         } else {
-            // no candidate and no doppelpack found
-            // look for the timer in stored timers
-            boolean found = TimerManager.getInstance().lookUpTimer(timer, bestMatching.getProgram());
-            if (!found) { // we have no mapping
-                logger.warn("Couldn't find a program with that title: ", timer.getTitle());
-                logger.warn("Couldn't assign timer: ", timer);
-                timer.setReason(LazyBonesTimer.NOT_FOUND);
-            }
+            // FIXME reactivate, programmanager needs a reference to timermanager
+            // // no candidate and no doppelpack found
+            // // look for the timer in stored timers
+            // boolean found = TimerManager.getInstance().lookUpTimer(timer, bestMatching.getProgram());
+            // if (!found) { // we have no mapping
+            // logger.warn("Couldn't find a program with that title: ", timer.getTitle());
+            // logger.warn("Couldn't assign timer: ", timer);
+            // timer.setReason(LazyBonesTimer.NOT_FOUND);
+            // }
         }
     }
 

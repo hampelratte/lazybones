@@ -37,6 +37,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class TimerSchedule {
+
+    private TimerManager timerManager;
+
+    public TimerSchedule(TimerManager timerManager) {
+        this.timerManager = timerManager;
+    }
     /**
      * Returns the next day, on which a timer event starts or stops, after the given calendar
      *
@@ -92,7 +98,7 @@ public class TimerSchedule {
     }
 
     private Set<Calendar> createEventSet() {
-        List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
+        List<LazyBonesTimer> timers = timerManager.getTimers();
         TreeSet<Calendar> events = new TreeSet<Calendar>();
         for (Iterator<LazyBonesTimer> iter = timers.iterator(); iter.hasNext();) {
             LazyBonesTimer timer = iter.next();

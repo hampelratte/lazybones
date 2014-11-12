@@ -62,14 +62,17 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     private JButton prevDateButton;
     private Timeline timeline;
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
-    private TimerSchedule timerSchedule = new TimerSchedule();
+    private TimerManager timerManager;
+    private TimerSchedule timerSchedule;
 
     private TimelineWeekdayButton[] weekdayButtons = new TimelineWeekdayButton[7];
 
-    public TimelinePanel() {
-        timeline = new Timeline();
+    public TimelinePanel(TimerManager timerManager) {
+        this.timerManager = timerManager;
+        timeline = new Timeline(timerManager);
+        timerSchedule = new TimerSchedule(timerManager);
         initGUI();
-        TimerManager.getInstance().addObserver(this);
+        timerManager.addObserver(this);
         enableDisableButtons();
     }
 
@@ -93,7 +96,8 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         for (int i = 0; i < weekdayButtons.length; i++) {
             Calendar day = (Calendar) today.clone();
             day.add(Calendar.DAY_OF_MONTH, i);
-            weekdayButtons[i] = new TimelineWeekdayButton(day);
+            weekdayButtons[i] = new TimelineWeekdayButton(timerManager, day);
+            timerManager.addObserver(weekdayButtons[i]);
             weekdayButtons[i].addActionListener(this);
             northPanel.add(weekdayButtons[i]);
         }
@@ -104,7 +108,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         setCalendar(GregorianCalendar.getInstance());
 
         add(timeline, BorderLayout.CENTER);
-        timeline.getList().showTimersForCurrentDate(TimerManager.getInstance().getTimers());
+        timeline.getList().showTimersForCurrentDate(timerManager.getTimers());
     }
 
     @Override
@@ -130,7 +134,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         enableDisableButtons();
 
         // display the new timers in the timeline
-        timeline.getList().showTimersForCurrentDate(TimerManager.getInstance().getTimers());
+        timeline.getList().showTimersForCurrentDate(timerManager.getTimers());
     }
 
     private void enableDisableButtons() {
@@ -153,7 +157,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o == TimerManager.getInstance()) {
+        if (o == timerManager) {
             enableDisableButtons();
         }
     }

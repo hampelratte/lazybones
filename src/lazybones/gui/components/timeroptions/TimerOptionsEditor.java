@@ -148,6 +148,9 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
 
     private SuggestingJHistoryComboBox comboDirectory;
 
+    private TimerManager timerManager;
+    private RecordingManager recordingManager;
+
     /**
      * The actual timer
      */
@@ -165,7 +168,9 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
     private String originalTitel = "";
     private String originalPath = "";
 
-    public TimerOptionsEditor(LazyBonesTimer timer, Mode mode) {
+    public TimerOptionsEditor(TimerManager timerManager, RecordingManager recordingManager, LazyBonesTimer timer, Mode mode) {
+        this.timerManager = timerManager;
+        this.recordingManager = recordingManager;
         this.mode = mode;
 
         logger.debug("Creating timer options panel");
@@ -176,7 +181,9 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         logger.debug("Timer options panel ready");
     }
 
-    public TimerOptionsEditor(Mode mode) {
+    public TimerOptionsEditor(TimerManager timerManager, RecordingManager recordingManager, Mode mode) {
+        this.timerManager = timerManager;
+        this.recordingManager = recordingManager;
         this.mode = mode;
         initGUI();
     }
@@ -401,7 +408,7 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             // set path
             List<String> dirSuggestions = new ArrayList<String>();
             // add directory suggestions from existing recordings
-            List<Recording> recordings = RecordingManager.getInstance().getRecordings();
+            List<Recording> recordings = recordingManager.getRecordings();
             if (recordings != null) { // if the user is fast enough, the recordings might not have been loaded
                 for (Recording recording : recordings) {
                     // abuse Timer class to parse path and title
@@ -413,7 +420,7 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
                 }
             }
             // add directory suggestions from upcoming timers
-            List<LazyBonesTimer> timers = TimerManager.getInstance().getTimers();
+            List<LazyBonesTimer> timers = timerManager.getTimers();
             for (LazyBonesTimer _timer : timers) {
                 if (!_timer.getPath().isEmpty()) {
                     dirSuggestions.add(_timer.getPath());

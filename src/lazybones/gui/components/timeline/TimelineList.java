@@ -71,12 +71,15 @@ public class TimelineList extends JPanel implements Observer {
     private Color overlayTextColor;
     private Color midnightLineColor;
 
-    public TimelineList() {
+    private TimerManager timerManager;
+
+    public TimelineList(TimerManager timerManager) {
+        this.timerManager = timerManager;
         setCalendar(calendar);
         setBackground(background);
 
         setLayout(new TimelineLayout());
-        TimerManager.getInstance().addObserver(this);
+        timerManager.addObserver(this);
 
         Thread repainter = new Thread() {
             @Override
@@ -159,7 +162,7 @@ public class TimelineList extends JPanel implements Observer {
         this.calendar.set(Calendar.SECOND, 0);
         this.calendar.set(Calendar.MILLISECOND, 0);
 
-        showTimersForCurrentDate(TimerManager.getInstance().getTimers());
+        showTimersForCurrentDate(timerManager.getTimers());
     }
 
     @Override
@@ -275,7 +278,7 @@ public class TimelineList extends JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o == TimerManager.getInstance()) {
+        if (o == timerManager) {
             if (arg instanceof TimersChangedEvent) {
                 TimersChangedEvent tce = (TimersChangedEvent) arg;
                 switch (tce.getType()) {
