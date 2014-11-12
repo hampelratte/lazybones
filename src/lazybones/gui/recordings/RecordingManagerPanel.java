@@ -85,6 +85,7 @@ import org.hampelratte.svdrp.sorting.RecordingAlphabeticalComparator;
 import org.hampelratte.svdrp.sorting.RecordingIsCutComparator;
 import org.hampelratte.svdrp.sorting.RecordingIsNewComparator;
 import org.hampelratte.svdrp.sorting.RecordingStarttimeComparator;
+import org.hampelratte.svdrp.util.SizeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -273,7 +274,17 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
                         diskUsageProgressBar.setValue(diskStatus.getUsage());
                         diskUsageProgressBar.setStringPainted(true);
                         diskUsageProgressBar.setString(diskStatus.toString());
-                        diskUsageProgressBar.setToolTipText(diskStatus.toString());
+                        //@formatter:off
+                        String tooltip = "<html>"
+                                + SizeFormatter.format(diskStatus.getSpaceFreeInBytes()) + " "
+                                + LazyBones.getTranslation("free", "free")
+                                + "<br>"
+                                + diskStatus.getUsage() + "% "
+                                + LazyBones.getTranslation("used", "used")
+                                + "</html>";
+                        //@formatter:on
+                        diskUsageProgressBar.setToolTipText(tooltip);
+
                     } catch (Throwable t) {
                         logger.error("Couldn't determine disk usage", t);
                     }
