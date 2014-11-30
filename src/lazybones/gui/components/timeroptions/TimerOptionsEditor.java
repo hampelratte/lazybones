@@ -560,6 +560,8 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         timer.setDescription(description.getText());
         timer.changeStateTo(Timer.ACTIVE, cbActive.isSelected());
         timer.changeStateTo(Timer.VPS, cbVps.isSelected());
+        timer.setStartTime((Calendar) spinnerStarttimeModel.getValue());
+        timer.setEndTime((Calendar) spinnerEndtimeModel.getValue());
         return timer;
     }
 
