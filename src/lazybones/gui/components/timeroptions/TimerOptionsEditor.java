@@ -319,26 +319,9 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         gbc.gridy = row++;
         add(comboDesc, gbc);
 
-        comboDescModel = new DescriptionComboBoxModel(false, (mode == Mode.UPDATE || mode == Mode.VIEW));
+        comboDescModel = new DescriptionComboBoxModel(false, mode == Mode.UPDATE);
         comboDesc.setModel(comboDescModel);
         comboDesc.addItemListener(this);
-        // comboDesc.setEnabled(!update);
-
-        if (mode == Mode.VIEW) { // set components to readonly
-            cbActive.setEnabled(false);
-            cbVps.setEnabled(false);
-            cbSeries.setEnabled(false);
-            title.setEnabled(false);
-            comboDirectory.setEnabled(false);
-            channels.setEnabled(false);
-            day.setEnabled(false);
-            spinnerStarttime.setEnabled(false);
-            spinnerEndtime.setEnabled(false);
-            lifetime.setEnabled(false);
-            priority.setEnabled(false);
-            comboDesc.setEnabled(false);
-            description.setEnabled(false);
-        }
     }
 
     private Component createCheckboxGrid() {
@@ -387,7 +370,7 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             }
 
             // set the description
-            if (mode == Mode.UPDATE || mode == Mode.VIEW) {
+            if (mode == Mode.UPDATE) {
                 description.setText(oldTimer.getDescription());
                 comboDescModel.setSelected(DescriptionSelectorItem.TIMER);
             } else {

@@ -89,7 +89,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
     private boolean accepted = false;
 
     public enum Mode {
-        NEW, UPDATE, VIEW
+        NEW, UPDATE
     }
 
     public TimerOptionsDialog(TimerManager timerManager, RecordingManager recordingManager, LazyBonesTimer timer, Program prog, Mode mode) {
