@@ -447,8 +447,6 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             // if title is EPISODE and path is TITLE, this is a series
             cbSeries.setSelected("TITLE".equals(timer.getPath()) && "EPISODE".equals(timer.getTitle()));
 
-            day.setText(timer.getDayString());
-
             // initialize the start and end time spinners
             spinnerStarttimeModel = new SpinnerCalendarModel(timer.getStartTime());
             spinnerStarttime.setModel(spinnerStarttimeModel);
@@ -463,6 +461,7 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
 
             dayChooser.setTimer(timer);
+            day.setText(timer.getDayString());
 
             // set timer uses VPS switch
             if (mode == Mode.NEW) {
@@ -560,8 +559,13 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
         timer.setDescription(description.getText());
         timer.changeStateTo(Timer.ACTIVE, cbActive.isSelected());
         timer.changeStateTo(Timer.VPS, cbVps.isSelected());
-        timer.setStartTime((Calendar) spinnerStarttimeModel.getValue());
-        timer.setEndTime((Calendar) spinnerEndtimeModel.getValue());
+
+        timer.getStartTime().set(Calendar.HOUR_OF_DAY, ((Calendar) spinnerStarttimeModel.getValue()).get(Calendar.HOUR_OF_DAY));
+        timer.getStartTime().set(Calendar.MINUTE, ((Calendar) spinnerStarttimeModel.getValue()).get(Calendar.MINUTE));
+        timer.getStartTime().set(Calendar.SECOND, 0);
+        timer.getEndTime().set(Calendar.HOUR_OF_DAY, ((Calendar) spinnerEndtimeModel.getValue()).get(Calendar.HOUR_OF_DAY));
+        timer.getEndTime().set(Calendar.MINUTE, ((Calendar) spinnerEndtimeModel.getValue()).get(Calendar.MINUTE));
+        timer.getEndTime().set(Calendar.SECOND, 0);
         return timer;
     }
 
