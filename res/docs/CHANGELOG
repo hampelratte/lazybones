@@ -4,6 +4,7 @@ Lazy Bones 1.3.5
 * Removed dead code
 * Bugfix: Selected program from TimerSelectionDialog was not applied in some
   cases
+* Added settings toggle to keep the player open, when TV-Browser is closed
 
 Lazy Bones 1.3.4
 ===============================================================================

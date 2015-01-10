@@ -222,9 +222,12 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public void onDeactivation() {
-        try {
-            Player.stop();
-        } catch (Exception e) {
+        String surviveOnExit = props.getProperty("surviveOnExit");
+        if (Boolean.FALSE.toString().toLowerCase().equals(surviveOnExit)) {
+            try {
+                Player.stop();
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -291,6 +294,11 @@ public class LazyBones extends Plugin implements Observer {
         String switchBefore = props.getProperty("switchBefore");
         switchBefore = switchBefore == null ? "false" : switchBefore;
         props.setProperty("switchBefore", switchBefore);
+
+        String surviveOnExit = props.getProperty("surviveOnExit");
+        surviveOnExit = surviveOnExit == null ? "false" : surviveOnExit;
+        props.setProperty("surviveOnExit", surviveOnExit);
+
         String recordingURL = props.getProperty("recording.url");
         recordingURL = recordingURL == null ? "http://<host>:3000/TS/<recording_number>.rec.ts" : recordingURL;
         props.setProperty("recording.url", recordingURL);
