@@ -188,9 +188,6 @@ public class LazyBones extends Plugin implements Observer {
         } else {
             logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:") + " " + response.getMessage());
         }
-
-        logger.debug("Storing {}-{} in tvb2vdr", originalProgram.getTitle(), t.getTitle());
-        timerManager.getTitleMapping().put(originalProgram.getTitle(), t.getTitle());
     }
 
     @Override

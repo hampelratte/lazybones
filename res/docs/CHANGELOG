@@ -1,3 +1,10 @@
+Lazy Bones 1.3.5
+===============================================================================
+* Bugfix: Start date from the timer options dialog was not applied to the timer
+* Removed dead code
+* Bugfix: Selected program from TimerSelectionDialog was not applied in some
+  cases
+
 Lazy Bones 1.3.4
 ===============================================================================
 * Bugfix: Start time from the timer options dialog was not applied to the timer 

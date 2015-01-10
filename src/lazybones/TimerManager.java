@@ -701,7 +701,9 @@ public class TimerManager extends Observable {
     public void assignProgramToTimer(Program prog, LazyBonesTimer timer) {
         timer.addTvBrowserProgID(prog.getUniqueID());
         replaceStoredTimer(timer);
-        getTitleMapping().put(prog.getTitle(), timer.getTitle());
+        if (!prog.getTitle().equals(timer.getTitle())) {
+            getTitleMapping().put(prog.getTitle(), timer.getTitle());
+        }
     }
 
     /**

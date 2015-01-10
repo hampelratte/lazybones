@@ -34,6 +34,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -46,9 +48,6 @@ import javax.swing.ListSelectionModel;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerProgram;
-
-import org.hampelratte.svdrp.responses.highlevel.Timer;
-
 import util.ui.Localizer;
 import util.ui.ProgramList;
 import util.ui.UiUtilities;
@@ -69,6 +68,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
 
     private final ProgramList list = new ProgramList(model);
 
+    private int selectedIndex = -1;
     private Program selectedProgram = null;
 
     private final LazyBones control;
@@ -87,7 +87,6 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         this.timerOptions = timerOptions;
         this.originalProgram = prog;
         initGUI();
-        UiUtilities.registerForClosing(this);
     }
 
     private void initGUI() {
@@ -139,31 +138,96 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         for (int i = 0; i < programs.length; i++) {
             model.addElement(programs[i]);
         }
+
+        // position centered on tvb
         dialog.pack();
+        int parentWidth = LazyBones.getInstance().getParent().getWidth();
+        int parentHeight = LazyBones.getInstance().getParent().getHeight();
+        int parentX = LazyBones.getInstance().getParent().getX();
+        int parentY = LazyBones.getInstance().getParent().getY();
+        int posX = (parentWidth - dialog.getWidth()) / 2;
+        int posY = (parentHeight - dialog.getHeight()) / 2;
+        dialog.setLocation(parentX + posX, parentY + posY);
         dialog.setVisible(true);
+
+        UiUtilities.registerForClosing(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
-            int index = list.getSelectedIndex();
-            if (index >= 0) {
-                selectedProgram = model.get(list.getSelectedIndex());
+            selectedIndex = list.getSelectedIndex();
+            if (selectedIndex >= 0) {
+                selectedProgram = model.get(selectedIndex);
                 TimerProgram program = (TimerProgram) selectedProgram;
-                Timer t = program.getTimer();
-                t.setTitle(timerOptions.getTitle());
-                t.setDescription(timerOptions.getDescription());
-                t.setLifetime(timerOptions.getLifetime());
-                t.setPriority(timerOptions.getPriority());
-                t.setStartTime(timerOptions.getStartTime());
-                t.setEndTime(timerOptions.getEndTime());
-                t.setHasFirstTime(timerOptions.hasFirstTime());
-                t.setFirstTime(timerOptions.getFirstTime());
-                t.setRepeatingDays(timerOptions.getRepeatingDays());
+                LazyBonesTimer t = program.getTimer();
+
+                boolean showOptionsDialog = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("showTimerOptionsDialog"));
+                if (showOptionsDialog) {
+                    // the user has seen the timer options editor and might have changed things
+                    // we don't want to loose that and copy it to the timer
+                    t.setTitle(timerOptions.getTitle());
+                    t.setDescription(timerOptions.getDescription());
+                    t.setLifetime(timerOptions.getLifetime());
+                    t.setPriority(timerOptions.getPriority());
+                    t.setStartTime(timerOptions.getStartTime());
+                    t.setEndTime(timerOptions.getEndTime());
+                    t.setHasFirstTime(timerOptions.hasFirstTime());
+                    t.setFirstTime(timerOptions.getFirstTime());
+                    t.setRepeatingDays(timerOptions.getRepeatingDays());
+                } else {
+                    // no timer options dialog has been shown
+                    // we should copy all values from the selected program
+                    t.addTvBrowserProgID(selectedProgram.getUniqueID());
+                    t.setTitle(selectedProgram.getTitle());
+                    t.setDescription(selectedProgram.getDescription());
+                    t.setStartTime(getStartTime(selectedProgram));
+                    t.setEndTime(getEndTime(selectedProgram));
+                    t.setLifetime(timerOptions.getLifetime());
+                    t.setPriority(timerOptions.getPriority());
+                    t.setHasFirstTime(timerOptions.hasFirstTime());
+                    t.setFirstTime(timerOptions.getFirstTime());
+                    t.setRepeatingDays(timerOptions.getRepeatingDays());
+                }
+
                 control.timerSelectionCallBack(selectedProgram, originalProgram);
             }
         }
         dialog.dispose();
+    }
+
+    private Calendar getStartTime(Program prog) {
+        Calendar startTime = getCalendarForDate(prog);
+        startTime.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        startTime.set(Calendar.MINUTE, prog.getMinutes());
+        return startTime;
+    }
+
+    private Calendar getEndTime(Program prog) {
+        Calendar endTime = getCalendarForDate(prog);
+        endTime.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        endTime.set(Calendar.MINUTE, prog.getMinutes());
+        if (prog.getLength() > 0) {
+            endTime.add(Calendar.MINUTE, prog.getLength());
+        } else if (model.getSize() > selectedIndex + 1) {
+            Program next = model.get(selectedIndex + 1);
+            Calendar startOfNextProgram = getStartTime(next);
+            endTime = startOfNextProgram;
+        } else {
+            throw new RuntimeException("Duration of selected program is unknown");
+        }
+
+        return endTime;
+    }
+
+    private Calendar getCalendarForDate(Program prog) {
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
+        cal.set(Calendar.MONTH, prog.getDate().getMonth());
+        cal.set(Calendar.YEAR, prog.getDate().getYear());
+        return cal;
     }
 
     @Override
