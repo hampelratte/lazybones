@@ -225,7 +225,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         cal.set(Calendar.MILLISECOND, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
-        cal.set(Calendar.MONTH, prog.getDate().getMonth());
+        cal.set(Calendar.MONTH, prog.getDate().getMonth() - 1);
         cal.set(Calendar.YEAR, prog.getDate().getYear());
         return cal;
     }
