@@ -1,3 +1,7 @@
+Lazy Bones 1.4.1
+===============================================================================
+* Bugfix: Wrong month (+1) in TimerSelectionDialog
+
 Lazy Bones 1.4.0
 ===============================================================================
 * Added settings toggle to keep the player open, when TV-Browser is closed
