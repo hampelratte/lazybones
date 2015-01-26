@@ -34,8 +34,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,16 +52,20 @@ import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
-import lazybones.gui.components.HintTextField;
 import lazybones.gui.settings.channelpanel.dnd.ListTransferHandler;
 import lazybones.gui.settings.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.swing.DecoratableTextField;
+import org.hampelratte.swing.TextFieldClearButtonDecorator;
+import org.hampelratte.swing.TextFieldHintDecorator;
 
 import util.ui.Localizer;
 
@@ -89,7 +91,7 @@ public class ChannelPanel implements ActionListener {
     private FilterListModel listModel = new FilterListModel();
     private JList<Channel> list = new JList<Channel>(listModel);
 
-    private HintTextField channelFilterTextfield = new HintTextField(LazyBones.getTranslation("filter_channels", "Filter channels"));
+    private DecoratableTextField channelFilterTextfield = new DecoratableTextField();
 
     private JTable table = new JTable();
 
@@ -150,7 +152,9 @@ public class ChannelPanel implements ActionListener {
         down.addActionListener(this);
         assign.addActionListener(this);
         remove.addActionListener(this);
-        channelFilterTextfield.addKeyListener(new ChannelFilterKeyAdapter());
+        channelFilterTextfield.getDocument().addDocumentListener(new ChannelFilterDocumentListener());
+        channelFilterTextfield.addDecorator(new TextFieldHintDecorator(LazyBones.getTranslation("filter_channels", "Filter channels")));
+        channelFilterTextfield.addDecorator(new TextFieldClearButtonDecorator());
     }
 
     public JPanel getPanel() {
@@ -418,10 +422,19 @@ public class ChannelPanel implements ActionListener {
         }
     }
 
-    private class ChannelFilterKeyAdapter extends KeyAdapter {
+    private class ChannelFilterDocumentListener implements DocumentListener {
         @Override
-        public void keyReleased(KeyEvent e) {
-            super.keyReleased(e);
+        public void insertUpdate(DocumentEvent e) {
+            listModel.setFilter(channelFilterTextfield.getText());
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            listModel.setFilter(channelFilterTextfield.getText());
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
             listModel.setFilter(channelFilterTextfield.getText());
         }
     }

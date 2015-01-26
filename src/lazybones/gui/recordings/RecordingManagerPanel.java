@@ -49,6 +49,7 @@ import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -62,6 +63,8 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
@@ -73,7 +76,6 @@ import lazybones.RecordingManager;
 import lazybones.VDRCallback;
 import lazybones.actions.DeleteRecordingAction;
 import lazybones.actions.GetRecordingDetailsAction;
-import lazybones.gui.components.HintTextField;
 import lazybones.gui.components.RecordingDetailsPanel;
 
 import org.hampelratte.svdrp.Response;
@@ -86,6 +88,10 @@ import org.hampelratte.svdrp.sorting.RecordingIsCutComparator;
 import org.hampelratte.svdrp.sorting.RecordingIsNewComparator;
 import org.hampelratte.svdrp.sorting.RecordingStarttimeComparator;
 import org.hampelratte.svdrp.util.SizeFormatter;
+import org.hampelratte.swing.DecoratableTextField;
+import org.hampelratte.swing.TextFieldClearButtonDecorator;
+import org.hampelratte.swing.TextFieldHintDecorator;
+import org.hampelratte.swing.TextFieldIconDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +119,9 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
     private final JPopupMenu popup = new JPopupMenu();
 
-    private HintTextField filter = new HintTextField(getTranslation("search", "Search"));
+    private DecoratableTextField filter = new DecoratableTextField();
+
+    // new HintTextField();
     private JProgressBar diskUsageProgressBar = new JProgressBar();
 
     private RecordingManager recordingManager;
@@ -247,13 +255,21 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
         filter.setPreferredSize(new Dimension(250, 26));
         filter.setMaximumSize(new Dimension(250, 26));
+        filter.addDecorator(new TextFieldHintDecorator(getTranslation("search", "Search")));
+        filter.addDecorator(new TextFieldClearButtonDecorator());
+        ImageIcon searchIcon = LazyBones.getInstance().createImageIcon("action", "system-search", 16);
+        filter.addDecorator(new TextFieldIconDecorator(searchIcon.getImage()));
+
         toolBar.add(filter);
-        filter.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
+        filter.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void removeUpdate(DocumentEvent e) { filter(); }
+            @Override public void insertUpdate(DocumentEvent e) { filter(); }
+            @Override public void changedUpdate(DocumentEvent e) { filter(); }
+            
+            private void filter() {
                 String query = filter.getText();
                 recordingTreeModel.filter(query);
-
+                
                 if (query.trim().isEmpty()) {
                     expandAll(recordingTree, false);
                     recordingTree.expandPath(new TreePath(recordingTreeModel.getRoot()));
