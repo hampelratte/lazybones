@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (c) Henrik Niehaus
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 3. Neither the name of the project (Lazy Bones) nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ * 3. Neither the name of the project (Lazy Bones) nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,13 +39,16 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 
+import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 
+import devplugin.Program;
+
 /**
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
- * 
+ *
  *         Utility class with different functions
  */
 public class Utilities {
@@ -198,7 +201,7 @@ public class Utilities {
     }
 
     /**
-     * 
+     *
      * @param a
      *            Calendar
      * @param b
@@ -224,7 +227,7 @@ public class Utilities {
 
     /**
      * Returns the difference of two calendars in minutes
-     * 
+     *
      * @param startTime
      * @param endTime
      * @return difference of two calendars in minutes
@@ -236,7 +239,7 @@ public class Utilities {
 
     /**
      * Filters a list of EPGEntries by a provided VDR channel name and a time which has to be in between a EPGEntries start and end time.
-     * 
+     *
      * @param epgList
      *            list of EPGEntries retrieved from VDR
      * @param vdrChannelName
@@ -254,4 +257,46 @@ public class Utilities {
         }
         return null;
     }
+
+    public static Calendar getStartTime(Program prog) {
+        Calendar cal = getCalendar(prog);
+        cal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+        cal.set(Calendar.MINUTE, prog.getMinutes());
+        return cal;
+    }
+
+    public static Calendar getEndTime(Program prog) {
+        Calendar cal = getStartTime(prog);
+        cal.add(Calendar.MINUTE, prog.getLength());
+        return cal;
+    }
+
+    private static Calendar getCalendar(Program prog) {
+        Calendar cal = prog.getDate().getCalendar();
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
+    }
+
+    public static boolean timerRunsOnDate(LazyBonesTimer timer, Calendar date) {
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+        Calendar selectedDayAtStartHour = (Calendar) date.clone();
+        selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
+
+        Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
+        dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
+
+        if (timer.getStartTime().after(selectedDayAtStartHour) & timer.getStartTime().before(dayAfterAtStartHour)
+                || timer.getEndTime().after(selectedDayAtStartHour) & timer.getEndTime().before(dayAfterAtStartHour)) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

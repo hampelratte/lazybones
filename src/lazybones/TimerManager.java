@@ -51,6 +51,7 @@ import lazybones.actions.CreateTimerAction;
 import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.responses.ConnectionProblem;
+import lazybones.conflicts.ConflictFinder;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
@@ -90,7 +91,7 @@ public class TimerManager extends Observable {
     /**
      * Stores all timers as Timer objects
      */
-    private final List<LazyBonesTimer> timers;
+    private final List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
 
     /**
      * The VDR timers from the last session, which have been stored to disk
@@ -105,14 +106,9 @@ public class TimerManager extends Observable {
     private final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
     private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 
-    private ConflictFinder conflictFinder;
+    private ConflictFinder conflictFinder = new ConflictFinder();
 
     private RecordingManager recordingManager;
-
-    public TimerManager() {
-        timers = new ArrayList<LazyBonesTimer>();
-        conflictFinder = new ConflictFinder(this);
-    }
 
     private void addTimer(LazyBonesTimer timer, boolean calculateRepeatingTimers, boolean notifyObservers) {
         if (!timer.isRepeating() || !calculateRepeatingTimers) {
@@ -379,18 +375,19 @@ public class TimerManager extends Observable {
             logger.info("No timer defined on VDR");
             setChanged();
             notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
-        } else { /*
-         * something went wrong, we have no timers -> load the stored ones
-         */
+        } else {
+            // something went wrong, we have no timers -> load the stored ones
             conLog.error(LazyBones.getTranslation("using_stored_timers", "Couldn't retrieve timers from VDR, using stored ones."));
-
             List<LazyBonesTimer> vdrtimers = getStoredTimers();
             setTimers(vdrtimers, false);
         }
 
         // handle conflicts, if some have been detected
-        conflictFinder.findConflicts();
-        conflictFinder.handleConflicts();
+        // Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = conflictFinder.findConflictingTimers(getTimers());
+        // for (ConflictingTimersSet<LazyBonesTimer> conflict : conflicts) {
+        // ConflictResolver conflictResolver = new ConflictResolver(conflict);
+        // conflictResolver.handleConflicts();
+        // }
 
         LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
         LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);

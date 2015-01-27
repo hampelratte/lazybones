@@ -26,13 +26,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package lazybones;
+package lazybones.conflicts;
 
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import lazybones.LazyBonesTimer;
 import lazybones.utils.Period;
 
 public class ConflictingTimersSet<E> extends HashSet<E> {

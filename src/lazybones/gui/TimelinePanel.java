@@ -51,6 +51,7 @@ import javax.swing.JPanel;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.TimerSchedule;
+import lazybones.gui.components.timeline.ConflictPanel;
 import lazybones.gui.components.timeline.Timeline;
 import lazybones.gui.components.timeline.TimelineWeekdayButton;
 import lazybones.utils.Utilities;
@@ -64,6 +65,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
     private TimerManager timerManager;
     private TimerSchedule timerSchedule;
+    private ConflictPanel conflictPanel;
 
     private TimelineWeekdayButton[] weekdayButtons = new TimelineWeekdayButton[7];
 
@@ -71,6 +73,8 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         this.timerManager = timerManager;
         timeline = new Timeline(timerManager);
         timerSchedule = new TimerSchedule(timerManager);
+        conflictPanel = new ConflictPanel(timerManager);
+
         initGUI();
         timerManager.addObserver(this);
         enableDisableButtons();
@@ -90,6 +94,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
         northPanel.add(date);
+        date.setFont(new Font("SansSerif", Font.PLAIN, 18));
         date.setPreferredSize(new Dimension(280, 30));
         northPanel.add(new JLabel("     "));
         Calendar today = Calendar.getInstance();
@@ -104,11 +109,14 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
 
         add(northPanel, BorderLayout.NORTH);
 
-        date.setFont(new Font("SansSerif", Font.PLAIN, 18));
         setCalendar(GregorianCalendar.getInstance());
 
         add(timeline, BorderLayout.CENTER);
+        timeline.setMinimumSize(new Dimension(100, 200));
         timeline.getList().showTimersForCurrentDate(timerManager.getTimers());
+
+        add(conflictPanel, BorderLayout.SOUTH);
+
     }
 
     @Override
@@ -165,6 +173,9 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     public void setCalendar(Calendar calendar) {
         // set calendar in timeline
         timeline.getList().setCalendar(calendar);
+
+        // set calendar in conflict resolution
+        conflictPanel.setCalendar(calendar);
 
         // show new date
         Date d = calendar.getTime();

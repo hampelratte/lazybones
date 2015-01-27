@@ -55,6 +55,7 @@ import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.TimersChangedEvent;
+import lazybones.utils.Utilities;
 
 public class TimelineList extends JPanel implements Observer {
     private final List<LazyBonesTimer> data = new ArrayList<LazyBonesTimer>();
@@ -270,7 +271,7 @@ public class TimelineList extends JPanel implements Observer {
     public void showTimersForCurrentDate(List<LazyBonesTimer> timers) {
         clear();
         for (LazyBonesTimer timer : timers) {
-            if (runsOnCurrentDate(timer)) {
+            if (Utilities.timerRunsOnDate(timer, calendar)) {
                 addTimer(timer);
             }
         }
@@ -286,42 +287,26 @@ public class TimelineList extends JPanel implements Observer {
                     List<LazyBonesTimer> timers = tce.getTimers();
                     clear();
                     for (LazyBonesTimer timer : timers) {
-                        if (runsOnCurrentDate(timer)) {
+                        if (Utilities.timerRunsOnDate(timer, calendar)) {
                             addTimer(timer);
                         }
                     }
                     break;
                 case TimersChangedEvent.TIMER_ADDED:
                     LazyBonesTimer timer = tce.getTimer();
-                    if (runsOnCurrentDate(timer)) {
+                    if (Utilities.timerRunsOnDate(timer, calendar)) {
                         addTimer(timer);
                     }
                     break;
                 case TimersChangedEvent.TIMER_REMOVED:
                     timer = tce.getTimer();
-                    if (runsOnCurrentDate(timer)) {
+                    if (Utilities.timerRunsOnDate(timer, calendar)) {
                         removeTimer(timer);
                     }
                     break;
                 }
             }
         }
-    }
-
-    private boolean runsOnCurrentDate(LazyBonesTimer timer) {
-        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
-        Calendar selectedDayAtStartHour = (Calendar) getCalendar().clone();
-        selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
-
-        Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
-        dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
-
-        if (timer.getStartTime().after(selectedDayAtStartHour) & timer.getStartTime().before(dayAfterAtStartHour)
-                || timer.getEndTime().after(selectedDayAtStartHour) & timer.getEndTime().before(dayAfterAtStartHour)) {
-            return true;
-        }
-
-        return false;
     }
 
     public void addTimelineListener(TimelineListener l) {
