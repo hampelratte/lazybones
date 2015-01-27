@@ -68,11 +68,6 @@ public class ConflictResolver {
     }
 
     public void handleConflicts() {
-        boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
-        if (!showTimerConflicts) {
-            return;
-        }
-
         // show timeline
         LazyBones.getInstance().getMainDialog().setVisible(true);
         LazyBones.getInstance().getMainDialog().showTimeline();
@@ -153,45 +148,6 @@ public class ConflictResolver {
         return programStart.before(now);
     }
 
-//        if (showTimerConflicts) {
-//            // check, if there are timer conflicts
-//            if (conflicts.size() > 0) {
-//                logger.debug("Handling conflicts");
-//                String msg = LazyBones.getTranslation("conflict_found", LazyBones.getInstance().getInfo().getName() + " has detected {0} timer conflict(s)!",
-//                        Integer.toString(conflicts.size()));
-//
-//                LazyBones.getInstance().getMainDialog().setVisible(true);
-//                LazyBones.getInstance().getMainDialog().showTimeline();
-//
-//                // debug output
-//                StringBuffer logMsg = new StringBuffer();
-//                for (ConflictingTimersSet<LazyBonesTimer> set : conflicts) {
-//                    logMsg.append("Conflict found: ");
-//                    for (LazyBonesTimer timer : set) {
-//                        logMsg.append(timer.getTitle() + ", ");
-//                    }
-//                    logMsg.append(" Conflict start: " + DateFormat.getDateTimeInstance().format(set.getConflictStartTime().getTime()));
-//                    logMsg.append(" Conflict end: " + DateFormat.getDateTimeInstance().format(set.getConflictEndTime().getTime()));
-//                    logger.debug(logMsg.toString());
-//                }
-//
-//                // set timeline date to the date of one conflict
-//                TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
-//                ConflictingTimersSet<LazyBonesTimer> set = conflicts.iterator().next();
-//                Calendar startTime = (Calendar) set.getConflictStartTime().clone();
-        // int timelineStartHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
-//                if (startTime.get(Calendar.HOUR_OF_DAY) < timelineStartHour) {
-//                    startTime.add(Calendar.HOUR_OF_DAY, -1);
-//                }
-//                tp.setCalendar(startTime);
-//
-//                popuplog.info(msg);
-//            }
-//
-//            LazyBones.getInstance().getMainDialog().getTimelinePanel().repaint();
-//        }
-    // }
-
     private boolean conflicts(Program repetition, List<Program> solution) {
         for (Program program : solution) {
             Calendar candidateStart = Utilities.getStartTime(repetition);
@@ -221,7 +177,7 @@ public class ConflictResolver {
             for (LazyBonesTimer timer : conflictingTimersSet) {
                 String title = getProgramTitle(timer);
                 ProgramSearcher searcher = LazyBones.getPluginManager().createProgramSearcher(PluginManager.SEARCHER_TYPE_EXACTLY, title, false);
-                devplugin.Channel[] allChannels = tvbrowser.core.ChannelList.getSubscribedChannels();
+                devplugin.Channel[] allChannels = LazyBones.getPluginManager().getSubscribedChannels();
                 ProgramFieldType[] searchFields = new ProgramFieldType[] { ProgramFieldType.TITLE_TYPE };
                 Program[] results = searcher.search(searchFields, new Date(), DAYS_TO_LOOK_FOR_REPS, allChannels, true);
                 for (Program program : results) {

@@ -117,7 +117,7 @@ public class ChannelPanel implements ActionListener {
                 return false;
             }
         };
-        devplugin.Channel[] c = tvbrowser.core.ChannelList.getSubscribedChannels();
+        devplugin.Channel[] c = LazyBones.getPluginManager().getSubscribedChannels();
         Map<String, Channel> channelMapping = ChannelManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
