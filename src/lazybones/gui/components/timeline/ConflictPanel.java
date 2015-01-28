@@ -228,7 +228,6 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
                     }
                 }
             });
-
             for (LazyBonesTimer timer : timers) {
                 timerManager.deleteTimer(timer);
             }

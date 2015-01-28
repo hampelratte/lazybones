@@ -149,11 +149,19 @@ public class ConflictResolver {
     }
 
     private boolean conflicts(Program repetition, List<Program> solution) {
+        int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+        int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+
         for (Program program : solution) {
             Calendar candidateStart = Utilities.getStartTime(repetition);
+            candidateStart.add(Calendar.MINUTE, -bufferBefore);
             Calendar candidateEnd = Utilities.getEndTime(repetition);
+            candidateEnd.add(Calendar.MINUTE, bufferAfter);
+
             Calendar programStart = Utilities.getStartTime(program);
+            programStart.add(Calendar.MINUTE, -bufferBefore);
             Calendar programEnd = Utilities.getEndTime(program);
+            programEnd.add(Calendar.MINUTE, bufferAfter);
 
             //@formatter:off
             if (    candidateStart.after(programStart) && candidateStart.before(programEnd)

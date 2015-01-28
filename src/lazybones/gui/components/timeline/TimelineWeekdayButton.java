@@ -71,6 +71,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     public void update(Observable o, Object arg) {
         if (o instanceof TimerManager) {
             hasChanged = true;
+            repaint();
         }
     }
 
