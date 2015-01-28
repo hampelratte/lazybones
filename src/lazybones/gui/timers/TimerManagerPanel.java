@@ -256,7 +256,6 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
             if (timerList.getSelectedIndex() >= 0) {
                 LazyBonesTimer timer = timerList.getSelectedValue();
                 deleteTimer(timer);
-                cancelEditing();
             }
         } else if (e.getSource() == buttonSync) {
             cancelEditing();
