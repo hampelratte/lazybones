@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -205,6 +206,13 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == reprogramTimersButton) {
+            int result = JOptionPane.showConfirmDialog(LazyBones.getInstance().getMainDialog(), LazyBones.getTranslation("timer_conflict_change_confirm", ""),
+                    "", JOptionPane.YES_NO_OPTION);
+
+            if (result != JOptionPane.OK_OPTION) {
+                return;
+            }
+
             // save solution for the timer creation later
             List<Program> solution = new ArrayList<>();
             Enumeration<Program> en = programListModel.elements();
