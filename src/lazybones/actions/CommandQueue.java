@@ -80,13 +80,14 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
     @Override
     public void run() {
         running = true;
+        ExecutorService worker = Executors.newSingleThreadExecutor();
+
         while (true) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
             }
 
-            ExecutorService worker = Executors.newSingleThreadExecutor();
             while (size() > 0 && running) {
                 final VDRAction action = poll();
                 LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
