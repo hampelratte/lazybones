@@ -40,6 +40,7 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,6 +53,8 @@ import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.responses.ConnectionProblem;
 import lazybones.conflicts.ConflictFinder;
+import lazybones.conflicts.ConflictResolver;
+import lazybones.conflicts.ConflictingTimersSet;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
@@ -383,11 +386,14 @@ public class TimerManager extends Observable {
         }
 
         // handle conflicts, if some have been detected
-        // Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = conflictFinder.findConflictingTimers(getTimers());
-        // for (ConflictingTimersSet<LazyBonesTimer> conflict : conflicts) {
-        // ConflictResolver conflictResolver = new ConflictResolver(conflict);
-        // conflictResolver.handleConflicts();
-        // }
+        Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = conflictFinder.findConflictingTimers(getTimers());
+        if (!conflicts.isEmpty()) {
+            boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
+            if (showTimerConflicts) {
+                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next());
+                conflictResolver.handleConflicts();
+            }
+        }
 
         LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
         LazyBones.getInstance().getMainDialog().setCursor(DEFAULT_CURSOR);

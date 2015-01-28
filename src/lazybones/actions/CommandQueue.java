@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.ListModel;
@@ -85,12 +86,13 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
             } catch (InterruptedException e) {
             }
 
+            ExecutorService worker = Executors.newSingleThreadExecutor();
             while (size() > 0 && running) {
                 final VDRAction action = poll();
                 LazyBones.getInstance().getParent().setCursor(WAITING_CURSOR);
                 LazyBones.getInstance().getMainDialog().setCursor(WAITING_CURSOR);
 
-                Executors.newSingleThreadExecutor().execute(new SwingWorker<Boolean, Object>() {
+                worker.execute(new SwingWorker<Boolean, Object>() {
                     @Override
                     protected Boolean doInBackground() throws Exception {
                         boolean success = action.execute();

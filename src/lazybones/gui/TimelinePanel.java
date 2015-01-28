@@ -81,6 +81,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
     }
 
     private void initGUI() {
+        // setLayout(new GridBagLayout());
         setLayout(new BorderLayout());
 
         nextDateButton = new JButton(LazyBones.getInstance().createImageIcon("action", "go-next", 16));
@@ -91,6 +92,7 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         prevDateButton.setActionCommand("PREVIOUS_DAY");
 
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        // JToolBar northPanel = new JToolBar();// JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
         northPanel.add(date);
@@ -112,11 +114,9 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         setCalendar(GregorianCalendar.getInstance());
 
         add(timeline, BorderLayout.CENTER);
-        timeline.setMinimumSize(new Dimension(100, 200));
         timeline.getList().showTimersForCurrentDate(timerManager.getTimers());
 
         add(conflictPanel, BorderLayout.SOUTH);
-
     }
 
     @Override
