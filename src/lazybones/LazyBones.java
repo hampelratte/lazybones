@@ -502,7 +502,7 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public void handleTvDataUpdateFinished() {
-        ProgramManager.getInstance().markPrograms(timerManager.getTimers());
+        ProgramManager.getInstance().markPrograms(timerManager);
     }
 
     public Frame getParent() {

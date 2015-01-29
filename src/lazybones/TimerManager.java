@@ -185,7 +185,7 @@ public class TimerManager extends Observable {
         }
 
         // try to mark programs
-        ProgramManager.getInstance().markPrograms(timers);
+        ProgramManager.getInstance().markPrograms(this);
         List<LazyBonesTimer> notAssigned = getNotAssignedTimers();
         if (notAssigned.size() > 0) {
             handleNotAssignedTimers();

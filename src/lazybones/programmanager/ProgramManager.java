@@ -39,6 +39,7 @@ import lazybones.ChannelManager;
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.TimerManager;
 import lazybones.VDRConnection;
 import lazybones.programmanager.evaluation.DoppelpackDetector;
 import lazybones.programmanager.evaluation.Evaluator;
@@ -115,11 +116,12 @@ public class ProgramManager {
     /**
      * Called to mark all Programs
      */
-    public void markPrograms(List<LazyBonesTimer> timers) {
+    public void markPrograms(TimerManager timerManager) {
+        List<LazyBonesTimer> timers = timerManager.getTimers();
         // for every timer
         try {
             for (LazyBonesTimer timer : timers) {
-                markSingularTimer(timer);
+                markSingularTimer(timer, timerManager);
             }
         } catch (ConcurrentModificationException e) {
             // the timers list has changed while we were marking programs, let's start over
@@ -129,7 +131,7 @@ public class ProgramManager {
             unmarkPrograms();
 
             // now mark all timers
-            markPrograms(timers);
+            markPrograms(timerManager);
         }
     }
 
@@ -150,7 +152,7 @@ public class ProgramManager {
      * @param timer
      * @param chan
      */
-    private void markSingularTimer(LazyBonesTimer timer) {
+    private void markSingularTimer(LazyBonesTimer timer, TimerManager timerManager) {
         // get the day program of the day, the previous day and the next day
         List<Program> threeDayProgram;
         try {
@@ -183,15 +185,14 @@ public class ProgramManager {
         if (bestMatching.getPercentage() >= threshold) {
             assignTimerToProgram(bestMatching.getProgram(), timer);
         } else {
-            // FIXME reactivate, programmanager needs a reference to timermanager
-            // // no candidate and no doppelpack found
-            // // look for the timer in stored timers
-            // boolean found = TimerManager.getInstance().lookUpTimer(timer, bestMatching.getProgram());
-            // if (!found) { // we have no mapping
-            // logger.warn("Couldn't find a program with that title: ", timer.getTitle());
-            // logger.warn("Couldn't assign timer: ", timer);
-            // timer.setReason(LazyBonesTimer.NOT_FOUND);
-            // }
+            // no candidate and no doppelpack found
+            // look for the timer in stored timers
+            boolean found = timerManager.lookUpTimer(timer, bestMatching.getProgram());
+            if (!found) { // we have no mapping
+                logger.warn("Couldn't find a program with that title: ", timer.getTitle());
+                logger.warn("Couldn't assign timer: ", timer);
+                timer.setReason(LazyBonesTimer.NOT_FOUND);
+            }
         }
     }
 
