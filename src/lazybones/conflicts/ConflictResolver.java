@@ -77,7 +77,7 @@ public class ConflictResolver {
         Calendar startTime = (Calendar) conflict.getConflictStartTime().clone();
         int timelineStartHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         if (startTime.get(Calendar.HOUR_OF_DAY) < timelineStartHour) {
-            startTime.add(Calendar.HOUR_OF_DAY, -1);
+            startTime.add(Calendar.DAY_OF_MONTH, -1);
         }
         tp.setCalendar(startTime);
         LazyBones.getInstance().getMainDialog().getTimelinePanel().repaint();
