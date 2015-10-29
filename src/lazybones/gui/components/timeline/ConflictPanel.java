@@ -137,7 +137,7 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
             description.setText(MSG_NO_SOLUTION);
             for (ConflictingTimersSet<LazyBonesTimer> conflict : conflictsToday) {
                 try {
-                    List<Program> solution = new ConflictResolver(conflict).solveConflict();
+                    List<Program> solution = new ConflictResolver(conflict, timerManager.getTimers()).solveConflict();
                     description.setText(MSG_SOLUTION);
                     setPrograms(solution);
                     dummy.setVisible(false);

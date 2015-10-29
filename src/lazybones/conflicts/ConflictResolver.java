@@ -31,12 +31,16 @@ package lazybones.conflicts;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
+import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.TimerManager;
 import lazybones.gui.TimelinePanel;
 import lazybones.utils.Utilities;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +66,11 @@ public class ConflictResolver {
      * For each program of a conflict set this list contains an array with all the repetitions of the program.
      */
     private List<Program[]> repetitions;
+    private List<LazyBonesTimer> allTimers;
 
-    public ConflictResolver(ConflictingTimersSet<LazyBonesTimer> conflict) {
+    public ConflictResolver(ConflictingTimersSet<LazyBonesTimer> conflict, List<LazyBonesTimer> allTimers) {
         this.conflict = conflict;
+        this.allTimers = allTimers;
     }
 
     public void handleConflicts() {
@@ -88,6 +94,7 @@ public class ConflictResolver {
         repetitions = findRepetitions(conflict);
         boolean solutionFound = findConflictlessSolution(solution, 0);
         if (solutionFound) {
+        	// TODO make sure the found solution does not collide with other existing timers
             StringBuilder sb = new StringBuilder("Found combination without conflicts:");
             for (Program program : solution) {
                 sb.append("\n\t").append(program.toString());
@@ -105,7 +112,7 @@ public class ConflictResolver {
         for (int i = 0; i < programRepetitions.length; i++) {
             logger.trace("Current rep {}", i);
             Program candidate = programRepetitions[i];
-            if (!conflicts(candidate, solution) && !inThePast(candidate)) {
+            if (!conflicts(candidate, solution) && !inThePast(candidate) && !conflictsWithOtherTimers(candidate)) {
                 solution.add(candidate);
                 logger.trace("Adding {} to solution", candidate);
                 programToAdd++;
@@ -142,7 +149,31 @@ public class ConflictResolver {
         return false;
     }
 
-    private boolean inThePast(Program candidate) {
+    private boolean conflictsWithOtherTimers(Program candidate) {
+    	ConflictFinder finder = new ConflictFinder();
+    	
+    	List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
+    	timers.add(createTimerFromProgram(candidate));
+    	Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = finder.findConflictingTimers(timers);
+		return !conflicts.isEmpty();
+	}
+
+	private LazyBonesTimer createTimerFromProgram(Program candidate) {
+		Channel channel = ChannelManager.getChannelMapping().get(candidate.getChannel().getId());
+		LazyBonesTimer timer = new LazyBonesTimer();
+		timer.setChannelNumber(channel.getChannelNumber());
+		timer.setTitle(candidate.getTitle());
+		
+		// start and end time with buffers
+		timer.setStartTime(Utilities.getStartTime(candidate));
+		timer.setEndTime(Utilities.getEndTime(candidate));
+		TimerManager.setTimerBuffers(timer);
+		
+		// TODO add all relevant properties
+		return timer;
+	}
+
+	private boolean inThePast(Program candidate) {
         Calendar now = Calendar.getInstance();
         Calendar programStart = Utilities.getStartTime(candidate);
         return programStart.before(now);

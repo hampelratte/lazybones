@@ -390,7 +390,7 @@ public class TimerManager extends Observable {
         if (!conflicts.isEmpty()) {
             boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
             if (showTimerConflicts) {
-                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next());
+                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next(), timers);
                 conflictResolver.handleConflicts();
             }
         }
@@ -545,20 +545,26 @@ public class TimerManager extends Observable {
         timer.setStartTime(calStart);
         Calendar calEnd = vdrEPG.getEndTime();
         timer.setEndTime(calEnd);
+        setTimerBuffers(timer);
+    }
+    
+    public static void setTimerBuffers(LazyBonesTimer timer) {
+    	Calendar calStart = timer.getStartTime();
+    	Calendar calEnd = timer.getEndTime();
 
-        // if we have a vps timer, set the status to vps, otherwise add the recording time buffers
-        boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
-        if (vpsDefault) {
-            timer.changeStateTo(VPS, ENABLED);
-        } else {
-            // start the recording x min before the beginning of the program
-            int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
-            calStart.add(Calendar.MINUTE, -bufferBefore);
-
-            // stop the recording x min after the end of the program
-            int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
-            calEnd.add(Calendar.MINUTE, bufferAfter);
-        }
+    	// if we have a vps timer, set the status to vps, otherwise add the recording time buffers
+    	boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+    	if (vpsDefault) {
+    		timer.changeStateTo(VPS, ENABLED);
+    	} else {
+    		// start the recording x min before the beginning of the program
+    		int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+    		calStart.add(Calendar.MINUTE, -bufferBefore);
+    		
+    		// stop the recording x min after the end of the program
+    		int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+    		calEnd.add(Calendar.MINUTE, bufferAfter);
+    	}
     }
 
     /**
