@@ -151,9 +151,14 @@ public class ConflictResolver {
 
     private boolean conflictsWithOtherTimers(Program candidate) {
     	ConflictFinder finder = new ConflictFinder();
-    	
+
     	List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
     	timers.add(createTimerFromProgram(candidate));
+
+        List<LazyBonesTimer> otherTimers = new ArrayList<LazyBonesTimer>(allTimers);
+        otherTimers.removeAll(conflict);
+        timers.addAll(otherTimers);
+
     	Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = finder.findConflictingTimers(timers);
 		return !conflicts.isEmpty();
 	}
@@ -163,12 +168,12 @@ public class ConflictResolver {
 		LazyBonesTimer timer = new LazyBonesTimer();
 		timer.setChannelNumber(channel.getChannelNumber());
 		timer.setTitle(candidate.getTitle());
-		
+
 		// start and end time with buffers
 		timer.setStartTime(Utilities.getStartTime(candidate));
 		timer.setEndTime(Utilities.getEndTime(candidate));
 		TimerManager.setTimerBuffers(timer);
-		
+
 		// TODO add all relevant properties
 		return timer;
 	}
