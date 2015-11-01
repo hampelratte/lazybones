@@ -173,8 +173,6 @@ public class ConflictResolver {
 		timer.setStartTime(Utilities.getStartTime(candidate));
 		timer.setEndTime(Utilities.getEndTime(candidate));
 		TimerManager.setTimerBuffers(timer);
-
-		// TODO add all relevant properties
 		return timer;
 	}
 
