@@ -159,8 +159,8 @@ public class ConflictResolver {
         otherTimers.removeAll(conflict);
         timers.addAll(otherTimers);
 
-    	Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = finder.findConflictingTimers(timers);
-		return !conflicts.isEmpty();
+        Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = finder.findConflictingTimers(timers, false);
+        return !conflicts.isEmpty();
 	}
 
 	private LazyBonesTimer createTimerFromProgram(Program candidate) {

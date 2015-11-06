@@ -61,6 +61,10 @@ public class ConflictFinder {
     }
 
     public Set<ConflictingTimersSet<LazyBonesTimer>> findConflictingTimers(List<LazyBonesTimer> timers) {
+        return findConflictingTimers(timers, true);
+    }
+
+    public Set<ConflictingTimersSet<LazyBonesTimer>> findConflictingTimers(List<LazyBonesTimer> timers, boolean saveConflictOnTimer) {
         logger.debug("Looking for conflicts");
 
         // clear old status data
@@ -96,7 +100,7 @@ public class ConflictFinder {
                 decreaseTransponderUse(timer);
                 if (conflictFound && transponderUse.size() <= numberOfCards) {
                     conflictFound = false;
-                    conflictingTimersSet.setConflictEndTime(event.getEventTime());
+                    conflictingTimersSet.setConflictEndTime(event.getEventTime(), saveConflictOnTimer);
                     conflicts.add(conflictingTimersSet);
                     conflictingTimersSet = new ConflictingTimersSet<LazyBonesTimer>();
                 }
