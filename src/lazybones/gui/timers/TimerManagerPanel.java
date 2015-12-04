@@ -91,8 +91,8 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
     private final CardLayout timerOptionsLayout = new CardLayout();
     private final JPanel timerOptionsPanel = new JPanel(timerOptionsLayout);
-    private final TimerOptionsEditor timerOptionsEditor;
     private final TimerOptionsView timerOptionsView = new TimerOptionsView();
+    private final TimerOptionsEditor timerOptionsEditor;
 
     private TimerManager timerManager;
 

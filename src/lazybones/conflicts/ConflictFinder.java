@@ -73,6 +73,7 @@ public class ConflictFinder {
         // reset timer conflict times
         for (LazyBonesTimer timer : timers) {
             timer.getConflictPeriods().clear();
+            // timer.getConflicts().clear();
         }
 
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
@@ -108,6 +109,14 @@ public class ConflictFinder {
             }
         }
 
+        if (saveConflictOnTimer) {
+            for (ConflictingTimersSet<LazyBonesTimer> conflict : conflicts) {
+                for (LazyBonesTimer lazyBonesTimer : conflict) {
+                    lazyBonesTimer.getConflicts().addAll(conflict);
+                    lazyBonesTimer.getConflicts().remove(lazyBonesTimer);
+                }
+            }
+        }
         return conflicts;
     }
 

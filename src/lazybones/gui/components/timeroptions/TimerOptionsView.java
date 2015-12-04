@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.conflicts.ConflictingTimersSet;
 import lazybones.gui.components.AbstractDetailsPanel;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -43,7 +44,7 @@ public class TimerOptionsView extends AbstractDetailsPanel {
     /**
      * The timer to show in the view
      */
-    private LazyBonesTimer timer;
+    private LazyBonesTimer timer = null;
 
     /**
      * The TVB program, which corresponds to the timer
@@ -74,7 +75,22 @@ public class TimerOptionsView extends AbstractDetailsPanel {
         template = template.replaceAll("\\{directory\\}", timer.getPath());
         template = template.replaceAll("\\{lifetime\\}", Integer.toString(timer.getLifetime()));
         template = template.replaceAll("\\{priority\\}", Integer.toString(timer.getPriority()));
+        template = template.replaceAll("\\{conflicts\\}", createListOfConflictingTimers(timer.getConflicts()));
         return template;
+    }
+
+    private String createListOfConflictingTimers(ConflictingTimersSet<LazyBonesTimer> conflictingTimersSet) {
+        if(conflictingTimersSet.isEmpty()) {
+            return "";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<ul>");
+            for (LazyBonesTimer timer : timer.getConflicts()) {
+                sb.append("<li>").append(timer.getTitle()).append("</li>");
+            }
+            sb.append("</ul>");
+            return sb.toString();
+        }
     }
 
     private String createDateString() {

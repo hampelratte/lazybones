@@ -56,6 +56,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
     private final JLabel time = new JLabel();
     private final JLabel title = new JLabel();
     private final JLabel recording = new JLabel();
+    private final JLabel conflicting = new JLabel();
 
     private final Color background = UIManager.getColor("List.background");
     private final Color altBackground = UIManager.getColor("Panel.background");
@@ -70,6 +71,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
         time.setFont(bold);
         title.setFont(bold);
         recording.setFont(recording.getFont().deriveFont(9.0f));
+        conflicting.setFont(recording.getFont());
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -86,13 +88,16 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
         gbc.gridx = 2;
         gbc.gridy = 0;
         add(recording, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        add(conflicting, gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(time, gbc);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         add(title, gbc);
     }
 
@@ -106,6 +111,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
             channel.setForeground(UIManager.getColor("List.selectionForeground"));
             date.setForeground(UIManager.getColor("List.selectionForeground"));
             recording.setForeground(UIManager.getColor("List.selectionForeground"));
+            conflicting.setForeground(UIManager.getColor("List.selectionForeground"));
         } else {
             setBackground(index % 2 == 0 ? background : altBackground);
             time.setForeground(UIManager.getColor("List.foreground"));
@@ -113,6 +119,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
             channel.setForeground(UIManager.getColor("List.foreground"));
             date.setForeground(UIManager.getColor("List.foreground"));
             recording.setForeground(UIManager.getColor("List.foreground"));
+            conflicting.setForeground(UIManager.getColor("List.foreground"));
         }
 
         if (value instanceof LazyBonesTimer) {
@@ -124,6 +131,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
                 channel.setForeground(inactive);
                 date.setForeground(inactive);
                 recording.setForeground(inactive);
+                conflicting.setForeground(inactive);
             }
 
             DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
@@ -144,6 +152,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
                 }
             }
 
+            // show recording indicator
             if (timer.isRecording()) {
                 recording.setIcon(LazyBones.getInstance().getIcon("lazybones/capture.png"));
                 recording.setText(LazyBones.getTranslation("tooltip_recording", "Currently recording"));
@@ -152,12 +161,22 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
                 recording.setText("");
             }
 
+            // show conflicts
+            if (timer.getConflicts().isEmpty()) {
+                conflicting.setIcon(null);
+                conflicting.setText("");
+            } else {
+                conflicting.setIcon(LazyBones.getInstance().getIcon("lazybones/dialog-warning.png"));
+                conflicting.setText(LazyBones.getTranslation("timer_conflict", "Conflicting timer"));
+            }
+
             setEnabled(list.isEnabled());
             date.setEnabled(list.isEnabled());
             channel.setEnabled(list.isEnabled());
             time.setEnabled(list.isEnabled());
             title.setEnabled(list.isEnabled());
             recording.setEnabled(list.isEnabled());
+            conflicting.setEnabled(list.isEnabled());
 
             return this;
         } else {

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import lazybones.conflicts.ConflictingTimersSet;
 import lazybones.gui.settings.DescriptionSelectorItem;
 import lazybones.utils.Period;
 
@@ -44,6 +45,8 @@ import util.program.AbstractPluginProgramFormating;
 import devplugin.Program;
 
 public class LazyBonesTimer extends Timer {
+
+    private static final long serialVersionUID = 3L;
 
     public static final int NO_REASON = 0;
     public static final int NO_EPG = 1;
@@ -65,6 +68,8 @@ public class LazyBonesTimer extends Timer {
      * Contains all time periods, where this timer conflicts with other timers
      */
     private final List<Period> conflictPeriods = new ArrayList<Period>();
+
+    private final ConflictingTimersSet<LazyBonesTimer> conflicts = new ConflictingTimersSet<LazyBonesTimer>();
 
     public LazyBonesTimer() {
         setDefaultLifetimeAndPrio();
@@ -279,5 +284,9 @@ public class LazyBonesTimer extends Timer {
             setForTheDays = setForTheDays & getRepeatingDays()[days[i]];
         }
         return setForTheDays;
+    }
+
+    public ConflictingTimersSet<LazyBonesTimer> getConflicts() {
+        return conflicts;
     }
 }
