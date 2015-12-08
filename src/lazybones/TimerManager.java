@@ -191,6 +191,28 @@ public class TimerManager extends Observable {
             handleNotAssignedTimers();
         }
 
+        // handle conflicts, if some have been detected
+        Set<Conflict> conflicts = conflictFinder.findConflictingTimers(getTimers());
+        if (!conflicts.isEmpty()) {
+            // clear old conflicts, which were stored on timers
+            for (LazyBonesTimer timer : timers) {
+                timer.getConflicts().clear();
+            }
+
+            // save conflicts on timers
+            for (Conflict conflict : conflicts) {
+                for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
+                    timer.getConflicts().add(conflict);
+                }
+            }
+
+            boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
+            if (showTimerConflicts) {
+                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next(), timers);
+                conflictResolver.handleConflicts();
+            }
+        }
+
         // notify observers, that the timers have changed
         setChanged();
         notifyObservers(new TimersChangedEvent(TimersChangedEvent.ALL, getTimers()));
@@ -383,28 +405,6 @@ public class TimerManager extends Observable {
             conLog.error(LazyBones.getTranslation("using_stored_timers", "Couldn't retrieve timers from VDR, using stored ones."));
             List<LazyBonesTimer> vdrtimers = getStoredTimers();
             setTimers(vdrtimers, false);
-        }
-
-        // handle conflicts, if some have been detected
-        Set<Conflict> conflicts = conflictFinder.findConflictingTimers(getTimers());
-        if (!conflicts.isEmpty()) {
-            // clear old conflicts, which were stored on timers
-            for (LazyBonesTimer timer : timers) {
-                timer.getConflicts().clear();
-            }
-
-            // save conflicts on timers
-            for (Conflict conflict : conflicts) {
-                for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
-                    timer.getConflicts().add(conflict);
-                }
-            }
-
-            boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
-            if (showTimerConflicts) {
-                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next(), timers);
-                conflictResolver.handleConflicts();
-            }
         }
 
         LazyBones.getInstance().getParent().setCursor(DEFAULT_CURSOR);
