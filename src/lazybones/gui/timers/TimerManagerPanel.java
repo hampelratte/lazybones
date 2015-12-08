@@ -270,8 +270,13 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
             mta.setCallback(new VDRCallback<VDRAction>() {
                 @Override
                 public void receiveResponse(VDRAction cmd, Response response) {
-                    cancelEditing();
                     timerManager.synchronize();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            cancelEditing();
+                        }
+                    });
                     if (!cmd.isSuccess()) {
                         String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
                         logger.error(mesg);
