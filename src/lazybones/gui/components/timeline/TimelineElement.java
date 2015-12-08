@@ -181,6 +181,9 @@ public class TimelineElement extends JComponent implements MouseListener {
                 if (conflictStart.before(timelineStart)) {
                     conflictStart.setTime(timelineStart.getTime());
                 }
+                if (conflictStart.before(timerStart)) {
+                    conflictStart.setTime(timerStart.getTime());
+                }
                 if (conflictEnd.after(timelineEnd)) {
                     conflictEnd.setTime(timelineEnd.getTime());
                 }
