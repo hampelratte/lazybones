@@ -32,7 +32,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
@@ -43,6 +42,7 @@ import javax.swing.JToggleButton;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
+import lazybones.conflicts.Conflict;
 import lazybones.utils.Period;
 
 public class TimelineWeekdayButton extends JToggleButton implements Observer {
@@ -85,8 +85,8 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
         for (LazyBonesTimer timer : timers) {
             if (timerRunsOnThisDay(timer)) {
                 timerCount++;
-                for (Iterator<Period> iterator = timer.getConflictPeriods().iterator(); iterator.hasNext();) {
-                    Period period = iterator.next();
+                for (Conflict conflict : timer.getConflicts()) {
+                    Period period = conflict.getPeriod();
                     Calendar startTime = period.getStartTime();
                     Calendar endTime = period.getEndTime();
                     if (startTime.after(selectedDayAtStartHour) & startTime.before(dayAfterAtStartHour)

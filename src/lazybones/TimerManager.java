@@ -52,9 +52,9 @@ import lazybones.actions.CreateTimerAction;
 import lazybones.actions.DeleteTimerAction;
 import lazybones.actions.ModifyTimerAction;
 import lazybones.actions.responses.ConnectionProblem;
+import lazybones.conflicts.Conflict;
 import lazybones.conflicts.ConflictFinder;
 import lazybones.conflicts.ConflictResolver;
-import lazybones.conflicts.ConflictingTimersSet;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog;
 import lazybones.gui.timers.TimerSelectionDialog;
 import lazybones.logging.LoggingConstants;
@@ -386,8 +386,20 @@ public class TimerManager extends Observable {
         }
 
         // handle conflicts, if some have been detected
-        Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = conflictFinder.findConflictingTimers(getTimers());
+        Set<Conflict> conflicts = conflictFinder.findConflictingTimers(getTimers());
         if (!conflicts.isEmpty()) {
+            // clear old conflicts, which were stored on timers
+            for (LazyBonesTimer timer : timers) {
+                timer.getConflicts().clear();
+            }
+
+            // save conflicts on timers
+            for (Conflict conflict : conflicts) {
+                for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
+                    timer.getConflicts().add(conflict);
+                }
+            }
+
             boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
             if (showTimerConflicts) {
                 ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next(), timers);
@@ -547,7 +559,7 @@ public class TimerManager extends Observable {
         timer.setEndTime(calEnd);
         setTimerBuffers(timer);
     }
-    
+
     public static void setTimerBuffers(LazyBonesTimer timer) {
     	Calendar calStart = timer.getStartTime();
     	Calendar calEnd = timer.getEndTime();
@@ -560,7 +572,7 @@ public class TimerManager extends Observable {
     		// start the recording x min before the beginning of the program
     		int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
     		calStart.add(Calendar.MINUTE, -bufferBefore);
-    		
+
     		// stop the recording x min after the end of the program
     		int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
     		calEnd.add(Calendar.MINUTE, bufferAfter);

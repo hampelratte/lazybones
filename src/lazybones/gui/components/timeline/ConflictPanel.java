@@ -40,10 +40,10 @@ import javax.swing.UIManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
+import lazybones.conflicts.Conflict;
 import lazybones.conflicts.ConflictFinder;
 import lazybones.conflicts.ConflictResolver;
 import lazybones.conflicts.ConflictUnresolvableException;
-import lazybones.conflicts.ConflictingTimersSet;
 import lazybones.utils.Utilities;
 import util.programmouseevent.ProgramMouseEventHandler;
 import util.settings.PluginPictureSettings;
@@ -61,8 +61,8 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
 
     private TimerManager timerManager;
     private Calendar calendar;
-    private Set<ConflictingTimersSet<LazyBonesTimer>> conflictsToday = new HashSet<>();
-    private ConflictingTimersSet<LazyBonesTimer> displayedConflict;
+    private Set<Conflict> conflictsToday = new HashSet<>();
+    private Conflict displayedConflict;
 
     private DefaultListModel<Program> programListModel = new DefaultListModel<>();
     private ProgramList programList;
@@ -119,11 +119,11 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
 
     private void update() {
         List<LazyBonesTimer> allTimers = timerManager.getTimers();
-        Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = new ConflictFinder().findConflictingTimers(allTimers);
+        Set<Conflict> conflicts = new ConflictFinder().findConflictingTimers(allTimers);
 
         conflictsToday.clear();
-        for (ConflictingTimersSet<LazyBonesTimer> conflict : conflicts) {
-            for (LazyBonesTimer timer : conflict) {
+        for (Conflict conflict : conflicts) {
+            for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
                 if (Utilities.timerRunsOnDate(timer, calendar)) {
                     conflictsToday.add(conflict);
                 }
@@ -135,7 +135,7 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
         } else {
             setVisible(true);
             description.setText(MSG_NO_SOLUTION);
-            for (ConflictingTimersSet<LazyBonesTimer> conflict : conflictsToday) {
+            for (Conflict conflict : conflictsToday) {
                 try {
                     List<Program> solution = new ConflictResolver(conflict, timerManager.getTimers()).solveConflict();
                     description.setText(MSG_SOLUTION);
@@ -223,7 +223,7 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
             // delete the old timers:
             // sort by descending timer id, so that we can delete them from highest ID to lowest
             // otherwise we might get the error "Timer x not defined"
-            List<LazyBonesTimer> timers = new ArrayList<>(displayedConflict);
+            List<LazyBonesTimer> timers = new ArrayList<>(displayedConflict.getInvolvedTimers());
             Collections.sort(timers, new Comparator<LazyBonesTimer>() {
                 @Override
                 public int compare(LazyBonesTimer o1, LazyBonesTimer o2) {

@@ -60,7 +60,7 @@ public class ConflictResolver {
 
     private static final int DAYS_TO_LOOK_FOR_REPS = 6;
 
-    private ConflictingTimersSet<LazyBonesTimer> conflict;
+    private Conflict conflict;
 
     /**
      * For each program of a conflict set this list contains an array with all the repetitions of the program.
@@ -68,7 +68,7 @@ public class ConflictResolver {
     private List<Program[]> repetitions;
     private List<LazyBonesTimer> allTimers;
 
-    public ConflictResolver(ConflictingTimersSet<LazyBonesTimer> conflict, List<LazyBonesTimer> allTimers) {
+    public ConflictResolver(Conflict conflict, List<LazyBonesTimer> allTimers) {
         this.conflict = conflict;
         this.allTimers = allTimers;
     }
@@ -80,7 +80,7 @@ public class ConflictResolver {
 
         // set timeline date to the date of the conflict
         TimelinePanel tp = LazyBones.getInstance().getMainDialog().getTimelinePanel();
-        Calendar startTime = (Calendar) conflict.getConflictStartTime().clone();
+        Calendar startTime = (Calendar) conflict.getPeriod().getStartTime().clone();
         int timelineStartHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         if (startTime.get(Calendar.HOUR_OF_DAY) < timelineStartHour) {
             startTime.add(Calendar.DAY_OF_MONTH, -1);
@@ -156,10 +156,10 @@ public class ConflictResolver {
     	timers.add(createTimerFromProgram(candidate));
 
         List<LazyBonesTimer> otherTimers = new ArrayList<LazyBonesTimer>(allTimers);
-        otherTimers.removeAll(conflict);
+        otherTimers.removeAll(conflict.getInvolvedTimers());
         timers.addAll(otherTimers);
 
-        Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = finder.findConflictingTimers(timers, false);
+        Set<Conflict> conflicts = finder.findConflictingTimers(timers);
         return !conflicts.isEmpty();
 	}
 
@@ -213,10 +213,10 @@ public class ConflictResolver {
         return false;
     }
 
-    private List<Program[]> findRepetitions(ConflictingTimersSet<LazyBonesTimer> conflictingTimersSet) {
+    private List<Program[]> findRepetitions(Conflict conflict) {
         List<Program[]> repetitions = new ArrayList<>();
         try {
-            for (LazyBonesTimer timer : conflictingTimersSet) {
+            for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
                 String title = getProgramTitle(timer);
                 ProgramSearcher searcher = LazyBones.getPluginManager().createProgramSearcher(PluginManager.SEARCHER_TYPE_EXACTLY, title, false);
                 devplugin.Channel[] allChannels = LazyBones.getPluginManager().getSubscribedChannels();

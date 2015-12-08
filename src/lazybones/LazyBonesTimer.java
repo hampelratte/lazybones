@@ -33,9 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import lazybones.conflicts.ConflictingTimersSet;
+import lazybones.conflicts.Conflict;
 import lazybones.gui.settings.DescriptionSelectorItem;
-import lazybones.utils.Period;
 
 import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
 import org.hampelratte.svdrp.responses.highlevel.Timer;
@@ -65,11 +64,9 @@ public class LazyBonesTimer extends Timer {
     private List<String> tvBrowserProgIDs = new ArrayList<String>();
 
     /**
-     * Contains all time periods, where this timer conflicts with other timers
+     * Contains all conflicts with other timers
      */
-    private final List<Period> conflictPeriods = new ArrayList<Period>();
-
-    private final ConflictingTimersSet<LazyBonesTimer> conflicts = new ConflictingTimersSet<LazyBonesTimer>();
+    private final List<Conflict> conflicts = new ArrayList<Conflict>();
 
     public LazyBonesTimer() {
         setDefaultLifetimeAndPrio();
@@ -181,18 +178,12 @@ public class LazyBonesTimer extends Timer {
         return false;
     }
 
-    public List<Period> getConflictPeriods() {
-        return conflictPeriods;
+    public List<Conflict> getConflicts() {
+        return conflicts;
     }
 
-    public void addConflictPeriod(Period period) {
-        if (period.getStartTime().before(getStartTime())) {
-            period.setStartTime((Calendar) getStartTime().clone());
-        }
-        if (period.getEndTime().after(getEndTime())) {
-            period.setEndTime((Calendar) getEndTime().clone());
-        }
-        getConflictPeriods().add(period);
+    public void addConflict(Conflict conflict) {
+        getConflicts().add(conflict);
     }
 
     public String getDisplayTitle() {
@@ -284,9 +275,5 @@ public class LazyBonesTimer extends Timer {
             setForTheDays = setForTheDays & getRepeatingDays()[days[i]];
         }
         return setForTheDays;
-    }
-
-    public ConflictingTimersSet<LazyBonesTimer> getConflicts() {
-        return conflicts;
     }
 }

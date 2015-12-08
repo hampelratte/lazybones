@@ -49,7 +49,7 @@ public class ConflictFinder {
 
     private static transient Logger logger = LoggerFactory.getLogger(ConflictFinder.class);
 
-    private final Set<ConflictingTimersSet<LazyBonesTimer>> conflicts = new HashSet<ConflictingTimersSet<LazyBonesTimer>>();
+    private final Set<Conflict> conflicts = new HashSet<Conflict>();
     private final HashMap<Integer, Integer> transponderUse = new HashMap<Integer, Integer>();
     private final HashSet<LazyBonesTimer> runningEvents = new HashSet<LazyBonesTimer>();
 
@@ -60,21 +60,11 @@ public class ConflictFinder {
 
     }
 
-    public Set<ConflictingTimersSet<LazyBonesTimer>> findConflictingTimers(List<LazyBonesTimer> timers) {
-        return findConflictingTimers(timers, true);
-    }
-
-    public Set<ConflictingTimersSet<LazyBonesTimer>> findConflictingTimers(List<LazyBonesTimer> timers, boolean saveConflictOnTimer) {
+    public Set<Conflict> findConflictingTimers(List<LazyBonesTimer> timers) {
         logger.debug("Looking for conflicts");
 
         // clear old status data
         reset();
-
-        // reset timer conflict times
-        for (LazyBonesTimer timer : timers) {
-            timer.getConflictPeriods().clear();
-            // timer.getConflicts().clear();
-        }
 
         int numberOfCards = Integer.parseInt(LazyBones.getProperties().getProperty("numberOfCards"));
         logger.debug("Number of cards: {}", numberOfCards);
@@ -83,7 +73,7 @@ public class ConflictFinder {
         // the timers and increases / decreases the transponder usage accordingly
         List<StartStopEvent> startStopEvents = Utilities.createStartStopEventList(timers);
         boolean conflictFound = false;
-        ConflictingTimersSet<LazyBonesTimer> conflictingTimersSet = new ConflictingTimersSet<LazyBonesTimer>();
+        Conflict conflict = new Conflict();
         for (Iterator<StartStopEvent> iter = startStopEvents.iterator(); iter.hasNext();) {
             StartStopEvent event = iter.next();
             LazyBonesTimer timer = event.getTimer();
@@ -92,29 +82,20 @@ public class ConflictFinder {
                 runningEvents.add(timer);
                 if (transponderUse.size() > numberOfCards) {
                     conflictFound = true;
-                    conflictingTimersSet.addAll(runningEvents);
-                    if (conflictingTimersSet.getConflictStartTime() == null) {
-                        conflictingTimersSet.setConflictStartTime(event.getEventTime());
+                    conflict.getInvolvedTimers().addAll(runningEvents);
+                    if (conflict.getPeriod().getStartTime() == null) {
+                        conflict.getPeriod().setStartTime(event.getEventTime());
                     }
                 }
             } else {
                 decreaseTransponderUse(timer);
                 if (conflictFound && transponderUse.size() <= numberOfCards) {
                     conflictFound = false;
-                    conflictingTimersSet.setConflictEndTime(event.getEventTime(), saveConflictOnTimer);
-                    conflicts.add(conflictingTimersSet);
-                    conflictingTimersSet = new ConflictingTimersSet<LazyBonesTimer>();
+                    conflict.getPeriod().setEndTime(event.getEventTime());
+                    conflicts.add(conflict);
+                    conflict = new Conflict();
                 }
                 runningEvents.remove(timer);
-            }
-        }
-
-        if (saveConflictOnTimer) {
-            for (ConflictingTimersSet<LazyBonesTimer> conflict : conflicts) {
-                for (LazyBonesTimer lazyBonesTimer : conflict) {
-                    lazyBonesTimer.getConflicts().addAll(conflict);
-                    lazyBonesTimer.getConflicts().remove(lazyBonesTimer);
-                }
             }
         }
         return conflicts;
@@ -124,7 +105,7 @@ public class ConflictFinder {
         return conflicts.size();
     }
 
-    public Set<ConflictingTimersSet<LazyBonesTimer>> getConflicts() {
+    public Set<Conflict> getConflicts() {
         return conflicts;
     }
 

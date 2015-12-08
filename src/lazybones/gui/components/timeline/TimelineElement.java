@@ -51,6 +51,7 @@ import lazybones.ChannelManager;
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.conflicts.Conflict;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Period;
 import lazybones.utils.Utilities;
@@ -169,8 +170,9 @@ public class TimelineElement extends JComponent implements MouseListener {
 
         // paint conflicts
         g.setColor(CONFLICT_COLOR);
-        if (timer.getConflictPeriods() != null && timer.getConflictPeriods().size() > 0) {
-            for (Period period : timer.getConflictPeriods()) {
+        if (!timer.getConflicts().isEmpty()) {
+            for (Conflict conflict : timer.getConflicts()) {
+                Period period = conflict.getPeriod();
                 Calendar conflictStart = (Calendar) period.getStartTime().clone();
                 Calendar conflictEnd = (Calendar) period.getEndTime().clone();
                 Calendar timerStart = (Calendar) timer.getStartTime().clone();

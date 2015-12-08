@@ -29,11 +29,13 @@
 package lazybones.gui.components.timeroptions;
 
 import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
-import lazybones.conflicts.ConflictingTimersSet;
+import lazybones.conflicts.Conflict;
 import lazybones.gui.components.AbstractDetailsPanel;
 
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -79,16 +81,26 @@ public class TimerOptionsView extends AbstractDetailsPanel {
         return template;
     }
 
-    private String createListOfConflictingTimers(ConflictingTimersSet<LazyBonesTimer> conflictingTimersSet) {
-        if(conflictingTimersSet.isEmpty()) {
+    private String createListOfConflictingTimers(List<Conflict> conflicts) {
+        if (conflicts.isEmpty()) {
             return "";
         } else {
+            DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
             StringBuilder sb = new StringBuilder();
-            sb.append("<ul>");
-            for (LazyBonesTimer timer : timer.getConflicts()) {
-                sb.append("<li>").append(timer.getTitle()).append("</li>");
+            for (Conflict conflict : conflicts) {
+                Date startTime = conflict.getPeriod().getStartTime().getTime();
+                Date endTime = conflict.getPeriod().getEndTime().getTime();
+                sb.append(dateFormat.format(startTime));
+                sb.append(" &ndash; ");
+                sb.append(dateFormat.format(endTime));
+                sb.append("<ul>");
+                for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
+                    if (!timer.equals(this.timer)) {
+                        sb.append("<li>").append(timer.getTitle()).append("</li>");
+                    }
+                }
+                sb.append("</ul><br/>");
             }
-            sb.append("</ul>");
             return sb.toString();
         }
     }
