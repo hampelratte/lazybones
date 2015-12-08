@@ -118,6 +118,9 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JCheckBox cbShowTimerConflicts;
     private JLabel lShowTimerConflicts = new JLabel(LazyBones.getTranslation("showTimerConflicts", "Show note on timer conflicts"));
 
+    private JCheckBox cbShowTimerConflictsInList;
+    private JLabel lShowTimerConflictsInList = new JLabel(LazyBones.getTranslation("showTimerConflictsInList", "Show conflicts in timer list"));
+
     private JLabel lDescSource;
 
     private JComboBox<DescriptionSelectorItem> cbDescSource;
@@ -147,6 +150,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         String descSourceTvb = props.getProperty("descSourceTvb");
         boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
         boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
+        boolean showTimerConflictsInList = Boolean.parseBoolean(props.getProperty("timer.conflicts.inTimerList", "true"));
         List<String> defaultDirectoryHistory = new ArrayList<String>();
 
         // load default directory history
@@ -222,6 +226,9 @@ public class TimerPanel implements MouseListener, ActionListener {
         cbShowTimerConflicts = new JCheckBox();
         cbShowTimerConflicts.setSelected(showTimerConflicts);
 
+        cbShowTimerConflictsInList = new JCheckBox();
+        cbShowTimerConflictsInList.setSelected(showTimerConflictsInList);
+
         lDefaultDirectory = new JLabel(LazyBones.getTranslation("default_directory", "Default directory"));
         cbDefaultDirectory = new JHistoryComboBox(defaultDirectoryHistory);
     }
@@ -290,6 +297,15 @@ public class TimerPanel implements MouseListener, ActionListener {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.insets = new Insets(5, 15, 5, 5);
+        panel.add(lShowTimerConflictsInList, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panel.add(cbShowTimerConflictsInList, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lNumberOfCards, gbc);
 
         gbc.gridx = 1;
@@ -297,7 +313,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(numberOfCards, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lTimelineStartHour, gbc);
 
@@ -307,7 +323,7 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         // history combobox for the default directory
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 8;
         gbc.insets = new Insets(5, 15, 30, 5);
         panel.add(lDefaultDirectory, gbc);
 
@@ -339,12 +355,12 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(lifetime, gbc);
 
         // mapping
-        panel.add(labMappings, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
-        panel.add(mappingPane, new GridBagConstraints(0, 9, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
+        panel.add(labMappings, new GridBagConstraints(0, 9, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
+        panel.add(mappingPane, new GridBagConstraints(0, 10, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
 
         // buttons
-        panel.add(addRow, new GridBagConstraints(4, 9, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
-        panel.add(delRow, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
+        panel.add(addRow, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
+        panel.add(delRow, new GridBagConstraints(4, 11, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
 
         return panel;
     }
@@ -360,6 +376,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         props.setProperty("descSourceTvb", ((DescriptionSelectorItem) cbDescSource.getSelectedItem()).getId());
         props.setProperty("vps.default", Boolean.toString(cbVPS.isSelected()));
         props.setProperty("timer.conflicts.show", Boolean.toString(cbShowTimerConflicts.isSelected()));
+        props.setProperty("timer.conflicts.inTimerList", Boolean.toString(cbShowTimerConflictsInList.isSelected()));
 
 
         // save default directory history

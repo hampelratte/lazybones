@@ -31,10 +31,12 @@ package lazybones.gui.timers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 import javax.swing.JLabel;
@@ -47,6 +49,10 @@ import lazybones.ChannelManager;
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
+import lazybones.conflicts.Conflict;
+import lazybones.gui.components.timeline.TimelineElement;
+import lazybones.utils.Period;
+import lazybones.utils.Utilities;
 import devplugin.Channel;
 
 public class TimerListCellRenderer extends JPanel implements ListCellRenderer<LazyBonesTimer> {
@@ -57,6 +63,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
     private final JLabel title = new JLabel();
     private final JLabel recording = new JLabel();
     private final JLabel conflicting = new JLabel();
+    private LazyBonesTimer timer;
 
     private final Color background = UIManager.getColor("List.background");
     private final Color altBackground = UIManager.getColor("Panel.background");
@@ -123,7 +130,8 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
         }
 
         if (value instanceof LazyBonesTimer) {
-            LazyBonesTimer timer = value;
+            // LazyBonesTimer timer = value;
+            timer = value;
 
             if (!timer.isActive()) {
                 time.setForeground(inactive);
@@ -181,6 +189,30 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
             return this;
         } else {
             return new JLabel(value.toString());
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        boolean paintConflictsInTimerList = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.inTimerList", "true"));
+        if (paintConflictsInTimerList) {
+            g.setColor(TimelineElement.CONFLICT_COLOR);
+            if (!timer.getConflicts().isEmpty()) {
+                for (Conflict conflict : timer.getConflicts()) {
+                    Period period = conflict.getPeriod();
+                    Calendar conflictStart = (Calendar) period.getStartTime().clone();
+                    Calendar conflictEnd = (Calendar) period.getEndTime().clone();
+
+                    long durationMinutes = 1440;
+                    double pixelsPerMinute = (double) getWidth() / (double) durationMinutes;
+                    long startMinute = conflictStart.get(Calendar.HOUR_OF_DAY) * 60 + conflictStart.get(Calendar.MINUTE);
+                    int x = (int) Math.ceil(pixelsPerMinute * startMinute);
+                    int width = (int) (pixelsPerMinute * Utilities.getDiffInMinutes(conflictStart, conflictEnd));
+                    g.fillRect(x, 0, width, getHeight() - 1);
+                }
+            }
         }
     }
 }
