@@ -62,6 +62,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -265,11 +266,11 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             @Override public void removeUpdate(DocumentEvent e) { filter(); }
             @Override public void insertUpdate(DocumentEvent e) { filter(); }
             @Override public void changedUpdate(DocumentEvent e) { filter(); }
-            
+
             private void filter() {
                 String query = filter.getText();
                 recordingTreeModel.filter(query);
-                
+
                 if (query.trim().isEmpty()) {
                     expandAll(recordingTree, false);
                     recordingTree.expandPath(new TreePath(recordingTreeModel.getRoot()));
@@ -376,13 +377,18 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
                         recordingManager.synchronize(new Runnable() {
                             @Override
                             public void run() {
-                                scrollPane.setEnabled(true);
-                                recordingTree.setEnabled(true);
-                                buttonRemove.setEnabled(true);
-                                buttonSync.setEnabled(true);
-                                if (hasFocus) {
-                                    recordingTree.requestFocus();
-                                }
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        scrollPane.setEnabled(true);
+                                        recordingTree.setEnabled(true);
+                                        buttonRemove.setEnabled(true);
+                                        buttonSync.setEnabled(true);
+                                        if (hasFocus) {
+                                            recordingTree.requestFocus();
+                                        }
+                                    }
+                                });
                             }
                         });
                     }
