@@ -1,3 +1,8 @@
+Lazy Bones 1.5.1
+===============================================================================
+* Fixed tooltip for timer buffers in the settings
+* Added rename function for recordings
+
 Lazy Bones 1.5.0
 ===============================================================================
 * Added a conflict resolution, which tries to find repetitions of colliding

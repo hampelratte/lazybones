@@ -54,17 +54,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import lazybones.gui.MainDialog;
-import lazybones.gui.RecordingsCenterPanel;
-import lazybones.gui.TimelineCenterPanel;
-import lazybones.gui.TimersCenterPanel;
-import lazybones.gui.settings.VDRSettingsPanel;
-import lazybones.logging.DebugConsoleHandler;
-import lazybones.logging.PopupHandler;
-import lazybones.logging.SimpleFormatter;
-import lazybones.programmanager.ProgramDatabase;
-import lazybones.programmanager.ProgramManager;
-
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.CHAN;
 import org.hampelratte.svdrp.commands.NEWT;
@@ -72,8 +61,6 @@ import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.hampelratte.svdrp.responses.highlevel.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import tvbrowser.core.Settings;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -88,6 +75,17 @@ import devplugin.PluginTreeNode;
 import devplugin.Program;
 import devplugin.ProgramReceiveTarget;
 import devplugin.Version;
+import lazybones.gui.MainDialog;
+import lazybones.gui.RecordingsCenterPanel;
+import lazybones.gui.TimelineCenterPanel;
+import lazybones.gui.TimersCenterPanel;
+import lazybones.gui.settings.VDRSettingsPanel;
+import lazybones.logging.DebugConsoleHandler;
+import lazybones.logging.PopupHandler;
+import lazybones.logging.SimpleFormatter;
+import lazybones.programmanager.ProgramDatabase;
+import lazybones.programmanager.ProgramManager;
+import tvbrowser.core.Settings;
 
 /**
  * A remote control plugin for VDR
@@ -205,7 +203,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public static Version getVersion() {
         // return new Version(0, 0, false, "snapshot-01-05-2013");
-        return new Version(1, 50, 0, true);
+        return new Version(1, 51, 0, true);
     }
 
     public MainDialog getMainDialog() {

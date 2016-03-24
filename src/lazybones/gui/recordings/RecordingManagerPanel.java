@@ -55,6 +55,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
@@ -70,14 +71,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import lazybones.LazyBones;
-import lazybones.Player;
-import lazybones.RecordingManager;
-import lazybones.VDRCallback;
-import lazybones.actions.DeleteRecordingAction;
-import lazybones.actions.GetRecordingDetailsAction;
-import lazybones.gui.components.RecordingDetailsPanel;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.DiskStatus;
@@ -96,6 +89,14 @@ import org.hampelratte.swing.TextFieldIconDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lazybones.LazyBones;
+import lazybones.Player;
+import lazybones.RecordingManager;
+import lazybones.VDRCallback;
+import lazybones.actions.DeleteRecordingAction;
+import lazybones.actions.GetRecordingDetailsAction;
+import lazybones.actions.RenameRecordingAction;
+import lazybones.gui.components.RecordingDetailsPanel;
 import util.ui.Localizer;
 
 public class RecordingManagerPanel extends JPanel implements ActionListener, ItemListener {
@@ -331,6 +332,8 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
         if ("DELETE".equals(e.getActionCommand()) && itemSelected) {
             deleteRecording(rec, selection);
+        } else if ("RENAME".equals(e.getActionCommand()) && itemSelected) {
+            renameRecording(rec, selection);
         } else if ("INFO".equals(e.getActionCommand()) && itemSelected) {
             createRecordingDetailsDialog(rec);
         } else if ("SYNC".equals(e.getActionCommand())) {
@@ -354,19 +357,14 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
 
     private void deleteRecording(final Recording rec, final TreePath tp) {
         if (tp.getLastPathComponent() instanceof Recording) {
-            scrollPane.setEnabled(false);
-            recordingTree.setEnabled(false);
-            buttonRemove.setEnabled(false);
-            buttonSync.setEnabled(false);
+            blockUserInput(true);
             final boolean hasFocus = recordingTree.hasFocus();
             VDRCallback<DeleteRecordingAction> callback = new VDRCallback<DeleteRecordingAction>() {
                 @Override
                 public void receiveResponse(DeleteRecordingAction cmd, Response response) {
                     if (!cmd.isSuccess()) {
                         logger.error(cmd.getResponse().getMessage());
-                        recordingTree.setEnabled(true);
-                        buttonRemove.setEnabled(true);
-                        buttonSync.setEnabled(true);
+                        blockUserInput(false);
                         if (hasFocus) {
                             recordingTree.requestFocus();
                         }
@@ -380,10 +378,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                        scrollPane.setEnabled(true);
-                                        recordingTree.setEnabled(true);
-                                        buttonRemove.setEnabled(true);
-                                        buttonSync.setEnabled(true);
+                                        blockUserInput(false);
                                         if (hasFocus) {
                                             recordingTree.requestFocus();
                                         }
@@ -397,6 +392,57 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
             DeleteRecordingAction dra = new DeleteRecordingAction(recordingManager, rec, callback);
             dra.enqueue();
         }
+    }
+
+    private void renameRecording(final Recording rec, final TreePath tp) {
+        if (tp.getLastPathComponent() instanceof Recording) {
+            blockUserInput(true);
+            final boolean hasFocus = recordingTree.hasFocus();
+
+            Object newName = JOptionPane.showInputDialog(null, getTranslation("new_name", "New name?"), getTranslation("rename", "Rename"),
+                    JOptionPane.QUESTION_MESSAGE, null, null, ((Recording)tp.getLastPathComponent()).getTitle());
+            if (newName == null) {
+                blockUserInput(false);
+                return;
+            }
+
+            VDRCallback<RenameRecordingAction> callback = new VDRCallback<RenameRecordingAction>() {
+                @Override
+                public void receiveResponse(RenameRecordingAction cmd, Response response) {
+                    if (!cmd.isSuccess()) {
+                        logger.error(cmd.getResponse().getMessage());
+                        blockUserInput(false);
+                        if (hasFocus) {
+                            recordingTree.requestFocus();
+                        }
+                    } else {
+                        recordingManager.synchronize(new Runnable() {
+                            @Override
+                            public void run() {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        blockUserInput(false);
+                                        if (hasFocus) {
+                                            recordingTree.requestFocus();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            };
+            RenameRecordingAction rra = new RenameRecordingAction(rec, (String) newName, callback);
+            rra.enqueue();
+        }
+    }
+
+    private void blockUserInput(boolean yesOrNo) {
+        scrollPane.setEnabled(!yesOrNo);
+        recordingTree.setEnabled(!yesOrNo);
+        buttonRemove.setEnabled(!yesOrNo);
+        buttonSync.setEnabled(!yesOrNo);
     }
 
     private void createRecordingDetailsDialog(Recording rec) {
@@ -426,6 +472,10 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         menuDelete.addActionListener(this);
         menuDelete.setActionCommand("DELETE");
         menuDelete.setIcon(LazyBones.getInstance().createImageIcon("actions", "edit-delete", 16));
+        JMenuItem menuRename = new JMenuItem(getTranslation("rename", "Rename"));
+        menuRename.addActionListener(this);
+        menuRename.setActionCommand("RENAME");
+        menuRename.setIcon(LazyBones.getInstance().createImageIcon("action", "document-edit", 16));
         JMenuItem menuInfo = new JMenuItem(getTranslation("recording_info", "Show information"));
         menuInfo.addActionListener(this);
         menuInfo.setActionCommand("INFO");
@@ -449,6 +499,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         popup.add(menuInfo);
         popup.add(menuPlay);
         popup.add(menuDelete);
+        popup.add(menuRename);
         popup.add(menuSync);
 
         recordingTree.addMouseListener(new MouseAdapter() {
