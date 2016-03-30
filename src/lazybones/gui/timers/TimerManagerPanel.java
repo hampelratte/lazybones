@@ -40,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -58,6 +59,10 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.hampelratte.svdrp.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
@@ -70,10 +75,6 @@ import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.components.timeroptions.TimerOptionsEditor;
 import lazybones.gui.components.timeroptions.TimerOptionsView;
 import lazybones.programmanager.ProgramManager;
-
-import org.hampelratte.svdrp.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TimerManagerPanel extends JPanel implements ActionListener, ListSelectionListener, ListDataListener {
 
@@ -366,26 +367,29 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     }
 
     private class TimerListAdapter extends AbstractListModel<LazyBonesTimer> implements Observer {
+        private List<LazyBonesTimer> timers;
 
         public TimerListAdapter() {
             timerManager.addObserver(this);
-            Collections.sort(timerManager.getTimers(), new TimerComparator());
+            timers = timerManager.getTimers();
+            Collections.sort(timers, new TimerComparator());
         }
 
         @Override
         public int getSize() {
-            return timerManager.getTimers() != null ? timerManager.getTimers().size() : 0;
+            return timers != null ? timers.size() : 0;
         }
 
         @Override
         public LazyBonesTimer getElementAt(int index) {
-            return timerManager.getTimers().get(index);
+            return timers.get(index);
         }
 
         @Override
         public void update(Observable o, Object arg) {
-            Collections.sort(timerManager.getTimers(), new TimerComparator());
-            fireContentsChanged(this, 0, timerManager.getTimers().size() - 1);
+            timers = timerManager.getTimers();
+            Collections.sort(timers, new TimerComparator());
+            fireContentsChanged(this, 0, timers.size() - 1);
         }
 
         @Override

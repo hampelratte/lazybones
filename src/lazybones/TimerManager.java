@@ -47,6 +47,19 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.LSTE;
+import org.hampelratte.svdrp.commands.LSTT;
+import org.hampelratte.svdrp.parsers.EPGParser;
+import org.hampelratte.svdrp.parsers.TimerParser;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import devplugin.Date;
+import devplugin.Program;
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.actions.CreateTimerAction;
 import lazybones.actions.DeleteTimerAction;
@@ -62,20 +75,6 @@ import lazybones.logging.PopupHandler;
 import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
 import lazybones.utils.Utilities;
-
-import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.LSTE;
-import org.hampelratte.svdrp.commands.LSTT;
-import org.hampelratte.svdrp.parsers.EPGParser;
-import org.hampelratte.svdrp.parsers.TimerParser;
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
-import org.hampelratte.svdrp.responses.highlevel.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import devplugin.Date;
-import devplugin.Program;
 
 /**
  * Class to manage all timers.
@@ -95,6 +94,7 @@ public class TimerManager extends Observable {
      * Stores all timers as Timer objects
      */
     private final List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
+    private final Lock timerListLock = new ReentrantLock();
 
     /**
      * The VDR timers from the last session, which have been stored to disk
@@ -172,7 +172,11 @@ public class TimerManager extends Observable {
      * @return a List of Timer objects
      */
     public List<LazyBonesTimer> getTimers() {
-        return timers;
+        // return a copy of the timer list to avoid ConcurrentModificationExceptions
+        timerListLock.lock();
+        List<LazyBonesTimer> timersCopy = new ArrayList<>(timers);
+        timerListLock.unlock();
+        return timersCopy;
     }
 
     /**
@@ -195,9 +199,11 @@ public class TimerManager extends Observable {
         Set<Conflict> conflicts = conflictFinder.findConflictingTimers(getTimers());
         if (!conflicts.isEmpty()) {
             // clear old conflicts, which were stored on timers
+            timerListLock.lock();
             for (LazyBonesTimer timer : timers) {
                 timer.getConflicts().clear();
             }
+            timerListLock.unlock();
 
             // save conflicts on timers
             for (Conflict conflict : conflicts) {
@@ -208,7 +214,7 @@ public class TimerManager extends Observable {
 
             boolean showTimerConflicts = Boolean.parseBoolean(LazyBones.getProperties().getProperty("timer.conflicts.show", "true"));
             if (showTimerConflicts) {
-                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next(), timers);
+                ConflictResolver conflictResolver = new ConflictResolver(conflicts.iterator().next(), getTimers());
                 conflictResolver.handleConflicts();
             }
         }
@@ -225,8 +231,6 @@ public class TimerManager extends Observable {
      * @return the timer for this program or null
      * @see Program
      */
-    private final Lock timerListLock = new ReentrantLock();
-
     public LazyBonesTimer getTimer(Program prog) {
         String progID = prog.getUniqueID();
         if (progID == null) {
