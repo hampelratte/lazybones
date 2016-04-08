@@ -44,10 +44,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
-import lazybones.LazyBones;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lazybones.LazyBones;
 
 public abstract class AbstractDetailsPanel extends JPanel {
 
@@ -126,8 +126,11 @@ public abstract class AbstractDetailsPanel extends JPanel {
 
     private String replaceColors(String template) {
         template = template.replaceAll("\\{backgroundColor\\}", toHexString(UIManager.getColor("TextArea.background")));
-        template = template.replaceAll("\\{textColor\\}", toHexString(UIManager.getColor("TextArea.foreground")));
-        template = template.replaceAll("\\{textInactiveColor\\}", toHexString(UIManager.getColor("TextArea.inactiveForeground")));
+        Color foreground = UIManager.getColor("TextArea.foreground");
+        template = template.replaceAll("\\{textColor\\}", toHexString(foreground));
+        Color inactiveForeGround = UIManager.getColor("TextArea.inactiveForeground");
+        inactiveForeGround = inactiveForeGround == null ? foreground : inactiveForeGround;
+        template = template.replaceAll("\\{textInactiveColor\\}", toHexString(inactiveForeGround));
         return template;
     }
 
