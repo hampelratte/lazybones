@@ -1,3 +1,9 @@
+Lazy Bones 1.5.2
+===============================================================================
+* Fixed NPE, which occured with LaFs, which don't have set the color
+  TextArea.inactiveForeground
+* Hopefully fixed ConcurrentModificationExceptions for the timer list
+
 Lazy Bones 1.5.1
 ===============================================================================
 * Fixed tooltip for timer buffers in the settings
