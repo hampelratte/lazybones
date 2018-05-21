@@ -66,6 +66,8 @@
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
 			<!--<jvmarg value="-verbose:class"/>-->
+			<jvmarg value="--add-modules=ALL-SYSTEM"/>
+            <jvmarg value="-XX:+IgnoreUnrecognizedVMOptions"/>
 		</java>
 	</target>
 
@@ -75,6 +77,8 @@
 			<jvmarg value="-Dpropertiesfile=${tvbrowser.runtime.dir}/linux.properties"/>
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
+			<jvmarg value="--add-modules=ALL-SYSTEM"/>
+			<jvmarg value="-XX:+IgnoreUnrecognizedVMOptions"/>
 		</java>
 	</target>
 
