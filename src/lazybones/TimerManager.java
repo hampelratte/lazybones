@@ -565,22 +565,22 @@ public class TimerManager extends Observable {
     }
 
     public static void setTimerBuffers(LazyBonesTimer timer) {
-    	Calendar calStart = timer.getStartTime();
-    	Calendar calEnd = timer.getEndTime();
+        Calendar calStart = timer.getStartTime();
+        Calendar calEnd = timer.getEndTime();
 
-    	// if we have a vps timer, set the status to vps, otherwise add the recording time buffers
-    	boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
-    	if (vpsDefault) {
-    		timer.changeStateTo(VPS, ENABLED);
-    	} else {
-    		// start the recording x min before the beginning of the program
-    		int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
-    		calStart.add(Calendar.MINUTE, -bufferBefore);
+        // if we have a vps timer, set the status to vps, otherwise add the recording time buffers
+        boolean vpsDefault = Boolean.parseBoolean(LazyBones.getProperties().getProperty("vps.default"));
+        if (vpsDefault) {
+            timer.changeStateTo(VPS, ENABLED);
+        } else {
+            // start the recording x min before the beginning of the program
+            int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+            calStart.add(Calendar.MINUTE, -bufferBefore);
 
-    		// stop the recording x min after the end of the program
-    		int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
-    		calEnd.add(Calendar.MINUTE, bufferAfter);
-    	}
+            // stop the recording x min after the end of the program
+            int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+            calEnd.add(Calendar.MINUTE, bufferAfter);
+        }
     }
 
     /**
@@ -611,6 +611,9 @@ public class TimerManager extends Observable {
             newTimer.setPriority(prio);
             newTimer.setTitle(prog.getTitle());
             newTimer.addTvBrowserProgID(prog.getUniqueID());
+            String descriptionSelectorItemId = LazyBones.getProperties().getProperty("descSourceTvb");
+            String desc = LazyBonesTimer.createDescription(descriptionSelectorItemId, "", prog);
+            newTimer.setDescription(desc);
 
             Calendar startTime = prog.getDate().getCalendar();
             int start = prog.getStartTime();
