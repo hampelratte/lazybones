@@ -79,6 +79,8 @@ import lazybones.gui.MainDialog;
 import lazybones.gui.RecordingsCenterPanel;
 import lazybones.gui.TimelineCenterPanel;
 import lazybones.gui.TimersCenterPanel;
+import lazybones.gui.settings.DescriptionSelectorItem;
+import lazybones.gui.settings.SeriesTitleSelectorItem;
 import lazybones.gui.settings.VDRSettingsPanel;
 import lazybones.logging.DebugConsoleHandler;
 import lazybones.logging.PopupHandler;
@@ -203,7 +205,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public static Version getVersion() {
         // return new Version(0, 0, false, "snapshot-01-05-2013");
-        return new Version(1, 53, 0, true);
+        return new Version(1, 54, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -314,8 +316,12 @@ public class LazyBones extends Plugin implements Observer {
         props.setProperty("showTimerOptionsDialog", showTimerOptionsDialog);
 
         String descSourceTvb = props.getProperty("descSourceTvb");
-        descSourceTvb = descSourceTvb == null ? "0" : descSourceTvb;
+        descSourceTvb = descSourceTvb == null ? DescriptionSelectorItem.LONGEST : descSourceTvb;
         props.setProperty("descSourceTvb", descSourceTvb);
+
+        String seriesTitle = props.getProperty("timer.series.title");
+        seriesTitle = seriesTitle == null ? SeriesTitleSelectorItem.VDR : seriesTitle;
+        props.setProperty("timer.series.title", seriesTitle);
 
         String minChannelNumber = props.getProperty("minChannelNumber");
         minChannelNumber = minChannelNumber == null ? "0" : minChannelNumber;

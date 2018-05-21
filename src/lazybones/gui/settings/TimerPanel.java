@@ -57,15 +57,15 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 
-import lazybones.LazyBones;
-import lazybones.TimerManager;
-import lazybones.TitleMapping;
-import lazybones.gui.components.historycombobox.JHistoryComboBox;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
+
+import lazybones.LazyBones;
+import lazybones.TimerManager;
+import lazybones.TitleMapping;
+import lazybones.gui.components.historycombobox.JHistoryComboBox;
 
 public class TimerPanel implements MouseListener, ActionListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerPanel.class);
@@ -122,13 +122,14 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JLabel lShowTimerConflictsInList = new JLabel(LazyBones.getTranslation("showTimerConflictsInList", "Show conflicts in timer list"));
 
     private JLabel lDescSource;
-
     private JComboBox<DescriptionSelectorItem> cbDescSource;
+
+    private JLabel lSeriesTitle;
+    private JComboBox<SeriesTitleSelectorItem> cbSeriesTitle;
 
     private JPopupMenu mappingPopup = new JPopupMenu();
 
     private JLabel lDefaultDirectory;
-
     private JHistoryComboBox cbDefaultDirectory;
 
     private TimerManager timerManager;
@@ -148,6 +149,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         int int_numberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
         int int_timelineStartHour = Integer.parseInt(props.getProperty("timelineStartHour"));
         String descSourceTvb = props.getProperty("descSourceTvb");
+        String seriesTitle = props.getProperty("timer.series.title");
         boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
         boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
         boolean showTimerConflictsInList = Boolean.parseBoolean(props.getProperty("timer.conflicts.inTimerList", "true"));
@@ -214,11 +216,18 @@ public class TimerPanel implements MouseListener, ActionListener {
         delRow.setActionCommand("DEL");
         delRow.addActionListener(this);
 
-        lDescSource = new JLabel(LazyBones.getTranslation("desc_source", "Use description from TV-Browser"));
+        lDescSource = new JLabel(LazyBones.getTranslation("desc_source", "Timer description"));
         cbDescSource = new JComboBox<DescriptionSelectorItem>();
         DescriptionComboBoxModel dcbm = new DescriptionComboBoxModel(true, false);
         dcbm.setSelected(descSourceTvb);
         cbDescSource.setModel(dcbm);
+
+        lSeriesTitle = new JLabel(LazyBones.getTranslation("series_title", "Timer title for series"));
+        cbSeriesTitle = new JComboBox<>();
+        SeriesTitleComboBoxModel stcbm = new SeriesTitleComboBoxModel();
+        stcbm.setSelected(seriesTitle);
+        cbSeriesTitle.setModel(stcbm);
+
 
         cbVPS = new JCheckBox();
         cbVPS.setSelected(vpsDefault);
@@ -245,123 +254,140 @@ public class TimerPanel implements MouseListener, ActionListener {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = WEST;
 
+        int row = 0;
         // left column of spinners
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = row;
         gbc.insets = new Insets(15, 15, 5, 5);
         panel.add(labBefore, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridy = row++;
         gbc.insets = new Insets(15, 5, 5, 5);
         panel.add(before, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(labAfter, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(after, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = row;
         gbc.insets = new Insets(15, 15, 5, 5);
+        panel.add(lSeriesTitle, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = row++;
+        gbc.insets = new Insets(15, 5, 5, 5);
+        panel.add(cbSeriesTitle, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lDescSource, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.insets = new Insets(15, 5, 5, 5);
+        gbc.gridy = row++;
+        gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(cbDescSource, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lVPS, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(cbVPS, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lShowTimerConflicts, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(cbShowTimerConflicts, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lShowTimerConflictsInList, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(cbShowTimerConflictsInList, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lNumberOfCards, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(numberOfCards, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lTimelineStartHour, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(timelineStartHour, gbc);
 
         // history combobox for the default directory
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 15, 30, 5);
         panel.add(lDefaultDirectory, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 30, 5);
         gbc.gridwidth = 3;
         panel.add(cbDefaultDirectory, gbc);
 
+        // mapping
+        panel.add(labMappings, new GridBagConstraints(0, row++, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
+        panel.add(mappingPane, new GridBagConstraints(0, row, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
+
+        // buttons
+        panel.add(addRow, new GridBagConstraints(4, row++, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
+        panel.add(delRow, new GridBagConstraints(4, row, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
+
         // right column of spinners
+        row = 0;
         gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridy = row;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(15, 50, 5, 5);
         panel.add(lPrio, gbc);
 
         gbc.gridx = 3;
-        gbc.gridy = 0;
+        gbc.gridy = row++;
         gbc.insets = new Insets(15, 5, 5, 5);
         panel.add(prio, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 50, 5, 5);
         panel.add(lLifetime, gbc);
 
         gbc.gridx = 3;
-        gbc.gridy = 1;
+        gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(lifetime, gbc);
-
-        // mapping
-        panel.add(labMappings, new GridBagConstraints(0, 9, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
-        panel.add(mappingPane, new GridBagConstraints(0, 10, 4, 2, 1.0, 1.0, WEST, BOTH, new Insets(0, 15, 15, 5), 0, 0));
-
-        // buttons
-        panel.add(addRow, new GridBagConstraints(4, 10, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(0, 5, 5, 15), 0, 0));
-        panel.add(delRow, new GridBagConstraints(4, 11, 1, 1, 0.0, 0.0, NORTHWEST, HORIZONTAL, new Insets(5, 5, 5, 15), 0, 0));
-
         return panel;
     }
 
@@ -371,6 +397,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         props.setProperty("timer.after", after.getValue().toString());
         props.setProperty("timer.prio", prio.getValue().toString());
         props.setProperty("timer.lifetime", lifetime.getValue().toString());
+        props.setProperty("timer.series.title", ((SeriesTitleSelectorItem) cbSeriesTitle.getSelectedItem()).getId());
         props.setProperty("numberOfCards", numberOfCards.getValue().toString());
         props.setProperty("timelineStartHour", timelineStartHour.getValue().toString());
         props.setProperty("descSourceTvb", ((DescriptionSelectorItem) cbDescSource.getSelectedItem()).getId());

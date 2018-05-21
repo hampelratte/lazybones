@@ -1,3 +1,12 @@
+Lazy Bones 1.5.4
+===============================================================================
+* New Setting for series timers. You now can choose to use the VDR keywords
+  TITLE / EPISODE or the information provided by TV-Browser. If there is no
+  episode information (episode number or episode title) available, Lazy Bones
+  will fall back to TITLE / EPISODE  
+* Bugfix: Timer description is set accordingly to the settings even, if there
+  is no EPG available from VDR
+
 Lazy Bones 1.5.3
 ===============================================================================
 * Made Lazy Bones compatible with Java 9 and TV-Browser 4.x

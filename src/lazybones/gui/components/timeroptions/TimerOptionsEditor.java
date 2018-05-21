@@ -32,6 +32,7 @@ import static lazybones.gui.settings.DescriptionSelectorItem.TIMER;
 import static lazybones.gui.settings.DescriptionSelectorItem.TVB_DESC;
 import static lazybones.gui.settings.DescriptionSelectorItem.TVB_PREFIX;
 import static lazybones.gui.settings.DescriptionSelectorItem.VDR;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -65,6 +66,17 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.Recording;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.XStream;
+
+import devplugin.Plugin;
+import devplugin.Program;
+import devplugin.ProgramFieldType;
 import lazybones.ChannelManager;
 import lazybones.ChannelManager.ChannelNotFoundException;
 import lazybones.LazyBones;
@@ -77,22 +89,11 @@ import lazybones.gui.components.historycombobox.SuggestingJHistoryComboBox;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.settings.DescriptionComboBoxModel;
 import lazybones.gui.settings.DescriptionSelectorItem;
+import lazybones.gui.settings.SeriesTitleSelectorItem;
 import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
-
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.responses.highlevel.Recording;
-import org.hampelratte.svdrp.responses.highlevel.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import tvbrowser.core.ChannelList;
 import util.ui.Localizer;
-
-import com.thoughtworks.xstream.XStream;
-
-import devplugin.Plugin;
-import devplugin.Program;
 
 public class TimerOptionsEditor extends JPanel implements ActionListener, ItemListener, WindowListener, ChangeListener {
     private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsEditor.class);
@@ -468,8 +469,39 @@ public class TimerOptionsEditor extends JPanel implements ActionListener, ItemLi
             if (cbSeries.isSelected()) {
                 originalTitel = title.getText();
                 originalPath = comboDirectory.getText();
-                title.setText("EPISODE");
-                comboDirectory.setText("TITLE");
+
+                String format = LazyBones.getProperties().getProperty("timer.series.title");
+                if(SeriesTitleSelectorItem.TVB.equals(format)) {
+                    String episodeNumber = prog.getIntFieldAsString(ProgramFieldType.EPISODE_NUMBER_TYPE);
+                    String episode = prog.getTextField(ProgramFieldType.EPISODE_TYPE);
+                    String series = prog.getTitle();
+                    logger.debug("Series {}- {} {}", new Object[] {series, episodeNumber, episode});
+
+                    if(isNotBlank(episodeNumber) || isNotBlank(episode)) {
+                        StringBuilder episodeSb = new StringBuilder();
+                        if(isNotBlank(episodeNumber)) {
+                            episodeSb.append(episodeNumber);
+                            if(isNotBlank(episode)) {
+                                episodeSb.append(" - ");
+                            }
+                        }
+                        if(isNotBlank(episode)) {
+                            episodeSb.append(episode);
+                        }
+                        title.setText(episodeSb.toString());
+                        comboDirectory.setText(prog.getTitle());
+                    } else {
+                        // fallback to VDR keywords
+                        title.setText("EPISODE");
+                        comboDirectory.setText("TITLE");
+                    }
+                } else {
+                    title.setText("EPISODE");
+                    comboDirectory.setText("TITLE");
+                }
+
+
+
             } else {
                 if (originalTitel.trim().isEmpty() && prog != null) {
                     title.setText(prog.getTitle());
