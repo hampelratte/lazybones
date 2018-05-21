@@ -33,23 +33,22 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import devplugin.Date;
+import devplugin.PluginManager;
+import devplugin.Program;
+import devplugin.ProgramFieldType;
+import devplugin.ProgramSearcher;
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.gui.TimelinePanel;
 import lazybones.utils.Utilities;
-
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import util.exc.TvBrowserException;
-import devplugin.Date;
-import devplugin.PluginManager;
-import devplugin.Program;
-import devplugin.ProgramFieldType;
-import devplugin.ProgramSearcher;
 
 /**
  * The ConflictResolver tries to resolve a conflict by searching for program repetitions.
@@ -94,7 +93,7 @@ public class ConflictResolver {
         repetitions = findRepetitions(conflict);
         boolean solutionFound = findConflictlessSolution(solution, 0);
         if (solutionFound) {
-        	// TODO make sure the found solution does not collide with other existing timers
+            // TODO make sure the found solution does not collide with other existing timers
             StringBuilder sb = new StringBuilder("Found combination without conflicts:");
             for (Program program : solution) {
                 sb.append("\n\t").append(program.toString());
@@ -150,10 +149,10 @@ public class ConflictResolver {
     }
 
     private boolean conflictsWithOtherTimers(Program candidate) {
-    	ConflictFinder finder = new ConflictFinder();
+        ConflictFinder finder = new ConflictFinder();
 
-    	List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
-    	timers.add(createTimerFromProgram(candidate));
+        List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
+        timers.add(createTimerFromProgram(candidate));
 
         List<LazyBonesTimer> otherTimers = new ArrayList<LazyBonesTimer>(allTimers);
         otherTimers.removeAll(conflict.getInvolvedTimers());
@@ -161,22 +160,22 @@ public class ConflictResolver {
 
         Set<Conflict> conflicts = finder.findConflictingTimers(timers);
         return !conflicts.isEmpty();
-	}
+    }
 
-	private LazyBonesTimer createTimerFromProgram(Program candidate) {
-		Channel channel = ChannelManager.getChannelMapping().get(candidate.getChannel().getId());
-		LazyBonesTimer timer = new LazyBonesTimer();
-		timer.setChannelNumber(channel.getChannelNumber());
-		timer.setTitle(candidate.getTitle());
+    private LazyBonesTimer createTimerFromProgram(Program candidate) {
+        Channel channel = ChannelManager.getChannelMapping().get(candidate.getChannel().getId());
+        LazyBonesTimer timer = new LazyBonesTimer();
+        timer.setChannelNumber(channel.getChannelNumber());
+        timer.setTitle(candidate.getTitle());
 
-		// start and end time with buffers
-		timer.setStartTime(Utilities.getStartTime(candidate));
-		timer.setEndTime(Utilities.getEndTime(candidate));
-		TimerManager.setTimerBuffers(timer);
-		return timer;
-	}
+        // start and end time with buffers
+        timer.setStartTime(Utilities.getStartTime(candidate));
+        timer.setEndTime(Utilities.getEndTime(candidate));
+        TimerManager.setTimerBuffers(timer);
+        return timer;
+    }
 
-	private boolean inThePast(Program candidate) {
+    private boolean inThePast(Program candidate) {
         Calendar now = Calendar.getInstance();
         Calendar programStart = Utilities.getStartTime(candidate);
         return programStart.before(now);
@@ -199,11 +198,11 @@ public class ConflictResolver {
 
             //@formatter:off
             if (    candidateStart.after(programStart) && candidateStart.before(programEnd)
-                 || candidateEnd.after(programStart) && candidateEnd.before(programEnd)
-                 || programStart.after(candidateStart) && programStart.before(candidateEnd)
-                 || programEnd.after(candidateStart) && programEnd.before(candidateEnd)
-                 || candidateStart.equals(programStart)
-                 || candidateEnd.equals(programEnd))
+                    || candidateEnd.after(programStart) && candidateEnd.before(programEnd)
+                    || programStart.after(candidateStart) && programStart.before(candidateEnd)
+                    || programEnd.after(candidateStart) && programEnd.before(candidateEnd)
+                    || candidateStart.equals(programStart)
+                    || candidateEnd.equals(programEnd))
             {
                 return true;
             }
@@ -218,7 +217,7 @@ public class ConflictResolver {
         try {
             for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
                 String title = getProgramTitle(timer);
-                ProgramSearcher searcher = LazyBones.getPluginManager().createProgramSearcher(PluginManager.SEARCHER_TYPE_EXACTLY, title, false);
+                ProgramSearcher searcher = LazyBones.getPluginManager().createProgramSearcher(PluginManager.TYPE_SEARCHER_EXACTLY, title, false);
                 devplugin.Channel[] allChannels = LazyBones.getPluginManager().getSubscribedChannels();
                 ProgramFieldType[] searchFields = new ProgramFieldType[] { ProgramFieldType.TITLE_TYPE };
                 Program[] results = searcher.search(searchFields, new Date(), DAYS_TO_LOOK_FOR_REPS, allChannels, true);

@@ -30,16 +30,16 @@ package lazybones.actions;
 
 import javax.swing.JOptionPane;
 
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.DELR;
+import org.hampelratte.svdrp.responses.highlevel.Recording;
+
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.RecordingManager;
 import lazybones.TimerManager;
 import lazybones.VDRCallback;
 import lazybones.VDRConnection;
-
-import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.DELR;
-import org.hampelratte.svdrp.responses.highlevel.Recording;
 
 public class DeleteRecordingAction extends VDRAction {
 
@@ -65,7 +65,7 @@ public class DeleteRecordingAction extends VDRAction {
             return true;
         }
 
-        int recordingNumber = recording.getNumber();
+        int recordingNumber = recording.getId();
         response = VDRConnection.send(new DELR(recordingNumber));
         if (response.getCode() == 250) {
             return true;
@@ -98,7 +98,7 @@ public class DeleteRecordingAction extends VDRAction {
                             return;
                         } else {
                             // timer is deleted, now delete the recording
-                            response = VDRConnection.send(new DELR(recording.getNumber()));
+                            response = VDRConnection.send(new DELR(recording.getId()));
                             if (response.getCode() != 250) {
                                 success = false;
                                 callback();

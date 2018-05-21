@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Henrik Niehaus & Lazy Bones development team
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project (Lazy Bones) nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,14 +30,14 @@ package lazybones.actions;
 
 import java.text.ParseException;
 
-import lazybones.VDRCallback;
-import lazybones.VDRConnection;
-
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.parsers.RecordingParser;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lazybones.VDRCallback;
+import lazybones.VDRConnection;
 
 public class GetRecordingDetailsAction extends VDRAction {
 
@@ -52,7 +52,7 @@ public class GetRecordingDetailsAction extends VDRAction {
 
     @Override
     boolean execute() {
-        response = VDRConnection.send(new LSTR(recording.getNumber()));
+        response = VDRConnection.send(new LSTR(recording.getId()));
         if (response != null && response.getCode() == 215) {
             // parse epg information
             try {

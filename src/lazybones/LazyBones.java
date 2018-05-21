@@ -163,7 +163,7 @@ public class LazyBones extends Plugin implements Observer {
 
     @Override
     public String getPluginCategory() {
-        return Plugin.REMOTE_CONTROL_SOFTWARE_CATEGORY;
+        return Plugin.CATEGORY_REMOTE_CONTROL_SOFTWARE;
     }
 
     /**
@@ -203,7 +203,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public static Version getVersion() {
         // return new Version(0, 0, false, "snapshot-01-05-2013");
-        return new Version(1, 52, 0, true);
+        return new Version(1, 53, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -843,10 +843,10 @@ public class LazyBones extends Plugin implements Observer {
         LazyBonesTimer timer = timerManager.getTimer(p);
         if (timer != null) {
             if (!timer.isActive()) {
-                return Program.LOWER_MEDIUM_MARK_PRIORITY;
+                return Program.PRIORITY_MARK_MEDIUM_LOWER;
             }
         }
-        return Program.HIGHER_MEDIUM_MARK_PRIORITY;
+        return Program.PRIORITY_MARK_MEDIUM_HIGHER;
     }
 
     @Override

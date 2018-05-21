@@ -37,8 +37,8 @@ import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.ui.Localizer;
 import devplugin.Program;
+import util.ui.Localizer;
 
 /**
  * Starts a player to watch a channel via streamdev
@@ -121,7 +121,7 @@ public class Player {
         String host = LazyBones.getProperties().getProperty("host");
         String url = LazyBones.getProperties().getProperty("recording.url");
         url = url.replaceAll("<host>", host);
-        url = url.replaceAll("<recording_number>", Integer.toString(rec.getNumber()));
+        url = url.replaceAll("<recording_number>", Integer.toString(rec.getId()));
         logger.debug("Trying to play url {}", url);
         arguments[arguments.length - 1] = url;
         playerThread = new PlayerThread(arguments);

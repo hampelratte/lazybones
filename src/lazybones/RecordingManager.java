@@ -35,9 +35,6 @@ import java.util.Observable;
 
 import javax.swing.SwingUtilities;
 
-import lazybones.actions.ListRecordingsAction;
-import lazybones.actions.StatDiskAction;
-
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.LSTR;
 import org.hampelratte.svdrp.commands.PLAY;
@@ -46,6 +43,9 @@ import org.hampelratte.svdrp.responses.highlevel.DiskStatus;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lazybones.actions.ListRecordingsAction;
+import lazybones.actions.StatDiskAction;
 
 /**
  * Class to manage all recordings.
@@ -118,8 +118,8 @@ public class RecordingManager extends Observable {
                     boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
                     if (loadInfos) {
                         for (Recording rec : recordings) {
-                            logger.trace("Getting info for recording {}", rec.getNumber());
-                            Response resp = VDRConnection.send(new LSTR(rec.getNumber()));
+                            logger.trace("Getting info for recording {}", rec.getId());
+                            Response resp = VDRConnection.send(new LSTR(rec.getId()));
                             if (resp != null && resp.getCode() == 215) {
                                 // parse epg information
                                 try {
@@ -181,7 +181,7 @@ public class RecordingManager extends Observable {
     // }
 
     public void playOnVdr(Recording rec) {
-        Response res = VDRConnection.send(new PLAY(rec.getNumber()));
+        Response res = VDRConnection.send(new PLAY(rec.getId()));
         if (res.getCode() != 250) {
             logger.error(res.getMessage());
         }

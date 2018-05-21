@@ -52,7 +52,7 @@ public class RenameRecordingAction extends VDRAction {
 
     @Override
     boolean execute() {
-        int recordingNumber = recording.getNumber();
+        int recordingNumber = recording.getId();
         response = VDRConnection.send(new MOVR(recordingNumber, newName));
         if (response.getCode() == 250) {
             return true;
