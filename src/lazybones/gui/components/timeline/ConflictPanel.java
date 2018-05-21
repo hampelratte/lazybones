@@ -37,6 +37,7 @@ import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 
+import devplugin.Program;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
@@ -48,7 +49,6 @@ import lazybones.utils.Utilities;
 import util.programmouseevent.ProgramMouseEventHandler;
 import util.settings.PluginPictureSettings;
 import util.ui.ProgramList;
-import devplugin.Program;
 
 public class ConflictPanel extends JPanel implements Observer, ActionListener {
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
@@ -64,7 +64,7 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
     private Set<Conflict> conflictsToday = new HashSet<>();
     private Conflict displayedConflict;
 
-    private DefaultListModel<Program> programListModel = new DefaultListModel<>();
+    private DefaultListModel<Object> programListModel = new DefaultListModel<>();
     private ProgramList programList;
     private JScrollPane programListScrollPane;
 
@@ -215,9 +215,10 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
 
             // save solution for the timer creation later
             List<Program> solution = new ArrayList<>();
-            Enumeration<Program> en = programListModel.elements();
+            Enumeration<Object> en = programListModel.elements();
             while (en.hasMoreElements()) {
-                solution.add(en.nextElement());
+                Program prog = (Program) en.nextElement();
+                solution.add(prog);
             }
 
             // delete the old timers:

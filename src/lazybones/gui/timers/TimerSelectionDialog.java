@@ -45,6 +45,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import devplugin.Program;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerProgram;
@@ -52,7 +53,6 @@ import util.ui.Localizer;
 import util.ui.ProgramList;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
-import devplugin.Program;
 
 /**
  * Shown, if a Program and a VDRTimer have totally different titles. The user has to choose the right program, then.
@@ -64,7 +64,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
 
     private final JButton cancel = new JButton();
 
-    private final DefaultListModel<Program> model = new DefaultListModel<Program>();
+    private final DefaultListModel<Object> model = new DefaultListModel<>();
 
     private final ProgramList list = new ProgramList(model);
 
@@ -158,7 +158,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         if (e.getSource() == ok) {
             selectedIndex = list.getSelectedIndex();
             if (selectedIndex >= 0) {
-                selectedProgram = model.get(selectedIndex);
+                selectedProgram = (Program) model.get(selectedIndex);
                 TimerProgram program = (TimerProgram) selectedProgram;
                 LazyBonesTimer t = program.getTimer();
 
@@ -210,7 +210,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         if (prog.getLength() > 0) {
             endTime.add(Calendar.MINUTE, prog.getLength());
         } else if (model.getSize() > selectedIndex + 1) {
-            Program next = model.get(selectedIndex + 1);
+            Program next = (Program) model.get(selectedIndex + 1);
             Calendar startOfNextProgram = getStartTime(next);
             endTime = startOfNextProgram;
         } else {
