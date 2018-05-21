@@ -1,3 +1,8 @@
+Lazy Bones 1.5.3
+===============================================================================
+* Made Lazy Bones compatible with Java 9 and TV-Browser 4.x
+* Fixed use of depreceated methods and constants
+
 Lazy Bones 1.5.2
 ===============================================================================
 * Fixed NPE, which occured with LaFs, which don't have set the color
