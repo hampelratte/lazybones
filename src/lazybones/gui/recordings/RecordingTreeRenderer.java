@@ -14,10 +14,10 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.tree.TreeCellRenderer;
 
-import lazybones.LazyBones;
-
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
+
+import lazybones.LazyBones;
 
 public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
 
@@ -70,6 +70,9 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
                     title = "<html>" + df.format(recording.getStartTime().getTime()) + " - <b>" + title + "</b>";
                     if (recording.getShortText() != null && recording.getShortText().trim().length() > 0) {
                         title += " - " + recording.getShortText();
+                    }
+                    if(recording.getDuration() != -1) {
+                        title += " (" + recording.getDuration() + "min)";
                     }
                     title += "</html>";
                 }

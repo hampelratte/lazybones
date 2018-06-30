@@ -2,7 +2,7 @@ Lazy Bones 1.5.5
 ===============================================================================
 * Added validation for the recording duration. If the reported duration is 
   shorter than the program length, the recording details panel shows a warning.
-
+* Display length of recording in recording tree
 
 Lazy Bones 1.5.4
 ===============================================================================
