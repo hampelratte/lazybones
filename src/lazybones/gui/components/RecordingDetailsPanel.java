@@ -29,16 +29,13 @@
 package lazybones.gui.components;
 
 import java.text.DateFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
-
-import lazybones.LazyBones;
-import lazybones.VDRCallback;
-import lazybones.actions.GetRecordingDetailsAction;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
@@ -47,6 +44,11 @@ import org.hampelratte.svdrp.responses.highlevel.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lazybones.LazyBones;
+import lazybones.VDRCallback;
+import lazybones.actions.GetRecordingDetailsAction;
+import lazybones.utils.Period;
+
 public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeSelectionListener {
 
     private static final long serialVersionUID = 1L;
@@ -54,6 +56,8 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
     private static transient Logger logger = LoggerFactory.getLogger(RecordingDetailsPanel.class);
 
     private Recording recording;
+
+    private String warning;
 
     public RecordingDetailsPanel(Recording recording) {
         super("recording_details.html");
@@ -67,6 +71,7 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
 
     public void setRecording(Recording recording) {
         this.recording = recording;
+        warning = null;
         updateHtmlPane();
     }
 
@@ -92,6 +97,11 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
         template = template.replaceAll("\\{lifetime\\}", Integer.toString(recording.getLifetime()));
         template = template.replaceAll("\\{priority\\}", Integer.toString(recording.getPriority()));
         template = template.replaceAll("\\{streams\\}", createStreamsString());
+        if(warning != null) {
+            template = template.replaceAll("\\{warning\\}", "<h1 class=\"warning\">"+warning+"</h1>");
+        } else {
+            template = template.replaceAll("\\{warning\\}", "");
+        }
         return template;
     }
 
@@ -148,10 +158,25 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
                                     .getTranslation("error_retrieve_recording_details", "Couldn't load recording details from VDR: {0}", response.getMessage());
                             logger.error(mesg);
                         }
+
+
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
+
+                                if(recording.getDuration() != -1) {
+                                    long duration = recording.getDuration();
+                                    Period programDuration = new Period(recording.getStartTime(), recording.getEndTime());
+                                    long plannedDuration = TimeUnit.SECONDS.toMinutes(programDuration.getDurationInSeconds());
+                                    if(duration < plannedDuration) {
+                                        logger.debug("Recording seems to be too short {} - {}", duration, plannedDuration);
+                                        warning = LazyBones.getTranslation("recording_too_short",
+                                                "The recording duration ({0}min) is shorter than the program duration ({1}min)",
+                                                Long.toString(duration), Long.toString(plannedDuration));
+                                        updateHtmlPane();
+                                    }
+                                }
                             }
                         });
                     }

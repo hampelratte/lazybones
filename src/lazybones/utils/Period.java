@@ -68,6 +68,13 @@ public class Period implements Serializable {
         this.startTime = startTime;
     }
 
+    public long getDurationInSeconds() {
+        if(startTime == null || endTime == null) {
+            throw new IllegalStateException("start and end time have to be set");
+        }
+        return (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
+    }
+
     @Override
     public String toString() {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());

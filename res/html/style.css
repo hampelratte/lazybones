@@ -33,6 +33,12 @@ ul {
     font-weight: bold;
 }
 
+.warning {
+    font-size: 140%;
+    font-weight: bold;
+    background-color: #ff8800;
+}
+
 tr.separator {
     padding: 0px;
     margin: 0px;

@@ -1,3 +1,9 @@
+Lazy Bones 1.5.5
+===============================================================================
+* Added validation for the recording duration. If the reported duration is 
+  shorter than the program length, the recording details panel shows a warning.
+
+
 Lazy Bones 1.5.4
 ===============================================================================
 * New Setting for series timers. You now can choose to use the VDR keywords
