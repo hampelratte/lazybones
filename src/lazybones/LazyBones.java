@@ -205,7 +205,7 @@ public class LazyBones extends Plugin implements Observer {
 
     public static Version getVersion() {
         // return new Version(0, 0, false, "snapshot-01-05-2013");
-        return new Version(1, 54, 0, true);
+        return new Version(1, 55, 0, true);
     }
 
     public MainDialog getMainDialog() {
