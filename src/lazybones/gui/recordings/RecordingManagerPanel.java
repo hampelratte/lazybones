@@ -80,6 +80,7 @@ import org.hampelratte.svdrp.responses.highlevel.TreeNode;
 import org.hampelratte.svdrp.sorting.RecordingAlphabeticalComparator;
 import org.hampelratte.svdrp.sorting.RecordingIsCutComparator;
 import org.hampelratte.svdrp.sorting.RecordingIsNewComparator;
+import org.hampelratte.svdrp.sorting.RecordingLengthComparator;
 import org.hampelratte.svdrp.sorting.RecordingStarttimeComparator;
 import org.hampelratte.svdrp.util.SizeFormatter;
 import org.hampelratte.swing.DecoratableTextField;
@@ -231,6 +232,7 @@ public class RecordingManagerPanel extends JPanel implements ActionListener, Ite
         sortStrategySelector.addItem(new SortStrategy(new RecordingStarttimeComparator(), getTranslation("sort.chronological", "chronological")));
         sortStrategySelector.addItem(new SortStrategy(new RecordingIsNewComparator(), getTranslation("sort.new_recordings", "new recordings")));
         sortStrategySelector.addItem(new SortStrategy(new RecordingIsCutComparator(), getTranslation("sort.cut_recordings", "cut recordings")));
+        sortStrategySelector.addItem(new SortStrategy(new RecordingLengthComparator(), getTranslation("sort.recording_length", "recording length")));
         sortStrategySelector.addItemListener(this);
         sortStrategySelector.setPreferredSize(new Dimension(250, 26));
         sortStrategySelector.setMaximumSize(new Dimension(250, 26));
