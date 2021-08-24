@@ -115,8 +115,10 @@ public class RecordingManager {
 
         // fetch the disk usage stats
         StatDiskAction sda = new StatDiskAction((cmd, response) -> {
-		    diskStatus = cmd.getDiskStatus();
-		    SwingUtilities.invokeLater(() -> fireDiskStatusChanged(diskStatus));
+        	if (cmd.isSuccess()) {
+			    diskStatus = cmd.getDiskStatus();
+			    SwingUtilities.invokeLater(() -> fireDiskStatusChanged(diskStatus));
+        	}
 		});
         sda.enqueue();
     }
@@ -125,12 +127,10 @@ public class RecordingManager {
         return (lstr, response) -> {
 		    if (lstr.isSuccess()) {
 		        updateRecordingList(lstr);
+		        SwingUtilities.invokeLater(() -> fireRecordingsChanged(recordings));
 		    }
-
-		    SwingUtilities.invokeLater(() -> fireRecordingsChanged(recordings));
-
 		    if (callback != null) {
-		        callback.run();
+		    	callback.run();
 		    }
 		};
     }

@@ -56,17 +56,19 @@ public class ListRecordingsAction extends VDRAction {
     boolean execute() {
         response = VDRConnection.send(new LSTR());
 
+        boolean success = false;
         if (response != null && response.getCode() == 250) {
             String recordingsString = response.getMessage();
             recordings = RecordingListParser.parse(recordingsString);
+            success = true;
         } else if (response != null && response.getCode() == 550) {
             // no recordings, do nothing
+        	success = true;
             logger.info("No recording on VDR");
         } else { /* something went wrong */
             conLog.error(LazyBones.getTranslation("error_retrieve_recordings", "Couldn't retrieve recordings from VDR."));
         }
-
-        return true;
+        return success;
     }
 
     public List<Recording> getRecordings() {
