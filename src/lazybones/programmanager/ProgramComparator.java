@@ -30,7 +30,6 @@ package lazybones.programmanager;
 
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 
 import devplugin.Program;
 
@@ -46,14 +45,14 @@ public class ProgramComparator implements Comparator<Program> {
         if (!prog1.getChannel().getId().equals(prog2.getChannel().getId()))
             return -1;
 
-        Calendar cal = GregorianCalendar.getInstance();
+        Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, prog1.getDate().getYear());
         cal.set(Calendar.MONTH, prog1.getDate().getMonth());
         cal.set(Calendar.DAY_OF_MONTH, prog1.getDate().getDayOfMonth());
         cal.set(Calendar.HOUR_OF_DAY, prog1.getHours());
         cal.set(Calendar.MINUTE, prog1.getMinutes());
 
-        Calendar thisCal = GregorianCalendar.getInstance();
+        Calendar thisCal = Calendar.getInstance();
         thisCal.set(Calendar.YEAR, prog2.getDate().getYear());
         thisCal.set(Calendar.MONTH, prog2.getDate().getMonth());
         thisCal.set(Calendar.DAY_OF_MONTH, prog2.getDate().getDayOfMonth());

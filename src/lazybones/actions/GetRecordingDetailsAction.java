@@ -41,7 +41,7 @@ import lazybones.VDRConnection;
 
 public class GetRecordingDetailsAction extends VDRAction {
 
-    private static transient Logger logger = LoggerFactory.getLogger(GetRecordingDetailsAction.class);
+    private static Logger logger = LoggerFactory.getLogger(GetRecordingDetailsAction.class);
 
     private Recording recording;
 

@@ -36,8 +36,6 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
-import lazybones.LazyBones;
-
 import org.hampelratte.svdrp.responses.highlevel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +48,7 @@ public abstract class ChannelSetTransferHandler extends TransferHandler {
 
     protected abstract void cleanup(JComponent c, Transferable data, boolean remove);
 
-    private static transient Logger logger = LoggerFactory.getLogger(LazyBones.class);
+    private static transient Logger logger = LoggerFactory.getLogger(ChannelSetTransferHandler.class);
 
     @Override
     protected Transferable createTransferable(JComponent c) {

@@ -28,6 +28,8 @@
  */
 package lazybones.programmanager;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.ConcurrentModificationException;
@@ -58,7 +60,7 @@ import util.programmouseevent.ProgramMouseEventHandler;
 import devplugin.Program;
 
 public class ProgramManager {
-    private static transient Logger logger = LoggerFactory.getLogger(ProgramManager.class);
+    private static Logger logger = LoggerFactory.getLogger(ProgramManager.class);
 
     private static ProgramManager instance;
 
@@ -75,7 +77,7 @@ public class ProgramManager {
     }
 
     public LazyBonesTimer getTimerForTime(Calendar cal, devplugin.Channel chan) {
-        long time_t = cal.getTimeInMillis() / 1000;
+        long time_t = cal.getTimeInMillis() / 1000; // NOSONAR same name as in VDR
         Object o = ChannelManager.getChannelMapping().get(chan.getId());
         int channelNumber = ((Channel) o).getChannelNumber();
 
@@ -83,7 +85,7 @@ public class ProgramManager {
         Response res = VDRConnection.send(cmd);
         if (res != null && res.getCode() == 215) {
             List<EPGEntry> epg = new EPGParser().parse(res.getMessage());
-            if (epg.size() > 0) {
+            if (!epg.isEmpty()) {
                 EPGEntry entry = epg.get(0); // we can use the first element, because there will be only one item in the list
                 Timer timer = new Timer();
                 timer.setChannelNumber(channelNumber);
@@ -104,9 +106,9 @@ public class ProgramManager {
     public JPopupMenu getContextMenuForTimer(LazyBonesTimer timer) {
         List<String> tvBrowserProgIds = timer.getTvBrowserProgIDs();
         JPopupMenu popup;
-        if (tvBrowserProgIds.size() > 0) {
+        if (!tvBrowserProgIds.isEmpty()) {
             Program prog = ProgramDatabase.getProgram(tvBrowserProgIds.get(0));
-            popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
+            popup = getPluginManager().createPluginContextMenu(prog, null);
         } else {
             popup = LazyBones.getInstance().getSimpleContextMenu(timer);
         }
@@ -139,7 +141,7 @@ public class ProgramManager {
      * Unmarks all programs, which are marked by LazyBones
      */
     public void unmarkPrograms() {
-        Program[] markedPrograms = LazyBones.getPluginManager().getMarkedPrograms();
+        Program[] markedPrograms = getPluginManager().getMarkedPrograms();
         for (Program marked : markedPrograms) {
             marked.unmark(LazyBones.getInstance());
         }
@@ -172,7 +174,7 @@ public class ProgramManager {
         // several criteria
         Result bestMatching = evaluator.evaluate(threeDayProgram, timer);
         if (bestMatching == null) {
-            logger.warn("Couldn't assign timer: ", timer);
+            logger.warn("Couldn't assign timer: {}", timer);
             timer.setReason(LazyBonesTimer.NOT_FOUND);
             return;
         }
@@ -189,8 +191,8 @@ public class ProgramManager {
             // look for the timer in stored timers
             boolean found = timerManager.lookUpTimer(timer, bestMatching.getProgram());
             if (!found) { // we have no mapping
-                logger.warn("Couldn't find a program with that title: ", timer.getTitle());
-                logger.warn("Couldn't assign timer: ", timer);
+                logger.warn("Couldn't find a program with that title: {}", timer.getTitle());
+                logger.warn("Couldn't assign timer: {}", timer);
                 timer.setReason(LazyBonesTimer.NOT_FOUND);
             }
         }
@@ -200,17 +202,11 @@ public class ProgramManager {
         timer.addTvBrowserProgID(prog.getUniqueID());
         prog.mark(LazyBones.getInstance());
         prog.validateMarking();
-        // if (timer.isRepeating()) {
-        // Date d = prog.getDate();
-        // timer.getStartTime().set(Calendar.DAY_OF_MONTH, d.getDayOfMonth());
-        // timer.getStartTime().set(Calendar.MONTH, d.getMonth()-1);
-        // timer.getStartTime().set(Calendar.YEAR, d.getYear());
-        // }
     }
 
     public void handleTimerDoubleClick(LazyBonesTimer timer, MouseEvent e) {
         List<String> progIDs = timer.getTvBrowserProgIDs();
-        if (progIDs.size() > 0) {
+        if (!progIDs.isEmpty()) {
             String firstProgID = progIDs.get(0);
             Program prog = ProgramDatabase.getProgram(firstProgID);
             if (prog != null) {

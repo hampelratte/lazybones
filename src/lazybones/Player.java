@@ -29,6 +29,7 @@
 package lazybones;
 
 import java.io.InputStream;
+import java.util.Optional;
 
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.CHAN;
@@ -38,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import devplugin.Program;
-import util.ui.Localizer;
+import util.i18n.Localizer;
 
 /**
  * Starts a player to watch a channel via streamdev
@@ -49,7 +50,9 @@ import util.ui.Localizer;
 public class Player {
     private static PlayerThread playerThread;
 
-    private static transient Logger logger = LoggerFactory.getLogger(Player.class);
+    private static Logger logger = LoggerFactory.getLogger(Player.class);
+
+    private Player() {}
 
     public static void play(Program prog) {
         Object o = ChannelManager.getChannelMapping().get(prog.getChannel().getId());
@@ -68,11 +71,11 @@ public class Player {
                 playerThread.stopThread();
             }
 
-            boolean switchBefore = new Boolean(LazyBones.getProperties().getProperty("switchBefore")).booleanValue();
+            boolean switchBefore = Boolean.parseBoolean(LazyBones.getProperties().getProperty("switchBefore"));
             if (switchBefore) {
                 Response res = VDRConnection.send(new CHAN(Integer.toString(channel)));
                 if (res == null || res.getCode() != 250) {
-                    String mesg = Localizer.getLocalization(Localizer.I18N_ERROR) + ": " + res.getMessage();
+                    String mesg = Localizer.getLocalization(Localizer.I18N_ERROR) + ": " + Optional.ofNullable(res).map(Response::getMessage).orElse("");
                     logger.error(mesg);
                     return;
                 }
@@ -92,9 +95,9 @@ public class Player {
             String host = LazyBones.getProperties().getProperty("host");
             String streamtype = LazyBones.getProperties().getProperty("streamtype");
             String url = LazyBones.getProperties().getProperty("streamurl");
-            url = url.replaceAll("<host>", host);
-            url = url.replaceAll("<streamtype>", streamtype);
-            url = url.replaceAll("<channel>", Integer.toString(channel));
+            url = url.replace("<host>", host);
+            url = url.replace("<streamtype>", streamtype);
+            url = url.replace("<channel>", Integer.toString(channel));
             arguments[arguments.length - 1] = url;
             playerThread = new PlayerThread(arguments);
         } catch (Exception e1) {
@@ -120,8 +123,8 @@ public class Player {
         arguments[0] = LazyBones.getProperties().getProperty("player");
         String host = LazyBones.getProperties().getProperty("host");
         String url = LazyBones.getProperties().getProperty("recording.url");
-        url = url.replaceAll("<host>", host);
-        url = url.replaceAll("<recording_number>", Integer.toString(rec.getId()));
+        url = url.replace("<host>", host);
+        url = url.replace("<recording_number>", Integer.toString(rec.getId()));
         logger.debug("Trying to play url {}", url);
         arguments[arguments.length - 1] = url;
         playerThread = new PlayerThread(arguments);
@@ -156,6 +159,10 @@ public class Player {
                 new PlayerOutputter(p.getInputStream());
                 new PlayerOutputter(p.getErrorStream());
                 p.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                String mesg = LazyBones.getTranslation("couldnt_start", "Couldn't start player");
+                logger.error(mesg, e);
             } catch (Exception e) {
                 String mesg = LazyBones.getTranslation("couldnt_start", "Couldn't start player");
                 logger.error(mesg, e);
@@ -192,6 +199,7 @@ public class Player {
                     logger.debug("PLAYER: {}", new String(buffer, 0, length));
                 }
             } catch (Exception e) {
+                // not interested in player output or any errors
             }
         }
     }

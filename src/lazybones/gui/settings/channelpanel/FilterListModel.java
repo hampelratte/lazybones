@@ -28,9 +28,9 @@
  */
 package lazybones.gui.settings.channelpanel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -42,10 +42,11 @@ public class FilterListModel implements ListModel<Channel> {
 
     private String filter = "";
 
-    private List<Channel> data = new Vector<>();
-    private List<Channel> filteredData = new Vector<>();
-    private List<ListDataListener> listeners = new Vector<>();
-    private int minChannel, maxChannel;
+    private List<Channel> data = Collections.synchronizedList(new ArrayList<>());
+    private List<Channel> filteredData = Collections.synchronizedList(new ArrayList<>());
+    private List<ListDataListener> listeners = Collections.synchronizedList(new ArrayList<>());
+    private int minChannel;
+    private int maxChannel;
 
     public void setFilter(String filter) {
         this.filter = filter;
@@ -66,7 +67,7 @@ public class FilterListModel implements ListModel<Channel> {
         filteredData.clear();
         for (Channel chan : data) {
             if (chan.getChannelNumber() >= minChannel && (chan.getChannelNumber() <= maxChannel || maxChannel == 0)) {
-                if (filterMatches(chan)) {
+                if (filterMatches(chan)) { // NOSONAR
                     filteredData.add(chan);
                 }
             }

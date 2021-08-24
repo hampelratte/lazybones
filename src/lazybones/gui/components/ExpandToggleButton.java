@@ -38,8 +38,8 @@ import lazybones.LazyBones;
 
 public class ExpandToggleButton extends JLabel implements MouseListener {
 
-    private Icon iconActive = LazyBones.getInstance().getIcon("lazybones/list-remove.png");
-    private Icon iconInactive = LazyBones.getInstance().getIcon("lazybones/list-add.png");
+    private transient Icon iconActive = LazyBones.getInstance().getIcon("lazybones/list-remove.png");
+    private transient Icon iconInactive = LazyBones.getInstance().getIcon("lazybones/list-add.png");
     private boolean selected = false;
 
     public ExpandToggleButton() {
@@ -63,17 +63,21 @@ public class ExpandToggleButton extends JLabel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+    	// not interested in this event
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+    	// not interested in this event
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
+    	// not interested in this event
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+    	// not interested in this event
     }
 }

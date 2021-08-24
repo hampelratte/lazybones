@@ -35,14 +35,16 @@ public class DebugConsoleHandler extends Handler {
 
     @Override
     public void close() throws SecurityException {
+    	// nothing to do here
     }
 
     @Override
     public void flush() {
+    	// nothing to do here
     }
 
     @Override
-    public void publish(LogRecord record) {
-        LoggingArchive.log(record);
+    public void publish(LogRecord logRecord) {
+        LoggingArchive.log(logRecord);
     }
 }

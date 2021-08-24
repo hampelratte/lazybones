@@ -41,8 +41,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import lazybones.LazyBones;
 import lazybones.RecordingManager;
@@ -94,7 +92,7 @@ public class MainDialog extends JDialog implements WindowClosingIf {
         }
 
         this.add(tabbedPane);
-        this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
@@ -102,22 +100,14 @@ public class MainDialog extends JDialog implements WindowClosingIf {
             }
         });
 
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (isVisible() && tabbedPane.getSelectedIndex() == INDEX_RC) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            remoteControl.updateVolume();
-                        }
-                    });
-                    screenshotPanel.startGrabbing();
-                } else {
-                    screenshotPanel.stopGrabbing();
-                }
-            }
-        });
+        tabbedPane.addChangeListener(e -> {
+		    if (isVisible() && tabbedPane.getSelectedIndex() == INDEX_RC) {
+		        SwingUtilities.invokeLater(() -> remoteControl.updateVolume());
+		        screenshotPanel.startGrabbing();
+		    } else {
+		        screenshotPanel.stopGrabbing();
+		    }
+		});
 
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         this.pack();

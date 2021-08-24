@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
 
 public class ListRecordingsAction extends VDRAction {
 
-    private static transient Logger logger = LoggerFactory.getLogger(ListRecordingsAction.class);
-    private static transient Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
+    private static Logger logger = LoggerFactory.getLogger(ListRecordingsAction.class);
+    private static Logger conLog = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
 
     private List<Recording> recordings;
 
@@ -59,17 +59,6 @@ public class ListRecordingsAction extends VDRAction {
         if (response != null && response.getCode() == 250) {
             String recordingsString = response.getMessage();
             recordings = RecordingListParser.parse(recordingsString);
-
-            // retrieve infos for all recordings
-            // this is to slow, instead we load the info on demand
-            /*
-             * for (Iterator iter = recordings.iterator(); iter.hasNext();) { Recording rec = (Recording) iter.next(); response = connection.send(new
-             * LSTR(rec.getNumber())); if(response != null && response.getCode() == 215) { // workaround for the epg parser, because LSTR does not send an 'e'
-             * as entry terminator String[] lines = response.getMessage().split("\n"); StringBuffer mesg = new StringBuffer(); for (int i = 0; i < lines.length;
-             * i++) { if(i == lines.length -1) { mesg.append("e\n"); } mesg.append(lines[i]+"\n"); }
-             * 
-             * // parse epg information List<EPGEntry> epg = EPGParser.parse(mesg.toString()); if(epg.size() > 0) { rec.setEpgInfo(epg.get(0)); } } }
-             */
         } else if (response != null && response.getCode() == 550) {
             // no recordings, do nothing
             logger.info("No recording on VDR");

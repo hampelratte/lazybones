@@ -28,6 +28,8 @@
  */
 package lazybones;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.text.ParseException;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -44,11 +46,11 @@ import org.slf4j.LoggerFactory;
 
 public class ChannelManager {
 
-    private static transient Logger logger = LoggerFactory.getLogger(ChannelManager.class);
+    private static Logger logger = LoggerFactory.getLogger(ChannelManager.class);
 
     private static ChannelManager instance;
 
-    private static Map<String, Channel> channelMapping = new Hashtable<String, Channel>();
+    private static Map<String, Channel> channelMapping = new Hashtable<>(); // NOSONAR this gets serialized -> can't change the type
 
     private List<Channel> channels = null;
 
@@ -134,10 +136,10 @@ public class ChannelManager {
     }
 
     public devplugin.Channel getTvbrowserChannelById(String id) {
-        devplugin.Channel[] channels = LazyBones.getPluginManager().getSubscribedChannels();
-        for (int i = 0; i < channels.length; i++) {
-            if (channels[i].getId().equals(id)) {
-                return channels[i];
+        devplugin.Channel[] subscribedChannels = getPluginManager().getSubscribedChannels();
+        for (int i = 0; i < subscribedChannels.length; i++) {
+            if (subscribedChannels[i].getId().equals(id)) {
+                return subscribedChannels[i];
             }
         }
         return null;

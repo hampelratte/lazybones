@@ -31,7 +31,6 @@ package lazybones;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 import javax.swing.SwingUtilities;
 
@@ -52,9 +51,9 @@ import lazybones.actions.StatDiskAction;
  *
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net</a>
  */
-public class RecordingManager extends Observable {
+public class RecordingManager {
 
-    private static transient Logger logger = LoggerFactory.getLogger(RecordingManager.class);
+    private static Logger logger = LoggerFactory.getLogger(RecordingManager.class);
 
     /**
      * Stores all recordings as Recording objects
@@ -67,15 +66,17 @@ public class RecordingManager extends Observable {
     private DiskStatus diskStatus;
 
     private TimerManager timerManager;
+    
+    private List<RecordingsChangedListener> recordingsChangedListeners = new ArrayList<>();
+    private List<DiskStatusListener> diskStatusListener = new ArrayList<>();
 
     public RecordingManager() {
-        recordings = new ArrayList<Recording>();
+        recordings = new ArrayList<>();
     }
 
     public void removeAll() {
         recordings.clear();
-        setChanged();
-        notifyObservers(recordings);
+        fireRecordingsChanged(recordings);
     }
 
     /**
@@ -109,78 +110,52 @@ public class RecordingManager extends Observable {
         logger.debug("Getting recordings from VDR");
 
         // fetch current recording list from vdr
-        VDRCallback<ListRecordingsAction> _callback = new VDRCallback<ListRecordingsAction>() {
-            @Override
-            public void receiveResponse(ListRecordingsAction lstr, Response response) {
-                if (lstr.isSuccess()) {
-                    // clear recording list
-                    recordings = lstr.getRecordings();
-                    boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
-                    if (loadInfos) {
-                        for (Recording rec : recordings) {
-                            logger.trace("Getting info for recording {}", rec.getId());
-                            Response resp = VDRConnection.send(new LSTR(rec.getId()));
-                            if (resp != null && resp.getCode() == 215) {
-                                // parse epg information
-                                try {
-                                    new RecordingParser().parseRecording(rec, resp.getMessage());
-                                } catch (ParseException e) {
-                                    logger.error("Couldn't parse epg information", e);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setChanged();
-                        notifyObservers(recordings);
-                    }
-                });
-
-                if (callback != null) {
-                    callback.run();
-                }
-            }
-        };
-        ListRecordingsAction lstr = new ListRecordingsAction(_callback);
+        ListRecordingsAction lstr = new ListRecordingsAction(createListRecordingsCallback(callback));
         lstr.enqueue();
 
         // fetch the disk usage stats
-        VDRCallback<StatDiskAction> sdaCallback = new VDRCallback<StatDiskAction>() {
-            @Override
-            public void receiveResponse(StatDiskAction cmd, Response response) {
-                diskStatus = cmd.getDiskStatus();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setChanged();
-                        notifyObservers(diskStatus);
-                    }
-                });
-            }
-        };
-        StatDiskAction sda = new StatDiskAction(sdaCallback);
+        StatDiskAction sda = new StatDiskAction((cmd, response) -> {
+		    diskStatus = cmd.getDiskStatus();
+		    SwingUtilities.invokeLater(() -> fireDiskStatusChanged(diskStatus));
+		});
         sda.enqueue();
     }
 
-    // public void loadInfo(Recording rec) {
-    // LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-    // Response response = VDRConnection.send(new LSTR(rec.getNumber()));
-    // if (response != null && response.getCode() == 215) {
-    // // parse epg information
-    // try {
-    // new RecordingParser().parseRecording(rec, response.getMessage());
-    // } catch (ParseException e) {
-    // logger.error("Couldn't parse epg information", e);
-    // }
-    // }
-    // LazyBones.getInstance().getMainDialog().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    // }
+	private VDRCallback<ListRecordingsAction> createListRecordingsCallback(Runnable callback) {
+        return (lstr, response) -> {
+		    if (lstr.isSuccess()) {
+		        updateRecordingList(lstr);
+		    }
 
-    public void playOnVdr(Recording rec) {
+		    SwingUtilities.invokeLater(() -> fireRecordingsChanged(recordings));
+
+		    if (callback != null) {
+		        callback.run();
+		    }
+		};
+    }
+
+    private void updateRecordingList(ListRecordingsAction lstr) {
+    	// clear recording list
+        recordings = lstr.getRecordings();
+        boolean loadInfos = Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("loadRecordInfos"));
+        if (loadInfos) {
+            for (Recording rec : recordings) {
+                logger.trace("Getting info for recording {}", rec.getId());
+                Response resp = VDRConnection.send(new LSTR(rec.getId()));
+                if (resp != null && resp.getCode() == 215) {
+                    // parse epg information
+                    try {
+                        new RecordingParser().parseRecording(rec, resp.getMessage());
+                    } catch (ParseException e) {
+                        logger.error("Couldn't parse epg information", e);
+                    }
+                }
+            }
+        }
+	}
+
+	public void playOnVdr(Recording rec) {
         Response res = VDRConnection.send(new PLAY(rec.getId()));
         if (res.getCode() != 250) {
             logger.error(res.getMessage());
@@ -193,5 +168,34 @@ public class RecordingManager extends Observable {
 
     public void setTimerManager(TimerManager timerManager) {
         this.timerManager = timerManager;
+    }
+    
+    private void fireRecordingsChanged(List<Recording> recordings) {
+    	for (RecordingsChangedListener l : recordingsChangedListeners) {
+    		try {
+    			l.recordingsChanged(recordings);
+    		} catch (Exception e) {
+				logger.error("Error while calling RecordingsChangedListener {}", l, e);
+    		}
+		}
+    }
+    
+    public void addRecordingsChangedListener(RecordingsChangedListener l) {
+    	this.recordingsChangedListeners.add(l);
+    }
+    
+    
+    private void fireDiskStatusChanged(DiskStatus diskStatus) {
+    	for (DiskStatusListener l : diskStatusListener) {
+    		try {
+    			l.diskStatusChanged(diskStatus);
+    		} catch (Exception e) {
+				logger.error("Error while calling DiskStatusListener {}", l, e);
+    		}
+		}
+	}
+    
+    public void addDiskStatusListener(DiskStatusListener l) {
+    	this.diskStatusListener.add(l);
     }
 }

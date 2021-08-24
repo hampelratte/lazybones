@@ -53,6 +53,8 @@ import devplugin.Program;
  */
 public class Utilities {
 
+	private Utilities() {}
+	
     public static int percentageOfEquality(String s, String t) {
         // check if strings are empty
         if (s == null || t == null || s.length() == 0 || t.length() == 0) {
@@ -83,20 +85,20 @@ public class Utilities {
         }
 
         s = s.toLowerCase();
-        s = s.replaceAll("-", " ");
-        s = s.replaceAll(":", " ");
-        s = s.replaceAll(";", " ");
-        s = s.replaceAll("\\|", " ");
-        s = s.replaceAll("_", " ");
-        s = s.replaceAll("\\.", "\\. ");
+        s = s.replace("-", " ");
+        s = s.replace(":", " ");
+        s = s.replace(";", " ");
+        s = s.replace("|", " ");
+        s = s.replace("_", " ");
+        s = s.replace(".", ". ");
         s = s.trim();
         t = t.toLowerCase();
-        t = t.replaceAll("-", " ");
-        t = t.replaceAll(":", " ");
-        t = t.replaceAll(";", " ");
-        t = t.replaceAll("\\|", " ");
-        t = t.replaceAll("_", " ");
-        t = t.replaceAll("\\.", "\\. ");
+        t = t.replace("-", " ");
+        t = t.replace(":", " ");
+        t = t.replace(";", " ");
+        t = t.replace("|", " ");
+        t = t.replace("_", " ");
+        t = t.replace(".", ". ");
         t = t.trim();
 
         // calculate levenshteinDistance
@@ -111,7 +113,7 @@ public class Utilities {
     public static int getLevenshteinDistance(String s, String t) {
         int n = s.length();
         int m = t.length();
-        int d[][] = new int[n + 1][m + 1];
+        int[][] d = new int[n + 1][m + 1];
         int i;
         int j;
         int cost;
@@ -214,7 +216,7 @@ public class Utilities {
     }
 
     public static List<StartStopEvent> createStartStopEventList(List<LazyBonesTimer> timers) {
-        ArrayList<StartStopEvent> startStopEvents = new ArrayList<StartStopEvent>();
+        ArrayList<StartStopEvent> startStopEvents = new ArrayList<>();
         for (LazyBonesTimer timer : timers) {
             if (timer.isActive()) {
                 startStopEvents.add(new StartStopEvent(timer, true));
@@ -291,12 +293,8 @@ public class Utilities {
         Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
         dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
 
-        if (timer.getStartTime().after(selectedDayAtStartHour) & timer.getStartTime().before(dayAfterAtStartHour)
-                || timer.getEndTime().after(selectedDayAtStartHour) & timer.getEndTime().before(dayAfterAtStartHour)) {
-            return true;
-        }
-
-        return false;
+        return timer.getStartTime().after(selectedDayAtStartHour) && timer.getStartTime().before(dayAfterAtStartHour)
+                || timer.getEndTime().after(selectedDayAtStartHour) && timer.getEndTime().before(dayAfterAtStartHour);
     }
 
 }

@@ -28,6 +28,8 @@
  */
 package lazybones.gui.components;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -55,13 +57,12 @@ public abstract class AbstractDetailsPanel extends JPanel {
 
     private static transient Logger logger = LoggerFactory.getLogger(AbstractDetailsPanel.class);
 
-    private JScrollPane scrollPane;
     private JEditorPaneAA htmlPane;
 
     private String templateFile;
     private String template;
 
-    public AbstractDetailsPanel(String templateFile) {
+    protected AbstractDetailsPanel(String templateFile) {
         this.templateFile = templateFile;
         initGUI();
     }
@@ -75,9 +76,9 @@ public abstract class AbstractDetailsPanel extends JPanel {
         htmlPane.setContentType("text/html");
         htmlPane.setBorder(BorderFactory.createEmptyBorder());
 
-        scrollPane = new JScrollPane(htmlPane);
+        var scrollPane = new JScrollPane(htmlPane);
         scrollPane.setMinimumSize(new Dimension(50, 50));
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0, 5, 5, 0);
@@ -92,8 +93,8 @@ public abstract class AbstractDetailsPanel extends JPanel {
             if (template == null) {
                 template = loadFile(templateFile);
             }
-            String template = internalReplaceTags(this.template);
-            htmlPane.setText(template);
+            String detailsTemplate = internalReplaceTags(this.template);
+            htmlPane.setText(detailsTemplate);
             htmlPane.setCaretPosition(0);
         } catch (Exception e) {
             htmlPane.setText("Couldn't load template for details:\n" + e.getLocalizedMessage());
@@ -125,18 +126,18 @@ public abstract class AbstractDetailsPanel extends JPanel {
     }
 
     private String replaceColors(String template) {
-        template = template.replaceAll("\\{backgroundColor\\}", toHexString(UIManager.getColor("TextArea.background")));
+        template = template.replace("{backgroundColor}", toHexString(UIManager.getColor("TextArea.background")));
         Color foreground = UIManager.getColor("TextArea.foreground");
-        template = template.replaceAll("\\{textColor\\}", toHexString(foreground));
+        template = template.replace("{textColor}", toHexString(foreground));
         Color inactiveForeGround = UIManager.getColor("TextArea.inactiveForeground");
         inactiveForeGround = inactiveForeGround == null ? foreground : inactiveForeGround;
-        template = template.replaceAll("\\{textInactiveColor\\}", toHexString(inactiveForeGround));
+        template = template.replace("{textInactiveColor}", toHexString(inactiveForeGround));
         return template;
     }
 
     private String injectCss(String template) throws IOException {
         String css = loadFile("style.css");
-        template = template.replaceAll("\\{style\\}", css);
+        template = template.replace("{style}", css);
         return template;
     }
 
@@ -159,27 +160,18 @@ public abstract class AbstractDetailsPanel extends JPanel {
     }
 
     protected String loadFile(String filename) throws IOException {
-        String template = null;
-        InputStream in = null;
+        String detailsTemplate = null;
         ByteArrayOutputStream bos = null;
-        try {
-            in = AbstractDetailsPanel.class.getClassLoader().getResourceAsStream(filename);
+        try (InputStream in = AbstractDetailsPanel.class.getClassLoader().getResourceAsStream(filename)) {
             bos = new ByteArrayOutputStream();
             int length = 0;
             byte[] buffer = new byte[1024];
             while ((length = in.read(buffer)) > 0) {
                 bos.write(buffer, 0, length);
             }
-            template = new String(bos.toByteArray());
-            return template;
+            detailsTemplate = new String(bos.toByteArray());
+            return detailsTemplate;
         } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    logger.error("Couldn't close input stream for file", e);
-                }
-            }
             if (bos != null) {
                 try {
                     bos.close();

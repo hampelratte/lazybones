@@ -45,8 +45,12 @@ import lazybones.LazyBonesTimer;
 
 public class TimelineLayout implements LayoutManager2 {
 
-    private final ArrayList<Component> components = new ArrayList<Component>();
+    private final ArrayList<Component> components = new ArrayList<>();
 
+    private int rowCount = 0;
+    
+    private Map<Integer, Integer> channelRowMap = new HashMap<>();
+    
     @Override
     public void addLayoutComponent(Component comp, Object constraints) {
         components.add(comp);
@@ -64,6 +68,7 @@ public class TimelineLayout implements LayoutManager2 {
 
     @Override
     public void invalidateLayout(Container target) {
+    	// nothing to do here
     }
 
     @Override
@@ -76,72 +81,74 @@ public class TimelineLayout implements LayoutManager2 {
         components.add(comp);
     }
 
-    @Override
-    public void layoutContainer(Container parent) {
-        if (parent.isValid()) {
-            return;
+	@Override
+	public void layoutContainer(Container parent) {
+		if (parent.isValid()) {
+			return;
+		}
+
+		int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
+		int width = parent instanceof TimelineRowHeader ? 0 : parent.getParent().getWidth();
+		int height = parent.getHeight();
+		double pixelsPerMinute = (double) (width - 1) / (double) (24 * 60);
+
+		rowCount = 0;
+		channelRowMap.clear();
+		for (Component comp : components) {
+			if (comp instanceof TimelineElement) {
+				layoutTimelineElement((TimelineElement) comp, startHour, pixelsPerMinute, width);
+			} else if (comp instanceof TimelineRowHeaderElement) {
+				comp.setSize(comp.getPreferredSize());
+				comp.setSize(comp.getWidth() + 16, ROW_HEIGHT);
+				comp.setLocation(8, (ROW_HEIGHT + PADDING) * rowCount);
+				rowCount++;
+				if (comp.getWidth() > width) {
+					width = comp.getWidth();
+				}
+			}
+		}
+
+		if (components.isEmpty() && parent instanceof TimelineRowHeader) {
+			width = 0;
+		}
+
+		parent.setPreferredSize(new Dimension(width, height));
+		parent.setSize(width, height);
+	}
+
+    private void layoutTimelineElement(TimelineElement te, int startHour, double pixelsPerMinute, int width) {
+        LazyBonesTimer timer = te.getTimer();
+
+        int startPos = calculateStartPosition(pixelsPerMinute, timer);
+        int endPos = calculateEndPosition(pixelsPerMinute, timer);
+
+        Calendar currentDate = te.getCurrentDate();
+        Calendar selectedDayAtStartHour = (Calendar) currentDate.clone();
+        selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
+        Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
+        dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
+        if (timer.getStartTime().before(selectedDayAtStartHour)) {
+            startPos = 0;
+        }
+        if (timer.getEndTime().after(dayAfterAtStartHour)) {
+            endPos = width;
         }
 
-        int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
-        int width = parent instanceof TimelineRowHeader ? 0 : parent.getParent().getWidth();
-        int height = parent.getHeight();
-
-        double pixelsPerMinute = (double) (width - 1) / (double) (24 * 60);
-
-        int rowCount = 0;
-        Map<Integer, Integer> channelRowMap = new HashMap<Integer, Integer>();
-        for (Component comp : components) {
-            if (comp instanceof TimelineElement) {
-                TimelineElement te = (TimelineElement) comp;
-                LazyBonesTimer timer = te.getTimer();
-
-                int startPos = calculateStartPosition(pixelsPerMinute, timer);
-                int endPos = calculateEndPosition(pixelsPerMinute, timer);
-
-                Calendar currentDate = te.getCurrentDate();
-                Calendar selectedDayAtStartHour = (Calendar) currentDate.clone();
-                selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
-                Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
-                dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
-                if (timer.getStartTime().before(selectedDayAtStartHour)) {
-                    startPos = 0;
-                }
-                if (timer.getEndTime().after(dayAfterAtStartHour)) {
-                    endPos = width;
-                }
-
-                int length = endPos - startPos;
-                Integer channelRow = channelRowMap.get(timer.getChannelNumber());
-                int row = rowCount;
-                if (channelRow == null) {
-                    channelRowMap.put(timer.getChannelNumber(), rowCount);
-                    rowCount++;
-                } else {
-                    row = channelRow.intValue();
-                }
-
-                te.setLocation(startPos, (ROW_HEIGHT + PADDING) * row);
-                te.setSize(length, ROW_HEIGHT);
-            } else if (comp instanceof TimelineRowHeaderElement) {
-                comp.setSize(comp.getPreferredSize());
-                comp.setSize(comp.getWidth() + 16, ROW_HEIGHT);
-                comp.setLocation(8, (ROW_HEIGHT + PADDING) * rowCount);
-                rowCount++;
-                if (comp.getWidth() > width) {
-                    width = comp.getWidth();
-                }
-            }
+        int length = endPos - startPos;
+        Integer channelRow = channelRowMap.get(timer.getChannelNumber());
+        int row = rowCount;
+        if (channelRow == null) {
+            channelRowMap.put(timer.getChannelNumber(), rowCount);
+            rowCount++;
+        } else {
+            row = channelRow.intValue();
         }
 
-        if (components.size() == 0 && parent instanceof TimelineRowHeader) {
-            width = 0;
-        }
+        te.setLocation(startPos, (ROW_HEIGHT + PADDING) * row);
+        te.setSize(length, ROW_HEIGHT);
+	}
 
-        parent.setPreferredSize(new Dimension(width, height));
-        parent.setSize(width, height);
-    }
-
-    private int calculateEndPosition(double pixelsPerMinute, LazyBonesTimer timer) {
+	private int calculateEndPosition(double pixelsPerMinute, LazyBonesTimer timer) {
         int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         int minute = timer.getEndTime().get(Calendar.MINUTE);
         int hour = timer.getEndTime().get(Calendar.HOUR_OF_DAY);
@@ -171,16 +178,7 @@ public class TimelineLayout implements LayoutManager2 {
 
     @Override
     public Dimension minimumLayoutSize(Container parent) {
-        Dimension d = new Dimension();
-        d.width = parent.getWidth();
-        d.height = 0;
-        for (Component comp : components) {
-            if (comp.getWidth() > d.width) {
-                d.width = comp.getWidth();
-            }
-            d.height += ROW_HEIGHT + PADDING;
-        }
-        return d;
+        return preferredLayoutSize(parent);
     }
 
     @Override

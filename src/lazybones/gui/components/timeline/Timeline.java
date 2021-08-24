@@ -28,12 +28,12 @@
  */
 package lazybones.gui.components.timeline;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import lazybones.TimerManager;
 
@@ -57,16 +57,13 @@ public class Timeline extends JPanel {
         scrollPane.setRowHeaderView(rowHeader);
         scrollPane.setColumnHeaderView(new TimelineHeader());
         scrollPane.setViewportView(list);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane);
 
-        scrollPane.getViewport().addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                list.revalidate();
-                list.repaint();
-            }
-        });
+        scrollPane.getViewport().addChangeListener(e -> {
+		    list.revalidate();
+		    list.repaint();
+		});
     }
 
     public TimelineList getList() {

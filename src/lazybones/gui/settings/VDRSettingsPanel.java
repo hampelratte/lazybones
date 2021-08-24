@@ -40,7 +40,7 @@ import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.gui.settings.channelpanel.ChannelPanel;
 import util.ui.ImageUtilities;
-import util.ui.Localizer;
+import util.i18n.Localizer;
 
 /**
  * The root container for the settings tabs

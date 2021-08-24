@@ -28,11 +28,11 @@
  */
 package lazybones.gui;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,11 +46,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import lazybones.ChannelManager;
-import lazybones.ChannelManager.ChannelNotFoundException;
-import lazybones.LazyBones;
-import lazybones.VDRConnection;
-
 import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.commands.PUTE;
 import org.hampelratte.svdrp.responses.highlevel.Channel;
@@ -60,145 +55,136 @@ import org.slf4j.LoggerFactory;
 
 import devplugin.Date;
 import devplugin.Program;
-
+import lazybones.ChannelManager;
+import lazybones.ChannelManager.ChannelNotFoundException;
+import lazybones.VDRConnection;
 
 public class DataUploadPanel extends JPanel {
 
-    private static final long serialVersionUID = 1L;
-    private JList<Channel> list;
-    private final DefaultListModel<Channel> model = new DefaultListModel<Channel>();
-    private JButton bUploadData;
+	private static final long serialVersionUID = 1L;
+	private JList<Channel> list;
+	private final DefaultListModel<Channel> model = new DefaultListModel<>();
 
-    private static transient Logger logger = LoggerFactory.getLogger(DataUploadPanel.class);
+	private static transient Logger logger = LoggerFactory.getLogger(DataUploadPanel.class);
 
-    public DataUploadPanel() {
-        initGUI();
-        loadChannels();
-    }
+	public DataUploadPanel() {
+		initGUI();
+		loadChannels();
+	}
 
-    private void loadChannels() {
-        for (Entry<String, Channel> entry : ChannelManager.getChannelMapping().entrySet()) {
-            String id = entry.getKey();
-            Channel chan = entry.getValue();
-            devplugin.Channel tvbChan = ChannelManager.getInstance().getTvbrowserChannelById(id);
-            if (tvbChan != null) {
-                model.addElement(chan);
-            }
-        }
-    }
+	private void loadChannels() {
+		for (Entry<String, Channel> entry : ChannelManager.getChannelMapping().entrySet()) {
+			String id = entry.getKey();
+			Channel chan = entry.getValue();
+			devplugin.Channel tvbChan = ChannelManager.getInstance().getTvbrowserChannelById(id);
+			if (tvbChan != null) {
+				model.addElement(chan);
+			}
+		}
+	}
 
-    private void initGUI() {
-        try {
-            {
-                GridBagLayout thisLayout = new GridBagLayout();
-                this.setPreferredSize(new java.awt.Dimension(562, 431));
-                thisLayout.rowWeights = new double[] { 0.1, 0.1 };
-                thisLayout.rowHeights = new int[] { 7, 7 };
-                thisLayout.columnWeights = new double[] { 0.1 };
-                thisLayout.columnWidths = new int[] { 7 };
-                this.setLayout(thisLayout);
-                {
-                    list = new JList<Channel>();
-                    this.add(new JScrollPane(list), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
-                            new Insets(5, 5, 5, 5), 0, 0));
-                    list.setModel(model);
-                }
-                {
-                    bUploadData = new JButton();
-                    this.add(bUploadData, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-                            5, 5), 0, 0));
-                    bUploadData.setText("upload data");
-                    bUploadData.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            uploadData();
-                        }
-                    });
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Couldn't initialize the gui", e);
-        }
-    }
+	private void initGUI() {
+		try {
 
-    private void uploadData() {
-        List<Channel> channels = list.getSelectedValuesList();
-        for (Channel chan : channels) {
-            devplugin.Channel tvbchan = null;
-            try {
-                tvbchan = ChannelManager.getInstance().getTvbrowserChannel(chan);
-                Set<Program> channelProgram = getChannelProgram(tvbchan);
-                if (channelProgram.size() > 0) {
-                    pute((DVBChannel) chan, channelProgram);
-                }
-            } catch (ChannelNotFoundException e) {
-                logger.warn("TV-Browser channel not found for channel {}", chan.getName());
-            }
-        }
-    }
+			GridBagLayout thisLayout = new GridBagLayout();
+			this.setPreferredSize(new java.awt.Dimension(562, 431));
+			thisLayout.rowWeights = new double[] { 0.1, 0.1 };
+			thisLayout.rowHeights = new int[] { 7, 7 };
+			thisLayout.columnWeights = new double[] { 0.1 };
+			thisLayout.columnWidths = new int[] { 7 };
+			this.setLayout(thisLayout);
+			list = new JList<>();
+			this.add(new JScrollPane(list), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
+					GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+			list.setModel(model);
+			var bUploadData = new JButton();
+			this.add(bUploadData, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+					GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+			bUploadData.setText("upload data");
+			bUploadData.addActionListener(e -> uploadData());
+		} catch (Exception e) {
+			logger.error("Couldn't initialize the gui", e);
+		}
+	}
 
-    private void pute(DVBChannel chan, Set<Program> channelProgram) {
-        // concatenate PUTE data
-        // C channel line
-        StringBuilder sb = new StringBuilder("C ");
-        sb.append(chan.getSource()).append('-');
-        sb.append(chan.getNID()).append('-');
-        sb.append(chan.getTID()).append('-');
-        sb.append(chan.getSID());
-        if (chan.getRID() >= 0) {
-            sb.append('-').append(chan.getRID());
-        }
-        sb.append(' ').append(chan.getName()).append("\n");
+	private void uploadData() {
+		List<Channel> channels = list.getSelectedValuesList();
+		for (Channel chan : channels) {
+			devplugin.Channel tvbchan = null;
+			try {
+				tvbchan = ChannelManager.getInstance().getTvbrowserChannel(chan);
+				Set<Program> channelProgram = getChannelProgram(tvbchan);
+				if (!channelProgram.isEmpty()) {
+					pute((DVBChannel) chan, channelProgram);
+				}
+			} catch (ChannelNotFoundException e) {
+				logger.warn("TV-Browser channel not found for channel {}", chan.getName());
+			}
+		}
+	}
 
-        // program entries
-        for (Program prog : channelProgram) {
-            // E entry
-            sb.append("E ");
-            // event id
-            Calendar progStartCal = prog.getDate().getCalendar();
-            progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
-            progStartCal.set(Calendar.MINUTE, prog.getMinutes());
-            progStartCal.set(Calendar.SECOND, 0);
-            long eventID = progStartCal.getTimeInMillis() / 60 % 0xFFFF;
-            long startTime = progStartCal.getTimeInMillis() / 1000;
-            long duration = prog.getLength() * 60;
-            sb.append(eventID).append(' ').append(startTime).append(' ').append(duration).append(" 0\n");
+	private void pute(DVBChannel chan, Set<Program> channelProgram) {
+		// concatenate PUTE data
+		// C channel line
+		StringBuilder sb = new StringBuilder("C ");
+		sb.append(chan.getSource()).append('-');
+		sb.append(chan.getNID()).append('-');
+		sb.append(chan.getTID()).append('-');
+		sb.append(chan.getSID());
+		if (chan.getRID() >= 0) {
+			sb.append('-').append(chan.getRID());
+		}
+		sb.append(' ').append(chan.getName()).append("\n");
 
-            // T
-            sb.append("T ").append(prog.getTitle().replaceAll("\n", "\\|")).append("\n");
+		// program entries
+		for (Program prog : channelProgram) {
+			// E entry
+			sb.append("E ");
+			// event id
+			Calendar progStartCal = prog.getDate().getCalendar();
+			progStartCal.set(Calendar.HOUR_OF_DAY, prog.getHours());
+			progStartCal.set(Calendar.MINUTE, prog.getMinutes());
+			progStartCal.set(Calendar.SECOND, 0);
+			long eventID = progStartCal.getTimeInMillis() / 60 % 0xFFFF;
+			long startTime = progStartCal.getTimeInMillis() / 1000;
+			long duration = prog.getLength() * 60L;
+			sb.append(eventID).append(' ').append(startTime).append(' ').append(duration).append(" 0\n");
 
-            // D, if exists
-            if (prog.getDescription() != null && !prog.getDescription().isEmpty()) {
-                sb.append("D ").append(prog.getDescription().replaceAll("\n", "\\|")).append("\n");
-            }
+			// T
+			sb.append("T ").append(prog.getTitle().replace("\n", "\\|")).append("\n");
 
-            sb.append("e\n");
-        }
+			// D, if exists
+			if (prog.getDescription() != null && !prog.getDescription().isEmpty()) {
+				sb.append("D ").append(prog.getDescription().replace("\n", "\\|")).append("\n");
+			}
 
-        sb.append("c");
+			sb.append("e\n");
+		}
 
-        logger.warn(sb.toString());
-        Response res = VDRConnection.send(new PUTE(sb.toString()));
-        logger.warn("Response from VDR: {} {}", res.getCode(), res.getMessage());
-    }
+		sb.append("c");
 
-    private Set<Program> getChannelProgram(devplugin.Channel tvbchan) {
-        Set<Program> channelProgramm = new HashSet<Program>();
-        if (tvbchan != null) {
-            Date date = new Date();
-            Iterator<Program> cdp = LazyBones.getPluginManager().getChannelDayProgram(date, tvbchan);
-            while (cdp.hasNext()) { // if it has next, it is not empty.
-                // add all programs to the resulting set
-                while (cdp.hasNext()) {
-                    Program prog = cdp.next();
-                    channelProgramm.add(prog);
-                }
+		logger.warn(sb.toString());
+		Response res = VDRConnection.send(new PUTE(sb.toString()));
+		logger.warn("Response from VDR: {} {}", res.getCode(), res.getMessage());
+	}
 
-                date = date.addDays(1);
-                cdp = LazyBones.getPluginManager().getChannelDayProgram(date, tvbchan);
-            }
-        }
+	private Set<Program> getChannelProgram(devplugin.Channel tvbchan) {
+		Set<Program> channelProgramm = new HashSet<>();
+		if (tvbchan != null) {
+			Date date = new Date();
+			Iterator<Program> cdp = getPluginManager().getChannelDayProgram(date, tvbchan);
+			while (cdp.hasNext()) { // if it has next, it is not empty.
+				// add all programs to the resulting set
+				while (cdp.hasNext()) {
+					Program prog = cdp.next();
+					channelProgramm.add(prog);
+				}
 
-        return channelProgramm;
-    }
+				date = date.addDays(1);
+				cdp = getPluginManager().getChannelDayProgram(date, tvbchan);
+			}
+		}
+
+		return channelProgramm;
+	}
 }

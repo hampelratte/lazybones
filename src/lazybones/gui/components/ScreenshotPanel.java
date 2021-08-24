@@ -60,7 +60,7 @@ public class ScreenshotPanel extends JLabel {
 
     private ImageIcon image;
 
-    private PreviewGrabber pg;
+    private transient PreviewGrabber pg;
 
     public ScreenshotPanel() {
         initGUI();
@@ -116,6 +116,7 @@ public class ScreenshotPanel extends JLabel {
                         stopGrabbing();
                     }
                 } catch (InterruptedException e) {
+                	Thread.currentThread().interrupt();
                     logger.error("Problem with grabber thread:", e);
                 }
             }
@@ -160,7 +161,7 @@ public class ScreenshotPanel extends JLabel {
                 }
                 return preview;
             } else {
-                logger.debug(res.toString());
+                logger.debug("GRAB response {}",res);
                 return null;
             }
         }

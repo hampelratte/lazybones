@@ -32,8 +32,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -64,16 +62,10 @@ import lazybones.logging.SimpleFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.ui.Localizer;
+import util.i18n.Localizer;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
- * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
- * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
 public class LogMessageDialog extends JDialog implements ListSelectionListener, WindowClosingIf {
 
     private static transient Logger logger = LoggerFactory.getLogger(LogMessageDialog.class.getName());
@@ -86,7 +78,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
     private JScrollPane listScrollpane;
     private JTextArea taDetails;
     private JScrollPane textScrollpane;
-    private HashMap<Level, Icon> icons = new HashMap<Level, Icon>();
+    private transient HashMap<Level, Icon> levelIcons = new HashMap<>();
 
     private LogMessageDialog() {
         super(LazyBones.getInstance().getParent(), false);
@@ -99,25 +91,20 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         setSize(700, 400);
         getContentPane().setLayout(new BorderLayout(10, 10));
 
-        icons.put(Level.SEVERE, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
-        icons.put(Level.WARNING, UIManager.getDefaults().getIcon("OptionPane.warningIcon"));
-        icons.put(Level.INFO, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.CONFIG, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.FINE, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.FINER, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
-        icons.put(Level.FINEST, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        levelIcons.put(Level.SEVERE, UIManager.getDefaults().getIcon("OptionPane.errorIcon"));
+        levelIcons.put(Level.WARNING, UIManager.getDefaults().getIcon("OptionPane.warningIcon"));
+        levelIcons.put(Level.INFO, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        levelIcons.put(Level.CONFIG, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        levelIcons.put(Level.FINE, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        levelIcons.put(Level.FINER, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
+        levelIcons.put(Level.FINEST, UIManager.getDefaults().getIcon("OptionPane.informationIcon"));
 
         JButton okButton = new JButton(Localizer.getLocalization(Localizer.I18N_OK));
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                close();
-            }
-        });
+        okButton.addActionListener(event -> close());
         getContentPane().add(okButton, BorderLayout.SOUTH);
         getContentPane().add(getSplitPane(), BorderLayout.CENTER);
 
-        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent we) {
@@ -137,7 +124,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         taDetails.setText("Details...");
     }
 
-    public synchronized static LogMessageDialog getInstance() {
+    public static synchronized LogMessageDialog getInstance() {
         if (instance == null) {
             instance = new LogMessageDialog();
             int parentWidth = LazyBones.getInstance().getParent().getWidth();
@@ -171,7 +158,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
     private JScrollPane getListScrollpane() {
         if (listScrollpane == null) {
-            list = new JList<LogRecord>();
+            list = new JList<>();
             list.addListSelectionListener(this);
             model = new LogMessageListModel();
             list.setModel(model);
@@ -200,8 +187,8 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
     }
 
     private class LogListCellRenderer extends JLabel implements ListCellRenderer<LogRecord> {
-        private Color background = UIManager.getColor("List.background");
-        private Color backgroundAlt = UIManager.getColor("Panel.background");
+        private Color listBackground = UIManager.getColor("List.background");
+        private Color listBackgroundAlt = UIManager.getColor("Panel.background");
         private Color textColor = UIManager.getColor("List.foreground");
         private Color textColorSelected = UIManager.getColor("List.selectionForeground");
 
@@ -212,11 +199,11 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         @Override
         public Component getListCellRendererComponent(JList<? extends LogRecord> list, LogRecord log, int index, boolean selected, boolean hasFocus) {
             StringBuilder sb = new StringBuilder("<html>");
-            sb.append(log.getMessage().replaceAll("\n", "<br>"));
+            sb.append(log.getMessage().replace("\n", "<br>"));
             sb.append("</html>");
 
             setText(sb.toString());
-            setIcon(icons.get(log.getLevel()));
+            setIcon(levelIcons.get(log.getLevel()));
             setForeground(textColor);
 
             if (selected) {
@@ -224,7 +211,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
                 setBackground(UIManager.getColor("List.selectionBackground"));
             } else {
                 setForeground(textColor);
-                setBackground(index % 2 == 0 ? background : backgroundAlt);
+                setBackground(index % 2 == 0 ? listBackground : listBackgroundAlt);
             }
 
             return this;
@@ -233,14 +220,14 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
         @Override
         public void updateUI() {
             super.updateUI();
-            background = UIManager.getColor("List.background");
-            backgroundAlt = UIManager.getColor("Panel.background");
+            listBackground = UIManager.getColor("List.background");
+            listBackgroundAlt = UIManager.getColor("Panel.background");
             textColor = UIManager.getColor("List.foreground");
             textColorSelected = UIManager.getColor("List.selectionForeground");
         }
     }
 
-    private SimpleFormatter formatter = new SimpleFormatter();
+    private transient SimpleFormatter formatter = new SimpleFormatter();
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
@@ -253,7 +240,7 @@ public class LogMessageDialog extends JDialog implements ListSelectionListener, 
 
     private class LogMessageListModel extends AbstractListModel<LogRecord> {
 
-        private List<LogRecord> messages = new ArrayList<LogRecord>();
+        private List<LogRecord> messages = new ArrayList<>();
 
         public void addMessage(LogRecord message) {
             messages.add(message);

@@ -45,7 +45,7 @@ import devplugin.Program;
  */
 public class StarttimeCriterion extends AbstractCriterion {
 
-    private static transient Logger logger = LoggerFactory.getLogger(StarttimeCriterion.class);
+    private static Logger logger = LoggerFactory.getLogger(StarttimeCriterion.class);
 
     public int evaluate(Program prog, LazyBonesTimer timer) {
         // program start time

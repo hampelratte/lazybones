@@ -84,33 +84,29 @@ public class DeleteRecordingAction extends VDRAction {
                 TimerManager timerManager = recordingManager.getTimerManager();
                 LazyBonesTimer timer = timerManager.getTimer(timerNumber);
 
-                VDRCallback<DeleteTimerAction> callback = new VDRCallback<DeleteTimerAction>() {
-                    @Override
-                    public void receiveResponse(DeleteTimerAction cmd, Response response) {
-                        /*
-                         * The DeleteTimerAction finished, we can now check again, if we can delete the recording
-                         */
+                VDRCallback<DeleteTimerAction> callback = (cmd, response) -> {
+				    /*
+				     * The DeleteTimerAction finished, we can now check again, if we can delete the recording
+				     */
+				    if (!cmd.isSuccess()) {
+				        response = cmd.getResponse();
+				        success = false;
+				        callback();
+				        return;
+				    } else {
+				        // timer is deleted, now delete the recording
+				        response = VDRConnection.send(new DELR(recording.getId()));
+				        if (response.getCode() != 250) {
+				            success = false;
+				            callback();
+				            return;
+				        }
+				    }
 
-                        if (!cmd.isSuccess()) {
-                            response = cmd.getResponse();
-                            success = false;
-                            callback();
-                            return;
-                        } else {
-                            // timer is deleted, now delete the recording
-                            response = VDRConnection.send(new DELR(recording.getId()));
-                            if (response.getCode() != 250) {
-                                success = false;
-                                callback();
-                                return;
-                            }
-                        }
-
-                        success = true;
-                        recordingManager.synchronize();
-                        callback();
-                    }
-                };
+				    success = true;
+				    recordingManager.synchronize();
+				    callback();
+				};
                 DeleteTimerAction dta = new DeleteTimerAction(timer, true);
                 dta.setCallback(callback);
                 dta.enqueue();

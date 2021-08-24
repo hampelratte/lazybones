@@ -29,9 +29,11 @@
 package lazybones.actions;
 
 import java.awt.Cursor;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,10 +42,10 @@ import javax.swing.ListModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListDataListener;
 
-import lazybones.LazyBones;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lazybones.LazyBones;
 
 public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements ListModel<VDRAction>, Runnable {
 
@@ -55,8 +57,8 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
 
     private boolean running = false;
 
-    private final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
-    private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
+    private static final Cursor WAITING_CURSOR = new Cursor(Cursor.WAIT_CURSOR);
+    private static final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 
     private CommandQueue() {
         Thread t = new Thread(this);
@@ -66,11 +68,11 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
 
     @Override
     public boolean add(VDRAction o) {
-        logger.debug("Enqueued {}", o.toString());
+        logger.debug("Enqueued {}", o);
         return super.add(o);
     }
 
-    public synchronized static CommandQueue getInstance() {
+    public static synchronized CommandQueue getInstance() {
         if (instance == null) {
             instance = new CommandQueue();
         }
@@ -82,10 +84,11 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
         running = true;
         ExecutorService worker = Executors.newSingleThreadExecutor();
 
-        while (true) {
+        while (running) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
+            	Thread.currentThread().interrupt();
             }
 
             while (size() > 0 && running) {
@@ -117,7 +120,7 @@ public class CommandQueue extends ConcurrentLinkedQueue<VDRAction> implements Li
     }
 
     // ######################### stuff for ListModel #######################################
-    private Vector<ListDataListener> listDataListeners = new Vector<ListDataListener>();
+    private transient List<ListDataListener> listDataListeners = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void addListDataListener(ListDataListener l) {

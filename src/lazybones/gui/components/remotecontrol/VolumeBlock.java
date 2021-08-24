@@ -78,11 +78,9 @@ public class VolumeBlock extends JPanel implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (e.getSource() == volSlider) {
-            if (!volSlider.getValueIsAdjusting()) {
-                logger.info("Setting volume to {}", volSlider.getValue());
-                VDRConnection.send(new VOLU(Integer.toString(volSlider.getValue())));
-            }
-        }
+        if (e.getSource() == volSlider && !volSlider.getValueIsAdjusting()) {
+		    logger.info("Setting volume to {}", volSlider.getValue());
+		    VDRConnection.send(new VOLU(Integer.toString(volSlider.getValue())));
+		}
     }
 }

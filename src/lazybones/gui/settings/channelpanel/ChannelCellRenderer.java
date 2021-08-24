@@ -31,7 +31,6 @@ package lazybones.gui.settings.channelpanel;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -47,59 +46,13 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (column == 0) {
-            if (!(value instanceof devplugin.Channel)) {
-                return null;
-            }
-
-            ChannelLabel channelLabel = new ChannelLabel((devplugin.Channel) value);
-            channelLabel.setFont(table.getFont());
-            channelLabel.setBorder(noFocusBorder);
-            channelLabel.setHorizontalAlignment(JLabel.LEFT);
-            channelLabel.setOpaque(true);
-
-            // set colors
-            if (isSelected) {
-                channelLabel.setForeground(table.getSelectionForeground());
-                channelLabel.setBackground(table.getSelectionBackground());
-            } else {
-                if ((row & 1) == 0) { // even lines
-                    channelLabel.setBackground(table.getBackground());
-                    channelLabel.setForeground(table.getForeground());
-                } else { // uneven lines
-                    channelLabel.setBackground(uneven);
-                    channelLabel.setForeground(table.getForeground());
-                }
-            }
-            return channelLabel;
+        	return createChannelLabel(table, value, isSelected, row);
         } else {
-            if (isSelected) {
-                super.setForeground(table.getSelectionForeground());
-                super.setBackground(table.getSelectionBackground());
-            } else {
-                if ((row & 1) == 0) { // even lines
-                    super.setForeground(table.getForeground());
-                    super.setBackground(table.getBackground());
-                } else { // uneven lines
-                    super.setForeground(table.getForeground());
-                    super.setBackground(uneven);
-                }
-            }
-
+        	setColors(table, row, isSelected);
             setFont(table.getFont());
 
             if (hasFocus) {
-                setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
-                if (!isSelected && table.isCellEditable(row, column)) {
-                    Color col;
-                    col = UIManager.getColor("Table.focusCellForeground");
-                    if (col != null) {
-                        super.setForeground(col);
-                    }
-                    col = UIManager.getColor("Table.focusCellBackground");
-                    if (col != null) {
-                        super.setBackground(col);
-                    }
-                }
+            	enableFocusedMode(table, row, column, isSelected);
             } else {
                 setBorder(noFocusBorder);
             }
@@ -116,7 +69,64 @@ public class ChannelCellRenderer extends DefaultTableCellRenderer {
         return this;
     }
 
-    @Override
+    private void enableFocusedMode(JTable table, int row, int column, boolean isSelected) {
+    	setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+        if (!isSelected && table.isCellEditable(row, column)) {
+            Color col;
+            col = UIManager.getColor("Table.focusCellForeground");
+            if (col != null) {
+                super.setForeground(col);
+            }
+            col = UIManager.getColor("Table.focusCellBackground");
+            if (col != null) {
+                super.setBackground(col);
+            }
+        }
+	}
+
+	private void setColors(JTable table, int row, boolean isSelected) {
+    	if (isSelected) {
+            super.setForeground(table.getSelectionForeground());
+            super.setBackground(table.getSelectionBackground());
+        } else {
+            if ((row & 1) == 0) { // even lines
+                super.setForeground(table.getForeground());
+                super.setBackground(table.getBackground());
+            } else { // uneven lines
+                super.setForeground(table.getForeground());
+                super.setBackground(uneven);
+            }
+        }
+	}
+
+	private Component createChannelLabel(JTable table, Object value, boolean isSelected, int row) {
+    	if (!(value instanceof devplugin.Channel)) {
+            return null;
+        }
+
+        ChannelLabel channelLabel = new ChannelLabel((devplugin.Channel) value);
+        channelLabel.setFont(table.getFont());
+        channelLabel.setBorder(noFocusBorder);
+        channelLabel.setHorizontalAlignment(LEFT);
+        channelLabel.setOpaque(true);
+
+        // set colors
+        if (isSelected) {
+            channelLabel.setForeground(table.getSelectionForeground());
+            channelLabel.setBackground(table.getSelectionBackground());
+        } else {
+            if ((row & 1) == 0) { // even lines
+                channelLabel.setBackground(table.getBackground());
+                channelLabel.setForeground(table.getForeground());
+            } else { // uneven lines
+                channelLabel.setBackground(uneven);
+                channelLabel.setForeground(table.getForeground());
+            }
+        }
+        return channelLabel;
+	}
+
+	@Override
     public void updateUI() {
         super.updateUI();
         uneven = UIManager.getColor("Panel.background");

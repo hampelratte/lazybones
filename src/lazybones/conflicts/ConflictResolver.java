@@ -28,6 +28,8 @@
  */
 package lazybones.conflicts;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -55,7 +57,7 @@ import util.exc.TvBrowserException;
  * Found repetitions are combined with a backtracking algorithm to find a combination, where no pair of two programs overlap.
  */
 public class ConflictResolver {
-    private static transient Logger logger = LoggerFactory.getLogger(ConflictResolver.class);
+    private static Logger logger = LoggerFactory.getLogger(ConflictResolver.class);
 
     private static final int DAYS_TO_LOOK_FOR_REPS = 6;
 
@@ -129,8 +131,7 @@ public class ConflictResolver {
 
                         // remove the current repetition of this program from the solution and try the next one
                         programToAdd--;
-                        solution.remove(solution.size()-1);
-                        continue;
+                        solution.remove(solution.size()-1); // NOSONAR
                     }
                 } else {
                     // we found a solution for the last program to add, so we can
@@ -151,10 +152,10 @@ public class ConflictResolver {
     private boolean conflictsWithOtherTimers(Program candidate) {
         ConflictFinder finder = new ConflictFinder();
 
-        List<LazyBonesTimer> timers = new ArrayList<LazyBonesTimer>();
+        List<LazyBonesTimer> timers = new ArrayList<>();
         timers.add(createTimerFromProgram(candidate));
 
-        List<LazyBonesTimer> otherTimers = new ArrayList<LazyBonesTimer>(allTimers);
+        List<LazyBonesTimer> otherTimers = new ArrayList<>(allTimers);
         otherTimers.removeAll(conflict.getInvolvedTimers());
         timers.addAll(otherTimers);
 
@@ -213,30 +214,30 @@ public class ConflictResolver {
     }
 
     private List<Program[]> findRepetitions(Conflict conflict) {
-        List<Program[]> repetitions = new ArrayList<>();
+        List<Program[]> foundRepetitions = new ArrayList<>();
         try {
             for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
                 String title = getProgramTitle(timer);
-                ProgramSearcher searcher = LazyBones.getPluginManager().createProgramSearcher(PluginManager.TYPE_SEARCHER_EXACTLY, title, false);
-                devplugin.Channel[] allChannels = LazyBones.getPluginManager().getSubscribedChannels();
+                ProgramSearcher searcher = getPluginManager().createProgramSearcher(PluginManager.TYPE_SEARCHER_EXACTLY, title, false);
+                devplugin.Channel[] allChannels = getPluginManager().getSubscribedChannels();
                 ProgramFieldType[] searchFields = new ProgramFieldType[] { ProgramFieldType.TITLE_TYPE };
                 Program[] results = searcher.search(searchFields, new Date(), DAYS_TO_LOOK_FOR_REPS, allChannels, true);
                 for (Program program : results) {
                     logger.trace("Found repetition {}", program);
                 }
-                repetitions.add(results);
+                foundRepetitions.add(results);
             }
         } catch (TvBrowserException e) {
             logger.error("Search for repetitions failed. Conflict resolution stopped!", e);
         }
-        return repetitions;
+        return foundRepetitions;
     }
 
     private String getProgramTitle(LazyBonesTimer timer) {
         String title = timer.getTitle();
         if (!timer.getTvBrowserProgIDs().isEmpty()) {
             String programId = timer.getTvBrowserProgIDs().get(0);
-            Program program = LazyBones.getPluginManager().getProgram(programId);
+            Program program = getPluginManager().getProgram(programId);
             if (program != null) {
                 title = program.getTitle();
             }

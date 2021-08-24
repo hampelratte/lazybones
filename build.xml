@@ -61,23 +61,33 @@
 		</jar>
 	</target>
 
+	<!-- 
+	/opt/jdk-15.0.1/bin/java -Xms16m -Xmx1G -module-path=lib:tvbrowser.jar -Djava.library.path="/home/henni/devel/svdrp/tvbrowser/runtime/tvbrowser_linux" 
+	-splash:imgs/splash.png -Dpropertiesfile=linux.properties -m tvbrowser/tvbrowser.TVBrowser 
+	-->
 	<target name="run" depends="compile,jar" description="Run TV-Browser">
-		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
+		<java module="tvbrowser/tvbrowser.TVBrowser" dir="${tvbrowser.runtime.dir}" fork="true">
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
 			<!--<jvmarg value="-verbose:class"/>-->
-			<jvmarg value="--add-modules=ALL-SYSTEM"/>
+			<jvmarg value="--module-path=lib:tvbrowser.jar"/>
+			<jvmarg value="-Djava.library.path=&quot;${tvbrowser.runtime.dir}&quot;"/>
+			<jvmarg value="-Dpropertiesfile=linux.properties"/>
+			<jvmarg value="-splash:imgs/splash.png"/>
             <jvmarg value="-XX:+IgnoreUnrecognizedVMOptions"/>
 		</java>
 	</target>
 
 	<target name="run-vdr-local" depends="compile,jar" description="Run TV-Browser configured for a local VDR">
-		<java jar="${tvbrowser.runtime.dir}/tvbrowser.jar" dir="${tvbrowser.runtime.dir}" fork="true">
+		<java module="tvbrowser/tvbrowser.TVBrowser" dir="${tvbrowser.runtime.dir}" fork="true">
 			<jvmarg value="-Duser.home=/home/henni/.tvbrowser-vdr-local"/>
 			<jvmarg value="-Dpropertiesfile=${tvbrowser.runtime.dir}/linux.properties"/>
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>
 			<jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"/>
-			<jvmarg value="--add-modules=ALL-SYSTEM"/>
+			<jvmarg value="--module-path=lib:tvbrowser.jar"/>
+            <jvmarg value="-Djava.library.path=&quot;${tvbrowser.runtime.dir}&quot;"/>
+            <jvmarg value="-Dpropertiesfile=linux.properties"/>
+            <jvmarg value="-splash:imgs/splash.png"/>
 			<jvmarg value="-XX:+IgnoreUnrecognizedVMOptions"/>
 		</java>
 	</target>

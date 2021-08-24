@@ -48,79 +48,61 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This code was edited or generated using CloudGarden's Jigloo
- * SWT/Swing GUI Builder, which is free for non-commercial
- * use. If Jigloo is being used commercially (ie, by a corporation,
- * company or business for any purpose whatever) then you
- * should purchase a license for each developer using Jigloo.
- * Please visit www.cloudgarden.com for details.
- * Use of Jigloo implies acceptance of these licensing terms.
- * A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
- * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
- * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
-/**
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>
  * 
  */
 public class RemoteControl extends JPanel implements ActionListener {
-    private static transient Logger logger = LoggerFactory.getLogger(RemoteControl.class);
+	private static transient Logger logger = LoggerFactory.getLogger(RemoteControl.class);
 
-    private NumberBlock numBlock;
+	private VolumeBlock volBlock;
 
-    private NavigationBlock navBlock;
+	private JButton watch = new JButton(LazyBones.getTranslation("watch", "Watch"));
 
-    private VolumeBlock volBlock;
+	public RemoteControl() {
+		initGUI();
+	}
 
-    private ColorButtonBlock colorButtonBlock;
+	private void initGUI() {
+		setLayout(new GridBagLayout());
 
-    private JButton watch = new JButton(LazyBones.getTranslation("watch", "Watch"));
+		var numBlock = new NumberBlock();
+		this.add(numBlock, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5), 0, 0));
+		volBlock = new VolumeBlock();
+		this.add(volBlock, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
+		var navBlock = new NavigationBlock();
+		this.add(navBlock, new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
+		var colorButtonBlock = new ColorButtonBlock();
+		this.add(colorButtonBlock, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5), 0, 0));
 
-    public RemoteControl() {
-        initGUI();
-    }
+		watch.addActionListener(this);
+		watch.setIcon(LazyBones.getInstance().createImageIcon("action", "media-playback-start", 16));
+		this.add(watch, new GridBagConstraints(0, 4, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTHWEST,
+				GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
+	}
 
-    private void initGUI() {
-        setLayout(new GridBagLayout());
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == watch) {
+			Response res = VDRConnection.send(new CHAN());
+			if (res != null && res.getCode() == 250) {
+				int chan = Integer.parseInt(res.getMessage().split(" ")[0]);
+				Player.play(chan);
+			}
+		}
+	}
 
-        numBlock = new NumberBlock();
-        this.add(numBlock, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5),
-                0, 0));
-        volBlock = new VolumeBlock();
-        this.add(volBlock, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5),
-                0, 0));
-        navBlock = new NavigationBlock();
-        this.add(navBlock, new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5),
-                0, 0));
-        colorButtonBlock = new ColorButtonBlock();
-        this.add(colorButtonBlock, new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-                10, 5), 0, 0));
-
-        watch.addActionListener(this);
-        watch.setIcon(LazyBones.getInstance().createImageIcon("action", "media-playback-start", 16));
-        this.add(watch,
-                new GridBagConstraints(0, 4, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTHWEST, GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == watch) {
-            Response res = VDRConnection.send(new CHAN());
-            if (res != null && res.getCode() == 250) {
-                int chan = Integer.parseInt(res.getMessage().split(" ")[0]);
-                Player.play(chan);
-            }
-        }
-    }
-
-    public void updateVolume() {
-        logger.info("Updating volume slider");
-        Response res = VDRConnection.send(new VOLU(""));
-        if (res != null && res.getCode() == 250) {
-            String[] words = res.getMessage().trim().split(" ");
-            String volString = words[words.length - 1];
-            int volu = Integer.parseInt(volString);
-            logger.info("Volume is {}", volu);
-            volBlock.setVolume(volu);
-        }
-    }
+	public void updateVolume() {
+		logger.info("Updating volume slider");
+		Response res = VDRConnection.send(new VOLU(""));
+		if (res != null && res.getCode() == 250) {
+			String[] words = res.getMessage().trim().split(" ");
+			String volString = words[words.length - 1];
+			int volu = Integer.parseInt(volString);
+			logger.info("Volume is {}", volu);
+			volBlock.setVolume(volu);
+		}
+	}
 }

@@ -30,8 +30,6 @@ package lazybones.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Iterator;
@@ -61,29 +59,19 @@ import org.slf4j.LoggerFactory;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
- * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
- * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
 public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf {
 
     private static transient Logger logger = LoggerFactory.getLogger(DebugConsole.class);
 
-    private final boolean AUTOSCROLL = true;
+    private static final boolean AUTOSCROLL = true;
 
-    private SimpleFormatter formatter = new SimpleFormatter();
-    private JComboBox<Level> comboLevel;
-
-    // gui
-    private JScrollPane scrollpane;
+    private transient SimpleFormatter formatter = new SimpleFormatter();
 
     private JScrollBar scrollbar;
 
     private JTextPane textpane = new JTextPane();
 
-    private Document doc = textpane.getDocument();
+    private transient Document doc = textpane.getDocument();
 
     private Level selectedLevel = Level.FINEST;
 
@@ -139,11 +127,11 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
         }
     }
 
-    private synchronized void insertLine(LogRecord record) {
-        if (record != null && record.getLevel().intValue() >= selectedLevel.intValue()) {
-            String line = formatter.format(record);
+    private synchronized void insertLine(LogRecord logRecord) {
+        if (logRecord != null && logRecord.getLevel().intValue() >= selectedLevel.intValue()) {
+            String line = formatter.format(logRecord);
             try {
-                doc.insertString(doc.getLength(), line, textpane.getStyle(record.getLevel().toString()));
+                doc.insertString(doc.getLength(), line, textpane.getStyle(logRecord.getLevel().toString()));
             } catch (Exception e) {
                 logger.error("Couldn't insert line", e);
             }
@@ -154,38 +142,34 @@ public class DebugConsole extends JFrame implements LogObserver, WindowClosingIf
         }
     }
 
-    private void initGUI() {
-        textpane.setEditable(false);
+	private void initGUI() {
+		textpane.setEditable(false);
 
-        getContentPane().setLayout(new BorderLayout());
-        scrollpane = new JScrollPane(textpane);
-        scrollbar = scrollpane.getVerticalScrollBar();
-        getContentPane().add(scrollpane, BorderLayout.CENTER);
-        {
-            ComboBoxModel<Level> comboLevelModel = new DefaultComboBoxModel<Level>(new Level[] { Level.FINEST, Level.FINE, Level.INFO, Level.WARNING,
-                    Level.SEVERE });
-            comboLevel = new JComboBox<Level>();
-            getContentPane().add(comboLevel, BorderLayout.SOUTH);
-            comboLevel.setModel(comboLevelModel);
-            comboLevel.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    selectedLevel = (Level) e.getItem();
-                    showCurrentLog();
-                }
-            });
-        }
+		getContentPane().setLayout(new BorderLayout());
+		var scrollpane = new JScrollPane(textpane);
+		scrollbar = scrollpane.getVerticalScrollBar();
+		getContentPane().add(scrollpane, BorderLayout.CENTER);
 
-        this.setSize(800, 300);
-        this.setTitle("Debug");
+		ComboBoxModel<Level> comboLevelModel = new DefaultComboBoxModel<>(
+				new Level[] { Level.FINEST, Level.FINE, Level.INFO, Level.WARNING, Level.SEVERE });
+		var comboLevel = new JComboBox<Level>();
+		getContentPane().add(comboLevel, BorderLayout.SOUTH);
+		comboLevel.setModel(comboLevelModel);
+		comboLevel.addItemListener(e -> {
+			selectedLevel = (Level) e.getItem();
+			showCurrentLog();
+		});
 
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent event) {
-                setVisible(false);
-            }
-        });
-    }
+		this.setSize(800, 300);
+		this.setTitle("Debug");
+
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent event) {
+				setVisible(false);
+			}
+		});
+	}
 
     @Override
     public void close() {

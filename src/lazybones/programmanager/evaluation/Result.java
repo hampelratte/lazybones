@@ -28,6 +28,8 @@
  */
 package lazybones.programmanager.evaluation;
 
+import java.util.Objects;
+
 import devplugin.Program;
 
 public class Result implements Comparable<Result> {
@@ -70,4 +72,21 @@ public class Result implements Comparable<Result> {
             return -1;
         }
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(percentage);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Result other = (Result) obj;
+		return percentage == other.percentage;
+	}
 }

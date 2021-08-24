@@ -28,6 +28,8 @@
  */
 package lazybones.gui.settings.channelpanel;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -41,6 +43,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -56,20 +59,23 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.swing.DecoratableTextField;
+import org.hampelratte.swing.TextFieldClearButtonDecorator;
+import org.hampelratte.swing.TextFieldHintDecorator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lazybones.ChannelManager;
 import lazybones.LazyBones;
 import lazybones.gui.settings.channelpanel.dnd.ListTransferHandler;
 import lazybones.gui.settings.channelpanel.dnd.TableTransferHandler;
 import lazybones.utils.Utilities;
-
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.swing.DecoratableTextField;
-import org.hampelratte.swing.TextFieldClearButtonDecorator;
-import org.hampelratte.swing.TextFieldHintDecorator;
-
-import util.ui.Localizer;
+import util.i18n.Localizer;
 
 public class ChannelPanel implements ActionListener {
+	private static final Logger LOG = LoggerFactory.getLogger(ChannelPanel.class);
+	
     private DefaultTableModel tableModel;
 
     private JButton up = new JButton();
@@ -89,7 +95,7 @@ public class ChannelPanel implements ActionListener {
     private JScrollPane listScrollpane;
 
     private FilterListModel listModel = new FilterListModel();
-    private JList<Channel> list = new JList<Channel>(listModel);
+    private JList<Channel> list = new JList<>(listModel);
 
     private DecoratableTextField channelFilterTextfield = new DecoratableTextField();
 
@@ -117,7 +123,7 @@ public class ChannelPanel implements ActionListener {
                 return false;
             }
         };
-        devplugin.Channel[] c = LazyBones.getPluginManager().getSubscribedChannels();
+        devplugin.Channel[] c = getPluginManager().getSubscribedChannels();
         Map<String, Channel> channelMapping = ChannelManager.getChannelMapping();
         for (int i = 0; i < c.length; i++) {
             Object[] row = { c[i], channelMapping.get(c[i].getId()) };
@@ -140,10 +146,10 @@ public class ChannelPanel implements ActionListener {
 
         MinMaxChannelListener minMaxListener = new MinMaxChannelListener();
         String minChannel = LazyBones.getProperties().getProperty("minChannelNumber");
-        minChannelNumber.setValue(new Integer(minChannel));
+        minChannelNumber.setValue(Integer.parseInt(minChannel));
         minChannelNumber.addChangeListener(minMaxListener);
         String maxChannel = LazyBones.getProperties().getProperty("maxChannelNumber");
-        maxChannelNumber.setValue(new Integer(maxChannel));
+        maxChannelNumber.setValue(Integer.parseInt(maxChannel));
         maxChannelNumber.addChangeListener(minMaxListener);
 
         refresh.addActionListener(this);
@@ -244,70 +250,82 @@ public class ChannelPanel implements ActionListener {
         if (e.getSource() == refresh) {
             refreshChannelList();
         } else if (e.getSource() == autoAssign) {
-            try {
-                tryToAssignChannels();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        	tryToAssignChannels();
         } else if (e.getSource() == up) {
-            int[] indices = table.getSelectedRows();
-            Arrays.sort(indices);
-            if (indices[0] > 0) {
-                for (int i = 0; i < indices.length; i++) {
-                    moveUp(indices[i]);
-                    indices[i]--;
-                }
-            }
-            restoreSelection(indices);
-            if (!Utilities.isCellVisible(table, indices[0], 1)) {
-                Utilities.scrollToVisible(table, indices[0], 1);
-            }
+            moveSelectedChannelsUp();
         } else if (e.getSource() == down) {
-            int[] indices = table.getSelectedRows();
-            Arrays.sort(indices);
-            if (indices[indices.length - 1] < tableModel.getRowCount() - 1) {
-                for (int i = indices.length - 1; i >= 0; i--) {
-                    moveDown(indices[i]);
-                    indices[i]++;
-                }
-            }
-            restoreSelection(indices);
-            if (!Utilities.isCellVisible(table, indices[indices.length - 1], 1)) {
-                Utilities.scrollToVisible(table, indices[indices.length - 1], 1);
-            }
+            moveSelectedChannelsDown();
         } else if (e.getSource() == remove) {
-            int[] rows = table.getSelectedRows();
-            for (int i = 0; i < rows.length; i++) {
-                Object channel = table.getValueAt(rows[i], 1);
-                if (channel != null) {
-                    listModel.addElement((Channel) channel);
-                    table.setValueAt(null, rows[i], 1);
-                }
-            }
+        	removeSelectedChannels();
         } else if (e.getSource() == assign) {
-            int[] rows = list.getSelectedIndices();
-            int tableRow = table.getSelectedRow();
-            if (tableRow < 0) {
-                return;
-            }
-
-            for (int i = rows.length - 1; i >= 0; i--) {
-                int row = tableRow + i;
-                if (row > table.getRowCount() - 1) {
-                    continue;
-                }
-
-                Object tableValue = table.getValueAt(row, 1);
-                if (tableValue != null) {
-                    listModel.addElement((Channel) tableValue);
-                }
-                table.setValueAt(listModel.getElementAt(rows[i]), row, 1);
-                listModel.removeElement(listModel.getElementAt(rows[i]));
-            }
+            assignSelectedChannels();
         }
     }
 
-    private void refreshChannelList() {
+	private void assignSelectedChannels() {
+		int[] rows = list.getSelectedIndices();
+        int tableRow = table.getSelectedRow();
+        if (tableRow < 0) {
+            return;
+        }
+
+        for (int i = rows.length - 1; i >= 0; i--) {
+            int row = tableRow + i;
+            if (row > table.getRowCount() - 1) {
+                continue;
+            }
+
+            Object tableValue = table.getValueAt(row, 1);
+            if (tableValue != null) {
+                listModel.addElement((Channel) tableValue);
+            }
+            table.setValueAt(listModel.getElementAt(rows[i]), row, 1);
+            listModel.removeElement(listModel.getElementAt(rows[i]));
+        }
+	}
+
+	private void moveSelectedChannelsUp() {
+    	int[] indices = table.getSelectedRows();
+        Arrays.sort(indices);
+        if (indices[0] > 0) {
+            for (int i = 0; i < indices.length; i++) {
+                moveUp(indices[i]);
+                indices[i]--;
+            }
+        }
+        restoreSelection(indices);
+        if (!Utilities.isCellVisible(table, indices[0], 1)) {
+            Utilities.scrollToVisible(table, indices[0], 1);
+        }
+	}
+	
+	private void moveSelectedChannelsDown() {
+		int[] indices = table.getSelectedRows();
+		Arrays.sort(indices);
+		if (indices[indices.length - 1] < tableModel.getRowCount() - 1) {
+			for (int i = indices.length - 1; i >= 0; i--) {
+				moveDown(indices[i]);
+				indices[i]++;
+			}
+		}
+		restoreSelection(indices);
+		if (!Utilities.isCellVisible(table, indices[indices.length - 1], 1)) {
+			Utilities.scrollToVisible(table, indices[indices.length - 1], 1);
+		}
+	}
+	
+	private void removeSelectedChannels() {
+		int[] rows = table.getSelectedRows();
+		for (int i = 0; i < rows.length; i++) {
+			Object channel = table.getValueAt(rows[i], 1);
+			if (channel != null) {
+				listModel.addElement((Channel) channel);
+				table.setValueAt(null, rows[i], 1);
+			}
+		}
+	}
+
+	private void refreshChannelList() {
         // set min and max channel number
         LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
         LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
@@ -336,7 +354,7 @@ public class ChannelPanel implements ActionListener {
     private int getChannelIndex(Channel chan) {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             Object o = tableModel.getValueAt(i, 1);
-            if (o != null && o instanceof Channel) {
+            if (o instanceof Channel) {
                 Channel c = (Channel) o;
                 if (c.equals(chan)) {
                     return i;
@@ -374,7 +392,7 @@ public class ChannelPanel implements ActionListener {
         LazyBones.getProperties().setProperty("minChannelNumber", minChannelNumber.getValue().toString());
         LazyBones.getProperties().setProperty("maxChannelNumber", maxChannelNumber.getValue().toString());
 
-        Hashtable<String, Channel> channelMapping = new Hashtable<String, Channel>();
+        Hashtable<String, Channel> channelMapping = new Hashtable<>(); // NOSONAR this gets serialized -> can't change the type
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             devplugin.Channel c = (devplugin.Channel) tableModel.getValueAt(i, 0);
 
@@ -390,35 +408,39 @@ public class ChannelPanel implements ActionListener {
         ChannelManager.setChannelMapping(channelMapping);
     }
 
-    public void tryToAssignChannels() {
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            ArrayList<Container> list = new ArrayList<Container>();
-            Object tvbc = tableModel.getValueAt(i, 0);
-            if (tvbc == null) {
-                continue;
-            }
-            String tvbChan = ((devplugin.Channel) tvbc).getName();
-            tvbChan = tvbChan.toLowerCase();
-
-            for (int j = 0; j < listModel.getSize(); j++) {
-                Channel chan = listModel.getElementAt(j);
-                String vdrChan = chan.getName();
-                vdrChan = vdrChan.toLowerCase();
-                int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
-                list.add(new Container(percent, i, chan));
-            }
-
-            Collections.sort(list);
-            if (list.size() <= 0) {
-                return;
-            }
-            Container c = list.get(list.size() - 1);
-            int index = c.getIndex();
-            Object o = tableModel.getValueAt(index, 1);
-            if (o == null || "".equals(o.toString())) {
-                tableModel.setValueAt(c.getChannel(), index, 1);
-                listModel.removeElement(c.getChannel());
-            }
+    private void tryToAssignChannels() {
+        try {
+	        for (int i = 0; i < tableModel.getRowCount(); i++) {
+	            ArrayList<Container> containers = new ArrayList<>();
+	            Object tvbc = tableModel.getValueAt(i, 0);
+	            if (tvbc == null) {
+	                continue;
+	            }
+	            String tvbChan = ((devplugin.Channel) tvbc).getName();
+	            tvbChan = tvbChan.toLowerCase();
+	
+	            for (int j = 0; j < listModel.getSize(); j++) {
+	                Channel chan = listModel.getElementAt(j);
+	                String vdrChan = chan.getName();
+	                vdrChan = vdrChan.toLowerCase();
+	                int percent = Utilities.percentageOfEquality(tvbChan, vdrChan);
+	                containers.add(new Container(percent, i, chan));
+	            }
+	
+	            Collections.sort(containers);
+	            if (containers.isEmpty()) {
+	                return;
+	            }
+	            Container c = containers.get(containers.size() - 1);
+	            int index = c.getIndex();
+	            Object o = tableModel.getValueAt(index, 1);
+	            if (o == null || "".equals(o.toString())) {
+	                tableModel.setValueAt(c.getChannel(), index, 1);
+	                listModel.removeElement(c.getChannel());
+	            }
+	        }
+        } catch (Exception ex) {
+        	LOG.error("Auto assigned failed with exception", ex);
         }
     }
 
@@ -473,8 +495,31 @@ public class ChannelPanel implements ActionListener {
                 return 1;
             }
         }
+        
+        @Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + Objects.hash(channel, percent);
+			return result;
+		}
 
-        public int getPercent() {
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Container other = (Container) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			return Objects.equals(channel, other.channel) && percent == other.percent;
+		}
+
+		public int getPercent() {
             return percent;
         }
 
@@ -495,5 +540,9 @@ public class ChannelPanel implements ActionListener {
         public void setChannel(Channel channel) {
             this.channel = channel;
         }
+
+		private ChannelPanel getEnclosingInstance() {
+			return ChannelPanel.this;
+		}
     }
 }

@@ -28,21 +28,25 @@
  */
 package lazybones.logging;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 import java.util.logging.LogRecord;
 
 // TODO check, if can use the MemoryHandler for this
 public class LoggingArchive {
     public static final int LOG_HISTORY = 10000;
 
-    private static Vector<LogObserver> observers = new Vector<LogObserver>();
+    private static List<LogObserver> observers = Collections.synchronizedList(new ArrayList<>());
 
-    private static CircularList<LogRecord> list = new CircularList<LogRecord>(LOG_HISTORY);
+    private static CircularList<LogRecord> list = new CircularList<>(LOG_HISTORY);
+    
+    private LoggingArchive() {}
 
-    public static void log(LogRecord record) {
-        list.add(record);
-        notifyObservers(record);
+    public static void log(LogRecord logRecord) {
+        list.add(logRecord);
+        notifyObservers(logRecord);
     }
 
     public static CircularList<LogRecord> getLog() {

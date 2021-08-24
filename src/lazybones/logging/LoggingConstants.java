@@ -31,4 +31,6 @@ package lazybones.logging;
 public class LoggingConstants {
     public static final String CONNECTION_LOGGER = "lazybones.connection";
     public static final String EPG_LOGGER = "lazybones.epg";
+    
+    private LoggingConstants() {}
 }

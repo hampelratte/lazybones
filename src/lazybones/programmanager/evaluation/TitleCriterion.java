@@ -38,7 +38,7 @@ import devplugin.Program;
 
 public class TitleCriterion extends AbstractCriterion {
 
-    private static transient Logger logger = LoggerFactory.getLogger(TitleCriterion.class);
+    private static Logger logger = LoggerFactory.getLogger(TitleCriterion.class);
 
     public int evaluate(Program prog, LazyBonesTimer timer) {
         // calculate the precentage of common words

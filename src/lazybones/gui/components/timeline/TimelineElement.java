@@ -64,11 +64,11 @@ public class TimelineElement extends JComponent implements MouseListener {
     private Calendar timelineEnd;
     private final DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
-    public final static Color COLOR_ACTIVE = UIManager.getColor("List.selectionBackground");
-    public final static Color COLOR_INACTIVE = Color.LIGHT_GRAY;
-    public final static Color TEXT_COLOR = UIManager.getColor("List.selectionForeground");
-    public final static Color TEXT_COLOR_INACTIVE = Color.GRAY;
-    public final static Color CONFLICT_COLOR = new Color(255, 0, 0, 90);
+    public static final Color COLOR_ACTIVE = UIManager.getColor("List.selectionBackground");
+    public static final Color COLOR_INACTIVE = Color.LIGHT_GRAY;
+    public static final Color TEXT_COLOR = UIManager.getColor("List.selectionForeground");
+    public static final Color TEXT_COLOR_INACTIVE = Color.GRAY;
+    public static final Color CONFLICT_COLOR = new Color(255, 0, 0, 90);
 
     public TimelineElement(LazyBonesTimer timer, Calendar currentDate) {
         this.timer = timer;
@@ -83,7 +83,7 @@ public class TimelineElement extends JComponent implements MouseListener {
         String title = timer.getDisplayTitle().replace("|", "");
         DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
-        StringBuffer sb = new StringBuffer();
+        var sb = new StringBuilder();
         sb.append("<html>");
         sb.append("<b>");
         sb.append(title);
@@ -169,42 +169,50 @@ public class TimelineElement extends JComponent implements MouseListener {
         }
 
         // paint conflicts
-        g.setColor(CONFLICT_COLOR);
-        if (!timer.getConflicts().isEmpty()) {
-            for (Conflict conflict : timer.getConflicts()) {
-                Period period = conflict.getPeriod();
-                Calendar conflictStart = (Calendar) period.getStartTime().clone();
-                Calendar conflictEnd = (Calendar) period.getEndTime().clone();
-                Calendar timerStart = (Calendar) timer.getStartTime().clone();
-                Calendar timerEnd = (Calendar) timer.getEndTime().clone();
-
-                if (conflictStart.before(timelineStart)) {
-                    conflictStart.setTime(timelineStart.getTime());
-                }
-                if (conflictStart.before(timerStart)) {
-                    conflictStart.setTime(timerStart.getTime());
-                }
-                if (conflictEnd.after(timelineEnd)) {
-                    conflictEnd.setTime(timelineEnd.getTime());
-                }
-                if (timerStart.before(timelineStart)) {
-                    timerStart.setTime(timelineStart.getTime());
-                }
-                if (timerEnd.after(timelineEnd)) {
-                    timerEnd.setTime(timelineEnd.getTime());
-                }
-
-                long durationMinutes = Utilities.getDiffInMinutes(timerStart, timerEnd);
-                double pixelsPerMinute = (double) getWidth() / (double) durationMinutes;
-                long startMinute = Utilities.getDiffInMinutes(timerStart, conflictStart);
-                int x = (int) Math.ceil(pixelsPerMinute * startMinute);
-                int width = (int) (pixelsPerMinute * Utilities.getDiffInMinutes(conflictStart, conflictEnd));
-                g.fillRect(x, 0, width, getHeight() - 1);
-            }
-        }
+        paintConflicts(g);
     }
 
-    @Override
+    private void paintConflicts(Graphics g) {
+    	g.setColor(CONFLICT_COLOR);
+        if (!timer.getConflicts().isEmpty()) {
+            for (Conflict conflict : timer.getConflicts()) {
+            	paintConflict(g, conflict);
+            }
+        }
+	}
+
+	private void paintConflict(Graphics g, Conflict conflict) {
+		Period period = conflict.getPeriod();
+        Calendar conflictStart = (Calendar) period.getStartTime().clone();
+        Calendar conflictEnd = (Calendar) period.getEndTime().clone();
+        Calendar timerStart = (Calendar) timer.getStartTime().clone();
+        Calendar timerEnd = (Calendar) timer.getEndTime().clone();
+
+        if (conflictStart.before(timelineStart)) {
+            conflictStart.setTime(timelineStart.getTime());
+        }
+        if (conflictStart.before(timerStart)) {
+            conflictStart.setTime(timerStart.getTime());
+        }
+        if (conflictEnd.after(timelineEnd)) {
+            conflictEnd.setTime(timelineEnd.getTime());
+        }
+        if (timerStart.before(timelineStart)) {
+            timerStart.setTime(timelineStart.getTime());
+        }
+        if (timerEnd.after(timelineEnd)) {
+            timerEnd.setTime(timelineEnd.getTime());
+        }
+
+        long durationMinutes = Utilities.getDiffInMinutes(timerStart, timerEnd);
+        double pixelsPerMinute = (double) getWidth() / (double) durationMinutes;
+        long startMinute = Utilities.getDiffInMinutes(timerStart, conflictStart);
+        int x = (int) Math.ceil(pixelsPerMinute * startMinute);
+        int width = (int) (pixelsPerMinute * Utilities.getDiffInMinutes(conflictStart, conflictEnd));
+        g.fillRect(x, 0, width, getHeight() - 1);
+	}
+
+	@Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
             ProgramManager.getInstance().handleTimerDoubleClick(getTimer(), e);

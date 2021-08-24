@@ -35,11 +35,11 @@ import java.util.logging.LogRecord;
 
 public class FilterChain implements Filter {
 
-    private List<Filter> filters = new ArrayList<Filter>();
+    private List<Filter> filters = new ArrayList<>();
 
-    public boolean isLoggable(LogRecord record) {
+    public boolean isLoggable(LogRecord logRecord) {
         for (Filter filter : filters) {
-            if (!filter.isLoggable(record)) {
+            if (!filter.isLoggable(logRecord)) {
                 return false;
             }
         }

@@ -33,10 +33,11 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+
+import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 import lazybones.LazyBones;
 import net.sf.nachocalendar.CalendarFactory;
@@ -44,8 +45,6 @@ import net.sf.nachocalendar.components.DatePanel;
 import net.sf.nachocalendar.event.DateSelectionEvent;
 import net.sf.nachocalendar.event.DateSelectionListener;
 import net.sf.nachocalendar.model.DateSelectionModel;
-
-import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 public class DayChooser extends BrowsePanel implements ActionListener, DateSelectionListener {
 
@@ -133,7 +132,7 @@ public class DayChooser extends BrowsePanel implements ActionListener, DateSelec
     public void valueChanged(DateSelectionEvent e) {
         Object o = cal.getDateSelectionModel().getSelectedDate();
         if (o != null) {
-            Calendar startDate = GregorianCalendar.getInstance();
+            Calendar startDate = Calendar.getInstance();
             startDate.setTimeInMillis(cal.getDate().getTime());
 
             if (timer.isRepeating()) {

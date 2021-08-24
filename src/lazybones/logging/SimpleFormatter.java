@@ -37,27 +37,27 @@ import java.util.logging.LogRecord;
 public class SimpleFormatter extends Formatter {
 
     @Override
-    public String format(LogRecord record) {
-        StringBuffer sb = new StringBuffer();
+    public String format(LogRecord logRecord) {
+        var sb = new StringBuilder();
 
         DateFormat mTimeFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 
-        String message = formatMessage(record);
-        sb.append(mTimeFormat.format(new java.util.Date(record.getMillis())));
+        String message = formatMessage(logRecord);
+        sb.append(mTimeFormat.format(new java.util.Date(logRecord.getMillis())));
         sb.append(" LAZYBONES ");
-        sb.append(record.getLevel().getLocalizedName());
+        sb.append(logRecord.getLevel().getLocalizedName());
         sb.append(' ');
-        sb.append(record.getSourceClassName());
+        sb.append(logRecord.getSourceClassName());
         sb.append('.');
-        sb.append(record.getSourceMethodName());
+        sb.append(logRecord.getSourceMethodName());
         sb.append(": ");
         sb.append(message);
         sb.append("\n");
-        if (record.getThrown() != null) {
+        if (logRecord.getThrown() != null) {
             try {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
-                record.getThrown().printStackTrace(pw);
+                logRecord.getThrown().printStackTrace(pw);
                 pw.close();
                 sb.append(sw.toString());
             } catch (Exception ex) {

@@ -33,6 +33,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 public class ChannelSet<E> extends LinkedHashSet<E> implements Transferable {
 
@@ -50,10 +51,6 @@ public class ChannelSet<E> extends LinkedHashSet<E> implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        if (flavor.equals(FLAVOR)) {
-            return true;
-        } else {
-            return false;
-        }
+        return Objects.equals(flavor, FLAVOR);
     }
 }

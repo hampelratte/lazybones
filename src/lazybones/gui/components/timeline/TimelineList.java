@@ -44,8 +44,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -55,47 +53,45 @@ import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
 import lazybones.TimersChangedEvent;
+import lazybones.TimersChangedListener;
 import lazybones.utils.Utilities;
 
-public class TimelineList extends JPanel implements Observer {
-    private final List<LazyBonesTimer> data = new ArrayList<LazyBonesTimer>();
-    private final List<TimelineListener> listeners = new ArrayList<TimelineListener>();
+public class TimelineList extends JPanel implements TimersChangedListener {
+    private final List<LazyBonesTimer> data = new ArrayList<>();
+    private final List<TimelineListener> listeners = new ArrayList<>();
     private Calendar calendar = new GregorianCalendar();
 
     private int rowCount = 0;
 
-    private Color background;
+    private Color timelineBackground;
     private Color rowBackground;
     private Color rowBackgroundAlt;
     private Color lineColor;
-    private Color textColor;
     private Color overlayTextColor;
     private Color midnightLineColor;
 
-    private TimerManager timerManager;
+    private transient TimerManager timerManager;
 
     public TimelineList(TimerManager timerManager) {
         this.timerManager = timerManager;
         setCalendar(calendar);
-        setBackground(background);
+        setBackground(timelineBackground);
 
         setLayout(new TimelineLayout());
-        timerManager.addObserver(this);
+        timerManager.addTimersChangedListener(this);
 
-        Thread repainter = new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(10 * 1000);
-                        repaint();
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
-        };
-        repainter.setName("Lazy Bones Timeline repainter");
-        repainter.start();
+		Thread repainter = new Thread(() -> {
+			while (true) {
+				try {
+					Thread.sleep(10000);
+					repaint();
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		});
+		repainter.setName("Lazy Bones Timeline repainter");
+		repainter.start();
     }
 
     public int getRowCount() {
@@ -215,7 +211,6 @@ public class TimelineList extends JPanel implements Observer {
         Font font = new Font("SansSerif", Font.BOLD, fontSize);
         FontMetrics fm = g.getFontMetrics(font);
         int selectedDayNameWidth = fm.stringWidth(selectedDayName);
-        // int nextDayNameWidth = fm.stringWidth(nextDayName);
 
         g.setColor(overlayTextColor);
         g.setFont(font);
@@ -237,9 +232,6 @@ public class TimelineList extends JPanel implements Observer {
         // paint current time line
         int startHour = Integer.parseInt(LazyBones.getProperties().getProperty("timelineStartHour"));
         Calendar currentTime = Calendar.getInstance();
-        // currentTime.set(Calendar.HOUR_OF_DAY, 1);
-        // currentTime.set(Calendar.MINUTE, 23);
-        // currentTime.add(Calendar.DAY_OF_MONTH, 1);
 
         if (isOnCurrentDate(currentTime)) { // are we showing the current day ?
             g.setColor(new Color(255, 0, 0, 128));
@@ -265,7 +257,7 @@ public class TimelineList extends JPanel implements Observer {
         Calendar dayAfterAtStartHour = (Calendar) selectedDayAtStartHour.clone();
         dayAfterAtStartHour.add(Calendar.DAY_OF_MONTH, 1);
 
-        return (time.after(selectedDayAtStartHour) & time.before(dayAfterAtStartHour));
+        return (time.after(selectedDayAtStartHour) & time.before(dayAfterAtStartHour)); // NOSONAR java:S2178
     }
 
     public void showTimersForCurrentDate(List<LazyBonesTimer> timers) {
@@ -277,39 +269,36 @@ public class TimelineList extends JPanel implements Observer {
         }
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        if (o == timerManager) {
-            if (arg instanceof TimersChangedEvent) {
-                TimersChangedEvent tce = (TimersChangedEvent) arg;
-                switch (tce.getType()) {
-                case TimersChangedEvent.ALL:
-                    List<LazyBonesTimer> timers = tce.getTimers();
-                    clear();
-                    for (LazyBonesTimer timer : timers) {
-                        if (Utilities.timerRunsOnDate(timer, calendar)) {
-                            addTimer(timer);
-                        }
-                    }
-                    break;
-                case TimersChangedEvent.TIMER_ADDED:
-                    LazyBonesTimer timer = tce.getTimer();
-                    if (Utilities.timerRunsOnDate(timer, calendar)) {
-                        addTimer(timer);
-                    }
-                    break;
-                case TimersChangedEvent.TIMER_REMOVED:
-                    timer = tce.getTimer();
-                    if (Utilities.timerRunsOnDate(timer, calendar)) {
-                        removeTimer(timer);
-                    }
-                    break;
-                }
-            }
-        }
-    }
+	@Override
+	public void timersChanged(TimersChangedEvent tce) {
+		switch (tce.getType()) {
+		case TimersChangedEvent.ALL:
+			List<LazyBonesTimer> timers = tce.getTimers();
+			clear();
+			for (LazyBonesTimer timer : timers) {
+				if (Utilities.timerRunsOnDate(timer, calendar)) {
+					addTimer(timer);
+				}
+			}
+			break;
+		case TimersChangedEvent.TIMER_ADDED:
+			LazyBonesTimer timer = tce.getTimer();
+			if (Utilities.timerRunsOnDate(timer, calendar)) {
+				addTimer(timer);
+			}
+			break;
+		case TimersChangedEvent.TIMER_REMOVED:
+			timer = tce.getTimer();
+			if (Utilities.timerRunsOnDate(timer, calendar)) {
+				removeTimer(timer);
+			}
+			break;
+		default:
+		}
 
-    public void addTimelineListener(TimelineListener l) {
+	}
+
+	public void addTimelineListener(TimelineListener l) {
         listeners.add(l);
     }
 
@@ -327,11 +316,11 @@ public class TimelineList extends JPanel implements Observer {
     @Override
     public void updateUI() {
         super.updateUI();
-        background = UIManager.getColor("List.background");
+        timelineBackground = UIManager.getColor("List.background");
         lineColor = UIManager.getColor("Panel.background").darker();
         rowBackground = UIManager.getColor("List.background");
         rowBackgroundAlt = UIManager.getColor("Panel.background");
-        textColor = UIManager.getColor("Label.foreground");
+        var textColor = UIManager.getColor("Label.foreground");
         overlayTextColor = new Color(textColor.getRed(), textColor.getGreen(), textColor.getBlue(), 51); // text color with 20% opacity
         midnightLineColor = textColor;
     }

@@ -55,18 +55,12 @@ public class PlayerPanel {
 
     private JPanel panel;
     private JTextField urlRecordings;
-    private JLabel lStreamtype;
     private JTextField url;
-    private JLabel lURL;
-    private JLabel lUrlRecordings;
     private JCheckBox switchBefore;
     private JCheckBox surviveOnExit;
     private JComboBox<String> streamType;
     private JTextField params;
-    private JLabel lParams;
     private JTextField player;
-    private JLabel lPlayer;
-    private JPanel container;
 
     public PlayerPanel() {
         initComponents();
@@ -80,26 +74,26 @@ public class PlayerPanel {
 
         Insets defaultInsets = new Insets(5, 5, 5, 5);
 
-        container = new JPanel();
+        var container = new JPanel();
         panel.add(container, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, NORTHWEST, HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
         GridBagLayout containerLayout = new GridBagLayout();
         container.setLayout(containerLayout);
 
-        lPlayer = new JLabel();
+        var lPlayer = new JLabel();
         container.add(lPlayer, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, WEST, NONE, defaultInsets, 0, 0));
         lPlayer.setText(LazyBones.getTranslation("player", "Player"));
 
         player = new JTextField(LazyBones.getProperties().getProperty("player"));
         container.add(player, new GridBagConstraints(1, 0, 1, 1, 0.9, 0.1, WEST, HORIZONTAL, defaultInsets, 0, 0));
 
-        lParams = new JLabel();
+        var lParams = new JLabel();
         container.add(lParams, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, WEST, NONE, defaultInsets, 0, 0));
         lParams.setText(LazyBones.getTranslation("params", "Parameters"));
 
         params = new JTextField(LazyBones.getProperties().getProperty("player_params"));
         container.add(params, new GridBagConstraints(1, 1, 1, 1, 0.9, 0.1, WEST, HORIZONTAL, defaultInsets, 0, 0));
 
-        streamType = new JComboBox<String>();
+        streamType = new JComboBox<>();
         container.add(streamType, new GridBagConstraints(1, 4, 1, 1, 0.9, 0.1, WEST, HORIZONTAL, defaultInsets, 0, 0));
 
         switchBefore = new JCheckBox(lSwitchBefore);
@@ -109,18 +103,18 @@ public class PlayerPanel {
         surviveOnExit = new JCheckBox(lSurviveOnExit);
         container.add(surviveOnExit, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, WEST, NONE, defaultInsets, 0, 0));
 
-        lUrlRecordings = new JLabel();
+        var lUrlRecordings = new JLabel();
         container.add(lUrlRecordings, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, WEST, NONE, defaultInsets, 0, 0));
         lUrlRecordings.setText(LazyBones.getTranslation("url", "URL") + " " + LazyBones.getTranslation("recordings", "Recordings"));
 
-        lURL = new JLabel();
+        var lURL = new JLabel();
         container.add(lURL, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, WEST, NONE, defaultInsets, 0, 0));
         lURL.setText(LazyBones.getTranslation("url", "URL"));
 
         url = new JTextField(LazyBones.getProperties().getProperty("streamurl"));
         container.add(url, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, WEST, HORIZONTAL, defaultInsets, 0, 0));
 
-        lStreamtype = new JLabel();
+        var lStreamtype = new JLabel();
         container.add(lStreamtype, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, WEST, NONE, defaultInsets, 0, 0));
         lStreamtype.setText(LazyBones.getTranslation("streamtype", "Stream type"));
 
@@ -128,8 +122,8 @@ public class PlayerPanel {
         container.add(urlRecordings, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, WEST, HORIZONTAL, defaultInsets, 0, 0));
 
 
-        switchBefore.setSelected(new Boolean(LazyBones.getProperties().getProperty("switchBefore")).booleanValue());
-        surviveOnExit.setSelected(new Boolean(LazyBones.getProperties().getProperty("surviveOnExit")).booleanValue());
+        switchBefore.setSelected(Boolean.parseBoolean(LazyBones.getProperties().getProperty("switchBefore")));
+        surviveOnExit.setSelected(Boolean.parseBoolean(LazyBones.getProperties().getProperty("surviveOnExit")));
         streamType.addItem("TS");
         streamType.addItem("PS");
         streamType.addItem("PES");
@@ -147,8 +141,8 @@ public class PlayerPanel {
         LazyBones.getProperties().setProperty("player_params", params.getText());
         LazyBones.getProperties().setProperty("streamurl", url.getText());
         LazyBones.getProperties().setProperty("recording.url", urlRecordings.getText());
-        LazyBones.getProperties().setProperty("switchBefore", new Boolean(switchBefore.isSelected()).toString());
-        LazyBones.getProperties().setProperty("surviveOnExit", new Boolean(surviveOnExit.isSelected()).toString());
+        LazyBones.getProperties().setProperty("switchBefore", Boolean.toString(switchBefore.isSelected()));
+        LazyBones.getProperties().setProperty("surviveOnExit", Boolean.toString(surviveOnExit.isSelected()));
         LazyBones.getProperties().setProperty("streamtype", streamType.getSelectedItem().toString());
     }
 

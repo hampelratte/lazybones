@@ -30,6 +30,7 @@ package lazybones.utils;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 
 import lazybones.ChannelManager;
 import lazybones.LazyBonesTimer;
@@ -75,8 +76,25 @@ public class StartStopEvent implements Comparable<StartStopEvent> {
     public int compareTo(StartStopEvent o) {
         return getEventTime().compareTo(o.getEventTime());
     }
-
+    
     @Override
+	public int hashCode() {
+		return Objects.hash(startEvent, timer);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		StartStopEvent other = (StartStopEvent) obj;
+		return startEvent == other.startEvent && Objects.equals(timer, other.timer);
+	}
+
+	@Override
     public String toString() {
         DateFormat df = DateFormat.getDateTimeInstance();
         Calendar cal = isStartEvent() ? timer.getStartTime() : timer.getEndTime();

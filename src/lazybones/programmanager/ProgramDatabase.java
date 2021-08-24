@@ -28,18 +28,19 @@
  */
 package lazybones.programmanager;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import lazybones.ChannelManager;
-import lazybones.ChannelManager.ChannelNotFoundException;
-import lazybones.LazyBones;
-import lazybones.LazyBonesTimer;
 import devplugin.Date;
 import devplugin.Program;
+import lazybones.ChannelManager;
+import lazybones.ChannelManager.ChannelNotFoundException;
+import lazybones.LazyBonesTimer;
 
 /**
  * A class to lookup TVB programs by different criteria like a LazyBonesTimer, the unique program ID or time and channel.
@@ -48,6 +49,8 @@ import devplugin.Program;
  */
 public class ProgramDatabase {
 
+	private ProgramDatabase() {}
+	
     public static Program getProgram(LazyBonesTimer timer) throws ChannelNotFoundException {
         // determine channel
         devplugin.Channel chan = ChannelManager.getInstance().getTvbrowserChannel(timer);
@@ -56,7 +59,7 @@ public class ProgramDatabase {
         long startTime = timer.getStartTime().getTimeInMillis();
         long endTime = timer.getEndTime().getTimeInMillis();
         long duration = endTime - startTime;
-        Calendar time = GregorianCalendar.getInstance();
+        Calendar time = Calendar.getInstance();
         long middleTime = startTime + duration / 2;
         time.setTimeInMillis(middleTime);
 
@@ -76,13 +79,13 @@ public class ProgramDatabase {
      *         (00:15), so dass man nicht mehr das richtige channelDayProgram bekommt und das Program nicht findet
      */
     private static Program getProgramAt(Calendar startTime, Calendar middleTime, devplugin.Channel chan) {
-        Iterator<Program> dayProgram = LazyBones.getPluginManager().getChannelDayProgram(new Date(startTime), chan);
+        Iterator<Program> dayProgram = getPluginManager().getChannelDayProgram(new Date(startTime), chan);
         while (dayProgram != null && dayProgram.hasNext()) {
             Program prog = dayProgram.next();
 
             Calendar progStart = createStartTimeCalendar(prog);
 
-            Calendar progEnd = GregorianCalendar.getInstance();
+            Calendar progEnd = Calendar.getInstance();
             progEnd.setTimeInMillis(progStart.getTimeInMillis());
             progEnd.add(Calendar.MINUTE, prog.getLength());
 
@@ -94,7 +97,7 @@ public class ProgramDatabase {
     }
 
     private static Calendar createStartTimeCalendar(Program prog) {
-        Calendar progStart = GregorianCalendar.getInstance();
+        Calendar progStart = Calendar.getInstance();
         progStart.set(Calendar.YEAR, prog.getDate().getYear());
         progStart.set(Calendar.MONTH, prog.getDate().getMonth() - 1);
         progStart.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());
@@ -111,7 +114,7 @@ public class ProgramDatabase {
      * @see devplugin.Program#getUniqueID()
      */
     public static Program getProgram(String uniqueProgID) {
-        return LazyBones.getPluginManager().getProgram(uniqueProgID);
+        return getPluginManager().getProgram(uniqueProgID);
     }
 
     public static List<Program> getProgramAroundTimer(LazyBonesTimer timer) throws ChannelNotFoundException {
@@ -137,7 +140,7 @@ public class ProgramDatabase {
         Date dayBefore = date.addDays(-1);
         Date dayAfter = date.addDays(1);
 
-        List<Program> list = new ArrayList<Program>();
+        List<Program> list = new ArrayList<>();
         addDayProgramToList(list, getChannelDayProgram(dayBefore, chan));
         addDayProgramToList(list, getChannelDayProgram(date, chan));
         addDayProgramToList(list, getChannelDayProgram(dayAfter, chan));
@@ -152,7 +155,7 @@ public class ProgramDatabase {
 
     private static Iterator<Program> getChannelDayProgram(Date date, devplugin.Channel chan) {
         if (chan != null) {
-            return LazyBones.getPluginManager().getChannelDayProgram(date, chan);
+            return getPluginManager().getChannelDayProgram(date, chan);
         } else {
             return new EmptyChannelDayProgram();
         }
@@ -166,11 +169,12 @@ public class ProgramDatabase {
 
         @Override
         public Program next() {
-            return null;
+            throw new NoSuchElementException();
         }
 
         @Override
         public void remove() {
+        	// nothing to do
         }
     }
 }

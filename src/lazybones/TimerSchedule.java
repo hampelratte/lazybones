@@ -81,7 +81,7 @@ public class TimerSchedule {
         selectedDayAtStartHour.set(Calendar.HOUR_OF_DAY, startHour);
 
         Set<Calendar> events = createEventSet();
-        ArrayList<Calendar> eventList = new ArrayList<Calendar>(events);
+        ArrayList<Calendar> eventList = new ArrayList<>(events);
         Collections.reverse(eventList);
         for (Iterator<Calendar> iter = eventList.iterator(); iter.hasNext();) {
             Calendar event = iter.next();
@@ -99,7 +99,7 @@ public class TimerSchedule {
 
     private Set<Calendar> createEventSet() {
         List<LazyBonesTimer> timers = timerManager.getTimers();
-        TreeSet<Calendar> events = new TreeSet<Calendar>();
+        TreeSet<Calendar> events = new TreeSet<>();
         for (Iterator<LazyBonesTimer> iter = timers.iterator(); iter.hasNext();) {
             LazyBonesTimer timer = iter.next();
             events.add(timer.getStartTime());

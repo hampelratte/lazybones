@@ -39,10 +39,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -51,20 +48,22 @@ import javax.swing.JPanel;
 import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.TimerSchedule;
+import lazybones.TimersChangedEvent;
+import lazybones.TimersChangedListener;
 import lazybones.gui.components.timeline.ConflictPanel;
 import lazybones.gui.components.timeline.Timeline;
 import lazybones.gui.components.timeline.TimelineWeekdayButton;
 import lazybones.utils.Utilities;
 
-public class TimelinePanel extends JPanel implements ActionListener, Observer {
+public class TimelinePanel extends JPanel implements ActionListener, TimersChangedListener {
 
     private JLabel date = new JLabel();
     private JButton nextDateButton;
     private JButton prevDateButton;
     private Timeline timeline;
     private DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
-    private TimerManager timerManager;
-    private TimerSchedule timerSchedule;
+    private transient TimerManager timerManager;
+    private transient TimerSchedule timerSchedule;
     private ConflictPanel conflictPanel;
 
     private TimelineWeekdayButton[] weekdayButtons = new TimelineWeekdayButton[7];
@@ -76,12 +75,11 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         conflictPanel = new ConflictPanel(timerManager);
 
         initGUI();
-        timerManager.addObserver(this);
+        timerManager.addTimersChangedListener(this);
         enableDisableButtons();
     }
 
     private void initGUI() {
-        // setLayout(new GridBagLayout());
         setLayout(new BorderLayout());
 
         nextDateButton = new JButton(LazyBones.getInstance().createImageIcon("action", "go-next", 16));
@@ -92,7 +90,6 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         prevDateButton.setActionCommand("PREVIOUS_DAY");
 
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        // JToolBar northPanel = new JToolBar();// JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         northPanel.add(prevDateButton);
         northPanel.add(nextDateButton);
         northPanel.add(date);
@@ -104,14 +101,14 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
             Calendar day = (Calendar) today.clone();
             day.add(Calendar.DAY_OF_MONTH, i);
             weekdayButtons[i] = new TimelineWeekdayButton(timerManager, day);
-            timerManager.addObserver(weekdayButtons[i]);
+            timerManager.addTimersChangedListener(weekdayButtons[i]);
             weekdayButtons[i].addActionListener(this);
             northPanel.add(weekdayButtons[i]);
         }
 
         add(northPanel, BorderLayout.NORTH);
 
-        setCalendar(GregorianCalendar.getInstance());
+        setCalendar(Calendar.getInstance());
 
         add(timeline, BorderLayout.CENTER);
         timeline.getList().showTimersForCurrentDate(timerManager.getTimers());
@@ -155,19 +152,13 @@ public class TimelinePanel extends JPanel implements ActionListener, Observer {
         // weekday buttons
         for (int i = 0; i < weekdayButtons.length; i++) {
             TimelineWeekdayButton button = weekdayButtons[i];
-            if (Utilities.sameDay(cal, button.getDay())) {
-                button.setSelected(true);
-            } else {
-                button.setSelected(false);
-            }
+            button.setSelected(Utilities.sameDay(cal, button.getDay()));
         }
     }
-
+    
     @Override
-    public void update(Observable o, Object arg) {
-        if (o == timerManager) {
-            enableDisableButtons();
-        }
+    public void timersChanged(TimersChangedEvent evt) {
+    	enableDisableButtons();
     }
 
     public void setCalendar(Calendar calendar) {

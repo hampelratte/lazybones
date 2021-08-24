@@ -136,20 +136,8 @@ public class CircularList<T> implements Iterable<T>, Iterator<T> {
         return temp.getData();
     }
 
+    @Override
     public void remove() {
         throw new RuntimeException("remove() is not implemented");
-    }
-
-    public static void main(String[] args) {
-        final int size = 5;
-        CircularList<String> list = new CircularList<String>(size);
-        for (int i = 0; i < size + 20; i++) {
-            list.add(Integer.toString(i));
-        }
-
-        for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
-            String s = iterator.next();
-            System.out.println(s);
-        }
     }
 }

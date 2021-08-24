@@ -44,7 +44,7 @@ import devplugin.Program;
  */
 public class DurationCriterion extends AbstractCriterion {
 
-    private static transient Logger logger = LoggerFactory.getLogger(DurationCriterion.class);
+    private static Logger logger = LoggerFactory.getLogger(DurationCriterion.class);
 
     public int evaluate(Program prog, LazyBonesTimer timer) {
         // program duration in minutes

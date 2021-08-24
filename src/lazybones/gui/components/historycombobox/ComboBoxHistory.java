@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.swing.DefaultComboBoxModel;
 
@@ -39,7 +40,7 @@ public class ComboBoxHistory extends DefaultComboBoxModel<String> implements Ite
 
     private int maxSize = 10;
 
-    private List<HistoryChangedListener> listeners = new ArrayList<HistoryChangedListener>();
+    private transient List<HistoryChangedListener> listeners = new ArrayList<>();
 
     public ComboBoxHistory(int size) {
         maxSize = size;
@@ -85,17 +86,17 @@ public class ComboBoxHistory extends DefaultComboBoxModel<String> implements Ite
             }
 
             @Override
-            public boolean hasNext() {
-                if(position < getSize()-1 && getSize()>0) {
-                    return true;
-                }
-                return false;
-            }
+			public boolean hasNext() {
+				return position < getSize() - 1 && getSize() > 0;
+			}
 
             @Override
             public String next() {
                 position++;
-                return getElementAt(position).toString();
+                if (position >= getSize()) {
+                	throw new NoSuchElementException();
+                }
+                return getElementAt(position);
             }
 
         };
@@ -111,7 +112,7 @@ public class ComboBoxHistory extends DefaultComboBoxModel<String> implements Ite
     }
 
     public List<String> asList() {
-        List<String> list = new ArrayList<String>(maxSize);
+        List<String> list = new ArrayList<>(maxSize);
         for (String item : this) {
             list.add(item);
         }

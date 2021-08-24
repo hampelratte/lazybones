@@ -52,7 +52,7 @@ public class ListTransferHandler extends ChannelSetTransferHandler {
         @SuppressWarnings("unchecked")
         JList<Channel> list = (JList<Channel>) c;
         List<Channel> channels = list.getSelectedValuesList();
-        ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
+        ChannelSet<Channel> channelSet = new ChannelSet<>();
         channelSet.addAll(channels);
 
         return channelSet;

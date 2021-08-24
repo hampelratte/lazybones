@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,17 +19,17 @@ import org.hampelratte.svdrp.responses.highlevel.TreeNode;
 import lazybones.LazyBones;
 
 public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
-
-    private final Icon iconNew;
-    private final Icon iconCut;
-    private final Icon iconBoth;
-    private final Icon iconClosed;
-    private final Icon iconOpened;
+                  
+    private final transient Icon iconNew;
+    private final transient Icon iconCut;
+    private final transient Icon iconBoth;
+    private final transient Icon iconClosed;
+    private final transient Icon iconOpened;
 
     public RecordingTreeRenderer() {
         iconNew = LazyBones.getInstance().getIcon("lazybones/new.png");
         iconCut = LazyBones.getInstance().getIcon("lazybones/edit-cut.png");
-        List<Icon> combined = Arrays.asList(new Icon[] { iconNew, iconCut });
+        List<Icon> combined = List.of(iconNew, iconCut);
         iconBoth = new CombinedIcon(combined, 2);
         iconClosed = UIManager.getIcon("Tree.closedIcon");
         iconOpened = UIManager.getIcon("Tree.openIcon");
@@ -41,14 +40,14 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         setIcon(value, expanded);
-        setColors(selected, row);
+        setColors(selected);
         String title = covertToString(value);
         setText(title);
         setEnabled(tree.isEnabled());
         return this;
     }
 
-    private void setColors(boolean selected, int row) {
+    private void setColors(boolean selected) {
         if (selected) {
             setBackground(UIManager.getColor("Tree.selectionBackground"));
             setForeground(UIManager.getColor("Tree.selectionForeground"));
@@ -84,7 +83,7 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
     private void setIcon(Object value, boolean expanded) {
         if (value instanceof Recording) {
             Recording recording = (Recording) value;
-            setHorizontalTextPosition(JLabel.LEADING);
+            setHorizontalTextPosition(LEADING);
             setIconTextGap(10);
             if (recording.isNew()) {
                 if (recording.isCut()) {
@@ -102,7 +101,7 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
                 setDisabledIcon(null);
             }
         } else {
-            setHorizontalTextPosition(JLabel.TRAILING);
+            setHorizontalTextPosition(TRAILING);
             setIconTextGap(5);
             if (expanded) {
                 setIcon(iconOpened);
@@ -115,7 +114,7 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
     }
 
     private class CombinedIcon implements Icon {
-        private List<Icon> icons = new ArrayList<Icon>();
+        private List<Icon> icons = new ArrayList<>();
         private int hgap = 2;
 
         public CombinedIcon(List<Icon> icons, int hgap) {

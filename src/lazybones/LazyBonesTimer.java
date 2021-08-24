@@ -29,9 +29,12 @@
 
 package lazybones;
 
+import static devplugin.Plugin.getPluginManager;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import lazybones.conflicts.Conflict;
 import lazybones.gui.settings.DescriptionSelectorItem;
@@ -61,12 +64,12 @@ public class LazyBonesTimer extends Timer {
     /**
      * List of all TV-B programs assigned to this timer
      */
-    private List<String> tvBrowserProgIDs = new ArrayList<String>();
+    private List<String> tvBrowserProgIDs = new ArrayList<>();
 
     /**
      * Contains all conflicts with other timers
      */
-    private final List<Conflict> conflicts = new ArrayList<Conflict>();
+    private final List<Conflict> conflicts = new ArrayList<>();
 
     public LazyBonesTimer() {
         setDefaultLifetimeAndPrio();
@@ -123,11 +126,11 @@ public class LazyBonesTimer extends Timer {
      * @return Returns if this timer could be assigned to a Program
      */
     public boolean isAssigned() {
-        return tvBrowserProgIDs.size() > 0;
+        return !tvBrowserProgIDs.isEmpty();
     }
 
     @Override
-    public Object clone() {
+    public Object clone() { // NOSONAR java:S2975
         Timer vdrtimer = (Timer) super.clone();
         LazyBonesTimer clone = new LazyBonesTimer(vdrtimer);
         clone.setTvBrowserProgIDs(getTvBrowserProgIDs());
@@ -171,12 +174,10 @@ public class LazyBonesTimer extends Timer {
      * @param timer
      * @return
      */
-    public boolean startsDuringTimer(LazyBonesTimer timer) {
-        if (this.getStartTime().compareTo(timer.getStartTime()) >= 0 && this.getStartTime().compareTo(timer.getEndTime()) <= 0) {
-            return true;
-        }
-        return false;
-    }
+	public boolean startsDuringTimer(LazyBonesTimer timer) {
+		return this.getStartTime().compareTo(timer.getStartTime()) >= 0
+				&& this.getStartTime().compareTo(timer.getEndTime()) <= 0;
+	}
 
     public List<Conflict> getConflicts() {
         return conflicts;
@@ -189,8 +190,8 @@ public class LazyBonesTimer extends Timer {
     public String getDisplayTitle() {
         if ("TITLE".equals(getPath()) && "EPISODE".equals(getTitle())) {
             String displayTitle = "TITLE/EPISODE";
-            if (getTvBrowserProgIDs() != null && getTvBrowserProgIDs().size() > 0) {
-                Program prog = LazyBones.getPluginManager().getProgram(getTvBrowserProgIDs().get(0));
+            if (getTvBrowserProgIDs() != null && !getTvBrowserProgIDs().isEmpty()) {
+                Program prog = getPluginManager().getProgram(getTvBrowserProgIDs().get(0));
                 if (prog != null) {
                     displayTitle += " (" + prog.getTitle() + ')';
                 }
@@ -211,10 +212,10 @@ public class LazyBonesTimer extends Timer {
      */
     public LazyBonesTimer getTimerWithoutBuffers() {
         LazyBonesTimer timer = (LazyBonesTimer) this.clone();
-        int buffer_before = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
-        timer.getStartTime().add(Calendar.MINUTE, buffer_before);
-        int buffer_after = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
-        timer.getEndTime().add(Calendar.MINUTE, -buffer_after);
+        int bufferBefore = Integer.parseInt(LazyBones.getProperties().getProperty("timer.before"));
+        timer.getStartTime().add(Calendar.MINUTE, bufferBefore);
+        int bufferAfter = Integer.parseInt(LazyBones.getProperties().getProperty("timer.after"));
+        timer.getEndTime().add(Calendar.MINUTE, -bufferAfter);
         return timer;
     }
 
@@ -236,7 +237,7 @@ public class LazyBonesTimer extends Timer {
      * @return the description as String
      */
     public static String createDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
-        String descTvb = prog != null ? prog.getDescription() != null ? prog.getDescription() : "" : "";
+        String descTvb = Optional.ofNullable(prog).map(Program::getDescription).orElse("");
         if (descriptionSelectorItemId.equals(DescriptionSelectorItem.VDR)) {
             return descVdr;
         } else if (descriptionSelectorItemId.equals(DescriptionSelectorItem.TVB_DESC)) {
@@ -256,7 +257,7 @@ public class LazyBonesTimer extends Timer {
 
     private static String createFormattedDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
         String selectedFormat = descriptionSelectorItemId.substring(descriptionSelectorItemId.indexOf('_') + 1);
-        AbstractPluginProgramFormating[] formats = LazyBones.getPluginManager().getAvailableGlobalPuginProgramFormatings();
+        AbstractPluginProgramFormating[] formats = getPluginManager().getAvailableGlobalPuginProgramFormatings();
         for (AbstractPluginProgramFormating format : formats) {
             if (format.getId().equals(selectedFormat)) {
                 ParamParser parser = new ParamParser();
@@ -272,7 +273,7 @@ public class LazyBonesTimer extends Timer {
     public boolean isSetForWeekdays(int... days) {
         boolean setForTheDays = true;
         for (int i = 0; i < days.length; i++) {
-            setForTheDays = setForTheDays & getRepeatingDays()[days[i]];
+            setForTheDays = setForTheDays & getRepeatingDays()[days[i]]; // NOSONAR java:S2178
         }
         return setForTheDays;
     }

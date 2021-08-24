@@ -34,18 +34,18 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JToggleButton;
 
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
+import lazybones.TimersChangedEvent;
+import lazybones.TimersChangedListener;
 import lazybones.conflicts.Conflict;
 import lazybones.utils.Period;
 
-public class TimelineWeekdayButton extends JToggleButton implements Observer {
+public class TimelineWeekdayButton extends JToggleButton implements TimersChangedListener {
 
     boolean hasChanged = false;
 
@@ -60,7 +60,7 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private final SimpleDateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
     private final SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
-    private TimerManager timerManager;
+    private transient TimerManager timerManager;
 
     public TimelineWeekdayButton(TimerManager timerManager, Calendar day) {
         this.timerManager = timerManager;
@@ -68,13 +68,11 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        if (o instanceof TimerManager) {
-            hasChanged = true;
-            repaint();
-        }
+    public void timersChanged(TimersChangedEvent evt) {
+    	hasChanged = true;
+    	repaint();
     }
-
+    
     /**
      * Updates the small dots on the button, the tooltip text and the enabled state
      */
@@ -89,8 +87,8 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
                     Period period = conflict.getPeriod();
                     Calendar startTime = period.getStartTime();
                     Calendar endTime = period.getEndTime();
-                    if (startTime.after(selectedDayAtStartHour) & startTime.before(dayAfterAtStartHour)
-                            || endTime.after(selectedDayAtStartHour) & endTime.before(dayAfterAtStartHour)) {
+                    if (startTime.after(selectedDayAtStartHour) && startTime.before(dayAfterAtStartHour)
+                            || endTime.after(selectedDayAtStartHour) && endTime.before(dayAfterAtStartHour)) {
                         conflictCount++;
                         break; // only count a timer once, though it has more than one conflict
                     }
@@ -128,12 +126,8 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
     private boolean timerRunsOnThisDay(LazyBonesTimer timer) {
         Calendar startTime = timer.getStartTime();
         Calendar endTime = timer.getEndTime();
-        if (startTime.after(selectedDayAtStartHour) & startTime.before(dayAfterAtStartHour)
-                || endTime.after(selectedDayAtStartHour) & endTime.before(dayAfterAtStartHour)) {
-            return true;
-        }
-
-        return false;
+        return (startTime.after(selectedDayAtStartHour) && startTime.before(dayAfterAtStartHour)
+                || endTime.after(selectedDayAtStartHour) && endTime.before(dayAfterAtStartHour));
     }
 
     @Override
@@ -148,19 +142,19 @@ public class TimelineWeekdayButton extends JToggleButton implements Observer {
         final int INDICATOR_SIZE = 3;
         final int PADDING = 2;
 
-        int element_size = INDICATOR_SIZE + PADDING;
-        int pos_y = getHeight() - element_size;
+        int elementSize = INDICATOR_SIZE + PADDING;
+        int posY = getHeight() - elementSize;
 
         int i = 0;
 
         g.setColor(Color.RED);
         for (i = 0; i < conflictCount; i++) {
-            g.fillRect(PADDING + i * element_size, pos_y, INDICATOR_SIZE, INDICATOR_SIZE);
+            g.fillRect(PADDING + i * elementSize, posY, INDICATOR_SIZE, INDICATOR_SIZE);
         }
 
         g.setColor(Color.BLACK);
         for (; i < timerCount; i++) {
-            g.fillRect(PADDING + i * element_size, pos_y, INDICATOR_SIZE, INDICATOR_SIZE);
+            g.fillRect(PADDING + i * elementSize, posY, INDICATOR_SIZE, INDICATOR_SIZE);
         }
     }
 }

@@ -28,8 +28,6 @@
  */
 package lazybones.gui.components.timeroptions;
 
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,21 +46,18 @@ public class SpinnerCalendarEditor extends JSpinner.DefaultEditor {
         this.model = model;
         getTextField().setEditable(true);
         getTextField().setFormatterFactory(new DefaultFormatterFactory(new CalendarFormatter(new SimpleDateFormat("HH:mm"))));
-        getTextField().addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                int amount = e.getWheelRotation();
-                Object value = null;
-                for (int i = 0; i < Math.abs(amount); i++) {
-                    if (amount > 0) {
-                        value = model.getPreviousValue();
-                    } else {
-                        value = model.getNextValue();
-                    }
-                }
-                model.setValue(value);
-            }
-        });
+        getTextField().addMouseWheelListener(e -> {
+		    int amount = e.getWheelRotation();
+		    Object value = null;
+		    for (int i = 0; i < Math.abs(amount); i++) {
+		        if (amount > 0) {
+		            value = model.getPreviousValue();
+		        } else {
+		            value = model.getNextValue();
+		        }
+		    }
+		    model.setValue(value);
+		});
     }
 
     private class CalendarFormatter extends DefaultFormatter {

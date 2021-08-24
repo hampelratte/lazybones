@@ -28,6 +28,7 @@
  */
 package lazybones.gui.settings;
 
+import static devplugin.Plugin.getPluginManager;
 import static lazybones.gui.settings.DescriptionSelectorItem.LONGEST;
 import static lazybones.gui.settings.DescriptionSelectorItem.TIMER;
 import static lazybones.gui.settings.DescriptionSelectorItem.TVB_DESC;
@@ -44,7 +45,7 @@ public class DescriptionComboBoxModel extends DefaultComboBoxModel<DescriptionSe
     public DescriptionComboBoxModel(boolean addLongestElement, boolean addTimerElement) {
         addElement(new DescriptionSelectorItem(VDR, "VDR"));
         addElement(new DescriptionSelectorItem(TVB_DESC, LazyBones.getTranslation("timer_desc_tvb", "TV-Browser description only")));
-        AbstractPluginProgramFormating[] formattings = LazyBones.getPluginManager().getAvailableGlobalPuginProgramFormatings();
+        AbstractPluginProgramFormating[] formattings = getPluginManager().getAvailableGlobalPuginProgramFormatings();
         for (AbstractPluginProgramFormating format : formattings) {
             String name = LazyBones.getTranslation("timer_desc_formatted", "TV-Browser - formatted ({0})", format.getName());
             addElement(new DescriptionSelectorItem(TVB_PREFIX + format.getId(), name));

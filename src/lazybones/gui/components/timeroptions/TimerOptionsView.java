@@ -51,7 +51,7 @@ public class TimerOptionsView extends AbstractDetailsPanel {
     /**
      * The TVB program, which corresponds to the timer
      */
-    private Program prog;
+    private transient Program prog;
 
     public TimerOptionsView() {
         super("timer_details.html");
@@ -59,7 +59,7 @@ public class TimerOptionsView extends AbstractDetailsPanel {
 
     @Override
     public String replaceTags(String template) {
-        template = template.replaceAll("\\{title\\}", timer.getDisplayTitle());
+        template = template.replace("{title}", timer.getDisplayTitle());
 
         String channel = "";
         if (prog != null) {
@@ -68,16 +68,16 @@ public class TimerOptionsView extends AbstractDetailsPanel {
             Channel chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
             channel = chan.getName();
         }
-        template = template.replaceAll("\\{channel\\}", channel);
+        template = template.replace("{channel}", channel);
         DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-        template = template.replaceAll("\\{startDate\\}", createDateString());
-        template = template.replaceAll("\\{startTime\\}", timeFormat.format(timer.getStartTime().getTime()));
-        template = template.replaceAll("\\{endTime\\}", timeFormat.format(timer.getEndTime().getTime()));
-        template = template.replaceAll("\\{description\\}", timer.getDescription().replaceAll("\n", "<br>"));
-        template = template.replaceAll("\\{directory\\}", timer.getPath());
-        template = template.replaceAll("\\{lifetime\\}", Integer.toString(timer.getLifetime()));
-        template = template.replaceAll("\\{priority\\}", Integer.toString(timer.getPriority()));
-        template = template.replaceAll("\\{conflicts\\}", createListOfConflictingTimers(timer.getConflicts()));
+        template = template.replace("{startDate}", createDateString());
+        template = template.replace("{startTime}", timeFormat.format(timer.getStartTime().getTime()));
+        template = template.replace("{endTime}", timeFormat.format(timer.getEndTime().getTime()));
+        template = template.replace("{description}", timer.getDescription().replace("\n", "<br>"));
+        template = template.replace("{directory}", timer.getPath());
+        template = template.replace("{lifetime}", Integer.toString(timer.getLifetime()));
+        template = template.replace("{priority}", Integer.toString(timer.getPriority()));
+        template = template.replace("{conflicts}", createListOfConflictingTimers(timer.getConflicts()));
         return template;
     }
 
@@ -94,9 +94,9 @@ public class TimerOptionsView extends AbstractDetailsPanel {
                 sb.append(" &ndash; ");
                 sb.append(dateFormat.format(endTime));
                 sb.append("<ul>");
-                for (LazyBonesTimer timer : conflict.getInvolvedTimers()) {
-                    if (!timer.equals(this.timer)) {
-                        sb.append("<li>").append(timer.getTitle()).append("</li>");
+                for (LazyBonesTimer involvedTimer : conflict.getInvolvedTimers()) {
+                    if (!involvedTimer.equals(this.timer)) {
+                        sb.append("<li>").append(involvedTimer.getTitle()).append("</li>");
                     }
                 }
                 sb.append("</ul><br/>");
@@ -109,33 +109,37 @@ public class TimerOptionsView extends AbstractDetailsPanel {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
         StringBuilder dateString = new StringBuilder();
         if (timer.isRepeating()) {
-            if (timer.isSetForWeekdays(0, 1, 2, 3, 4, 5, 6)) {
-                dateString.append(LazyBones.getTranslation("daily", "daily")).append(' ');
-            } else if (timer.isSetForWeekdays(0, 1, 2, 3, 4)) {
-                dateString.append(LazyBones.getTranslation("onWorkdays", "on workdays")).append(' ');
-            } else if (timer.isSetForWeekdays(5, 6)) {
-                dateString.append(LazyBones.getTranslation("atTheWeekend", "at the weekend")).append(' ');
-            } else {
-                dateString.append(timer.getRepeatingDays()[0] ? LazyBones.getTranslation("onMondays", "on Mondays") : "").append(' ');
-                dateString.append(timer.getRepeatingDays()[1] ? LazyBones.getTranslation("onTuesdays", "on Tuesdays") : "").append(' ');
-                dateString.append(timer.getRepeatingDays()[2] ? LazyBones.getTranslation("onWednesdays", "on Wednesdays") : "").append(' ');
-                dateString.append(timer.getRepeatingDays()[3] ? LazyBones.getTranslation("onThursdays", "on Thursdays") : "").append(' ');
-                dateString.append(timer.getRepeatingDays()[4] ? LazyBones.getTranslation("onFridays", "on Fridays") : "").append(' ');
-                dateString.append(timer.getRepeatingDays()[5] ? LazyBones.getTranslation("onSaturdays", "on Saturdays") : "").append(' ');
-                dateString.append(timer.getRepeatingDays()[6] ? LazyBones.getTranslation("onSundays", "on Sundays") : "").append(' ');
-            }
-
-            if (timer.hasFirstTime()) {
-                dateString.append("ab dem ");
-                dateString.append(dateFormat.format(timer.getFirstTime().getTime()));
-            }
+            createRepeatingDateString(dateString, dateFormat);
         } else {
             dateString.append(dateFormat.format(timer.getStartTime().getTime()));
         }
         return dateString.toString();
     }
 
-    public void setTimer(LazyBonesTimer timer) {
+    private void createRepeatingDateString(StringBuilder dateString, DateFormat dateFormat) { // NOSONAR
+    	if (timer.isSetForWeekdays(0, 1, 2, 3, 4, 5, 6)) {
+            dateString.append(LazyBones.getTranslation("daily", "daily")).append(' ');
+        } else if (timer.isSetForWeekdays(0, 1, 2, 3, 4)) {
+            dateString.append(LazyBones.getTranslation("onWorkdays", "on workdays")).append(' ');
+        } else if (timer.isSetForWeekdays(5, 6)) {
+            dateString.append(LazyBones.getTranslation("atTheWeekend", "at the weekend")).append(' ');
+        } else {
+            dateString.append(timer.getRepeatingDays()[0] ? LazyBones.getTranslation("onMondays", "on Mondays") : "").append(' ');
+            dateString.append(timer.getRepeatingDays()[1] ? LazyBones.getTranslation("onTuesdays", "on Tuesdays") : "").append(' ');
+            dateString.append(timer.getRepeatingDays()[2] ? LazyBones.getTranslation("onWednesdays", "on Wednesdays") : "").append(' ');
+            dateString.append(timer.getRepeatingDays()[3] ? LazyBones.getTranslation("onThursdays", "on Thursdays") : "").append(' ');
+            dateString.append(timer.getRepeatingDays()[4] ? LazyBones.getTranslation("onFridays", "on Fridays") : "").append(' ');
+            dateString.append(timer.getRepeatingDays()[5] ? LazyBones.getTranslation("onSaturdays", "on Saturdays") : "").append(' ');
+            dateString.append(timer.getRepeatingDays()[6] ? LazyBones.getTranslation("onSundays", "on Sundays") : "").append(' ');
+        }
+
+        if (timer.hasFirstTime()) {
+            dateString.append("ab dem ");
+            dateString.append(dateFormat.format(timer.getFirstTime().getTime()));
+        }
+	}
+
+	public void setTimer(LazyBonesTimer timer) {
         this.timer = timer;
         updateHtmlPane();
     }

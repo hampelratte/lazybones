@@ -40,9 +40,9 @@ import javax.swing.table.TableModel;
 
 public class TitleMapping implements Serializable, TableModel {
 
-    private ArrayList<String> vdrTitles = new ArrayList<String>();
+    private ArrayList<String> vdrTitles = new ArrayList<>();
 
-    private ArrayList<String> tvbTitles = new ArrayList<String>();
+    private ArrayList<String> tvbTitles = new ArrayList<>();
 
     public void put(String tvbTitle, String vdrTitle) {
         if (vdrTitles.contains(vdrTitle)) {
@@ -90,7 +90,7 @@ public class TitleMapping implements Serializable, TableModel {
         return null;
     }
 
-    private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
+    private transient ArrayList<TableModelListener> listeners = new ArrayList<>();
 
     @Override
     public void addTableModelListener(TableModelListener l) {
@@ -150,7 +150,7 @@ public class TitleMapping implements Serializable, TableModel {
     }
 
     public Map<String, String> getAsMap() {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         for (int i = 0; i < tvbTitles.size(); i++) {
             map.put(tvbTitles.get(i), vdrTitles.get(i));
         }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import devplugin.Program;
 
 public class DoppelpackDetector {
-    private static transient Logger logger = LoggerFactory.getLogger(DoppelpackDetector.class);
+    private static Logger logger = LoggerFactory.getLogger(DoppelpackDetector.class);
 
     private List<Program> searchArea;
 
@@ -35,49 +35,57 @@ public class DoppelpackDetector {
 
         boolean doppelpackFound = false;
         if (doppelpackCandidates.size() > 1) {
-            timer.setReason(LazyBonesTimer.NOT_FOUND);
-            String doppelpackTitle = null;
-            for (int i = 0; i < doppelpackCandidates.size(); i++) {
-                Program prog = doppelpackCandidates.get(i);
-                String title = prog.getTitle();
-                while (i < doppelpackCandidates.size() - 1) {
-                    Program next = doppelpackCandidates.get(i + 1);
-                    if (title.equals(next.getTitle())) {
-                        logger.debug("Doppelpack found: {}", title);
-                        doppelpackFound = true;
-                        doppelpackTitle = title;
-                        timer.setReason(LazyBonesTimer.NO_REASON);
-                    } else {
-                        // There is a program with a different name. If this is a real doppelpack, this program
-                        // is most probably a short program, like a short news or weather program. If this program
-                        // is a longer one, this is most probably not a doppelpack.
-                        // For example a movie surrounded by short news program, which triggered the doppelpack detection
-                        if (next.getLength() > 15) {
-                            return false;
-                        }
-                    }
-                    i++;
-                }
-            }
-
-            // mark all doppelpack programs
-            if (doppelpackTitle != null) {
-                for (Program prog : doppelpackCandidates) {
-                    if (prog.getTitle().equals(doppelpackTitle)) {
-                        prog.mark(LazyBones.getInstance());
-                        timer.addTvBrowserProgID(prog.getUniqueID());
-                    }
-                }
-            }
+        	doppelpackFound = processDoppelpackCandidates(timer, doppelpackCandidates);
         }
-
         return doppelpackFound;
     }
 
-    private List<Program> collectDoppelpackCandidates(LazyBonesTimer timer, Iterator<Program> it) {
+    private boolean processDoppelpackCandidates(LazyBonesTimer timer, List<Program> doppelpackCandidates) {
+    	timer.setReason(LazyBonesTimer.NOT_FOUND);
+    	boolean doppelpackFound = false;
+        String doppelpackTitle = null;
+        for (int i = 0; i < doppelpackCandidates.size(); i++) {
+            Program prog = doppelpackCandidates.get(i);
+            String title = prog.getTitle();
+            while (i < doppelpackCandidates.size() - 1) {
+                Program next = doppelpackCandidates.get(i + 1);
+                if (title.equals(next.getTitle())) {
+                    logger.debug("Doppelpack found: {}", title);
+                    doppelpackFound = true;
+                    doppelpackTitle = title;
+                    timer.setReason(LazyBonesTimer.NO_REASON);
+                } else {
+                    // There is a program with a different name. If this is a real doppelpack, this program
+                    // is most probably a short program, like a short news or weather program. If this program
+                    // is a longer one, this is most probably not a doppelpack.
+                    // For example a movie surrounded by short news program, which triggered the doppelpack detection
+                    if (next.getLength() > 15) {
+                        return false;
+                    }
+                }
+                i++; // NOSONAR
+            }
+        }
+        markAllDoppelpacks(timer, doppelpackTitle, doppelpackCandidates);
+        return doppelpackFound;
+	}
+
+	private void markAllDoppelpacks(LazyBonesTimer timer, String doppelpackTitle, List<Program> doppelpackCandidates) {
+    	// mark all doppelpack programs
+    	if (doppelpackTitle != null) {
+    		for (Program prog : doppelpackCandidates) {
+    			if (prog.getTitle().equals(doppelpackTitle)) {
+    				prog.mark(LazyBones.getInstance());
+    				timer.addTvBrowserProgID(prog.getUniqueID());
+    			}
+    		}
+    	}
+	}
+
+	private List<Program> collectDoppelpackCandidates(LazyBonesTimer timer, Iterator<Program> it) {
         // contains programs, which start and stop between the start and the stop time
         // of the timer and could be part of a Doppelpack
-        List<Program> doppelPack = new ArrayList<Program>();
+        List<Program> doppelPack = new ArrayList<>();
 
         // iterate over all programs and
         // compare start and end time to collect doppelpack candidates

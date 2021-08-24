@@ -43,7 +43,7 @@ import lazybones.LazyBonesTimer;
 
 public class TimelineRowHeader extends JPanel implements TimelineListener {
 
-    private final List<Integer> channels = new ArrayList<Integer>();
+    private final List<Integer> channels = new ArrayList<>();
     private Color lineColor;
 
     public TimelineRowHeader(TimelineList list) {

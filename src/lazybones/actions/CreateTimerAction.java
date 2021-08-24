@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public class CreateTimerAction extends VDRAction {
 
-    private static transient Logger logger = LoggerFactory.getLogger(CreateTimerAction.class);
+    private static Logger logger = LoggerFactory.getLogger(CreateTimerAction.class);
 
     private final LazyBonesTimer timer;
     private final TimerManager timerManager;
@@ -65,7 +65,7 @@ public class CreateTimerAction extends VDRAction {
             timerManager.synchronize();
             return true;
         } else {
-            logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:") + " " + response.getMessage());
+            logger.error(LazyBones.getTranslation("couldnt_create", "Couldn\'t create timer:") + " " + response.getMessage()); // NOSONAR
             return false;
         }
     }

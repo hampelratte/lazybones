@@ -37,7 +37,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
-import org.hampelratte.svdrp.Response;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
 import org.hampelratte.svdrp.responses.highlevel.Stream;
 import org.hampelratte.svdrp.responses.highlevel.TreeNode;
@@ -81,26 +80,26 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
             return "";
         }
 
-        template = template.replaceAll("\\{title\\}", recording.getDisplayTitle());
+        template = template.replace("{title}", recording.getDisplayTitle());
 
         String channel = recording.getChannelName();
-        template = template.replaceAll("\\{channel\\}", channel);
+        template = template.replace("{channel}", channel);
         DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        template = template.replaceAll("\\{startDate\\}", dateFormat.format(recording.getStartTime().getTime()));
-        template = template.replaceAll("\\{startTime\\}", timeFormat.format(recording.getStartTime().getTime()));
-        template = template.replaceAll("\\{endTime\\}", timeFormat.format(recording.getEndTime().getTime()));
-        template = template.replaceAll("\\{shortText\\}", recording.getShortText());
-        template = template.replaceAll("\\{description\\}", recording.getDescription().replaceAll("\n", "<br>"));
-        template = template.replaceAll("\\{status\\}", createStatusString());
-        template = template.replaceAll("\\{directory\\}", recording.getFolder());
-        template = template.replaceAll("\\{lifetime\\}", Integer.toString(recording.getLifetime()));
-        template = template.replaceAll("\\{priority\\}", Integer.toString(recording.getPriority()));
-        template = template.replaceAll("\\{streams\\}", createStreamsString());
+        template = template.replace("{startDate}", dateFormat.format(recording.getStartTime().getTime()));
+        template = template.replace("{startTime}", timeFormat.format(recording.getStartTime().getTime()));
+        template = template.replace("{endTime}", timeFormat.format(recording.getEndTime().getTime()));
+        template = template.replace("{shortText}", recording.getShortText());
+        template = template.replace("{description}", recording.getDescription().replace("\n", "<br>"));
+        template = template.replace("{status}", createStatusString());
+        template = template.replace("{directory}", recording.getFolder());
+        template = template.replace("{lifetime}", Integer.toString(recording.getLifetime()));
+        template = template.replace("{priority}", Integer.toString(recording.getPriority()));
+        template = template.replace("{streams}", createStreamsString());
         if(warning != null) {
-            template = template.replaceAll("\\{warning\\}", "<h1 class=\"warning\">"+warning+"</h1>");
+            template = template.replace("{warning}", "<h1 class=\"warning\">"+warning+"</h1>");
         } else {
-            template = template.replaceAll("\\{warning\\}", "");
+            template = template.replace("{warning}", "");
         }
         return template;
     }
@@ -119,7 +118,7 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
     }
 
     private String createStreamsString() {
-        if (recording.getStreams().size() > 0) {
+        if (!recording.getStreams().isEmpty()) {
             StringBuilder streamInfo = new StringBuilder("<ul>");
             for (Stream stream : recording.getStreams()) {
                 streamInfo.append("<li>");
@@ -140,54 +139,50 @@ public class RecordingDetailsPanel extends AbstractDetailsPanel implements TreeS
         return content + ' ' + description + " (" + language + ")";
     }
 
-    @Override
-    public void valueChanged(final TreeSelectionEvent e) {
-        final TreePath selected = e.getNewLeadSelectionPath();
-        if (selected != null) {
-            TreeNode treeNode = (TreeNode) selected.getPathComponent(selected.getPathCount() - 1);
-            if (treeNode instanceof Recording) {
-                final Recording rec = (Recording) treeNode;
-                VDRCallback<GetRecordingDetailsAction> callback = new VDRCallback<GetRecordingDetailsAction>() {
-                    @Override
-                    public void receiveResponse(GetRecordingDetailsAction cmd, Response response) {
-                        if (cmd.isSuccess()) {
-                            setRecording(cmd.getRecording());
-                        } else {
-                            reset();
-                            String mesg = LazyBones
-                                    .getTranslation("error_retrieve_recording_details", "Couldn't load recording details from VDR: {0}", response.getMessage());
-                            logger.error(mesg);
-                        }
+	@Override
+	public void valueChanged(final TreeSelectionEvent e) {
+		final TreePath selected = e.getNewLeadSelectionPath();
+		if (selected != null) {
+			TreeNode treeNode = (TreeNode) selected.getPathComponent(selected.getPathCount() - 1);
+			if (treeNode instanceof Recording) {
+				final Recording rec = (Recording) treeNode;
+				GetRecordingDetailsAction grda = new GetRecordingDetailsAction(rec, createCallback(e, selected, rec));
+				grda.enqueue();
+			} else {
+				reset();
+			}
+		} else {
+			reset();
+		}
+	}
+    
+    VDRCallback<GetRecordingDetailsAction> createCallback(TreeSelectionEvent e, TreePath selected, Recording rec) {
+    	return (cmd, response) -> {
+			if (cmd.isSuccess()) {
+				setRecording(cmd.getRecording());
+			} else {
+				reset();
+				String mesg = LazyBones.getTranslation("error_retrieve_recording_details",
+						"Couldn't load recording details from VDR: {0}", response.getMessage());
+				logger.error(mesg);
+			}
 
+			SwingUtilities.invokeLater(() -> {
+				((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
 
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                ((JTree) e.getSource()).getModel().valueForPathChanged(selected, rec);
-
-                                if(recording.getDuration() != -1) {
-                                    long duration = recording.getDuration();
-                                    Period programDuration = new Period(recording.getStartTime(), recording.getEndTime());
-                                    long plannedDuration = TimeUnit.SECONDS.toMinutes(programDuration.getDurationInSeconds());
-                                    if(duration < plannedDuration) {
-                                        logger.debug("Recording seems to be too short {} - {}", duration, plannedDuration);
-                                        warning = LazyBones.getTranslation("recording_too_short",
-                                                "The recording duration ({0}min) is shorter than the program duration ({1}min)",
-                                                Long.toString(duration), Long.toString(plannedDuration));
-                                        updateHtmlPane();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                };
-                GetRecordingDetailsAction grda = new GetRecordingDetailsAction(rec, callback);
-                grda.enqueue();
-            } else {
-                reset();
-            }
-        } else {
-            reset();
-        }
+				if (recording.getDuration() != -1) {
+					long duration = recording.getDuration();
+					Period programDuration = new Period(recording.getStartTime(), recording.getEndTime());
+					long plannedDuration = TimeUnit.SECONDS.toMinutes(programDuration.getDurationInSeconds());
+					if (duration < plannedDuration) {
+						logger.debug("Recording seems to be too short {} - {}", duration, plannedDuration);
+						warning = LazyBones.getTranslation("recording_too_short",
+								"The recording duration ({0}min) is shorter than the program duration ({1}min)",
+								Long.toString(duration), Long.toString(plannedDuration));
+						updateHtmlPane();
+					}
+				}
+			});
+		};
     }
 }

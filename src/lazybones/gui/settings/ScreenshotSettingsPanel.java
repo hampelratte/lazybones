@@ -28,6 +28,14 @@
  */
 package lazybones.gui.settings;
 
+import static java.awt.GridBagConstraints.BOTH;
+import static java.awt.GridBagConstraints.HORIZONTAL;
+import static java.awt.GridBagConstraints.NONE;
+import static java.awt.GridBagConstraints.NORTHWEST;
+import static java.awt.GridBagConstraints.WEST;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -46,16 +54,12 @@ import javax.swing.UIManager;
 
 import lazybones.LazyBones;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose whatever) then you should purchase a license for each developer using Jigloo. Please
- * visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS
- * MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
 public class ScreenshotSettingsPanel implements ItemListener {
+	private static final Insets INSETS_5 = new Insets(5, 5, 5, 5);
+	
     private String lMethod = LazyBones.getTranslation("method", "Method");
 
-    private JComboBox<String> method = new JComboBox<String>();
+    private JComboBox<String> method = new JComboBox<>();
 
     private CardLayout cardLayout = new CardLayout();
 
@@ -87,35 +91,29 @@ public class ScreenshotSettingsPanel implements ItemListener {
         picturePath = new JTextField(20);
         picturePath.setText(LazyBones.getProperties().getProperty("preview.path"));
 
-        JTextArea description;
-        description = new JTextArea(lDescription, 10, 40);
-        description = new JTextArea(lDescription);
+        JTextArea description = new JTextArea(lDescription);
         description.setEditable(false);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         description.setBackground(UIManager.getColor("JPanel.background"));
 
-        note = new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        note = new JScrollPane(description, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        GridBagLayout httpPanelLayout = new GridBagLayout();
-        httpPanel.setLayout(httpPanelLayout);
-        httpPanel.add(lURL, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-        httpPanel.add(url, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-        httpPanel.add(lPicturePath,
-                new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-        httpPanel.add(picturePath, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5),
-                0, 0));
-        httpPanel.add(note,
-                new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
+		GridBagLayout httpPanelLayout = new GridBagLayout();
+		httpPanel.setLayout(httpPanelLayout);
+		httpPanel.add(lURL, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, WEST, NONE, INSETS_5, 0, 0));
+		httpPanel.add(url, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, WEST, HORIZONTAL, INSETS_5, 0, 0));
+		httpPanel.add(lPicturePath, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, WEST, NONE, INSETS_5, 0, 0));
+		httpPanel.add(picturePath, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, WEST, HORIZONTAL, INSETS_5, 0, 0));
+		httpPanel.add(note,
+				new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, HORIZONTAL, INSETS_5, 0, 0));
 
-        httpPanelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1 };
+		httpPanelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1 };
         httpPanelLayout.rowHeights = new int[] { 7, 7, 7 };
         httpPanelLayout.columnWeights = new double[] { 0.1, 0.1 };
         httpPanelLayout.columnWidths = new int[] { 7, 7 };
         cardsContainer.add(httpPanel, "HTTP");
-        {
-            cardsContainer.add(new JPanel(), "SVDRP");
-        }
+        cardsContainer.add(new JPanel(), "SVDRP");
 
         method.addItem("HTTP");
         method.addItem("SVDRP");
@@ -137,21 +135,21 @@ public class ScreenshotSettingsPanel implements ItemListener {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = WEST;
         panel.add(new JLabel(lMethod), gbc);
 
         gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.anchor = NORTHWEST;
         panel.add(method, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(0, 0, 0, 0);
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.fill = BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        panel.add(cardsContainer, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0,
+        panel.add(cardsContainer, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, NORTHWEST, HORIZONTAL, new Insets(0, 0, 0,
                 0), 0, 0));
         return panel;
     }

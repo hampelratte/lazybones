@@ -56,8 +56,8 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
     private JLabel time = new JLabel();
     private JLabel title = new JLabel();
 
-    private Color background = Color.WHITE;
-    private Color altBackground = new Color(250, 250, 220);
+    private Color listCellBackground = Color.WHITE;
+    private Color listCellAltBackground = new Color(250, 250, 220);
 
     public RecordingListCellRenderer() {
         initGUI();
@@ -108,7 +108,7 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             time.setForeground(UIManager.getColor("List.selectionForeground"));
             title.setForeground(UIManager.getColor("List.selectionForeground"));
         } else {
-            setBackground(index % 2 == 0 ? background : altBackground);
+            setBackground(index % 2 == 0 ? listCellBackground : listCellAltBackground);
             date.setForeground(UIManager.getColor("List.foreground"));
             time.setForeground(UIManager.getColor("List.foreground"));
             title.setForeground(UIManager.getColor("List.foreground"));
@@ -122,13 +122,12 @@ public class RecordingListCellRenderer extends JPanel implements ListCellRendere
             date.setText(df.format(rec.getStartTime().getTime()));
             time.setText(tf.format(rec.getStartTime().getTime()));
 
-            String recTitle = rec.getDisplayTitle();
             StringBuilder sb = new StringBuilder(rec.getDisplayTitle());
             if (rec.getShortText().length() > 0) {
                 sb.append(" - ");
                 sb.append(rec.getShortText());
             }
-            recTitle = sb.toString();
+            String recTitle = sb.toString();
             title.setText(recTitle);
 
             if (rec.isNew()) {

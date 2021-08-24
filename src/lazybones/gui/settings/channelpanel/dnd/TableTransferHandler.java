@@ -44,7 +44,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
     private int addCount = 0; // Number of items added.
 
     private JList<Channel> channelList;
-    private Set<Channel> overwrittenChannels = new HashSet<Channel>();
+    private Set<Channel> overwrittenChannels = new HashSet<>();
 
     public TableTransferHandler(JList<Channel> channelList) {
         this.channelList = channelList;
@@ -55,7 +55,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         addCount = 0;
         JTable table = (JTable) c;
         rows = table.getSelectedRows();
-        ChannelSet<Channel> channelSet = new ChannelSet<Channel>();
+        ChannelSet<Channel> channelSet = new ChannelSet<>();
         for (int i = 0; i < rows.length; i++) {
             channelSet.add((Channel) table.getValueAt(rows[i], 1));
         }
@@ -95,7 +95,7 @@ public class TableTransferHandler extends ChannelSetTransferHandler {
         }
 
         // move overwritten to list
-        if (overwrittenChannels.size() > 0) {
+        if (!overwrittenChannels.isEmpty()) {
             ListTransferHandler lth = (ListTransferHandler) channelList.getTransferHandler();
             lth.setOverwrittenChannels(overwrittenChannels);
         }

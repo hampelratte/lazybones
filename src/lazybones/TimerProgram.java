@@ -28,9 +28,9 @@
  */
 package lazybones;
 
-import tvdataservice.MutableProgram;
 import devplugin.Channel;
 import devplugin.Date;
+import tvdataservice.MutableProgram;
 
 /**
  * A Program, which contains its' according timer

@@ -49,14 +49,14 @@ public abstract class VDRAction {
     /**
      * Default constructor
      */
-    public VDRAction() {
+    protected VDRAction() {
     }
 
     /**
      * @param callback
      *            the {@link VDRCallback} to call, when this VDRAction has finished
      */
-    public VDRAction(VDRCallback callback) {
+    protected VDRAction(VDRCallback callback) {
         this.callback = callback;
     }
 

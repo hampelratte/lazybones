@@ -48,7 +48,7 @@ import lazybones.TimerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.ui.Localizer;
+import util.i18n.Localizer;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
 import devplugin.Program;
@@ -60,7 +60,7 @@ import devplugin.Program;
  */
 public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
 
-    private static transient Logger logger = LoggerFactory.getLogger(TimerOptionsDialog.class);
+    private static Logger logger = LoggerFactory.getLogger(TimerOptionsDialog.class);
 
     private final JButton ok = new JButton();
 
@@ -71,8 +71,6 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
     private JDialog dialog;
 
     private final TimerOptionsEditor top;
-
-    private JPanel panel;
 
     /**
      * The actual timer
@@ -110,7 +108,7 @@ public class TimerOptionsDialog implements ActionListener, WindowClosingIf {
         dialog = new JDialog(control.getParent(), true);
         dialog.setTitle(LazyBones.getTranslation("windowtitle_timerOptions", "Timer Options"));
         dialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
-        panel = new JPanel(new GridBagLayout());
+        var panel = new JPanel(new GridBagLayout());
 
         // register escape listener
         UiUtilities.registerForClosing(this);

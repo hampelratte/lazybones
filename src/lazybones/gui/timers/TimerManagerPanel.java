@@ -41,8 +41,6 @@ import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -59,7 +57,6 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.hampelratte.svdrp.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +65,9 @@ import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.RecordingManager;
 import lazybones.TimerManager;
-import lazybones.VDRCallback;
+import lazybones.TimersChangedEvent;
+import lazybones.TimersChangedListener;
 import lazybones.actions.ModifyTimerAction;
-import lazybones.actions.VDRAction;
 import lazybones.gui.components.timeroptions.TimerOptionsDialog.Mode;
 import lazybones.gui.components.timeroptions.TimerOptionsEditor;
 import lazybones.gui.components.timeroptions.TimerOptionsView;
@@ -80,9 +77,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
 
     private static transient Logger logger = LoggerFactory.getLogger(TimerManagerPanel.class);
 
-    private JScrollPane scrollPane = null;
-    private final JList<LazyBonesTimer> timerList = new JList<LazyBonesTimer>();
-    private JToolBar buttonBar = null;
+    private final JList<LazyBonesTimer> timerList = new JList<>();
     private JButton buttonNew = null;
     private JButton buttonEdit = null;
     private JButton buttonSync = null;
@@ -95,7 +90,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
     private final TimerOptionsView timerOptionsView = new TimerOptionsView();
     private final TimerOptionsEditor timerOptionsEditor;
 
-    private TimerManager timerManager;
+    private transient TimerManager timerManager;
 
     public TimerManagerPanel(TimerManager timerManager, RecordingManager recordingManager) {
         this.timerManager = timerManager;
@@ -118,7 +113,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         gbc.gridwidth = 2;
         gbc.insets = new java.awt.Insets(5, 10, 5, 10);
         gbc.anchor = GridBagConstraints.WEST;
-        buttonBar = createButtonBar();
+        var buttonBar = createButtonBar();
         this.add(buttonBar, gbc);
 
         // add timer list
@@ -134,7 +129,7 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         timerList.addListSelectionListener(this);
         timerList.setModel(new TimerListAdapter());
         timerList.getModel().addListDataListener(this);
-        scrollPane = new JScrollPane(timerList);
+        var scrollPane = new JScrollPane(timerList);
         scrollPane.setPreferredSize(new Dimension(300, 0));
         scrollPane.setMinimumSize(new Dimension(200, 0));
         this.add(scrollPane, gbc);
@@ -258,32 +253,21 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
                 LazyBonesTimer timer = timerList.getSelectedValue();
                 deleteTimer(timer);
             }
-        } else if (e.getSource() == buttonSync) {
-            cancelEditing();
-            timerManager.synchronize();
-        } else if (e.getSource() == buttonCancel) {
+        } else if (e.getSource() == buttonSync || e.getSource() == buttonCancel) {
             cancelEditing();
             timerManager.synchronize();
         } else if (e.getSource() == buttonSave) {
             LazyBonesTimer oldTimer = timerOptionsEditor.getOldTimer();
             LazyBonesTimer changedTimer = timerOptionsEditor.getTimer();
             ModifyTimerAction mta = new ModifyTimerAction(changedTimer, oldTimer);
-            mta.setCallback(new VDRCallback<VDRAction>() {
-                @Override
-                public void receiveResponse(VDRAction cmd, Response response) {
-                    timerManager.synchronize();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            cancelEditing();
-                        }
-                    });
-                    if (!cmd.isSuccess()) {
-                        String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
-                        logger.error(mesg);
-                    }
-                }
-            });
+            mta.setCallback((cmd, response) -> {
+			    timerManager.synchronize();
+			    SwingUtilities.invokeLater(this::cancelEditing);
+			    if (!cmd.isSuccess()) {
+			        String mesg = LazyBones.getTranslation("couldnt_change", "Couldn\'t change timer:") + " " + cmd.getResponse().getMessage();
+			        logger.error(mesg);
+			    }
+			});
             mta.enqueue();
         }
     }
@@ -315,22 +299,14 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         buttonSync.setEnabled(false);
         buttonRemove.setEnabled(false);
         final boolean requestFocus = timerList.hasFocus();
-        timerManager.deleteTimer(timer, new Runnable() {
-            @Override
-            public void run() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        timerList.setEnabled(true);
-                        buttonSync.setEnabled(true);
-                        buttonNew.setEnabled(true);
-                        if (requestFocus) {
-                            timerList.requestFocus();
-                        }
-                    }
-                });
-            }
-        });
+        timerManager.deleteTimer(timer, () -> SwingUtilities.invokeLater(() -> {
+		    timerList.setEnabled(true);
+		    buttonSync.setEnabled(true);
+		    buttonNew.setEnabled(true);
+		    if (requestFocus) {
+		        timerList.requestFocus();
+		    }
+		}));
     }
 
     @Override
@@ -355,7 +331,6 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
             }
         } catch (RuntimeException t) {
             logger.error(t.getMessage(), t);
-            throw t;
         }
     }
 
@@ -366,11 +341,11 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         }
     }
 
-    private class TimerListAdapter extends AbstractListModel<LazyBonesTimer> implements Observer {
+    private class TimerListAdapter extends AbstractListModel<LazyBonesTimer> implements TimersChangedListener {
         private List<LazyBonesTimer> timers;
 
         public TimerListAdapter() {
-            timerManager.addObserver(this);
+            timerManager.addTimersChangedListener(this);
             timers = timerManager.getTimers();
             Collections.sort(timers, new TimerComparator());
         }
@@ -386,15 +361,10 @@ public class TimerManagerPanel extends JPanel implements ActionListener, ListSel
         }
 
         @Override
-        public void update(Observable o, Object arg) {
-            timers = timerManager.getTimers();
-            Collections.sort(timers, new TimerComparator());
-            fireContentsChanged(this, 0, timers.size() - 1);
-        }
-
-        @Override
-        protected void fireContentsChanged(Object source, int start, int end) {
-            super.fireContentsChanged(source, start, end);
+        public void timersChanged(TimersChangedEvent evt) {
+        	timers = timerManager.getTimers();
+        	Collections.sort(timers, new TimerComparator());
+        	fireContentsChanged(this, 0, timers.size() - 1);
         }
     }
 

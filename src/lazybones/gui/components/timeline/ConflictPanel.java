@@ -1,10 +1,13 @@
 package lazybones.gui.components.timeline;
 
+import static devplugin.Plugin.getPluginManager;
 import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.HORIZONTAL;
 import static java.awt.GridBagConstraints.NONE;
 import static java.awt.GridBagConstraints.SOUTHWEST;
 import static java.awt.GridBagConstraints.WEST;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,12 +21,9 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.DefaultListModel;
@@ -41,6 +41,8 @@ import devplugin.Program;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerManager;
+import lazybones.TimersChangedEvent;
+import lazybones.TimersChangedListener;
 import lazybones.conflicts.Conflict;
 import lazybones.conflicts.ConflictFinder;
 import lazybones.conflicts.ConflictResolver;
@@ -50,7 +52,7 @@ import util.programmouseevent.ProgramMouseEventHandler;
 import util.settings.PluginPictureSettings;
 import util.ui.ProgramList;
 
-public class ConflictPanel extends JPanel implements Observer, ActionListener {
+public class ConflictPanel extends JPanel implements TimersChangedListener, ActionListener {
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
     private static final int NO_PADDING = 0;
     private static final int NO_WEIGHT = 0;
@@ -59,12 +61,12 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
     private static final String MSG_NO_SOLUTION = LazyBones.getTranslation("timer_conflict_no_solution", "No solution found");
     private static final String MSG_SOLUTION = LazyBones.getTranslation("timer_conflict_solution", "Possible solution found");
 
-    private TimerManager timerManager;
     private Calendar calendar;
-    private Set<Conflict> conflictsToday = new HashSet<>();
-    private Conflict displayedConflict;
+    private transient TimerManager timerManager;
+    private transient Set<Conflict> conflictsToday = new HashSet<>();
+    private transient Conflict displayedConflict;
 
-    private DefaultListModel<Object> programListModel = new DefaultListModel<>();
+    private DefaultListModel<Program> programListModel = new DefaultListModel<>();
     private ProgramList programList;
     private JScrollPane programListScrollPane;
 
@@ -75,7 +77,7 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
 
     public ConflictPanel(TimerManager timerManager) {
         this.timerManager = timerManager;
-        timerManager.addObserver(this);
+        timerManager.addTimersChangedListener(this);
 
         initGUI();
     }
@@ -96,8 +98,8 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
         description.setBackground(UIManager.getColor("Panel.background"));
         description.setBorder(null);
         JScrollPane scrollPane = new JScrollPane(description);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
         scrollPane.setPreferredSize(new Dimension(0, 50));
         add(scrollPane, new GridBagConstraints(0, 1, 1, 1, FULL_WEIGHT, FULL_WEIGHT, WEST, HORIZONTAL, DEFAULT_INSETS, NO_PADDING, NO_PADDING));
@@ -173,19 +175,17 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        if (o instanceof TimerManager) {
-            update();
-        }
+    public void timersChanged(TimersChangedEvent evt) {
+    	update();
     }
-
+    
     class ProgramListMouseAdapter extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2) {
                 int index = programList.locationToIndex(e.getPoint());
                 programList.setSelectedIndex(index);
-                Program prog = (Program) programList.getSelectedValue();
+                Program prog = programList.getSelectedValue();
                 ProgramMouseEventHandler.handleProgramClick(prog, LazyBones.getInstance(), false, e);
             }
         }
@@ -195,8 +195,8 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
             if (e.isPopupTrigger()) {
                 int index = programList.locationToIndex(e.getPoint());
                 programList.setSelectedIndex(index);
-                Program prog = (Program) programList.getSelectedValue();
-                JPopupMenu popup = LazyBones.getPluginManager().createPluginContextMenu(prog, null);
+                Program prog = programList.getSelectedValue();
+                JPopupMenu popup = getPluginManager().createPluginContextMenu(prog, null);
                 popup.setLocation(e.getPoint());
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
@@ -215,28 +215,24 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
 
             // save solution for the timer creation later
             List<Program> solution = new ArrayList<>();
-            Enumeration<Object> en = programListModel.elements();
+            Enumeration<Program> en = programListModel.elements();
             while (en.hasMoreElements()) {
-                Program prog = (Program) en.nextElement();
-                solution.add(prog);
+                solution.add(en.nextElement());
             }
 
             // delete the old timers:
             // sort by descending timer id, so that we can delete them from highest ID to lowest
             // otherwise we might get the error "Timer x not defined"
             List<LazyBonesTimer> timers = new ArrayList<>(displayedConflict.getInvolvedTimers());
-            Collections.sort(timers, new Comparator<LazyBonesTimer>() {
-                @Override
-                public int compare(LazyBonesTimer o1, LazyBonesTimer o2) {
-                    if (o1.getID() > o2.getID()) {
-                        return -1;
-                    } else if (o1.getID() < o2.getID()) {
-                        return 1;
-                    } else {
-                        throw new RuntimeException("2 timers with same ID. This should'nt happen");
-                    }
-                }
-            });
+            Collections.sort(timers, (o1, o2) -> {
+			    if (o1.getID() > o2.getID()) {
+			        return -1;
+			    } else if (o1.getID() < o2.getID()) {
+			        return 1;
+			    } else {
+			        throw new AmbiguousTimerException();
+			    }
+			});
             for (LazyBonesTimer timer : timers) {
                 timerManager.deleteTimer(timer);
             }
@@ -246,5 +242,11 @@ public class ConflictPanel extends JPanel implements Observer, ActionListener {
                 timerManager.createTimer(program, true);
             }
         }
+    }
+    
+    public static class AmbiguousTimerException extends RuntimeException {
+    	public AmbiguousTimerException() {
+    		super("2 timers with same ID. This shouldn't happen");
+		}
     }
 }

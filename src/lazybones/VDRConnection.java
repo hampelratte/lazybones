@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class VDRConnection {
 
-    private static transient Logger logger = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
+    private static Logger logger = LoggerFactory.getLogger(LoggingConstants.CONNECTION_LOGGER);
 
     private static Connection connection;
 
@@ -72,6 +72,8 @@ public class VDRConnection {
      */
     private static final int CONNECTION_KEEP_ALIVE = 15000;
 
+    private VDRConnection() {}
+    
     /**
      * Sends a SVDRP command to VDR and returns a response object, which represents the vdr response
      *
@@ -79,7 +81,7 @@ public class VDRConnection {
      *            The SVDRP command to send
      * @return The SVDRP response or null, if the Command couldn't be sent
      */
-    public synchronized static Response send(final Command cmd) {
+    public static synchronized Response send(final Command cmd) {
         Response res = null;
         try {
             if (connection == null) {

@@ -52,12 +52,6 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
     public BrowseTextField(BrowsePanel panel) {
         this.panel = panel;
         panel.setTextField(textfield);
-
-        /*
-         * panel.setBackground(UIManager.getColor("ToolTip.background")); for (int i = 0; i < panel.getComponents().length; i++) {
-         * panel.getComponent(i).setBackground(UIManager.getColor("ToolTip.background")); }
-         */
-
         this.setLayout(new BorderLayout());
         this.add(textfield, BorderLayout.CENTER);
         this.add(button, BorderLayout.EAST);
@@ -66,7 +60,7 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
     }
 
     public void showDialog() {
-        int x = (int) button.getWidth() + 10;
+        int x = button.getWidth() + 10;
         int y = 0;
         JPopupMenu menu = new JPopupMenu();
         menu.add(panel);
@@ -85,6 +79,7 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
         textfield.setEditable(editable);
     }
 
+    @Override
     public void setEnabled(boolean enabled) {
         textfield.setEnabled(enabled);
         button.setEnabled(enabled);
@@ -99,10 +94,8 @@ public class BrowseTextField extends JPanel implements ActionListener, PropertyC
     }
 
     public void propertyChange(PropertyChangeEvent pce) {
-        if ("visible".equals(pce.getPropertyName())) {
-            if (((Boolean) pce.getNewValue()).booleanValue() == false) {
-                button.setSelected(false);
-            }
-        }
+        if ("visible".equals(pce.getPropertyName()) && !((boolean) pce.getNewValue())) {
+		    button.setSelected(false);
+		}
     }
 }

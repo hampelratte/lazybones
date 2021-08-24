@@ -43,11 +43,11 @@ import devplugin.Program;
 
 public class Evaluator {
 
-    private static transient Logger logger = LoggerFactory.getLogger(Evaluator.class);
+    private static Logger logger = LoggerFactory.getLogger(Evaluator.class);
 
-    private final List<Criterion> criteria = new ArrayList<Criterion>();
+    private final List<Criterion> criteria = new ArrayList<>();
 
-    private final List<Result> results = new ArrayList<Result>();
+    private final List<Result> results = new ArrayList<>();
 
     public Evaluator() {
         criteria.add(new TitleCriterion());
@@ -79,11 +79,11 @@ public class Evaluator {
             results.add(new Result(program, percentage));
         }
 
-        if (results.size() > 0) {
-            Collections.sort(results);
-            return results.get(results.size() - 1);
-        } else {
+        if (results.isEmpty()) {
             return null;
+        } else {
+        	Collections.sort(results);
+        	return results.get(results.size() - 1);
         }
     }
 }

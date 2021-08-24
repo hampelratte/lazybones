@@ -51,22 +51,24 @@ public class PopupHandler extends Handler {
     }
 
     @Override
-    public void publish(final LogRecord record) {
+    public void publish(final LogRecord logRecord) {
         if (lmd == null) {
             lmd = LogMessageDialog.getInstance();
         }
 
-        boolean loggable = filter.isLoggable(record);
-        if (loggable && record.getLevel().intValue() >= Level.SEVERE.intValue() || KEYWORD.equals(record.getLoggerName())) {
-            lmd.addMessage(record);
+        boolean loggable = filter.isLoggable(logRecord);
+        if (loggable && logRecord.getLevel().intValue() >= Level.SEVERE.intValue() || KEYWORD.equals(logRecord.getLoggerName())) {
+            lmd.addMessage(logRecord);
         }
     }
 
     @Override
     public void close() throws SecurityException {
+    	// nothing to do here
     }
 
     @Override
     public void flush() {
+    	// nothing to do here
     }
 }

@@ -47,11 +47,11 @@ import org.slf4j.LoggerFactory;
 
 public class ConflictFinder {
 
-    private static transient Logger logger = LoggerFactory.getLogger(ConflictFinder.class);
+    private static Logger logger = LoggerFactory.getLogger(ConflictFinder.class);
 
-    private final Set<Conflict> conflicts = new HashSet<Conflict>();
-    private final HashMap<Integer, Integer> transponderUse = new HashMap<Integer, Integer>();
-    private final HashSet<LazyBonesTimer> runningEvents = new HashSet<LazyBonesTimer>();
+    private final Set<Conflict> conflicts = new HashSet<>();
+    private final HashMap<Integer, Integer> transponderUse = new HashMap<>();
+    private final HashSet<LazyBonesTimer> runningEvents = new HashSet<>();
 
     private void reset() {
         conflicts.clear();
@@ -110,10 +110,10 @@ public class ConflictFinder {
     }
 
     private void increaseTransponderUse(LazyBonesTimer timer) {
-        Channel _chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-        if (_chan instanceof BroadcastChannel) {
-            BroadcastChannel chan = (BroadcastChannel) _chan;
-            if (chan != null && transponderUse.containsKey(chan.getFrequency())) {
+        Channel tempChan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if (tempChan instanceof BroadcastChannel) {
+            BroadcastChannel chan = (BroadcastChannel) tempChan;
+            if (transponderUse.containsKey(chan.getFrequency())) {
                 int count = transponderUse.get(chan.getFrequency());
                 count++;
                 transponderUse.put(chan.getFrequency(), count);
@@ -124,9 +124,9 @@ public class ConflictFinder {
     }
 
     private void decreaseTransponderUse(LazyBonesTimer timer) {
-        Channel _chan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
-        if (_chan instanceof BroadcastChannel) {
-            BroadcastChannel chan = (BroadcastChannel) _chan;
+        Channel tempChan = ChannelManager.getInstance().getChannelByNumber(timer.getChannelNumber());
+        if (tempChan instanceof BroadcastChannel) {
+            BroadcastChannel chan = (BroadcastChannel) tempChan;
             if (transponderUse.containsKey(chan.getFrequency())) {
                 int count = transponderUse.get(chan.getFrequency());
                 if (count == 1) {

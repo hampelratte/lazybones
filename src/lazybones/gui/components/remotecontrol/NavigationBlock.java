@@ -40,7 +40,7 @@ import javax.swing.JPanel;
 
 import lazybones.Controller;
 import lazybones.LazyBones;
-import util.ui.Localizer;
+import util.i18n.Localizer;
 
 /**
  * @author <a href="hampelratte@users.sf.net">hampelratte@users.sf.net </a>

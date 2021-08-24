@@ -32,15 +32,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-
-import lazybones.RecordingManager;
 
 import org.hampelratte.svdrp.responses.highlevel.Folder;
 import org.hampelratte.svdrp.responses.highlevel.Recording;
@@ -49,11 +45,14 @@ import org.hampelratte.svdrp.sorting.RecordingAlphabeticalComparator;
 import org.hampelratte.svdrp.sorting.RecordingSortStrategy;
 import org.hampelratte.svdrp.util.RecordingTreeBuilder;
 
-public class RecordingTreeModel implements TreeModel, Observer {
+import lazybones.RecordingManager;
+import lazybones.RecordingsChangedListener;
+
+public class RecordingTreeModel implements TreeModel, RecordingsChangedListener {
 
     private Folder root = new Folder("");
 
-    private final List<TreeModelListener> tmls = new ArrayList<TreeModelListener>();
+    private final List<TreeModelListener> tmls = new ArrayList<>();
 
     private final RecordingManager rm;
 
@@ -65,7 +64,7 @@ public class RecordingTreeModel implements TreeModel, Observer {
 
     public RecordingTreeModel(RecordingManager recordingManager) {
         this.rm = recordingManager;
-        rm.addObserver(this);
+        rm.addRecordingsChangedListener(this);
         sortBy(sortStrategy, sortAscending);
     }
 
@@ -147,10 +146,7 @@ public class RecordingTreeModel implements TreeModel, Observer {
                         for (TreeModelListener tml : tmls) {
                             tml.treeNodesRemoved(tme);
                         }
-
                         return;
-                    } else {
-                        System.err.println("Element wurde nicht aus dem Baum gelöscht");
                     }
                 }
 
@@ -163,16 +159,11 @@ public class RecordingTreeModel implements TreeModel, Observer {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        if (arg instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<Recording> recordings = (List<Recording>) arg;
-            setRecordings(RecordingTreeBuilder.buildTree(recordings));
-
-            filter(filter);
-        }
+    public void recordingsChanged(List<Recording> recordings) {
+    	setRecordings(RecordingTreeBuilder.buildTree(recordings));
+    	filter(filter);
     }
-
+    
     public void sortBy(Comparator<Recording> comparator, boolean ascending) {
         this.sortStrategy = comparator;
         this.sortAscending = ascending;

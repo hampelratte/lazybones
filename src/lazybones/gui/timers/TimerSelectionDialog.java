@@ -35,7 +35,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -49,7 +48,7 @@ import devplugin.Program;
 import lazybones.LazyBones;
 import lazybones.LazyBonesTimer;
 import lazybones.TimerProgram;
-import util.ui.Localizer;
+import util.i18n.Localizer;
 import util.ui.ProgramList;
 import util.ui.UiUtilities;
 import util.ui.WindowClosingIf;
@@ -64,12 +63,11 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
 
     private final JButton cancel = new JButton();
 
-    private final DefaultListModel<Object> model = new DefaultListModel<>();
+    private final DefaultListModel<Program> model = new DefaultListModel<>();
 
     private final ProgramList list = new ProgramList(model);
 
     private int selectedIndex = -1;
-    private Program selectedProgram = null;
 
     private final LazyBones control;
 
@@ -77,15 +75,12 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
 
     private final Program[] programs;
 
-    private final Program originalProgram;
-
     private final LazyBonesTimer timerOptions;
 
-    public TimerSelectionDialog(Program[] programs, LazyBonesTimer timerOptions, Program prog) {
+    public TimerSelectionDialog(Program[] programs, LazyBonesTimer timerOptions) {
         this.control = LazyBones.getInstance();
         this.programs = programs;
         this.timerOptions = timerOptions;
-        this.originalProgram = prog;
         initGUI();
     }
 
@@ -158,7 +153,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         if (e.getSource() == ok) {
             selectedIndex = list.getSelectedIndex();
             if (selectedIndex >= 0) {
-                selectedProgram = (Program) model.get(selectedIndex);
+                Program selectedProgram = model.get(selectedIndex);
                 TimerProgram program = (TimerProgram) selectedProgram;
                 LazyBonesTimer t = program.getTimer();
 
@@ -190,7 +185,7 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
                     t.setRepeatingDays(timerOptions.getRepeatingDays());
                 }
 
-                control.timerSelectionCallBack(selectedProgram, originalProgram);
+                control.timerSelectionCallBack(selectedProgram);
             }
         }
         dialog.dispose();
@@ -210,18 +205,18 @@ public class TimerSelectionDialog implements ActionListener, WindowClosingIf {
         if (prog.getLength() > 0) {
             endTime.add(Calendar.MINUTE, prog.getLength());
         } else if (model.getSize() > selectedIndex + 1) {
-            Program next = (Program) model.get(selectedIndex + 1);
+            Program next = model.get(selectedIndex + 1);
             Calendar startOfNextProgram = getStartTime(next);
             endTime = startOfNextProgram;
         } else {
-            throw new RuntimeException("Duration of selected program is unknown");
+            throw new ProgramDurationUnknownException();
         }
 
         return endTime;
     }
 
     private Calendar getCalendarForDate(Program prog) {
-        Calendar cal = GregorianCalendar.getInstance();
+        Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MILLISECOND, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.DAY_OF_MONTH, prog.getDate().getDayOfMonth());

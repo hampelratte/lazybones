@@ -65,9 +65,9 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
     private final JLabel conflicting = new JLabel();
     private LazyBonesTimer timer;
 
-    private final Color background = UIManager.getColor("List.background");
+    private final Color listBackground = UIManager.getColor("List.background");
     private final Color altBackground = UIManager.getColor("Panel.background");
-    private final Color inactive = Color.LIGHT_GRAY;
+    private static final Color inactive = Color.LIGHT_GRAY;
 
     public TimerListCellRenderer() {
         initGUI();
@@ -111,26 +111,9 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
     @Override
     public Component getListCellRendererComponent(JList<? extends LazyBonesTimer> list, LazyBonesTimer value, int index, boolean isSelected,
             boolean cellHasFocus) {
-        if (isSelected) {
-            setBackground(UIManager.getColor("List.selectionBackground"));
-            time.setForeground(UIManager.getColor("List.selectionForeground"));
-            title.setForeground(UIManager.getColor("List.selectionForeground"));
-            channel.setForeground(UIManager.getColor("List.selectionForeground"));
-            date.setForeground(UIManager.getColor("List.selectionForeground"));
-            recording.setForeground(UIManager.getColor("List.selectionForeground"));
-            conflicting.setForeground(UIManager.getColor("List.selectionForeground"));
-        } else {
-            setBackground(index % 2 == 0 ? background : altBackground);
-            time.setForeground(UIManager.getColor("List.foreground"));
-            title.setForeground(UIManager.getColor("List.foreground"));
-            channel.setForeground(UIManager.getColor("List.foreground"));
-            date.setForeground(UIManager.getColor("List.foreground"));
-            recording.setForeground(UIManager.getColor("List.foreground"));
-            conflicting.setForeground(UIManager.getColor("List.foreground"));
-        }
+    	setColors(index, isSelected);
 
         if (value instanceof LazyBonesTimer) {
-            // LazyBonesTimer timer = value;
             timer = value;
 
             if (!timer.isActive()) {
@@ -192,7 +175,27 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
         }
     }
 
-    @Override
+    private void setColors(int index, boolean isSelected) {
+        if (isSelected) {
+            setBackground(UIManager.getColor("List.selectionBackground"));
+            time.setForeground(UIManager.getColor("List.selectionForeground"));
+            title.setForeground(UIManager.getColor("List.selectionForeground"));
+            channel.setForeground(UIManager.getColor("List.selectionForeground"));
+            date.setForeground(UIManager.getColor("List.selectionForeground"));
+            recording.setForeground(UIManager.getColor("List.selectionForeground"));
+            conflicting.setForeground(UIManager.getColor("List.selectionForeground"));
+        } else {
+            setBackground(index % 2 == 0 ? listBackground : altBackground);
+            time.setForeground(UIManager.getColor("List.foreground"));
+            title.setForeground(UIManager.getColor("List.foreground"));
+            channel.setForeground(UIManager.getColor("List.foreground"));
+            date.setForeground(UIManager.getColor("List.foreground"));
+            recording.setForeground(UIManager.getColor("List.foreground"));
+            conflicting.setForeground(UIManager.getColor("List.foreground"));
+        }
+	}
+
+	@Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -207,7 +210,7 @@ public class TimerListCellRenderer extends JPanel implements ListCellRenderer<La
 
                     long durationMinutes = 1440;
                     double pixelsPerMinute = (double) getWidth() / (double) durationMinutes;
-                    long startMinute = conflictStart.get(Calendar.HOUR_OF_DAY) * 60 + conflictStart.get(Calendar.MINUTE);
+                    long startMinute = conflictStart.get(Calendar.HOUR_OF_DAY) * 60L + conflictStart.get(Calendar.MINUTE);
                     int x = (int) Math.ceil(pixelsPerMinute * startMinute);
                     int width = (int) (pixelsPerMinute * Utilities.getDiffInMinutes(conflictStart, conflictEnd));
                     g.fillRect(x, 0, width, getHeight() - 1);

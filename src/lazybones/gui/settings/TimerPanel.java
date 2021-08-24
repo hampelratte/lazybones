@@ -68,7 +68,7 @@ import lazybones.TitleMapping;
 import lazybones.gui.components.historycombobox.JHistoryComboBox;
 
 public class TimerPanel implements MouseListener, ActionListener {
-    private static transient Logger logger = LoggerFactory.getLogger(TimerPanel.class);
+    private static Logger logger = LoggerFactory.getLogger(TimerPanel.class);
 
     private final String lBefore = LazyBones.getTranslation("before", "Buffer before program");
 
@@ -82,7 +82,8 @@ public class TimerPanel implements MouseListener, ActionListener {
 
     private JSpinner after;
 
-    private JLabel labBefore, labAfter;
+    private JLabel labBefore;
+    private JLabel labAfter;
 
     private JLabel lPrio = new JLabel(LazyBones.getTranslation("priority", "Priority"));
 
@@ -142,18 +143,18 @@ public class TimerPanel implements MouseListener, ActionListener {
     @SuppressWarnings("unchecked")
     private void initComponents() {
         Properties props = LazyBones.getProperties();
-        int int_before = Integer.parseInt(props.getProperty("timer.before"));
-        int int_after = Integer.parseInt(props.getProperty("timer.after"));
-        int int_prio = Integer.parseInt(props.getProperty("timer.prio"));
-        int int_lifetime = Integer.parseInt(props.getProperty("timer.lifetime"));
-        int int_numberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
-        int int_timelineStartHour = Integer.parseInt(props.getProperty("timelineStartHour"));
+        int intBefore = Integer.parseInt(props.getProperty("timer.before"));
+        int intAfter = Integer.parseInt(props.getProperty("timer.after"));
+        int intPrio = Integer.parseInt(props.getProperty("timer.prio"));
+        int intLifetime = Integer.parseInt(props.getProperty("timer.lifetime"));
+        int intNumberOfCards = Integer.parseInt(props.getProperty("numberOfCards"));
+        int intTimelineStartHour = Integer.parseInt(props.getProperty("timelineStartHour"));
         String descSourceTvb = props.getProperty("descSourceTvb");
         String seriesTitle = props.getProperty("timer.series.title");
         boolean vpsDefault = Boolean.parseBoolean(props.getProperty("vps.default"));
         boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
         boolean showTimerConflictsInList = Boolean.parseBoolean(props.getProperty("timer.conflicts.inTimerList", "true"));
-        List<String> defaultDirectoryHistory = new ArrayList<String>();
+        List<String> defaultDirectoryHistory = new ArrayList<>();
 
         // load default directory history
         XStream xstream = new XStream();
@@ -164,7 +165,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         }
 
         before = new JSpinner();
-        before.setValue(new Integer(int_before));
+        before.setValue(intBefore);
         before.setToolTipText(ttBefore);
         ((JSpinner.DefaultEditor) before.getEditor()).getTextField().setColumns(2);
         labBefore = new JLabel(lBefore);
@@ -174,25 +175,25 @@ public class TimerPanel implements MouseListener, ActionListener {
         after = new JSpinner();
         ((JSpinner.DefaultEditor) after.getEditor()).getTextField().setColumns(2);
         after.setToolTipText(ttAfter);
-        after.setValue(new Integer(int_after));
+        after.setValue(intAfter);
         labAfter = new JLabel(lAfter);
         labAfter.setToolTipText(ttAfter);
         labAfter.setLabelFor(after);
 
         prio = new JSpinner();
         ((JSpinner.DefaultEditor) prio.getEditor()).getTextField().setColumns(2);
-        prio.setModel(new SpinnerNumberModel(int_prio, 0, 99, 1));
+        prio.setModel(new SpinnerNumberModel(intPrio, 0, 99, 1));
         lifetime = new JSpinner();
         ((JSpinner.DefaultEditor) lifetime.getEditor()).getTextField().setColumns(2);
-        lifetime.setModel(new SpinnerNumberModel(int_lifetime, 0, 99, 1));
+        lifetime.setModel(new SpinnerNumberModel(intLifetime, 0, 99, 1));
 
         numberOfCards = new JSpinner();
         ((JSpinner.DefaultEditor) numberOfCards.getEditor()).getTextField().setColumns(2);
-        numberOfCards.setModel(new SpinnerNumberModel(int_numberOfCards, 1, 10, 1));
+        numberOfCards.setModel(new SpinnerNumberModel(intNumberOfCards, 1, 10, 1));
 
         timelineStartHour = new JSpinner();
         ((JSpinner.DefaultEditor) timelineStartHour.getEditor()).getTextField().setColumns(2);
-        timelineStartHour.setModel(new SpinnerNumberModel(int_timelineStartHour, 0, 23, 1));
+        timelineStartHour.setModel(new SpinnerNumberModel(intTimelineStartHour, 0, 23, 1));
 
         labMappings = new JLabel(lMappings);
         mappingTable = new JTable(timerManager.getTitleMapping());
@@ -217,7 +218,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         delRow.addActionListener(this);
 
         lDescSource = new JLabel(LazyBones.getTranslation("desc_source", "Timer description"));
-        cbDescSource = new JComboBox<DescriptionSelectorItem>();
+        cbDescSource = new JComboBox<>();
         DescriptionComboBoxModel dcbm = new DescriptionComboBoxModel(true, false);
         dcbm.setSelected(descSourceTvb);
         cbDescSource.setModel(dcbm);
@@ -245,10 +246,6 @@ public class TimerPanel implements MouseListener, ActionListener {
     public JPanel getPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagLayout panelLayout = new GridBagLayout();
-        // panelLayout.columnWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1 };
-        // panelLayout.columnWidths = new int[] { 7, 7, 7, 7, 7 };
-        // panelLayout.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1 };
-        // panelLayout.rowHeights = new int[] { 7, 7, 7, 20, 7, 7, 29, 7 };
         panel.setLayout(panelLayout);
         panel.setPreferredSize(new java.awt.Dimension(1021, 672));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -385,7 +382,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         panel.add(lLifetime, gbc);
 
         gbc.gridx = 3;
-        gbc.gridy = row++;
+        gbc.gridy = row;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel.add(lifetime, gbc);
         return panel;
@@ -417,18 +414,22 @@ public class TimerPanel implements MouseListener, ActionListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        // not interested in this event
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        // not interested in this event
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+        // not interested in this event
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        // not interested in this event
     }
 
     @Override

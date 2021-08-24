@@ -35,8 +35,8 @@ import lazybones.LazyBones;
 
 public class ConnectionFilter implements Filter {
 
-    public boolean isLoggable(LogRecord record) {
-        if (record.getLoggerName().equals(LoggingConstants.CONNECTION_LOGGER)) {
+    public boolean isLoggable(LogRecord logRecord) {
+        if (logRecord.getLoggerName().equals(LoggingConstants.CONNECTION_LOGGER)) {
             return Boolean.TRUE.toString().equals(LazyBones.getProperties().getProperty("logConnectionErrors"));
         }
 

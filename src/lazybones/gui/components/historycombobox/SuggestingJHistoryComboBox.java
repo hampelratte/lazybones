@@ -40,9 +40,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyListener {
 
     private EventConsumingPlainDocument doc = new EventConsumingPlainDocument();
@@ -80,7 +77,7 @@ public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyL
     }
 
     public SuggestingJHistoryComboBox() {
-        this(new ArrayList<String>());
+        this(new ArrayList<>());
     }
 
     @Override
@@ -99,7 +96,6 @@ public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyL
         }
     }
 
-    Logger logger = LoggerFactory.getLogger(SuggestingJHistoryComboBox.class);
     private void suggest() {
         JTextField textField = (JTextField) getEditor().getEditorComponent();
         String text = textField.getText();
@@ -127,9 +123,11 @@ public class SuggestingJHistoryComboBox extends JHistoryComboBox implements KeyL
 
     @Override
     public void keyPressed(KeyEvent e) {
+    	// not interested in this event
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
+    	// not interested in this event
     }
 }

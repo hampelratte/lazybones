@@ -8,7 +8,7 @@ import lazybones.utils.Period;
 
 public class Conflict {
     private Period period = new Period();
-    private Set<LazyBonesTimer> involvedTimers = new HashSet<LazyBonesTimer>();
+    private Set<LazyBonesTimer> involvedTimers = new HashSet<>();
 
     public Period getPeriod() {
         return period;
