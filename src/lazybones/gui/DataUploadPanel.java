@@ -151,11 +151,11 @@ public class DataUploadPanel extends JPanel {
 			sb.append(eventID).append(' ').append(startTime).append(' ').append(duration).append(" 0\n");
 
 			// T
-			sb.append("T ").append(prog.getTitle().replace("\n", "\\|")).append("\n");
+			sb.append("T ").append(prog.getTitle().replace("\n", "|")).append("\n");
 
 			// D, if exists
 			if (prog.getDescription() != null && !prog.getDescription().isEmpty()) {
-				sb.append("D ").append(prog.getDescription().replace("\n", "\\|")).append("\n");
+				sb.append("D ").append(prog.getDescription().replace("\n", "|")).append("\n");
 			}
 
 			sb.append("e\n");
