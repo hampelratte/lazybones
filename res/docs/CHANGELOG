@@ -3,6 +3,7 @@ Lazy Bones 1.6.0
 * Support TV-Browser 4.2.3
 * Added indicator icon for erroneous recordings
 * Added possbility to sort by erroneous recordings
+* Fixed start time set to wrong date when scrolling the time to previous day
 
 Lazy Bones 1.5.6
 ===============================================================================
