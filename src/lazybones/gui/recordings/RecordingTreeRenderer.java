@@ -22,15 +22,14 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
                   
     private final transient Icon iconNew;
     private final transient Icon iconCut;
-    private final transient Icon iconBoth;
+    private final transient Icon iconError;
     private final transient Icon iconClosed;
     private final transient Icon iconOpened;
 
     public RecordingTreeRenderer() {
         iconNew = LazyBones.getInstance().getIcon("lazybones/new.png");
         iconCut = LazyBones.getInstance().getIcon("lazybones/edit-cut.png");
-        List<Icon> combined = List.of(iconNew, iconCut);
-        iconBoth = new CombinedIcon(combined, 2);
+        iconError = LazyBones.getInstance().getIcon("lazybones/image-missing.png");
         iconClosed = UIManager.getIcon("Tree.closedIcon");
         iconOpened = UIManager.getIcon("Tree.openIcon");
 
@@ -85,20 +84,25 @@ public class RecordingTreeRenderer extends JLabel implements TreeCellRenderer {
             Recording recording = (Recording) value;
             setHorizontalTextPosition(LEADING);
             setIconTextGap(10);
+            
+            var combined = new ArrayList<Icon>();
             if (recording.isNew()) {
-                if (recording.isCut()) {
-                    setIcon(iconBoth);
-                    setDisabledIcon(iconBoth);
-                } else {
-                    setIcon(iconNew);
-                    setDisabledIcon(iconNew);
-                }
-            } else if (recording.isCut()) {
-                setIcon(iconCut);
-                setDisabledIcon(iconCut);
+            	combined.add(iconNew);
+            }
+            if (recording.isCut()) {
+            	combined.add(iconCut);
+            }
+            if (recording.hasError()) {
+            	combined.add(iconError);
+            }
+            
+            if (combined.isEmpty()) {
+            	setIcon(null);
+            	setDisabledIcon(null);
             } else {
-                setIcon(null);
-                setDisabledIcon(null);
+            	var iconAll = new CombinedIcon(combined, combined.size());
+            	setIcon(iconAll);
+            	setDisabledIcon(iconAll);
             }
         } else {
             setHorizontalTextPosition(TRAILING);
