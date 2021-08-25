@@ -8,8 +8,8 @@ programming and editing of recording timers and comes with a remote control
 
 Requirements
 ================================================================================
- * Oracle JRE 1.8 (others might work as well)
- * TV-Browser >= 3.2
+ * Java 11 (others might work as well)
+ * TV-Browser >= 4.2.3
 
 
 Installation / Configuration
