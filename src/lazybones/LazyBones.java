@@ -786,7 +786,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     @Override
-    public boolean receivePrograms(Program[] programArr, ProgramReceiveTarget receiveTarget) {
+    public boolean receivePrograms(int eventType, Program[] programArr, ProgramReceiveTarget receiveTarget) {
         logger.debug("Program received for target [{}]", receiveTarget.getTargetId());
         if (TARGET_CAPTURE.equals(receiveTarget.getTargetId())) {
             // store current property values
@@ -820,7 +820,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     @Override
-    public int getMarkPriorityForProgram(Program p) {
+    public int getMarkPriorityMaxForProgram(Program p) {
         LazyBonesTimer timer = timerManager.getTimer(p);
         if (timer != null && !timer.isActive()) {
 		    return Program.PRIORITY_MARK_MIN;
