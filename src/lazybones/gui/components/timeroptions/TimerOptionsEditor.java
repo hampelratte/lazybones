@@ -603,14 +603,15 @@ public class TimerOptionsEditor extends JPanel implements ItemListener, WindowLi
 		timer.changeStateTo(Timer.ACTIVE, cbActive.isSelected());
 		timer.changeStateTo(Timer.VPS, cbVps.isSelected());
 
-		timer.getStartTime().set(Calendar.HOUR_OF_DAY,
-				((Calendar) spinnerStarttimeModel.getValue()).get(Calendar.HOUR_OF_DAY));
-		timer.getStartTime().set(Calendar.MINUTE, ((Calendar) spinnerStarttimeModel.getValue()).get(Calendar.MINUTE));
+		Calendar startTime = (Calendar) spinnerStarttimeModel.getValue();
+		timer.getStartTime().setTimeInMillis(startTime.getTimeInMillis());
 		timer.getStartTime().set(Calendar.SECOND, 0);
-		timer.getEndTime().set(Calendar.HOUR_OF_DAY,
-				((Calendar) spinnerEndtimeModel.getValue()).get(Calendar.HOUR_OF_DAY));
-		timer.getEndTime().set(Calendar.MINUTE, ((Calendar) spinnerEndtimeModel.getValue()).get(Calendar.MINUTE));
+		timer.getStartTime().set(Calendar.MILLISECOND, 0);
+		
+		Calendar endTime = (Calendar) spinnerEndtimeModel.getValue();
+		timer.getEndTime().setTimeInMillis(endTime.getTimeInMillis());
 		timer.getEndTime().set(Calendar.SECOND, 0);
+		timer.getEndTime().set(Calendar.MILLISECOND, 0);
 		return timer;
 	}
 
