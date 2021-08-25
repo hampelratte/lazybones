@@ -1,3 +1,9 @@
+Lazy Bones 1.6.0
+===============================================================================
+* Support TV-Browser 4.2.3
+* Added indicator icon for erroneous recordings
+* Added possbility to sort by erroneous recordings
+
 Lazy Bones 1.5.6
 ===============================================================================
 * Added possibility to sort recordings by their length
