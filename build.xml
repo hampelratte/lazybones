@@ -21,7 +21,11 @@
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
 
-		<javac source="11" target="11" srcdir="${svdrp.src.dir}" destdir="${classes.dir}" deprecation="true" debug="true" encoding="utf-8" includeantruntime="false">
+		<javac
+			source="${java.required.version}" target="${java.required.version}"
+			modulepath="${system.modules.path}"
+			srcdir="${svdrp.src.dir}" destdir="${classes.dir}" 
+			deprecation="true" debug="true" encoding="utf-8" includeantruntime="false">
 			<classpath>
 				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
@@ -122,7 +126,7 @@
 
 	<target name="checklist" description="Checklist of things to do before releasing a version.">
 		<!-- Make sure that the right java version is used for the build -->
-        <input message="Are you using the correct Java version?" validargs="y,n" addproperty="check.java.version" />
+        <input message="Are you using the correct Java version (${java.required.version})?" validargs="y,n" addproperty="check.java.version" />
         <condition property="do.abort">
             <equals arg1="n" arg2="${check.java.version}" />
         </condition>
