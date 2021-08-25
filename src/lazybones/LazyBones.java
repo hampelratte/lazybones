@@ -191,7 +191,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     public static Version getVersion() {
-        return new Version(1, 56, 0, true);
+        return new Version(1, 60, 0, true);
     }
 
     public MainDialog getMainDialog() {
