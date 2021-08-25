@@ -823,9 +823,9 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     public int getMarkPriorityForProgram(Program p) {
         LazyBonesTimer timer = timerManager.getTimer(p);
         if (timer != null && !timer.isActive()) {
-            return Program.getHighlightingPriorityMaximum();
-        }
-        return Program.getHighlightingPriorityMaximum();
+		    return Program.PRIORITY_MARK_MIN;
+		}
+        return Program.getHighlightingPriorityMaximum() - 1;
     }
 
     @Override
