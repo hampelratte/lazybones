@@ -28,49 +28,8 @@
  */
 package lazybones;
 
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
-import org.hampelratte.svdrp.Response;
-import org.hampelratte.svdrp.commands.CHAN;
-import org.hampelratte.svdrp.commands.NEWT;
-import org.hampelratte.svdrp.responses.highlevel.Channel;
-import org.hampelratte.svdrp.responses.highlevel.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thoughtworks.xstream.XStream;
-
-import devplugin.ActionMenu;
-import devplugin.ButtonAction;
-import devplugin.Marker;
-import devplugin.Plugin;
-import devplugin.PluginCenterPanel;
-import devplugin.PluginCenterPanelWrapper;
-import devplugin.PluginInfo;
-import devplugin.PluginTreeNode;
-import devplugin.Program;
-import devplugin.ProgramReceiveTarget;
-import devplugin.Version;
+import devplugin.*;
 import lazybones.gui.MainDialog;
 import lazybones.gui.RecordingsCenterPanel;
 import lazybones.gui.TimelineCenterPanel;
@@ -83,7 +42,24 @@ import lazybones.logging.PopupHandler;
 import lazybones.logging.SimpleFormatter;
 import lazybones.programmanager.ProgramDatabase;
 import lazybones.programmanager.ProgramManager;
+import org.hampelratte.svdrp.Response;
+import org.hampelratte.svdrp.commands.CHAN;
+import org.hampelratte.svdrp.commands.NEWT;
+import org.hampelratte.svdrp.responses.highlevel.Channel;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tvbrowser.core.Settings;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 
 /**
  * A remote control plugin for VDR
@@ -93,7 +69,7 @@ import tvbrowser.core.Settings;
  */
 public class LazyBones extends Plugin implements TimersChangedListener {
 
-    private static Logger logger = LoggerFactory.getLogger(LazyBones.class);
+    private static final Logger logger = LoggerFactory.getLogger(LazyBones.class);
 
     /** Translator */
     private static final util.i18n.Localizer mLocalizer = util.i18n.Localizer.getLocalizerFor(LazyBones.class);
@@ -165,7 +141,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
         int bufferAfter = Integer.parseInt(props.getProperty("timer.after"));
 
         LazyBonesTimer t = ((TimerProgram) selectedProgram).getTimer();
-        // start the recording x min before the beggining of the program
+        // start the recording x min before the beginning of the program
         t.getStartTime().add(Calendar.MINUTE, -bufferBefore);
         // stop the recording x min after the end of the program
         t.getEndTime().add(Calendar.MINUTE, bufferAfter);
@@ -213,7 +189,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
             try {
                 Player.stop();
             } catch (Exception e) {
-            	// fail silently, it's fine
+                // fail silently, it's fine
             }
         }
     }
@@ -333,6 +309,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     @SuppressWarnings("unchecked")
     private void loadData() {
         XStream xstream = new XStream();
+        xstream.allowTypesByRegExp(new String[]{"org\\.hampelratte.*"});
 
         // load title mapping
         try {
@@ -415,11 +392,11 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     private void initLogging() {
         String logDirectory = Settings.propLogdirectory.getString();
         if (logDirectory != null && System.getProperty("java.util.logging.config.file") == null) {
-		    // no logging config file is set, so we can adjust the logging level by ourselves
-		    java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
-		    rootLogger.setLevel(Level.FINE);
-		    logger.info("No logging configuration defined. Setting logging level to Level.FINE");
-		}
+            // no logging config file is set, so we can adjust the logging level by ourselves
+            java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
+            rootLogger.setLevel(Level.FINE);
+            logger.info("No logging configuration defined. Setting logging level to Level.FINE");
+        }
 
         // create our special logging components
         SimpleFormatter formatter = new SimpleFormatter();
@@ -475,6 +452,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
 
     private void storeData() {
         XStream xstream = new XStream();
+        xstream.allowTypesByRegExp(new String[] {"org\\.hampelratte.*"});
         props.setProperty("channelMapping", xstream.toXML(ChannelManager.getChannelMapping()));
         props.setProperty("timers", xstream.toXML(timerManager.getTimers()));
         props.setProperty("titleMapping", xstream.toXML(timerManager.getTitleMapping().getAsMap()));
@@ -508,7 +486,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
 
         for (LazyBonesTimer timer : timerManager.getTimers()) {
             if (timer.isAssigned()) {
-            	addProgramsToPluginTree(node, timer.getTvBrowserProgIDs());
+                addProgramsToPluginTree(node, timer.getTvBrowserProgIDs());
             }
         }
 
@@ -516,21 +494,21 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     private void addProgramsToPluginTree(PluginTreeNode node, List<String> tvBrowserProgIDs) {
-    	for (String progID : tvBrowserProgIDs) {
-    		Program prog = ProgramDatabase.getProgram(progID);
-    		if (prog != null) {
-    			node.addProgram(prog);
-    		} else { // can be null, if program time is near 00:00, because then
-    			// the wrong day is taken to ask tvb for the programm
-    			prog = ProgramDatabase.getProgram(progID);
-    			if (prog != null) {
-    				node.addProgram(prog);
-    			}
-    		}
-    	}
-	}
+        for (String progID : tvBrowserProgIDs) {
+            Program prog = ProgramDatabase.getProgram(progID);
+            if (prog != null) {
+                node.addProgram(prog);
+            } else { // can be null, if program time is near 00:00, because then
+                // the wrong day is taken to ask tvb for the programm
+                prog = ProgramDatabase.getProgram(progID);
+                if (prog != null) {
+                    node.addProgram(prog);
+                }
+            }
+        }
+    }
 
-	@Override
+    @Override
     public boolean canUseProgramTree() {
         return true;
     }
@@ -557,9 +535,9 @@ public class LazyBones extends Plugin implements TimersChangedListener {
 
     @Override
     public void timersChanged(TimersChangedEvent evt) {
-    	updateTree();
+        updateTree();
     }
-    
+
     public void synchronize() {
         timerManager.synchronize();
         recordingManager.synchronize();
@@ -631,17 +609,17 @@ public class LazyBones extends Plugin implements TimersChangedListener {
 
             List<ActionMenu> actions = new ArrayList<>(size);
             AbstractAction watch = new AbstractAction() {
-            	@Override
-            	public void actionPerformed(ActionEvent evt) {
-            		Player.play(program);
-            	}
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    Player.play(program);
+                }
             };
             watch.putValue(Action.NAME, LazyBones.getTranslation("watch", "Watch this channel"));
             watch.putValue(Action.SMALL_ICON, createImageIcon("actions", "media-playback-start", 16));
             actions.add(new ActionMenu(watch));
-            
+
             if (marked) {
-            	addActionMenuForMarkedProgram(actions, program);
+                addActionMenuForMarkedProgram(actions, program);
             } else {
                 addActionMenuForUnmarkedProgram(actions, program, notAssignedTimersExist);
             }
@@ -713,9 +691,9 @@ public class LazyBones extends Plugin implements TimersChangedListener {
                 ImageIcon icon = createImageIcon("lazybones/appointment-new.png");
                 actions.add(new ActionMenu(name, icon, timers));
             }
-		}
+        }
 
-		private void addActionMenuForMarkedProgram(List<ActionMenu> actions, Program program) {
+        private void addActionMenuForMarkedProgram(List<ActionMenu> actions, Program program) {
             AbstractAction action1 = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
@@ -748,9 +726,9 @@ public class LazyBones extends Plugin implements TimersChangedListener {
             action3.putValue(Action.NAME, LazyBones.getTranslation("resync", "Synchronize with VDR"));
             action3.putValue(Action.SMALL_ICON, createImageIcon("actions", "view-refresh", 16));
             actions.add(new ActionMenu(action3));
-		}
+        }
 
-		JPopupMenu simpleMenu;
+        JPopupMenu simpleMenu;
 
         public JPopupMenu createSimpleActionMenu(final LazyBonesTimer timer) {
             if (simpleMenu == null) {
@@ -823,8 +801,8 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     public int getMarkPriorityMaxForProgram(Program p) {
         LazyBonesTimer timer = timerManager.getTimer(p);
         if (timer != null && !timer.isActive()) {
-		    return Program.PRIORITY_MARK_MIN;
-		}
+            return Program.PRIORITY_MARK_MIN;
+        }
         return Program.getHighlightingPriorityMaximum() - 1;
     }
 
@@ -837,10 +815,10 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     public Icon[] getProgramTableIcons(Program program) {
         LazyBonesTimer timer = timerManager.getTimer(program);
         if (timer != null && timer.hasState(Timer.VPS)) {
-		    Icon[] icons = new ImageIcon[1];
-		    icons[0] = LazyBones.getInstance().getIcon("lazybones/vps16.png");
-		    return icons;
-		}
+            Icon[] icons = new ImageIcon[1];
+            icons[0] = LazyBones.getInstance().getIcon("lazybones/vps16.png");
+            return icons;
+        }
         return super.getProgramTableIcons(program);
     }
 }
