@@ -33,7 +33,9 @@
 			</classpath>
 		</javac>
 
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true" encoding="utf-8" includeantruntime="false">
+		<javac
+			source="${java.required.version}" target="${java.required.version}"
+			srcdir="${src.dir}" destdir="${classes.dir}" deprecation="true" debug="true" encoding="utf-8" includeantruntime="false">
 			<classpath>
 				<pathelement location="${tvbrowser.runtime.dir}/tvbrowser.jar" />
 				<pathelement location="${tvbrowser.runtime.dir}/plugins/CapturePlugin.jar" />

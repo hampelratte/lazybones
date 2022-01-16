@@ -13,13 +13,13 @@
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
     </src_description>
   </component>
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/build/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="11" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library name="nachocalendar-0.22.jar">
@@ -70,24 +70,6 @@
       <library name="mxparser-1.2.2.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/mxparser-1.2.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="xpp3_min-1.1.4c.jar">
-        <CLASSES>
-          <root url="file://lib/xpp3_min-1.1.4c.jar" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="xstream-1.4.10.jar">
-        <CLASSES>
-          <root url="file://lib/xstream-1.4.10.jar" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
