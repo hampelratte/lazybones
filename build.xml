@@ -65,10 +65,6 @@
 		</jar>
 	</target>
 
-	<!-- 
-	/opt/jdk-15.0.1/bin/java -Xms16m -Xmx1G -module-path=lib:tvbrowser.jar -Djava.library.path="/home/henni/devel/svdrp/tvbrowser/runtime/tvbrowser_linux" 
-	-splash:imgs/splash.png -Dpropertiesfile=linux.properties -m tvbrowser/tvbrowser.TVBrowser 
-	-->
 	<target name="run" depends="compile,jar" description="Run TV-Browser">
 		<java module="tvbrowser/tvbrowser.TVBrowser" dir="${tvbrowser.runtime.dir}" fork="true">
 			<jvmarg value="-Djava.util.logging.config.file=${basedir}/logging.properties"/>

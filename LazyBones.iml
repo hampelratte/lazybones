@@ -75,24 +75,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library name="xpp3_min-1.1.4c.jar">
-        <CLASSES>
-          <root url="file://lib/xpp3_min-1.1.4c.jar" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="xstream-1.4.10.jar">
-        <CLASSES>
-          <root url="file://lib/xstream-1.4.10.jar" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="module" module-name="svdrp4j" />
     <orderEntry type="module" module-name="tvbrowser" />
   </component>
