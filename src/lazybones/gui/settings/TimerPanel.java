@@ -45,18 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
+import devplugin.Program;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +57,7 @@ import lazybones.LazyBones;
 import lazybones.TimerManager;
 import lazybones.TitleMapping;
 import lazybones.gui.components.historycombobox.JHistoryComboBox;
+import util.ui.MarkPriorityComboBoxRenderer;
 
 public class TimerPanel implements MouseListener, ActionListener {
     private static Logger logger = LoggerFactory.getLogger(TimerPanel.class);
@@ -133,6 +125,9 @@ public class TimerPanel implements MouseListener, ActionListener {
     private JLabel lDefaultDirectory;
     private JHistoryComboBox cbDefaultDirectory;
 
+    private JLabel lMarkPriority;
+    private JComboBox<String> cbMarkPriority;
+
     private TimerManager timerManager;
 
     public TimerPanel(TimerManager timerManager) {
@@ -155,6 +150,7 @@ public class TimerPanel implements MouseListener, ActionListener {
         boolean showTimerConflicts = Boolean.parseBoolean(props.getProperty("timer.conflicts.show", "true"));
         boolean showTimerConflictsInList = Boolean.parseBoolean(props.getProperty("timer.conflicts.inTimerList", "true"));
         List<String> defaultDirectoryHistory = new ArrayList<>();
+        int selectedMarkPriority = Integer.parseInt(props.getProperty("markPriority")) + 1;
 
         // load default directory history
         XStream xstream = new XStream();
@@ -241,6 +237,17 @@ public class TimerPanel implements MouseListener, ActionListener {
 
         lDefaultDirectory = new JLabel(LazyBones.getTranslation("default_directory", "Default directory"));
         cbDefaultDirectory = new JHistoryComboBox(defaultDirectoryHistory);
+
+        lMarkPriority = new JLabel(LazyBones.getTranslation("mark_priority", "Mark priority"));
+        DefaultComboBoxModel<String> cbMarkPriorityModel = new DefaultComboBoxModel<>();
+        int maxPrio = Program.getHighlightingPriorityMaximum();
+        for (int i = Program.PRIORITY_MARK_NONE; i <= maxPrio; i++) {
+            cbMarkPriorityModel.addElement(i + " ".repeat(20));
+        }
+        cbMarkPriority = new JComboBox<>(cbMarkPriorityModel);
+        cbMarkPriority.setRenderer(new MarkPriorityComboBoxRenderer());
+        cbMarkPriority.setSelectedIndex(selectedMarkPriority);
+        cbMarkPriority.addItemListener(e -> props.setProperty("markPriority", Integer.toString(cbMarkPriority.getSelectedIndex()-1)));
     }
 
     public JPanel getPanel() {
@@ -346,14 +353,25 @@ public class TimerPanel implements MouseListener, ActionListener {
         // history combobox for the default directory
         gbc.gridx = 0;
         gbc.gridy = row;
-        gbc.insets = new Insets(5, 15, 30, 5);
+        gbc.insets = new Insets(5, 15, 5, 5);
         panel.add(lDefaultDirectory, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = row++;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridwidth = 3;
+        panel.add(cbDefaultDirectory, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.insets = new Insets(5, 15, 30, 5);
+        panel.add(lMarkPriority, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = row++;
         gbc.insets = new Insets(5, 5, 30, 5);
         gbc.gridwidth = 3;
-        panel.add(cbDefaultDirectory, gbc);
+        panel.add(cbMarkPriority, gbc);
 
         // mapping
         panel.add(labMappings, new GridBagConstraints(0, row++, 1, 1, 0.0, 0.0, WEST, NONE, new Insets(5, 15, 5, 5), 0, 0));
