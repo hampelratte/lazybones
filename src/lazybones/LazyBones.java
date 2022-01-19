@@ -297,6 +297,10 @@ public class LazyBones extends Plugin implements TimersChangedListener {
         timelineStartHour = timelineStartHour == null ? "5" : timelineStartHour;
         props.setProperty("timelineStartHour", timelineStartHour);
 
+        String markPriority = props.getProperty("markPriority");
+        markPriority = markPriority == null ? "3" : markPriority;
+        props.setProperty("markPriority", markPriority);
+
         VDRConnection.host = host;
         VDRConnection.port = Integer.parseInt(port);
         VDRConnection.timeout = Integer.parseInt(timeout);
@@ -803,7 +807,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
         if (timer != null && !timer.isActive()) {
             return Program.PRIORITY_MARK_MIN;
         }
-        return Program.getHighlightingPriorityMaximum() - 1;
+        return Integer.parseInt(props.getProperty("markPriority"));
     }
 
     @Override
