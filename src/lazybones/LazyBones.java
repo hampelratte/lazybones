@@ -314,6 +314,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     private void loadData() {
         XStream xstream = new XStream();
         xstream.allowTypesByRegExp(new String[]{"org\\.hampelratte.*"});
+        xstream.allowTypesByRegExp(new String[]{"lazybones\\..*"});
 
         // load title mapping
         try {
@@ -394,7 +395,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     private void initLogging() {
-        String logDirectory = Settings.Directories.LOG.getString();
+        String logDirectory = Settings.propLogdirectory.getString();
         if (logDirectory != null && System.getProperty("java.util.logging.config.file") == null) {
             // no logging config file is set, so we can adjust the logging level by ourselves
             java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
