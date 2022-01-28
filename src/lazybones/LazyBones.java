@@ -167,7 +167,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     public static Version getVersion() {
-        return new Version(1, 70, 0, true);
+        return new Version(1, 71, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -314,6 +314,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     private void loadData() {
         XStream xstream = new XStream();
         xstream.allowTypesByRegExp(new String[]{"org\\.hampelratte.*"});
+        xstream.allowTypesByRegExp(new String[]{"lazybones\\..*"});
 
         // load title mapping
         try {
