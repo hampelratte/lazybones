@@ -395,7 +395,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     private void initLogging() {
-        String logDirectory = Settings.propLogdirectory.getString();
+        String logDirectory = Settings.Directories.LOG.getString();
         if (logDirectory != null && System.getProperty("java.util.logging.config.file") == null) {
             // no logging config file is set, so we can adjust the logging level by ourselves
             java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
