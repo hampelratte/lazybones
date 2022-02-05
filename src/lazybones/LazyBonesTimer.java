@@ -29,22 +29,20 @@
 
 package lazybones;
 
-import static devplugin.Plugin.getPluginManager;
+import devplugin.Program;
+import lazybones.conflicts.Conflict;
+import lazybones.gui.settings.DescriptionSelectorItem;
+import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
+import org.hampelratte.svdrp.responses.highlevel.Timer;
+import util.paramhandler.ParamParser;
+import util.program.AbstractPluginProgramFormating;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-import lazybones.conflicts.Conflict;
-import lazybones.gui.settings.DescriptionSelectorItem;
-
-import org.hampelratte.svdrp.responses.highlevel.EPGEntry;
-import org.hampelratte.svdrp.responses.highlevel.Timer;
-
-import util.paramhandler.ParamParser;
-import util.program.AbstractPluginProgramFormating;
-import devplugin.Program;
+import static devplugin.Plugin.getPluginManager;
 
 public class LazyBonesTimer extends Timer {
 
@@ -55,6 +53,8 @@ public class LazyBonesTimer extends Timer {
     public static final int NOT_FOUND = 2;
     public static final int NO_CHANNEL = 3;
     public static final int NO_PROGRAM = 4;
+    public static final String TITLE = "TITLE";
+    public static final String EPISODE = "EPISODE";
 
     /**
      * The reason, why this Timer couldn't be assigned
@@ -148,8 +148,7 @@ public class LazyBonesTimer extends Timer {
     /**
      * Set the reason why this timer couldn't be assigned
      *
-     * @param reason
-     *            the reason why this timer couldn't be assigned
+     * @param reason the reason why this timer couldn't be assigned
      * @see #NO_CHANNEL
      * @see #NO_EPG
      * @see #NO_PROGRAM
@@ -161,35 +160,19 @@ public class LazyBonesTimer extends Timer {
     }
 
     /**
-     *
-     * @param id
+     * @param id program ID from TV-Browser
      */
     public void addTvBrowserProgID(String id) {
         tvBrowserProgIDs.add(id);
     }
 
-    /**
-     * Returns, if <code>this</code> starts between the start time and the end time of the given timer <code>timer</code>.
-     *
-     * @param timer
-     * @return
-     */
-	public boolean startsDuringTimer(LazyBonesTimer timer) {
-		return this.getStartTime().compareTo(timer.getStartTime()) >= 0
-				&& this.getStartTime().compareTo(timer.getEndTime()) <= 0;
-	}
-
     public List<Conflict> getConflicts() {
         return conflicts;
     }
 
-    public void addConflict(Conflict conflict) {
-        getConflicts().add(conflict);
-    }
-
     public String getDisplayTitle() {
-        if ("TITLE".equals(getPath()) && "EPISODE".equals(getTitle())) {
-            String displayTitle = "TITLE/EPISODE";
+        if (TITLE.equals(getPath()) && EPISODE.equals(getTitle())) {
+            String displayTitle = TITLE + '/' + EPISODE;
             if (getTvBrowserProgIDs() != null && !getTvBrowserProgIDs().isEmpty()) {
                 Program prog = getPluginManager().getProgram(getTvBrowserProgIDs().get(0));
                 if (prog != null) {
@@ -207,7 +190,6 @@ public class LazyBonesTimer extends Timer {
     }
 
     /**
-     *
      * @return This timer without time buffers
      */
     public LazyBonesTimer getTimerWithoutBuffers() {
@@ -230,10 +212,8 @@ public class LazyBonesTimer extends Timer {
     /**
      * Creates the description for a timer according to the setting in the configuration panel.
      *
-     * @param descVdr
-     *            The description provided by VDR
-     * @param prog
-     *            The program, which corresponds to this timer
+     * @param descVdr The description provided by VDR
+     * @param prog    The program, which corresponds to this timer
      * @return the description as String
      */
     public static String createDescription(String descriptionSelectorItemId, String descVdr, Program prog) {
@@ -272,8 +252,8 @@ public class LazyBonesTimer extends Timer {
 
     public boolean isSetForWeekdays(int... days) {
         boolean setForTheDays = true;
-        for (int i = 0; i < days.length; i++) {
-            setForTheDays = setForTheDays & getRepeatingDays()[days[i]]; // NOSONAR java:S2178
+        for (int day : days) {
+            setForTheDays = setForTheDays & getRepeatingDays()[day]; // NOSONAR java:S2178
         }
         return setForTheDays;
     }
