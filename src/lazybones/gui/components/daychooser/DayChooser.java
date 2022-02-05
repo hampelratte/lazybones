@@ -37,6 +37,8 @@ import java.util.Calendar;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import lazybones.LazyBonesTimer;
+import lazybones.gui.components.timeroptions.TimerOptionsEditor;
 import org.hampelratte.svdrp.responses.highlevel.Timer;
 
 import lazybones.LazyBones;
@@ -50,7 +52,8 @@ public class DayChooser extends BrowsePanel implements ActionListener, DateSelec
 
     private static final long serialVersionUID = -2936338063641916673L;
 
-    private Timer timer;
+    private LazyBonesTimer timer;
+    private TimerOptionsEditor timerOptionsEditor;
 
     private final JCheckBox monday = new JCheckBox(LazyBones.getTranslation("monday", "Monday"));
     private final JCheckBox tuesday = new JCheckBox(LazyBones.getTranslation("tuesday", "Tuesday"));
@@ -66,13 +69,9 @@ public class DayChooser extends BrowsePanel implements ActionListener, DateSelec
         initGUI();
     }
 
-    public DayChooser(Timer timer) {
-        setTimer(timer);
-        initGUI();
-    }
-
-    public void setTimer(Timer timer) {
+    public void setTimer(LazyBonesTimer timer, TimerOptionsEditor timerOptionsEditor) {
         this.timer = timer;
+        this.timerOptionsEditor = timerOptionsEditor;
     }
 
     private void initGUI() {
@@ -160,5 +159,6 @@ public class DayChooser extends BrowsePanel implements ActionListener, DateSelec
         updateTimer();
         String dayString = timer.getDayString();
         super.textfield.setText(dayString);
+        timerOptionsEditor.startTimeChanged();
     }
 }

@@ -167,7 +167,7 @@ public class LazyBones extends Plugin implements TimersChangedListener {
     }
 
     public static Version getVersion() {
-        return new Version(1, 71, 0, true);
+        return new Version(1, 72, 0, true);
     }
 
     public MainDialog getMainDialog() {
@@ -733,21 +733,16 @@ public class LazyBones extends Plugin implements TimersChangedListener {
             actions.add(new ActionMenu(action3));
         }
 
-        JPopupMenu simpleMenu;
-
         public JPopupMenu createSimpleActionMenu(final LazyBonesTimer timer) {
-            if (simpleMenu == null) {
-                simpleMenu = new JPopupMenu();
-                JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("actions", "edit-delete", 16));
-                delItem.addActionListener(e -> timerManager.deleteTimer(timer));
+            JPopupMenu simpleMenu = new JPopupMenu();
+            JMenuItem delItem = new JMenuItem(LazyBones.getTranslation("dont_capture", "Delete timer"), createImageIcon("actions", "edit-delete", 16));
+            delItem.addActionListener(e -> timerManager.deleteTimer(timer));
 
-                JMenuItem editItem = new JMenuItem(LazyBones.getTranslation("edit", "Edit Timer"), createImageIcon("actions", "document-edit", 16));
-                editItem.addActionListener(e -> timerManager.editTimer(timer));
+            JMenuItem editItem = new JMenuItem(LazyBones.getTranslation("edit", "Edit Timer"), createImageIcon("actions", "document-edit", 16));
+            editItem.addActionListener(e -> timerManager.editTimer(timer));
 
-                simpleMenu.add(editItem);
-                simpleMenu.add(delItem);
-            }
-
+            simpleMenu.add(editItem);
+            simpleMenu.add(delItem);
             return simpleMenu;
         }
 

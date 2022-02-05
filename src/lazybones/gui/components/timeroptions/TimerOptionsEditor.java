@@ -337,7 +337,7 @@ public class TimerOptionsEditor extends JPanel implements ItemListener, WindowLi
             setStartAndEndTime();
             priority.setModel(new SpinnerNumberModel(timer.getPriority(), 0, 99, 1));
             lifetime.setModel(new SpinnerNumberModel(timer.getLifetime(), 0, 99, 1));
-            dayChooser.setTimer(timer);
+            dayChooser.setTimer(timer, this);
             day.setText(timer.getDayString());
             setVpsCheckboxState();
         }
@@ -678,7 +678,14 @@ public class TimerOptionsEditor extends JPanel implements ItemListener, WindowLi
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == spinnerStarttime) {
             Calendar startTime = (Calendar) spinnerStarttimeModel.getValue();
-            day.setText(Integer.toString(startTime.get(Calendar.DAY_OF_MONTH)));
+            timer.setStartTime(startTime);
+            dayChooser.setTimer(timer, this);
+            day.setText(timer.getDayString());
         }
+    }
+
+    public void startTimeChanged() {
+        spinnerStarttimeModel.setValue(timer.getStartTime());
+        day.setText(timer.getDayString());
     }
 }
